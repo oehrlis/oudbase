@@ -137,7 +137,11 @@ function CleanAndQuit()
 tty >/dev/null 2>&1
 pTTY=$?
 
-# Define Logfile
+# Define Logfile but first reset LOG_BASE if directory does not exists
+if [ ! -d ${LOG_BASE} ]; then
+    export LOG_BASE="/tmp"
+fi
+
 LOGFILE="${LOG_BASE}/$(basename ${SCRIPT_NAME} .sh).log"
 touch ${LOGFILE} 2>/dev/null
 if [ $? -eq 0 ] && [ -w "${LOGFILE}" ]; then
@@ -204,7 +208,9 @@ fi
 
 # set the real directories based on the cli or defaul values
 export ORACLE_BASE=${INSTALL_ORACLE_BASE}
+export INSTALL_OUD_BASE=${INSTALL_OUD_BASE:-"${ORACLE_BASE}"}
 export OUD_BASE=${INSTALL_OUD_BASE:-"${ORACLE_BASE}"}
+export INSTALL_OUD_DATA=${INSTALL_OUD_DATA:-"${OUD_BASE}"}
 export OUD_DATA=${INSTALL_OUD_DATA:-"${OUD_BASE}"}
 export ORACLE_INSTANCE_BASE=${INSTALL_ORACLE_INSTANCE_BASE:-"${OUD_DATA}/instances"}
 export ORACLE_HOME_BASE=${INSTALL_ORACLE_HOME_BASE:-"${ORACLE_BASE}/middleware"}
@@ -224,8 +230,17 @@ DoMsg "SCRIPT_FQN           = $SCRIPT_FQN"
 DoMsg "Installing OUD Environment"
 DoMsg "Create required directories in ORACLE_BASE=${ORACLE_BASE}"
 
-for i in    ${OUD_DATA}/etc \
-            ${OUD_DATA}/log \
+# adjust LOG_BASE and ETC_BASE depending on OUD_DATA
+if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
+    export LOG_BASE=${OUD_LOCAL}/log
+    export ETC_BASE=${OUD_LOCAL}/etc
+else
+    export LOG_BASE=${OUD_DATA}/log
+    export ETC_BASE=${OUD_DATA}/etc
+fi
+
+for i in    ${LOG_BASE} \
+            ${ETC_BASE} \
             ${ORACLE_BASE}/local \
             ${OUD_BACKUP_BASE} \
             ${ORACLE_INSTANCE_BASE}; do
@@ -249,6 +264,12 @@ for i in    OUD_BACKUP_BASE \
         ${ORACLE_BASE}/local/bin/oudenv.sh && DoMsg "Store customization for $i (${!variable})"
     fi
 done
+
+# move the oud config to the OUD_DATE/etc folder
+if [ ! "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
+    DoMsg "Move ${OUD_BASE}/local/etc to ${OUD_DATA}/etc"
+    mv ${OUD_BASE}/local/etc/* ${OUD_DATA}/etc
+fi
 
 # Any script here will happen after the tar file extract.
 echo "# OUD Base Directory" >$HOME/.OUD_BASE

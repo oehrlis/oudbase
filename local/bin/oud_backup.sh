@@ -175,12 +175,12 @@ done
 if [ "$MyOUD_INSTANCES" = "" ]; then
     # Load list of OUD Instances from oudtab
     DoMsg "INFO : Load list of OUD instances"
-    if [ -f "${OUD_DATA}/etc/oudtab" ]; then 
+    if [ -f "${ETC_BASE}/oudtab" ]; then 
         # create a OUD Instance Liste based on oudtab
-        export OUDTAB=${OUD_DATA}/etc/oudtab
+        export OUDTAB=${ETC_BASE}/oudtab
         export OUD_INST_LIST=$(grep -v '^#' ${OUDTAB}|cut -f1 -d:)
     else
-        DoMsg "WARN : Could not load OUD list from \${OUD_DATA}/etc/oudtab"
+        DoMsg "WARN : Could not load OUD list from \${ETC_BASE}/oudtab"
         DoMsg "WARN : Fallback to \${OUD_DATA}/*/OUD"
         unset OUD_INST_LIST
         for i in ${ORACLE_INSTANCE_BASE}/*/OUD; do

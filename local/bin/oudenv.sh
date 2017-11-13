@@ -37,8 +37,8 @@
 # - ORACLE_HOME       define the backup base directory, defaults to ORACLE_BASE/middleware
 # - ORACLE_FMW_HOME   define the backup base directory, defaults to ORACLE_HOME
 # - JAVA_HOME         define the java home
-# - LOG_BASE          alternative log directory, defaults to OUD_DATA/log
-# - ETC_BASE          alternative etc/config directory, defaults to OUD_DATA/etc
+# - LOG_BASE          alternative log directory, defaults to OUD_BASE/local/log
+# - ETC_BASE          alternative etc/config directory, defaults to OUD_BASE/local/etc
 #
 # - Do not change anything below the customization section.
 # ---------------------------------------------------------------------------
@@ -58,8 +58,6 @@ export OUD_BACKUP_BASE=${OUD_BACKUP_BASE:-"${OUD_DATA}/backup"}
 export ORACLE_HOME=${ORACLE_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name oud-setup*)|sed 's/\/oud\/oud-setup$//'|head -n 1)"}
 export ORACLE_FMW_HOME=${ORACLE_FMW_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name oud-setup)|sed 's/\/oud\/oud-setup$//'|head -n 1)"}
 export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(which java)| sed "s:/bin/java::")}
-export LOG_BASE=${OUD_DATA}/log
-export ETC_BASE=${OUD_DATA}/etc
 # - EOF Environment Variables -----------------------------------------------
 
 # - Initialization ----------------------------------------------------------
@@ -94,16 +92,24 @@ else
     fi
 fi
 
+if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
+    export LOG_BASE=${OUD_LOCAL}/log
+    export ETC_BASE=${OUD_LOCAL}/etc
+else
+    export LOG_BASE=${OUD_DATA}/log
+    export ETC_BASE=${OUD_DATA}/etc
+fi
+
 # Load list of OUD Instances from oudtab
-if [ -f "${OUD_DATA}/etc/oudtab" ]; then 
+if [ -f "${ETC_BASE}/oudtab" ]; then 
     # create a OUD Instance Liste based on oudtab
-    export OUDTAB=${OUD_DATA}/etc/oudtab
+    export OUDTAB=${ETC_BASE}/oudtab
     export OUD_INST_LIST=$(grep -v '^#' ${OUDTAB}|cut -f1 -d:)
     
     # set a default OUD_INST_LIST if oudtab is empty
     if [ "${OUD_INST_LIST}" = "" ]; then
         # try to load instance list based on OUD instance base directory
-        echo "WARN : Could not find any OUD instance in \${OUD_DATA}/etc/oudtab"
+        echo "WARN : Could not find any OUD instance in \${ETC_BASE}/oudtab"
         echo "WARN : Fallback to \${OUD_DATA}/*/OUD"
         unset OUD_INST_LIST
         for i in "${OUD_INSTANCE_BASE}/*/OUD"; do
@@ -118,7 +124,7 @@ if [ -f "${OUD_DATA}/etc/oudtab" ]; then
     fi
 else
     # try to load instance list based on OUD instance base directory
-    echo "WARN : Could not load OUD list from \${OUD_DATA}/etc/oudtab"
+    echo "WARN : Could not load OUD list from \${ETC_BASE}/oudtab"
     echo "WARN : Fallback to \${OUD_DATA}/*/OUD"
     unset OUD_INST_LIST
     for i in "${OUD_INSTANCE_BASE}/*/OUD"; do
