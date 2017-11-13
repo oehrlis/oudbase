@@ -1,0 +1,54 @@
+# -----------------------------------------------------------------------
+#  Trivadis AG, Infrastructure Managed Services
+#  Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# -----------------------------------------------------------------------
+#  File-Name........: oud_instance.service
+#  Author...........: Stefan Oehrli, stefan.oehrli at trivadis.com
+#  Date.............: 07. Sept 2017
+#  Revision.........: 1.0
+#  Purpose..........: Unit file for ODSM domain
+#  Usage............: systemctl enable wls_odsm.service
+#  Notes............: 
+#           This is a template file for a systemd service for Oracle Unified 
+#           Directory instance. Adjust user, group, service name 
+#           directory path before using it.
+#
+#           Install the script:
+#           sudo cp oud_instance.service /usr/lib/systemd/system/
+#
+#           Enable the service:
+#           sudo systemctl enable oud_instance.service
+#
+#           Disable and deactivate the service:
+#           sudo systemctl disable oud_instance.service
+#
+#           Start the service manual:
+#           sudo systemctl start oud_instance.service
+#
+#           Stop the service manual:
+#           sudo systemctl stop oud_instance.service
+#
+# -----------------------------------------------------------------------
+#  Revision history.:  
+#  07.09.2017  soe     initial release
+#  10.11.2017  soe     Add notes how to use it
+# -----------------------------------------------------------------------
+
+[Unit]
+Description=OUD Instance
+Wants=network.target
+After=network.target
+ 
+[Service]
+Type=simple
+User=oracle
+Group=oinstall
+Environment=OPENDS_JAVA_HOME="/usr/java/jdk1.8.0_144/"
+ExecStart=/u01/instances/oud_cdse/OUD/bin/start-ds --quiet
+ExecStop=/u01/instances/oud_cdse/OUD/bin/stop-ds --quiet
+ExecReload=/u01/instances/oud_cdse/OUD/bin/stop-ds --restart --quiet
+StandardOutput=syslog
+
+ 
+[Install]
+WantedBy=multi-user.target

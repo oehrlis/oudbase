@@ -1,0 +1,12 @@
+2016-10-12_10:43:49  START: Start of oud_export.sh (Version 1.0) with 
+2016-10-12_10:43:49  INFO : Usage, oud_export.sh [-hv -m <MAILADDRESSES>]
+2016-10-12_10:43:49  INFO :   -h                 Usage (this message
+2016-10-12_10:43:49  INFO :   -v                 enable verbose mode
+2016-10-12_10:43:49  INFO :   -m <MAILADDRESSES> List of Mail Addresses
+2016-10-12_10:43:49  INFO : Logfile : /u00/app/oracle/local/log/oud_export.log
+2016-10-12_10:43:49  ERR  : Exit Code 1. Wrong amount of arguments. See usage for correct one.
+2016-10-12_10:44:01  START: Start of oud_export.sh (Version 1.0) with -v
+2016-10-12_10:44:01  INFO : processing commandline parameter
+2016-10-12_10:44:01  INFO : [oud_pi] Check if oud_pi is running
+2016-10-12_10:44:01  INFO : [oud_pi] OUD Instance oud_pi down, no export will be performed.
+2016-10-12_10:44:01  END  : of oud_export.sh

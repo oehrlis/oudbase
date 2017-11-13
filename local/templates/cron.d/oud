@@ -1,0 +1,32 @@
+# -----------------------------------------------------------------------------
+# $Id: $
+# -----------------------------------------------------------------------------
+# Trivadis AG, Business Development & Support (BDS)
+# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# -----------------------------------------------------------------------------
+# Name.......: oud
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Editor.....: $LastChangedBy: $
+# Date.......: $LastChangedDate: $
+# Revision...: $LastChangedRevision: $
+# Purpose....: Cronjob File for OUD Environment
+# Notes......: --
+# Reference..: --
+# -----------------------------------------------------------------------------
+# Rev History:
+# 11.10.2016   soe  Initial version
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# weekly full backup of all runing instances
+# -----------------------------------------------------------------------------
+0 19 * * 1   oracle /u00/app/oracle/local/bin/oud_backup.sh -t FULL -m oud@oradba.ch >> /tmp/oud_backup.out 2>&1
+
+# -----------------------------------------------------------------------------
+# daily incremental backup of all runing instances
+# -----------------------------------------------------------------------------
+0 19 * * 0,2,3,4,5,6   oracle /u00/app/oracle/local/bin/oud_backup.sh -t INCREMENTAL -m oud@oradba.ch >> /tmp/oud_backup.out 2>&1
+
+# -----------------------------------------------------------------------------
+# daily export of all runing instances
+# -----------------------------------------------------------------------------
+0 22 * * *   oracle /u00/app/oracle/local/bin/oud_export.sh -m oud@oradba.ch >> /tmp/oud_backup.out 2>&1

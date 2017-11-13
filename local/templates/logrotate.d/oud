@@ -1,0 +1,27 @@
+# -----------------------------------------------------------------------------
+# $Id: $
+# -----------------------------------------------------------------------------
+# Trivadis AG, Business Development & Support (BDS)
+# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# -----------------------------------------------------------------------------
+# Name.......: oud
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Editor.....: $LastChangedBy: $
+# Date.......: $LastChangedDate: $
+# Revision...: $LastChangedRevision: $
+# Purpose....: Logrotate configuration file for OUD Environment
+# Notes......: --
+# Reference..: --
+# -----------------------------------------------------------------------------
+# Rev History:
+# 11.10.2016   soe  Initial version
+# -----------------------------------------------------------------------------
+/u00/app/oracle/local/log/oud_backup.log
+/u00/app/oracle/local/log/oud_export.log
+/u00/app/oracle/local/log/oud_status.log
+{
+    compress
+    missingok
+    rotate=5
+    size=500k
+}
