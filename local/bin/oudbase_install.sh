@@ -47,7 +47,7 @@ function Usage()
     DoMsg "INFO :   -v                          enable verbose mode"
     DoMsg "INFO :   -b <ORACLE_BASE>            ORACLE_BASE Directory. Mandatory argument. This "
     DoMsg "INFO                                 directory is use as OUD_BASE directory"
-    DoMsg "INFO :   -o <OUD_BASE>               OUD_BASE Directory. (default \$OUD_BASE)."
+    DoMsg "INFO :   -o <OUD_BASE>               OUD_BASE Directory. (default \$ORACLE_BASE)."
     DoMsg "INFO :   -d <OUD_DATA>               OUD_DATA Directory. (default \$ORACLE_BASE). This directory has to be "
     DoMsg "INFO                                 specified to distinct persistant data from software eg. in a docker containers"
     DoMsg "INFO :   -i <ORACLE_INSTANCE_BASE>   Base directory for OUD instances (default \$OUD_DATA/instances)"

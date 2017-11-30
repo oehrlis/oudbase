@@ -92,6 +92,10 @@ else
     fi
 fi
 
+# set the ETC_CORE to the oud local directory
+export ETC_CORE=${OUD_LOCAL}/etc
+
+# set the log and etc base directory depending on OUD_DATA
 if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
     export LOG_BASE=${OUD_LOCAL}/log
     export ETC_BASE=${OUD_LOCAL}/etc
@@ -100,16 +104,22 @@ else
     export ETC_BASE=${OUD_DATA}/etc
 fi
 
-# Load list of OUD Instances from oudtab
-if [ -f "${ETC_BASE}/oudtab" ]; then 
-    # create a OUD Instance Liste based on oudtab
+# set the OUDTAB to ETC_BASE or fallback to ETC_CORE
+if [ -f "${ETC_BASE}/oudtab" ]; then
     export OUDTAB=${ETC_BASE}/oudtab
+else
+    export OUDTAB=${ETC_CORE}/oudtab
+fi
+
+# Load list of OUD Instances from oudtab
+if [ -f "${OUDTAB}" ]; then 
+    # create a OUD Instance Liste based on oudtab
     export OUD_INST_LIST=$(grep -v '^#' ${OUDTAB}|cut -f1 -d:)
     
     # set a default OUD_INST_LIST if oudtab is empty
     if [ "${OUD_INST_LIST}" = "" ]; then
         # try to load instance list based on OUD instance base directory
-        echo "WARN : Could not find any OUD instance in \${ETC_BASE}/oudtab"
+        echo "WARN : Could not find any OUD instance in ${OUDTAB}"
         echo "WARN : Fallback to \${OUD_DATA}/*/OUD"
         unset OUD_INST_LIST
         for i in "${OUD_INSTANCE_BASE}/*/OUD"; do
@@ -124,7 +134,7 @@ if [ -f "${ETC_BASE}/oudtab" ]; then
     fi
 else
     # try to load instance list based on OUD instance base directory
-    echo "WARN : Could not load OUD list from \${ETC_BASE}/oudtab"
+    echo "WARN : Could not load OUD list from ${OUDTAB}"
     echo "WARN : Fallback to \${OUD_DATA}/*/OUD"
     unset OUD_INST_LIST
     for i in "${OUD_INSTANCE_BASE}/*/OUD"; do
@@ -340,12 +350,16 @@ fi
 # set the new PATH
 export PATH=${OUD_LOCAL}/bin:${OUD_INSTANCE_HOME}/OUD/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
 
-if [ -f ${ETC_BASE}/${OUD_INSTANCE}_pwd.txt ]; then
-    export PWD_FILE=${ETC_BASE}/${OUD_INSTANCE}_pwd.txt
-else
-    export PWD_FILE=${ETC_BASE}/pwd.txt
+# source oudenv.conf file from core etc directory if it exits
+if [ -f "${ETC_CORE}/oudenv.conf" ]; then
+    . "${ETC_CORE}/oudenv.conf"
+fi 
+# source oud._DEFAULT_.conf from core etc directory if it exits
+if [ -f "${ETC_CORE}/oud._DEFAULT_.conf" ]; then
+    . "${ETC_CORE}/oud._DEFAULT_.conf"
 fi
 
+# start to source stuff from ETC_BASE
 # source oudenv.conf file to set environment variables and aliases
 if [ -f "${ETC_BASE}/oudenv.conf" ]; then
     . "${ETC_BASE}/oudenv.conf"
@@ -361,6 +375,13 @@ fi
 # source oud.<OUD_INSTANCE>.conf if exists
 if [ -f "${ETC_BASE}/oud.${OUD_INSTANCE}.conf" ]; then
     . "${ETC_BASE}/oud.${OUD_INSTANCE}.conf"
+fi
+
+# set the password file variable based on ETC_BASE
+if [ -f ${ETC_BASE}/${OUD_INSTANCE}_pwd.txt ]; then
+    export PWD_FILE=${ETC_BASE}/${OUD_INSTANCE}_pwd.txt
+else
+    export PWD_FILE=${ETC_BASE}/pwd.txt
 fi
 
 if [ ${pTTY} -eq 0 ] && [ "${SILENT}" = "" ]; then
