@@ -12,10 +12,8 @@ PATH=$PATH:$HOME/.local/bin:$HOME/bin
 export PATH
 
 # Check OUD_BASE and load if necessary
-if [ "${OUD_BASE}" = "" ]
-  then
-    if [ -f "${HOME}/.OUD_BASE" ]
-      then
+if [ "${OUD_BASE}" = "" ]; then
+    if [ -f "${HOME}/.OUD_BASE" ]; then
         . "${HOME}/.OUD_BASE"
       else
         echo "ERROR: Could not load ${HOME}/.OUD_BASE"

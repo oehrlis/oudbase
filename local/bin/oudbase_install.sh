@@ -40,11 +40,12 @@ ERROR=0
 function Usage()
 {
     VERBOSE="TRUE"
-    DoMsg "INFO : Usage, ${SCRIPT_NAME} [-hv] [-b <ORACLE_BASE>] "
+    DoMsg "INFO : Usage, ${SCRIPT_NAME} [-hav] [-b <ORACLE_BASE>] "
     DoMsg "INFO :   [-i <ORACLE_INSTANCE_BASE>] [-m <ORACLE_HOME_BASE>] [-B <OUD_BACKUP_BASE>]"
     DoMsg "INFO : "
     DoMsg "INFO :   -h                          Usage (this message)"
     DoMsg "INFO :   -v                          enable verbose mode"
+    DoMsg "INFO :   -a                          append to  profile eg. .bash_profile or .profile"
     DoMsg "INFO :   -b <ORACLE_BASE>            ORACLE_BASE Directory. Mandatory argument. This "
     DoMsg "INFO                                 directory is use as OUD_BASE directory"
     DoMsg "INFO :   -o <OUD_BASE>               OUD_BASE Directory. (default \$ORACLE_BASE)."
@@ -120,6 +121,7 @@ function CleanAndQuit()
         2)  DoMsg "ERR  : Exit Code ${1}. Wrong arguments (${2}). See usage for correct one.";;
         3)  DoMsg "ERR  : Exit Code ${1}. Missing mandatory argument ${2}. See usage for correct one.";;
         10) DoMsg "ERR  : Exit Code ${1}. OUD_BASE not set or $OUD_BASE not available.";;
+        20) DoMsg "ERR  : Exit Code ${1}. Can not append to profile.";;
         40) DoMsg "ERR  : Exit Code ${1}. This is not an Install package. Missing TAR section.";;
         41) DoMsg "ERR  : Exit Code ${1}. Error creating directory ${2}.";;
         42) DoMsg "ERR  : Exit Code ${1}. ORACEL_BASE directory not available";;
@@ -169,10 +171,11 @@ fi
 
 # usage and getopts
 DoMsg "INFO : processing commandline parameter"
-while getopts hvb:o:d:i:m:B:E: arg; do
+while getopts hvab:o:d:i:m:B:E: arg; do
     case $arg in
       h) Usage 0;;
       v) VERBOSE="TRUE";;
+      a) APPEND_PROFILE="TRUE";;
       b) INSTALL_ORACLE_BASE="${OPTARG}";;
       o) INSTALL_OUD_BASE="${OPTARG}";;
       d) INSTALL_OUD_DATA="${OPTARG}";;
@@ -268,7 +271,33 @@ done
 # move the oud config to the OUD_DATE/etc folder
 if [ ! "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
     DoMsg "Move ${OUD_BASE}/local/etc to ${OUD_DATA}/etc"
-    mv ${OUD_BASE}/local/etc/* ${OUD_DATA}/etc
+    mv ${ORACLE_BASE}/local/etc/* ${OUD_DATA}/etc
+fi
+
+# append to the profile....
+if [ "${APPEND_PROFILE}" = "TRUE" ]; then
+    if [ -f "${HOME}/.bash_profile" ]; then
+        PROFILE="${HOME}/.bash_profile"
+    elif [ -f "${HOME}/.bash_profile" ]; then
+        PROFILE="${HOME}/.bash_profile"
+    else
+        CleanAndQuit 20
+    fi
+    DoMsg "Append to profile ${PROFILE}"
+    echo '# Check OUD_BASE and load if necessary'             >>"${PROFILE}"
+    echo 'if [ "${OUD_BASE}" = "" ]; then'                    >>"${PROFILE}"
+    echo '  if [ -f "${HOME}/.OUD_BASE" ]; then'              >>"${PROFILE}"
+    echo '    . "${HOME}/.OUD_BASE"'                          >>"${PROFILE}"
+    echo '  else'                                             >>"${PROFILE}"
+    echo '    echo "ERROR: Could not load ${HOME}/.OUD_BASE"' >>"${PROFILE}"
+    echo '  fi'                                               >>"${PROFILE}"
+    echo 'fi'                                                 >>"${PROFILE}"
+    echo ''                                                   >>"${PROFILE}"
+    echo '# define an oudenv alias'                           >>"${PROFILE}"
+    echo 'alias oud=". $(find $OUD_BASE -name oudenv.sh)"'    >>"${PROFILE}"
+    echo ''                                                   >>"${PROFILE}"
+    echo '# source oud environment'                           >>"${PROFILE}"
+    echo '. $(find $OUD_BASE -name oudenv.sh)'                >>"${PROFILE}"
 fi
 
 # Any script here will happen after the tar file extract.
