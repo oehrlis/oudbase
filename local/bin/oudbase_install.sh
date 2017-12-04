@@ -268,12 +268,6 @@ for i in    OUD_BACKUP_BASE \
     fi
 done
 
-# move the oud config to the OUD_DATE/etc folder
-if [ ! "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
-    DoMsg "Move ${OUD_BASE}/local/etc to ${OUD_DATA}/etc"
-    mv ${ORACLE_BASE}/local/etc/* ${OUD_DATA}/etc
-fi
-
 # append to the profile....
 if [ "${APPEND_PROFILE}" = "TRUE" ]; then
     if [ -f "${HOME}/.bash_profile" ]; then
