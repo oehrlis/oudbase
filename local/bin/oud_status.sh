@@ -209,7 +209,6 @@ MybindDN=${MybindDN:-"cn=Directory Manager"}
 MybindPasswordFile=${MybindPasswordFile:-"${PWD_FILE}"}
 if [ ! -f "${MybindPasswordFile}" ]; then
     CleanAndQuit 43 ${MyOUD_INSTANCE}
-else
 fi  
 
 DoMsg "INFO : Run status on OUD Instance ${MyOUD_INSTANCE}"
