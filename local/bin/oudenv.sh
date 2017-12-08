@@ -55,9 +55,9 @@ export OUD_DATA=${OUD_DATA:-"/u01"}
 export OUD_LOCAL="${OUD_BASE}/local"            # sowiesoe
 export OUD_INSTANCE_BASE=${OUD_INSTANCE_BASE:-"${OUD_DATA}/instances"}
 export OUD_BACKUP_BASE=${OUD_BACKUP_BASE:-"${OUD_DATA}/backup"}
-export ORACLE_HOME=${ORACLE_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name oud-setup*)|sed 's/\/oud\/oud-setup$//'|head -n 1)"}
+export ORACLE_HOME=${ORACLE_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name oud-setup)|sed 's/\/oud\/oud-setup$//'|head -n 1)"}
 export ORACLE_FMW_HOME=${ORACLE_FMW_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name oud-setup)|sed 's/\/oud\/oud-setup$//'|head -n 1)"}
-export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(which java)| sed "s:/bin/java::")}
+export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(find ${ORACLE_BASE} -type f -name java|head -1)| sed "s:/bin/java::")}
 # - EOF Environment Variables -----------------------------------------------
 
 # - Initialization ----------------------------------------------------------
@@ -182,6 +182,7 @@ function oud_status {
         STATUS="not yet created..."
     fi
     get_ports "-silent"      # read ports from OUD config file
+    get_oracle_home "-silent"      # read oracle home from OUD install.path file
     echo "--------------------------------------------------------------"
     echo " Instance Name      : ${OUD_INSTANCE}"
     echo " Instance Home ($DIR_STATUS) : ${OUD_INSTANCE_HOME} "
@@ -222,13 +223,18 @@ function oudup {
 function get_oracle_home {
 # Purpose....: get the corresponding ORACLE_HOME from OUD Instance
 # ---------------------------------------------------------------------------
+    Silent=$1
     if [ -r "${OUD_INSTANCE_HOME}/OUD/install.path" ]; then
         read ORACLE_HOME < "${OUD_INSTANCE_HOME}/OUD/install.path"
+        ORACLE_HOME=$(dirname ${ORACLE_HOME})
     else
         echo "WARN : Can not determin ORACLE_HOME from OUD Instance."
         echo "       Please explicitly set ORACLE_HOME"
     fi
     export ORACLE_HOME
+    if [ "${Silent}" == "" ]; then
+        echo " Oracle Home    : ${ORACLE_HOME}"
+    fi
 }
 
 # ---------------------------------------------------------------------------
@@ -317,6 +323,7 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
         export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
         
         # get_oracle_home 
+        get_oracle_home -silent    # get oracle home from OUD instance
         export INSTANCE_NAME=$(relpath "${ORACLE_HOME}" "${OUD_INSTANCE_HOME}")
         export PORT
         export PORT_SSL
@@ -326,7 +333,8 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
         # fallback to OUD_INSTANCE_BASE Instance directory
         export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
         echo "WARN : Set Instance based on ${OUD_INSTANCE_HOME}"
-        get_ports silent    # get ports from OUD config
+        get_oracle_home -silent    # get oracle home from OUD instance
+        get_ports -silent    # get ports from OUD config
         echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:">>${OUDTAB}
         echo "WARN : Add ${OUD_INSTANCE} to ${OUDTAB} please review ports"
     else # print error and keep current setting
@@ -337,8 +345,8 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
 else # check if the requested OUD Instance exists in oudbase
     if [ -d "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD" ]; then
         export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
-        get_oracle_home     # get oracle home from OUD instance
-        get_ports silent    # get ports from OUD config
+        get_oracle_home -silent    # get oracle home from OUD instance
+        get_ports -silent    # get ports from OUD config
         export INSTANCE_NAME=$(relpath "${ORACLE_HOME}" "${OUD_INSTANCE_HOME}")
     else # print error and keep current setting
         echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUD_INSTANCE_BASE}"
