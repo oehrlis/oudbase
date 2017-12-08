@@ -235,8 +235,8 @@ DoMsg "Create required directories in ORACLE_BASE=${ORACLE_BASE}"
 
 # adjust LOG_BASE and ETC_BASE depending on OUD_DATA
 if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
-    export LOG_BASE=${OUD_LOCAL}/log
-    export ETC_BASE=${OUD_LOCAL}/etc
+    export LOG_BASE=${ORACLE_BASE}/local/log
+    export ETC_BASE=${ORACLE_BASE}/local/etc
 else
     export LOG_BASE=${OUD_DATA}/log
     export ETC_BASE=${OUD_DATA}/etc
