@@ -55,9 +55,19 @@ export OUD_DATA=${OUD_DATA:-"/u01"}
 export OUD_LOCAL="${OUD_BASE}/local"            # sowiesoe
 export OUD_INSTANCE_BASE=${OUD_INSTANCE_BASE:-"${OUD_DATA}/instances"}
 export OUD_BACKUP_BASE=${OUD_BACKUP_BASE:-"${OUD_DATA}/backup"}
-export ORACLE_HOME=${ORACLE_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name oud-setup)|sed 's/\/oud\/oud-setup$//'|head -n 1)"}
-export ORACLE_FMW_HOME=${ORACLE_FMW_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name oud-setup)|sed 's/\/oud\/oud-setup$//'|head -n 1)"}
-export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(find ${ORACLE_BASE} /usr/java -type f -name jar|head -1)| sed "s:/bin/jar::")}
+export ORACLE_HOME=${ORACLE_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name oud-setup 2>/dev/null )2>/dev/null|sed 's/\/oud\/oud-setup$//'|head -n 1)"}
+export ORACLE_FMW_HOME=${ORACLE_FMW_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name oud-setup 2>/dev/null )2>/dev/null|sed 's/\/oud\/oud-setup$//'|head -n 1)"}
+export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(find ${ORACLE_BASE} /usr/java -type f -name java 2>/dev/null |head -1)2>/dev/null| sed "s:/bin/java::")}
+
+# fallback for ODSEE home...
+export ORACLE_HOME=${ORACLE_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name dsadm)|sed 's/\/bin\/dsadm$//'|head -n 1)"}
+
+# set directory type
+export DIRECTORY_TYPE=OUD
+if [ $(basename $(find ${ORACLE_BASE} -type f -name dsadm)) == "dsadm" ]; then
+    export DIRECTORY_TYPE=ODSEE
+    echo "Directory type is ${DIRECTORY_TYPE}"
+fi
 # - EOF Environment Variables -----------------------------------------------
 
 # - Initialization ----------------------------------------------------------
@@ -171,69 +181,75 @@ fi
 function oud_status {
 # Purpose....: just display the current OUD settings
 # ---------------------------------------------------------------------------
-    STATUS="$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
-              grep org.opends.server.core.DirectoryServer|\
-              grep -c ${OUD_INSTANCE} ) -gt 0 ]; \
-              then echo 'up'; else echo 'down'; fi)"
-    if [ -d ${OUD_INSTANCE_HOME} ]; then
-        DIR_STATUS="ok"
-    else
-        DIR_STATUS="??"
-        STATUS="not yet created..."
+    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+        STATUS="$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
+                  grep org.opends.server.core.DirectoryServer|\
+                  grep -c ${OUD_INSTANCE} ) -gt 0 ]; \
+                  then echo 'up'; else echo 'down'; fi)"
+        if [ -f ${OUD_INSTANCE_HOME}/OUD/config/config.ldif ]; then
+            DIR_STATUS="ok"
+        else
+            DIR_STATUS="??"
+            STATUS="not yet created..."
+        fi
+        get_ports "-silent"      # read ports from OUD config file
+        get_oracle_home "-silent"      # read oracle home from OUD install.path file
+        echo "--------------------------------------------------------------"
+        echo " Instance Name      : ${OUD_INSTANCE}"
+        echo " Instance Home ($DIR_STATUS) : ${OUD_INSTANCE_HOME} "
+        echo " Oracle Home        : ${ORACLE_HOME}"
+        echo " Instance Status    : ${STATUS}"
+        echo " LDAP Port          : $PORT"
+        echo " LDAPS Port         : $PORT_SSL"
+        echo " Admin Port         : $PORT_ADMIN"
+        echo " Replication Port   : $PORT_REP"
+        echo "--------------------------------------------------------------"
     fi
-    get_ports "-silent"      # read ports from OUD config file
-    get_oracle_home "-silent"      # read oracle home from OUD install.path file
-    echo "--------------------------------------------------------------"
-    echo " Instance Name      : ${OUD_INSTANCE}"
-    echo " Instance Home ($DIR_STATUS) : ${OUD_INSTANCE_HOME} "
-    echo " Oracle Home        : ${ORACLE_HOME}"
-    echo " Instance Status    : ${STATUS}"
-    echo " LDAP Port          : $PORT"
-    echo " LDAPS Port         : $PORT_SSL"
-    echo " Admin Port         : $PORT_ADMIN"
-    echo " Replication Port   : $PORT_REP"
-    echo "--------------------------------------------------------------"
 }
 
 # ---------------------------------------------------------------------------
 function oudup {
 # Purpose....: display the status of the OUD instances
 # ---------------------------------------------------------------------------
-    echo "TYPE INSTANCE   STATUS PORTS          HOME"
-    echo "---- ---------- ------ -------------- ----------------------------------"
-    for i in ${OUD_INST_LIST}; do
-        STATUS="$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
-                    grep org.opends.server.core.DirectoryServer|\
-                    grep -c $i ) -gt 0 ]; \
-                    then echo 'up'; else echo 'down'; fi)"
-        # oudtab ohne instance home
-        PORT_ADMIN=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f4)
-        PORT=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f2)
-        PORT_SSL=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f3)
-        printf "OUD  %-10s %-6s %-14s %-s\n" \
-            $i \
-            ${STATUS} \
-            "${PORT}/${PORT_SSL}/${PORT_ADMIN}" \
-            "${OUD_INSTANCE_BASE}/$i"
-    done
-    echo ""
+    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+        echo "TYPE INSTANCE   STATUS PORTS          HOME"
+        echo "---- ---------- ------ -------------- ----------------------------------"
+        for i in ${OUD_INST_LIST}; do
+            STATUS="$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
+                        grep org.opends.server.core.DirectoryServer|\
+                        grep -c $i ) -gt 0 ]; \
+                        then echo 'up'; else echo 'down'; fi)"
+            # oudtab ohne instance home
+            PORT_ADMIN=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f4)
+            PORT=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f2)
+            PORT_SSL=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f3)
+            printf "OUD  %-10s %-6s %-14s %-s\n" \
+                $i \
+                ${STATUS} \
+                "${PORT}/${PORT_SSL}/${PORT_ADMIN}" \
+                "${OUD_INSTANCE_BASE}/$i"
+        done
+        echo ""
+    fi
 }
 
 # ---------------------------------------------------------------------------
 function get_oracle_home {
 # Purpose....: get the corresponding ORACLE_HOME from OUD Instance
 # ---------------------------------------------------------------------------
-    Silent=$1
-    if [ -r "${OUD_INSTANCE_HOME}/OUD/install.path" ]; then
-        read ORACLE_HOME < "${OUD_INSTANCE_HOME}/OUD/install.path"
-        ORACLE_HOME=$(dirname ${ORACLE_HOME})
-    else
-        echo "WARN : Can not determin ORACLE_HOME from OUD Instance."
-        echo "       Please explicitly set ORACLE_HOME"
-    fi
-    export ORACLE_HOME
-    if [ "${Silent}" == "" ]; then
-        echo " Oracle Home    : ${ORACLE_HOME}"
+    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+        Silent=$1
+        if [ -r "${OUD_INSTANCE_HOME}/OUD/install.path" ]; then
+            read ORACLE_HOME < "${OUD_INSTANCE_HOME}/OUD/install.path"
+            ORACLE_HOME=$(dirname ${ORACLE_HOME})
+        else
+            echo "WARN : Can not determin ORACLE_HOME from OUD Instance."
+            echo "       Please explicitly set ORACLE_HOME"
+        fi
+        export ORACLE_HOME
+        if [ "${Silent}" == "" ]; then
+            echo " Oracle Home    : ${ORACLE_HOME}"
+        fi
     fi
 }
 
@@ -241,32 +257,34 @@ function get_oracle_home {
 function get_ports {
 # Purpose....: get the corresponding PORTS from OUD Instance
 # ---------------------------------------------------------------------------
-    Silent=$1
-    CONFIG="${OUD_INSTANCE_HOME}/OUD/config/config.ldif"
-    if [ -r $CONFIG ]; then
-        # read ports from config file
-        PORT_ADMIN=$(sed -n '/LDAP Administration Connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
-        PORT=$(sed -n '/LDAP Connection Handler/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
-        PORT_SSL=$(sed -n '/LDAPS Connection Handler/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
-        PORT_REP=$(sed -n '/LDAP Replication Connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
-    else
-        echo "WARN : Can not determin config.ldif from OUD Instance."
-        echo "       Please explicitly set your PORTS"
-    fi
-    # export the port variables and set default values with not specified
-    export PORT_ADMIN=${PORT_ADMIN:-"4444"}
-    export PORT=${PORT:-"1389"}
-    export PORT_SSL=${PORT_SSL:-"1636"}
-    export PORT_REP=${PORT_REP:-"8989"}
-    
-    if [ "${Silent}" == "" ]; then
-        echo "--------------------------------------------------------------"
-        echo " Instance Name   : ${OUD_INSTANCE}"
-        echo " LDAP Port       : $PORT"
-        echo " LDAPS Port      : $PORT_SSL"
-        echo " Admin Port      : $PORT_ADMIN"
-        echo " Replication Port: $PORT_REP"
-        echo "--------------------------------------------------------------"
+    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+        Silent=$1
+        CONFIG="${OUD_INSTANCE_HOME}/OUD/config/config.ldif"
+        if [ -r $CONFIG ]; then
+            # read ports from config file
+            PORT_ADMIN=$(sed -n '/LDAP Administration Connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+            PORT=$(sed -n '/LDAP Connection Handler/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+            PORT_SSL=$(sed -n '/LDAPS Connection Handler/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+            PORT_REP=$(sed -n '/LDAP Replication Connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+        else
+            echo "WARN : Can not determin config.ldif from OUD Instance."
+            echo "       Please explicitly set your PORTS"
+        fi
+        # export the port variables and set default values with not specified
+        export PORT_ADMIN=${PORT_ADMIN:-"4444"}
+        export PORT=${PORT:-"1389"}
+        export PORT_SSL=${PORT_SSL:-"1636"}
+        export PORT_REP=${PORT_REP:-"8989"}
+        
+        if [ "${Silent}" == "" ]; then
+            echo "--------------------------------------------------------------"
+            echo " Instance Name   : ${OUD_INSTANCE}"
+            echo " LDAP Port       : $PORT"
+            echo " LDAPS Port      : $PORT_SSL"
+            echo " Admin Port      : $PORT_ADMIN"
+            echo " Replication Port: $PORT_REP"
+            echo "--------------------------------------------------------------"
+        fi
     fi
 }
 
@@ -392,8 +410,9 @@ else
     export PWD_FILE=${ETC_BASE}/pwd.txt
 fi
 
+
 if [ ${pTTY} -eq 0 ] && [ "${SILENT}" = "" ]; then
-    echo "Source environment for OUD Instance ${OUD_INSTANCE}"
+    echo "Source environment for ${DIRECTORY_TYPE} Instance ${OUD_INSTANCE}"
     oud_status
 fi
 # - EOF ---------------------------------------------------------------------
