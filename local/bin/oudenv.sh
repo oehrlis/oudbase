@@ -289,6 +289,56 @@ function get_ports {
 }
 
 # ---------------------------------------------------------------------------
+function oud_help {
+# Purpose....: just display help for OUD environment
+# ---------------------------------------------------------------------------
+echo "--- OUD Instances -----------------------------------------------------"
+echo ""
+echo "--- ENV Variables -----------------------------------------------------"
+echo "  CUSTOM_ORA_LOG      = ${CUSTOM_ORA_LOG-n/a}"
+echo "  DIRECTORY_TYPE      = ${DIRECTORY_TYPE-n/a}"
+echo "  ETC_BASE            = ${ETC_BASE-n/a}"
+echo "  ETC_BASE            = ${ETC_BASE-n/a}"
+echo "  ETC_CORE            = ${ETC_CORE-n/a}"
+echo "  INSTANCE_BASE       = ${INSTANCE_BASE-n/a}"
+echo "  INSTANCE_BASE       = ${INSTANCE_BASE-n/a}"
+echo "  JAVA_HOME           = ${JAVA_HOME-n/a}"
+echo "  LOG_BASE            = ${LOG_BASE-n/a}"
+echo "  ORACLE_BASE         = ${ORACLE_BASE-n/a}"
+echo "  ORACLE_FMW_HOME     = ${ORACLE_FMW_HOME-'n/a'}"
+echo "  ORACLE_HOME         = ${ORACLE_HOME-n/a}"
+echo "  OUD_INSTANCE        = ${OUD_INSTANCE-n/a}"
+echo "  OUD_INSTANCE_BASE   = ${OUD_INSTANCE_BASE-n/a}"
+echo "  OUD_INSTANCE_HOME   = ${OUD_INSTANCE_HOME-n/a}"
+echo "  PORT                = ${PORT-n/a}"
+echo "  PORT_ADMIN          = ${PORT_ADMIN-n/a}"
+echo "  PORT_REP            = ${PORT_REP-n/a}"
+echo "  PORT_SSL            = ${PORT_SSL-n/a}"
+echo ""
+echo "--- Default Aliases ---------------------------------------------------"
+echo "  oudup       List OUD instances and there status short form u"
+echo "  oud_status  Display OUD status of current instance"
+echo "  oud_help    Display OUD environment help short form h"
+echo "  gp          Get ports of current oud instance"
+echo "  goh         Get oracle home of current oud instance"
+echo ""
+#if [ -s "${ETC_BASE}/oudenv_custom.conf" ]; then
+#    echo "--- Custom Aliases ---------------------------------------------------"
+#    while read -r line; do
+##    If the line starts with alias then echo the line
+#    if [[ $line == alias* ]] ; then
+#        ALIAS=$(echo $line|sed -r 's/^.*\s(.*)=.*/\1/' )
+#        COMMENT=$(echo $line|sed -r 's/^.*#(.*)/\1/'|xargs )
+#        printf " %-10s %-s\n" \
+#                ${ALIAS}
+#                ${COMMENT}
+#    fi
+#    done < "${ETC_BASE}/oudenv_custom.conf"
+#    echo ""
+#fi  
+}
+
+# ---------------------------------------------------------------------------
 function relpath {
 # Purpose....: get the relative path of DIR1 from DIR2
 # ---------------------------------------------------------------------------
@@ -391,6 +441,10 @@ if [ -f "${ETC_BASE}/oudenv.conf" ]; then
     . "${ETC_BASE}/oudenv.conf"
 else
     echo "WARN : Could not source ${ETC_BASE}/oudenv.conf"
+fi  
+
+if [ -f "${ETC_BASE}/oudenv_custom.conf" ]; then
+    . "${ETC_BASE}/oudenv_custom.conf"
 fi  
 
 # source oud._DEFAULT_.conf if exists
