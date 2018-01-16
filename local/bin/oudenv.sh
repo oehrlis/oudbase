@@ -57,14 +57,14 @@ export OUD_INSTANCE_BASE=${OUD_INSTANCE_BASE:-"${OUD_DATA}/instances"}
 export OUD_BACKUP_BASE=${OUD_BACKUP_BASE:-"${OUD_DATA}/backup"}
 export ORACLE_HOME=${ORACLE_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name oud-setup 2>/dev/null )2>/dev/null|sed 's/\/oud\/oud-setup$//'|head -n 1)"}
 export ORACLE_FMW_HOME=${ORACLE_FMW_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name oud-setup 2>/dev/null )2>/dev/null|sed 's/\/oud\/oud-setup$//'|head -n 1)"}
-export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(find ${ORACLE_BASE} /usr/java -type f -name java 2>/dev/null |head -1)2>/dev/null| sed "s:/bin/java::")}
+export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(find ${ORACLE_BASE} /usr/java -type f -name java 2>/dev/null |head -1)| sed "s:/bin/java::")}
 
 # fallback for ODSEE home...
-export ORACLE_HOME=${ORACLE_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name dsadm)|sed 's/\/bin\/dsadm$//'|head -n 1)"}
+export ORACLE_HOME=${ORACLE_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name dsadm) 2>/dev/null|sed 's/\/bin\/dsadm$//'|head -n 1)"}
 
 # set directory type
 export DIRECTORY_TYPE=OUD
-if [ $(basename $(find ${ORACLE_BASE} -type f -name dsadm)) == "dsadm" ]; then
+if [ "$(basename $(find ${ORACLE_BASE} -type f -name dsadm)2>/dev/null)" = "dsadm" ]; then
     export DIRECTORY_TYPE=ODSEE
     echo "Directory type is ${DIRECTORY_TYPE}"
 fi
