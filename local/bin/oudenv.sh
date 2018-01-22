@@ -58,11 +58,11 @@ export OUD_BACKUP_BASE=${OUD_BACKUP_BASE:-"${OUD_DATA}/backup"}
 
 export ORACLE_HOME=${ORACLE_HOME:-"$(find ${ORACLE_BASE} ! -readable -prune -o -name oud-setup -print |sed 's/\/oud\/oud-setup$//'|head -n 1)"}
 export ORACLE_FMW_HOME=${ORACLE_FMW_HOME:-"$(find ${ORACLE_BASE} ! -readable -prune -o -name oudsm-wlst.jar -print|sed -r 's/(\/[^\/]+){3}\/oudsm-wlst.jar//g'|head -n 1)"}
-export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(find ${ORACLE_BASE} /usr/java -type f -name java 2>/dev/null |head -1)| sed "s:/bin/java::")}
+export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(find ${ORACLE_BASE} /usr/java ! -readable -prune -o -type f -name java -print |head -1)| sed "s:/bin/java::")}
 
 # set directory type
 export DIRECTORY_TYPE=OUD
-if [ "$(basename $(find ${ORACLE_BASE} ! -readable -prune -o -name dsadm -print))" = "dsadm" ]; then
+if [ "$(find ${ORACLE_BASE} ! -readable -prune -o -name dsadm -printf '%f\n')" = "dsadm" ]; then
     export DIRECTORY_TYPE=ODSEE
     # fallback for ODSEE home...
     export ORACLE_HOME=${ORACLE_HOME:-"$(find ${ORACLE_BASE} ! -readable -prune -o -name dsadm -print |sed 's/\/bin\/dsadm$//'|head -n 1)"}
@@ -326,13 +326,13 @@ if [ -s "${ETC_BASE}/oudenv_custom.conf" ]; then
     echo "--- Custom Aliases ---------------------------------------------------"
     while read -r line; do
 #    If the line starts with alias then echo the line
-    if [[ $line =~ ^alias*  ]] ; then
+    if [[ $line == alias*  ]] ; then
         ALIAS=$(echo $line|sed -r 's/^.*\s(.*)=('"'"'|").*/\1/' )
-        COMMENT=$(echo $line|sed -r 's/^.*(#(.*)$|(('"'"')|"))$/\2/'|xargs)
+        COMMENT=$(echo $line|sed -r 's/^.*(#(.*)$|(('"'"')|"))$/\2/')
         COMMENT=${COMMENT:-"n/a"}
         printf " %-10s %-s\n" \
                 ${ALIAS} \
-                ${COMMENT}
+                "${COMMENT}"
     fi
     done < "${ETC_BASE}/oudenv_custom.conf"
     echo ""

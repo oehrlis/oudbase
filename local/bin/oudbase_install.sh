@@ -298,8 +298,6 @@ done
 if [ "${APPEND_PROFILE}" = "TRUE" ]; then
     if [ -f "${HOME}/.bash_profile" ]; then
         PROFILE="${HOME}/.bash_profile"
-    elif [ -f "${HOME}/.bash_profile" ]; then
-        PROFILE="${HOME}/.bash_profile"
     else
         CleanAndQuit 20
     fi
@@ -314,10 +312,10 @@ if [ "${APPEND_PROFILE}" = "TRUE" ]; then
     echo 'fi'                                                 >>"${PROFILE}"
     echo ''                                                   >>"${PROFILE}"
     echo '# define an oudenv alias'                           >>"${PROFILE}"
-    echo 'alias oud=". ${OUD_BASE}/local/oudenv.sh)"'         >>"${PROFILE}"
+    echo 'alias oud=". ${OUD_BASE}/local/bin/oudenv.sh"'      >>"${PROFILE}"
     echo ''                                                   >>"${PROFILE}"
     echo '# source oud environment'                           >>"${PROFILE}"
-    echo '. ${OUD_BASE}/local/oudenv.sh)'                     >>"${PROFILE}"
+    echo '. ${OUD_BASE}/local/bin/oudenv.sh'                  >>"${PROFILE}"
 fi
 
 # Any script here will happen after the tar file extract.
