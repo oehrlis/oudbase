@@ -330,7 +330,7 @@ if [ -s "${ETC_BASE}/oudenv_custom.conf" ]; then
         ALIAS=$(echo $line|sed -r 's/^.*\s(.*)=('"'"'|").*/\1/' )
         COMMENT=$(echo $line|sed -r 's/^.*(#(.*)$|(('"'"')|"))$/\2/')
         COMMENT=${COMMENT:-"n/a"}
-        printf " %-10s %-s\n" \
+        printf "  %-10s %-s\n" \
                 ${ALIAS} \
                 "${COMMENT}"
     fi
