@@ -41,7 +41,8 @@ function Usage()
 {
     VERBOSE="TRUE"
     DoMsg "INFO : Usage, ${SCRIPT_NAME} [-hav] [-b <ORACLE_BASE>] "
-    DoMsg "INFO :   [-i <ORACLE_INSTANCE_BASE>] [-m <ORACLE_HOME_BASE>] [-B <OUD_BACKUP_BASE>]"
+    DoMsg "INFO :   [-i <OUD_INSTANCE_BASE>] [-B <OUD_BACKUP_BASE>]"
+    DoMsg "INFO :   [-m <ORACLE_HOME>] [-f <ORACLE_FMW_HOME>] [-j <JAVA_HOME>]"
     DoMsg "INFO : "
     DoMsg "INFO :   -h                          Usage (this message)"
     DoMsg "INFO :   -v                          enable verbose mode"
@@ -49,11 +50,14 @@ function Usage()
     DoMsg "INFO :   -b <ORACLE_BASE>            ORACLE_BASE Directory. Mandatory argument. This "
     DoMsg "INFO                                 directory is use as OUD_BASE directory"
     DoMsg "INFO :   -o <OUD_BASE>               OUD_BASE Directory. (default \$ORACLE_BASE)."
-    DoMsg "INFO :   -d <OUD_DATA>               OUD_DATA Directory. (default \$ORACLE_BASE). This directory has to be "
-    DoMsg "INFO                                 specified to distinct persistant data from software eg. in a docker containers"
-    DoMsg "INFO :   -i <ORACLE_INSTANCE_BASE>   Base directory for OUD instances (default \$OUD_DATA/instances)"
-    DoMsg "INFO :   -m <ORACLE_HOME_BASE>       Base directory for OUD binaries (default \$ORACLE_BASE/middleware)"
+    DoMsg "INFO :   -d <OUD_DATA>               OUD_DATA Directory. (default /u01 if available otherwise \$ORACLE_BASE). "
+    DoMsg "INFO                                 This directory has to be specified to distinct persistant data from software "
+    DoMsg "INFO                                 eg. in a docker containers"
     DoMsg "INFO :   -B <OUD_BACKUP_BASE>        Base directory for OUD backups (default \$OUD_DATA/backup)"
+    DoMsg "INFO :   -i <OUD_INSTANCE_BASE>      Base directory for OUD instances (default \$OUD_DATA/instances)"
+    DoMsg "INFO :   -m <ORACLE_HOME>            Oracle home directory for OUD binaries (default \$ORACLE_BASE/products)"
+    DoMsg "INFO :   -f <ORACLE_FMW_HOME>        Oracle Fusion Middleware home directory. (default \$ORACLE_BASE/products)"
+    DoMsg "INFO :   -j <JAVA_HOME>              JAVA_HOME directory. (default search for java in \$ORACLE_BASE/products)"
     DoMsg "INFO : "
     DoMsg "INFO : Logfile : ${LOGFILE}"
 
@@ -171,7 +175,7 @@ fi
 
 # usage and getopts
 DoMsg "INFO : processing commandline parameter"
-while getopts hvab:o:d:i:m:B:E: arg; do
+while getopts hvab:o:d:i:m:B:E:f:j arg; do
     case $arg in
       h) Usage 0;;
       v) VERBOSE="TRUE";;
@@ -179,9 +183,11 @@ while getopts hvab:o:d:i:m:B:E: arg; do
       b) INSTALL_ORACLE_BASE="${OPTARG}";;
       o) INSTALL_OUD_BASE="${OPTARG}";;
       d) INSTALL_OUD_DATA="${OPTARG}";;
-      i) INSTALL_ORACLE_INSTANCE_BASE="${OPTARG}";;
-      m) INSTALL_ORACLE_HOME_BASE="${OPTARG}";;
+      i) INSTALL_OUD_INSTANCE_BASE="${OPTARG}";;
       B) INSTALL_OUD_BACKUP_BASE="${OPTARG}";;
+      f) INSTALL_JAVA_HOME="${OPTARG}";;
+      m) INSTALL_ORACLE_HOME="${OPTARG}";;
+      j) INSTALL_ORACLE_FMW_HOME="${OPTARG}";;
       E) CleanAndQuit "${OPTARG}";;
       ?) Usage 2 $*;;
     esac
@@ -207,26 +213,44 @@ if [ ! "${INSTALL_OUD_DATA}" = "" ] && [ ! -d "${INSTALL_OUD_DATA}" ]; then
     CleanAndQuit 44 ${INSTALL_OUD_DATA}
 fi
 
-# define the real directories names
+# define default values for a couple of directories and set the real 
+# directories based on the cli or default values
+DEFAULT_ORACLE_BASE="/u01/app/oracle"
+export ORACLE_BASE=${INSTALL_ORACLE_BASE:-"${DEFAULT_ORACLE_BASE}"}
 
-# set the real directories based on the cli or defaul values
-export ORACLE_BASE=${INSTALL_ORACLE_BASE}
-export INSTALL_OUD_BASE=${INSTALL_OUD_BASE:-"${ORACLE_BASE}"}
-export OUD_BASE=${INSTALL_OUD_BASE:-"${ORACLE_BASE}"}
-export INSTALL_OUD_DATA=${INSTALL_OUD_DATA:-"${OUD_BASE}"}
-export OUD_DATA=${INSTALL_OUD_DATA:-"${OUD_BASE}"}
-export ORACLE_INSTANCE_BASE=${INSTALL_ORACLE_INSTANCE_BASE:-"${OUD_DATA}/instances"}
-export ORACLE_HOME_BASE=${INSTALL_ORACLE_HOME_BASE:-"${ORACLE_BASE}/middleware"}
-export OUD_BACKUP_BASE=${INSTALL_OUD_BACKUP_BASE:-"${OUD_DATA}/backup"}
+DEFAULT_OUD_BASE="${ORACLE_BASE}"
+INSTALL_OUD_BASE=${INSTALL_OUD_BASE:-"${DEFAULT_OUD_BASE}"}
+export OUD_BASE=${INSTALL_OUD_BASE:-"${DEFAULT_OUD_BASE}"}
+
+DEFAULT_OUD_DATA=$(if [ -d "/u01" ]; then echo "/u01"; else echo "${DEFAULT_ORACLE_BASE}"; fi)
+INSTALL_OUD_DATA=${INSTALL_OUD_DATA:-"${DEFAULT_OUD_DATA}"}
+export OUD_DATA=${INSTALL_OUD_DATA}
+
+DEFAULT_OUD_INSTANCE_BASE="${OUD_DATA}/instances"
+export OUD_INSTANCE_BASE=${INSTALL_OUD_INSTANCE_BASE:-"${DEFAULT_OUD_INSTANCE_BASE}"}
+
+DEFAULT_OUD_BACKUP_BASE="${OUD_DATA}/backup"
+export OUD_BACKUP_BASE=${INSTALL_OUD_BACKUP_BASE:-"${DEFAULT_OUD_BACKUP_BASE}"}
+
+DEFAULT_ORACLE_HOME="${ORACLE_BASE}/product/fmw12.2.1.3.0"
+export ORACLE_HOME=${INSTALL_ORACLE_HOME:-"${DEFAULT_ORACLE_HOME}"}
+
+DEFAULT_ORACLE_FMW_HOME="${ORACLE_BASE}/product/fmw12.2.1.3.0"
+export ORACLE_FMW_HOME=${INSTALL_ORACLE_FMW_HOME:-"${DEFAULT_ORACLE_FMW_HOME}"}
+
+DEFAULT_JAVA_HOME=$(readlink -f $(find ${ORACLE_BASE} /usr/java -type f -name java 2>/dev/null |head -1)| sed "s:/bin/java::")
+export JAVA_HOME=${INSTALL_JAVA_HOME:-"${DEFAULT_JAVA_HOME}"}
 
 # Print some information on the defined variables
 DoMsg "Using the following variable for installation"
 DoMsg "ORACLE_BASE          = $ORACLE_BASE"
 DoMsg "OUD_BASE             = $OUD_BASE"
 DoMsg "OUD_DATA             = $OUD_DATA"
-DoMsg "ORACLE_INSTANCE_BASE = $ORACLE_INSTANCE_BASE"
-DoMsg "ORACLE_HOME_BASE     = $ORACLE_HOME_BASE"
+DoMsg "OUD_INSTANCE_BASE    = $OUD_INSTANCE_BASE"
 DoMsg "OUD_BACKUP_BASE      = $OUD_BACKUP_BASE"
+DoMsg "ORACLE_HOME          = $ORACLE_HOME"
+DoMsg "ORACLE_FMW_HOME      = $ORACLE_FMW_HOME"
+DoMsg "JAVA_HOME            = $JAVA_HOME"
 DoMsg "SCRIPT_FQN           = $SCRIPT_FQN"
 
 # just do Installation if there are more lines after __TARFILE_FOLLOWS__ 
@@ -246,7 +270,7 @@ for i in    ${LOG_BASE} \
             ${ETC_BASE} \
             ${ORACLE_BASE}/local \
             ${OUD_BACKUP_BASE} \
-            ${ORACLE_INSTANCE_BASE}; do
+            ${OUD_INSTANCE_BASE}; do
     mkdir -pv ${i} >/dev/null 2>&1 && DoMsg "Create Directory ${i}" || CleanAndQuit 41 ${i}
 done
 
@@ -256,11 +280,13 @@ tail -n +$SKIP $SCRIPT_FQN | tar -xzv --exclude="._*"  -C ${ORACLE_BASE}/local
 
 # Store install customization
 for i in    OUD_BACKUP_BASE \
-            ORACLE_HOME_BASE \
-            ORACLE_INSTANCE_BASE \
+            OUD_INSTANCE_BASE \
             OUD_DATA \
             OUD_BASE \
-            ORACLE_BASE; do
+            ORACLE_BASE \
+            ORACLE_HOME \
+            ORACLE_FMW_HOME \
+            JAVA_HOME; do
     variable="INSTALL_${i}"
     if [ ! "${!variable}" == "" ]; then
         sed -i "/<INSTALL_CUSTOMIZATION>/a $i=${!variable}" \
@@ -288,10 +314,10 @@ if [ "${APPEND_PROFILE}" = "TRUE" ]; then
     echo 'fi'                                                 >>"${PROFILE}"
     echo ''                                                   >>"${PROFILE}"
     echo '# define an oudenv alias'                           >>"${PROFILE}"
-    echo 'alias oud=". $(find $OUD_BASE -name oudenv.sh)"'    >>"${PROFILE}"
+    echo 'alias oud=". ${OUD_BASE}/local/oudenv.sh)"'         >>"${PROFILE}"
     echo ''                                                   >>"${PROFILE}"
     echo '# source oud environment'                           >>"${PROFILE}"
-    echo '. $(find $OUD_BASE -name oudenv.sh)'                >>"${PROFILE}"
+    echo '. ${OUD_BASE}/local/oudenv.sh)'                     >>"${PROFILE}"
 fi
 
 # Any script here will happen after the tar file extract.

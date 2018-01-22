@@ -55,17 +55,17 @@ export OUD_DATA=${OUD_DATA:-"/u01"}
 export OUD_LOCAL="${OUD_BASE}/local"            # sowiesoe
 export OUD_INSTANCE_BASE=${OUD_INSTANCE_BASE:-"${OUD_DATA}/instances"}
 export OUD_BACKUP_BASE=${OUD_BACKUP_BASE:-"${OUD_DATA}/backup"}
-export ORACLE_HOME=${ORACLE_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name oud-setup 2>/dev/null )2>/dev/null|sed 's/\/oud\/oud-setup$//'|head -n 1)"}
-export ORACLE_FMW_HOME=${ORACLE_FMW_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name oud-setup 2>/dev/null )2>/dev/null|sed 's/\/oud\/oud-setup$//'|head -n 1)"}
-export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(find ${ORACLE_BASE} /usr/java -type f -name java 2>/dev/null |head -1)| sed "s:/bin/java::")}
 
-# fallback for ODSEE home...
-export ORACLE_HOME=${ORACLE_HOME:-"$(readlink -f $(find ${ORACLE_BASE} -type f -name dsadm) 2>/dev/null|sed 's/\/bin\/dsadm$//'|head -n 1)"}
+export ORACLE_HOME=${ORACLE_HOME:-"$(find ${ORACLE_BASE} ! -readable -prune -o -name oud-setup -print |sed 's/\/oud\/oud-setup$//'|head -n 1)"}
+export ORACLE_FMW_HOME=${ORACLE_FMW_HOME:-"$(find ${ORACLE_BASE} ! -readable -prune -o -name oudsm-wlst.jar -print|sed -r 's/(\/[^\/]+){3}\/oudsm-wlst.jar//g'|head -n 1)"}
+export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(find ${ORACLE_BASE} /usr/java -type f -name java 2>/dev/null |head -1)| sed "s:/bin/java::")}
 
 # set directory type
 export DIRECTORY_TYPE=OUD
-if [ "$(basename $(find ${ORACLE_BASE} -type f -name dsadm)2>/dev/null)" = "dsadm" ]; then
+if [ "$(basename $(find ${ORACLE_BASE} ! -readable -prune -o -name dsadm -print))" = "dsadm" ]; then
     export DIRECTORY_TYPE=ODSEE
+    # fallback for ODSEE home...
+    export ORACLE_HOME=${ORACLE_HOME:-"$(find ${ORACLE_BASE} ! -readable -prune -o -name dsadm -print |sed 's/\/bin\/dsadm$//'|head -n 1)"}
     echo "Directory type is ${DIRECTORY_TYPE}"
 fi
 # - EOF Environment Variables -----------------------------------------------
@@ -322,20 +322,21 @@ echo "  oud_help    Display OUD environment help short form h"
 echo "  gp          Get ports of current oud instance"
 echo "  goh         Get oracle home of current oud instance"
 echo ""
-#if [ -s "${ETC_BASE}/oudenv_custom.conf" ]; then
-#    echo "--- Custom Aliases ---------------------------------------------------"
-#    while read -r line; do
-##    If the line starts with alias then echo the line
-#    if [[ $line == alias* ]] ; then
-#        ALIAS=$(echo $line|sed -r 's/^.*\s(.*)=.*/\1/' )
-#        COMMENT=$(echo $line|sed -r 's/^.*#(.*)/\1/'|xargs )
-#        printf " %-10s %-s\n" \
-#                ${ALIAS}
-#                ${COMMENT}
-#    fi
-#    done < "${ETC_BASE}/oudenv_custom.conf"
-#    echo ""
-#fi  
+if [ -s "${ETC_BASE}/oudenv_custom.conf" ]; then
+    echo "--- Custom Aliases ---------------------------------------------------"
+    while read -r line; do
+#    If the line starts with alias then echo the line
+    if [[ $line =~ ^alias*  ]] ; then
+        ALIAS=$(echo $line|sed -r 's/^.*\s(.*)=('"'"'|").*/\1/' )
+        COMMENT=$(echo $line|sed -r 's/^.*(#(.*)$|(('"'"')|"))$/\2/'|xargs)
+        COMMENT=${COMMENT:-"n/a"}
+        printf " %-10s %-s\n" \
+                ${ALIAS} \
+                ${COMMENT}
+    fi
+    done < "${ETC_BASE}/oudenv_custom.conf"
+    echo ""
+fi
 }
 
 # ---------------------------------------------------------------------------
@@ -387,7 +388,11 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
     if [ $(grep -v '^#' ${OUDTAB}| grep -iwc ${OUD_INSTANCE}) -eq 1 ]; then 
         # set new environment based on oudtab
         OUD_CONF_STR=$(grep -v '^#' ${OUDTAB}|grep -i ${OUD_INSTANCE}|head -1)
-        IFS=: read OUD_INSTANCE PORT PORT_SSL PORT_ADMIN PORT_REP <<< $OUD_CONF_STR
+        OUD_INSTANCE=$(echo ${OUD_CONF_STR}|cut -d: -f1)
+        PORT=$(echo ${OUD_CONF_STR}|cut -d: -f2)
+        PORT_SSL=$(echo ${OUD_CONF_STR}|cut -d: -f3)
+        PORT_ADMIN=$(echo ${OUD_CONF_STR}|cut -d: -f4)
+        PORT_REP=$(echo ${OUD_CONF_STR}|cut -d: -f5)
         export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
         
         # get_oracle_home 
