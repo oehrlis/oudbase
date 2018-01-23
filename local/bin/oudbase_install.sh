@@ -177,7 +177,7 @@ fi
 
 # usage and getopts
 DoMsg "INFO : processing commandline parameter"
-while getopts hvab:o:d:i:m:B:E:f:j arg; do
+while getopts hvab:o:d:i:m:B:E:f:j: arg; do
     case $arg in
       h) Usage 0;;
       v) VERBOSE="TRUE";;
