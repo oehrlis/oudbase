@@ -13,15 +13,15 @@ export PATH
 
 # Check OUD_BASE and load if necessary
 if [ "${OUD_BASE}" = "" ]; then
-    if [ -f "${HOME}/.OUD_BASE" ]; then
-        . "${HOME}/.OUD_BASE"
-      else
-        echo "ERROR: Could not load ${HOME}/.OUD_BASE"
-    fi
+  if [ -f "${HOME}/.OUD_BASE" ]; then
+    . "${HOME}/.OUD_BASE"
+  else
+    echo "ERROR: Could not load ${HOME}/.OUD_BASE"
+  fi
 fi
 
 # define an oudenv alias
-alias oud=". $(find $OUD_BASE -name oudenv.sh)"
+alias oud=". ${OUD_BASE}/local/bin/oudenv.sh"
 
 # source oud environment
-. $(find $OUD_BASE -name oudenv.sh)
+. ${OUD_BASE}/local/bin/oudenv.sh
