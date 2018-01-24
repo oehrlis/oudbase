@@ -161,7 +161,7 @@ Variable besides the ones mentioned above.
 | $PORT_SSL                 | OUD instance SSL port taken from oudtab file |
 | $OUDTAB                   | oudtab config file eg. ${ETC_BASE}/oudtab |
 
-###Aliases
+### Aliases
 
 | Alias                     | Description                            |
 | ------------------------- | -------------------------------------- |
@@ -177,7 +177,7 @@ Variable besides the ones mentioned above.
 | u                         | u runs oudup to display the current OUD Instances |
 | vio                       | vio opens the oudtab file eg. ${ETC_BASE}/oudtab |
 
-###Functions
+### Functions
 
 | Function                  | Description                            |
 | ------------------------- | -------------------------------------- |
