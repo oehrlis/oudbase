@@ -116,6 +116,7 @@ The OUD Base does have the following configuration files.
 | .OUD_BASE           | This is a simple file in the user home directory. It includes the pointer to the OUD Base directory. This file is used to initiate $OUD_BASE. |
 | oudtab              | oudtab is a simple file which includes all OUD instance and there ports eg. default LDAP port, admin port, SSL port and replication port.      |
 | oudenv.conf         | This is the main configuration file for environment variables and aliases. It is loaded when an environment is set or changed. Location of oudenv.conf is $ETC_BASE. |
+| oudenv_custom.conf  | This is the custom configuration file for environment variables and aliases. It is loaded after oudenv.conf when an environment is set or changed. Location of oudenv_custom.conf is $ETC_BASE. Every alias will be shown in oud_help (h) with the alias name and the comment as help text |
 | oud._DEFAULT_.conf  | This configuration file for custom environment variables. Location of oud._DEFAULT_.conf is $ETC_BASE. |
 | oud._INSTANCE_.conf | This configuration file for custom environment variables for a dedicated OUD instance eg. oud_pi Location of oud._oud_pi_.conf is $ETC_BASE.|
 
@@ -175,6 +176,12 @@ Variable besides the ones mentioned above.
 | task                      | task does run a manage-tasks with hostname, port etc parameter |
 | u                         | u runs oudup to display the current OUD Instances |
 | vio                       | vio opens the oudtab file eg. ${ETC_BASE}/oudtab |
+
+###Functions
+
+| Function                  | Description                            |
+| ------------------------- | -------------------------------------- |
+| oud_help                  | Display a short help for important variable and aliases. If custom aliases has been specified in oudenv_custom.conf the will be shown as well. The alias name will be displayed by side a help text. The help text is taken from the line comment of the alias command if available otherwise oud_help will just display n/a |
 
 ## Issues
 Please file your bug reports, enhancement requests, questions and other support requests within [Github's issue tracker](https://help.github.com/articles/about-issues/):
