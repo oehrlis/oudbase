@@ -23,13 +23,14 @@ export LOG_BASE=${LOG_BASE-"/tmp"}
 # - End of Customization ----------------------------------------------------
 
 # - Default Values ----------------------------------------------------------
-VERSION=0.1
+VERSION=1.0.0
 DOAPPEND="TRUE"                                        # enable log file append
 VERBOSE="TRUE"                                         # enable verbose mode
 SCRIPT_NAME=$(basename $0)                             # Basename of the script
 SCRIPT_FQN=$(readlink -f $0)                           # Full qualified script name
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
+CONFIG_FILES="oudtab oudenv.conf oud._DEFAULT_.conf"
 # - End of Default Values ---------------------------------------------------
 
 # - Functions ---------------------------------------------------------------
@@ -276,9 +277,39 @@ for i in    ${LOG_BASE} \
     mkdir -pv ${i} >/dev/null 2>&1 && DoMsg "INFO : Create Directory ${i}" || CleanAndQuit 41 ${i}
 done
 
+# backup config files if the exits. Just check if ${OUD_BASE}/local/etc
+# does exist
+if [ -d ${OUD_BASE}/local/etc ]; then
+    DoMsg "INFO : Backup existing config files"
+    SAVE_CONFIG="TRUE"
+    for i in ${CONFIG_FILES}; do
+        if [ -f ${OUD_BASE}/local/etc/$i ]; then
+            DoMsg "INFO : Backup $i to $i.save"
+            cp ${OUD_BASE}/local/etc/$i ${OUD_BASE}/local/etc/$i.save
+        fi
+    done
+fi
+
 DoMsg "INFO : Extracting file into ${ORACLE_BASE}/local"
 # take the tarfile and pipe it into tar
 tail -n +$SKIP $SCRIPT_FQN | tar -xzv --exclude="._*"  -C ${ORACLE_BASE}/local
+
+# restore customized config files
+if [ "${SAVE_CONFIG}" = "TRUE" ]; then
+    DoMsg "INFO : Restore cusomized config files"
+    for i in ${CONFIG_FILES}; do
+        if [ -f ${OUD_BASE}/local/etc/$i ]; then
+            if ! cmp ${OUD_BASE}/local/etc/$i.save ${OUD_BASE}/local/etc/$i >/dev/null 2>&1 ; then
+                DoMsg "INFO : Restore $i.save to $i"
+                cp ${OUD_BASE}/local/etc/$i ${OUD_BASE}/local/etc/$i.new
+                cp ${OUD_BASE}/local/etc/$i.save ${OUD_BASE}/local/etc/$i
+                rm ${OUD_BASE}/local/etc/$i.save
+            else
+                rm ${OUD_BASE}/local/etc/$i.save
+            fi
+        fi
+    done
+fi
 
 # Store install customization
 for i in    OUD_BACKUP_BASE \

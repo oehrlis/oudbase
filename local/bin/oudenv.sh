@@ -289,6 +289,22 @@ function get_ports {
 }
 
 # ---------------------------------------------------------------------------
+function update_oudtab {
+# Purpose....: update OUD tab
+# ---------------------------------------------------------------------------
+    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+        get_ports -silent
+        if [ -f "${OUDTAB}" ]; then
+            if [ $(grep -v '^#' ${OUDTAB}| grep -iwc ${OUD_INSTANCE}) -eq 1 ]; then 
+                sed -i "/${OUD_INSTANCE}/c\\${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP" "${OUDTAB}"
+            else
+                echo "add ${OUD_INSTANCE} to ${OUDTAB}"
+                echo "${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP" >>"${OUDTAB}"
+            fi
+        fi
+    fi
+}
+# ---------------------------------------------------------------------------
 function oud_help {
 # Purpose....: just display help for OUD environment
 # ---------------------------------------------------------------------------
