@@ -298,7 +298,7 @@ tail -n +$SKIP $SCRIPT_FQN | tar -xzv --exclude="._*"  -C ${ORACLE_BASE}/local
 if [ "${SAVE_CONFIG}" = "TRUE" ]; then
     DoMsg "INFO : Restore cusomized config files"
     for i in ${CONFIG_FILES}; do
-        if [ -f ${OUD_BASE}/local/etc/$i ]; then
+        if [ -f ${OUD_BASE}/local/etc/$i.save ]; then
             if ! cmp ${OUD_BASE}/local/etc/$i.save ${OUD_BASE}/local/etc/$i >/dev/null 2>&1 ; then
                 DoMsg "INFO : Restore $i.save to $i"
                 cp ${OUD_BASE}/local/etc/$i ${OUD_BASE}/local/etc/$i.new
