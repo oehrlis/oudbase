@@ -233,13 +233,9 @@ function oudup {
             PORT=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f2)
             PORT_SSL=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f3)
             DIRECTORY_TYPE=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f6)
-            export DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${ORACLE_BASE}"}
-            printf "%-5s  %-10s %-6s %-14s %-s\n" \
-                ${DIRECTORY_TYPE} \ 
-                $i \
-                ${STATUS} \
-                "${PORT}/${PORT_SSL}/${PORT_ADMIN}" \
-                "${OUD_INSTANCE_BASE}/$i"
+            DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
+            printf '%-5s %-10s %-6s %-14s %-s\n' ${DIRECTORY_TYPE} ${i} ${STATUS} \
+                "${PORT}/${PORT_SSL}/${PORT_ADMIN}" "${OUD_INSTANCE_BASE}/$i"
         done
         echo ""
     fi
@@ -436,6 +432,7 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
         PORT_ADMIN=$(echo ${OUD_CONF_STR}|cut -d: -f4)
         PORT_REP=$(echo ${OUD_CONF_STR}|cut -d: -f5)
         DIRECTORY_TYPE=$(echo ${OUD_CONF_STR}|cut -d: -f6)
+        DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
         export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
         export OUD_INSTANCE_ADMIN=${OUD_INSTANCE_ADMIN_BASE}/${OUD_INSTANCE}
 
