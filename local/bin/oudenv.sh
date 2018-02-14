@@ -221,8 +221,8 @@ function oudup {
 # Purpose....: display the status of the OUD instances
 # ---------------------------------------------------------------------------
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-        echo "TYPE  INSTANCE   STATUS PORTS          HOME"
-        echo "----- ---------- ------ -------------- ----------------------------------"
+        echo "TYPE  INSTANCE     STATUS PORTS          HOME"
+        echo "----- ------------ ------ -------------- ----------------------------------"
         for i in ${OUD_INST_LIST}; do
             STATUS="$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
                         grep org.opends.server.core.DirectoryServer|\
@@ -234,7 +234,7 @@ function oudup {
             PORT_SSL=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f3)
             DIRECTORY_TYPE=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f6)
             DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
-            printf '%-5s %-10s %-6s %-14s %-s\n' ${DIRECTORY_TYPE} ${i} ${STATUS} \
+            printf '%-5s %-12s %-6s %-14s %-s\n' ${DIRECTORY_TYPE} ${i} ${STATUS} \
                 "${PORT}/${PORT_SSL}/${PORT_ADMIN}" "${OUD_INSTANCE_BASE}/$i"
         done
         echo ""
