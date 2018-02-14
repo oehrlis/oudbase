@@ -241,7 +241,12 @@ function get_oracle_home {
         Silent=$1
         if [ -r "${OUD_INSTANCE_HOME}/OUD/install.path" ]; then
             read ORACLE_HOME < "${OUD_INSTANCE_HOME}/OUD/install.path"
-            ORACLE_HOME=$(dirname ${ORACLE_HOME})
+            if [ -d ${ORACLE_HOME} ]; then
+                ORACLE_HOME=$(dirname ${ORACLE_HOME})
+            else
+                echo "WARN : Can not determin ORACLE_HOME from OUD Instance."
+                echo "       Please explicitly set ORACLE_HOME"
+            fi
         else
             echo "WARN : Can not determin ORACLE_HOME from OUD Instance."
             echo "       Please explicitly set ORACLE_HOME"
