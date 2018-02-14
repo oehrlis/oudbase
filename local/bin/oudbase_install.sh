@@ -250,7 +250,6 @@ if [ "${INSTALL_ORACLE_HOME}" == "" ]; then
     export ORACLE_PRODUCT=$(dirname $DEFAULT_ORACLE_HOME)
 fi
 
-
 # Print some information on the defined variables
 DoMsg "INFO : Using the following variable for installation"
 DoMsg "INFO : ORACLE_BASE          = $ORACLE_BASE"
