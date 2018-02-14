@@ -51,7 +51,7 @@
 # ---------------------------------------------------------------------------
 export HOST=$(hostname)
 export ORACLE_BASE=${ORACLE_BASE:-"${OUD_BASE}"}
-export OUD_DATA=${OUD_DATA:-"/u01"}
+export OUD_DATA=${OUD_DATA:-"${ORACLE_BASE}"}
 export OUD_LOCAL="${OUD_BASE}/local"            # sowiesoe
 export OUD_INSTANCE_BASE=${OUD_INSTANCE_BASE:-"${OUD_DATA}/instances"}
 export OUD_BACKUP_BASE=${OUD_BACKUP_BASE:-"${OUD_DATA}/backup"}
