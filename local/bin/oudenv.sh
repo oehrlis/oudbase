@@ -64,7 +64,8 @@ export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(find ${ORACLE_BASE} ${SYSTEM_JAVA}
 
 
 # set directory type
-export DIRECTORY_TYPE=OUD
+export DEFAULT_DIRECTORY_TYPE="OUD"
+export DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
 if [ "$(find ${ORACLE_BASE} ! -readable -prune -o -name dsadm -printf '%f\n')" = "dsadm" ]; then
     export DIRECTORY_TYPE=ODSEE
     # fallback for ODSEE home...
@@ -220,8 +221,8 @@ function oudup {
 # Purpose....: display the status of the OUD instances
 # ---------------------------------------------------------------------------
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-        echo "TYPE INSTANCE   STATUS PORTS          HOME"
-        echo "---- ---------- ------ -------------- ----------------------------------"
+        echo "TYPE  INSTANCE   STATUS PORTS          HOME"
+        echo "----- ---------- ------ -------------- ----------------------------------"
         for i in ${OUD_INST_LIST}; do
             STATUS="$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
                         grep org.opends.server.core.DirectoryServer|\
@@ -231,7 +232,10 @@ function oudup {
             PORT_ADMIN=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f4)
             PORT=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f2)
             PORT_SSL=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f3)
-            printf "OUD  %-10s %-6s %-14s %-s\n" \
+            DIRECTORY_TYPE=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f6)
+            export DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${ORACLE_BASE}"}
+            printf "%-5s  %-10s %-6s %-14s %-s\n" \
+                ${DIRECTORY_TYPE} \ 
                 $i \
                 ${STATUS} \
                 "${PORT}/${PORT_SSL}/${PORT_ADMIN}" \
@@ -306,10 +310,10 @@ function update_oudtab {
         get_ports -silent
         if [ -f "${OUDTAB}" ]; then
             if [ $(grep -v '^#' ${OUDTAB}| grep -iwc ${OUD_INSTANCE}) -eq 1 ]; then 
-                sed -i "/${OUD_INSTANCE}/c\\${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP" "${OUDTAB}"
+                sed -i "/${OUD_INSTANCE}/c\\${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP:$DIRECTORY_TYPE" "${OUDTAB}"
             else
                 echo "add ${OUD_INSTANCE} to ${OUDTAB}"
-                echo "${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP" >>"${OUDTAB}"
+                echo "${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP:$DIRECTORY_TYPE" >>"${OUDTAB}"
             fi
         fi
     fi
@@ -431,6 +435,7 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
         PORT_SSL=$(echo ${OUD_CONF_STR}|cut -d: -f3)
         PORT_ADMIN=$(echo ${OUD_CONF_STR}|cut -d: -f4)
         PORT_REP=$(echo ${OUD_CONF_STR}|cut -d: -f5)
+        DIRECTORY_TYPE=$(echo ${OUD_CONF_STR}|cut -d: -f6)
         export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
         export OUD_INSTANCE_ADMIN=${OUD_INSTANCE_ADMIN_BASE}/${OUD_INSTANCE}
 
@@ -441,6 +446,7 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
         export PORT_SSL
         export PORT_ADMIN
         export PORT_REP
+        export DIRECTORY_TYPE
     elif [ -d "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD" ]; then
         # fallback to OUD_INSTANCE_BASE Instance directory
         export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
@@ -448,7 +454,7 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
         echo "WARN : Set Instance based on ${OUD_INSTANCE_HOME}"
         get_oracle_home -silent    # get oracle home from OUD instance
         get_ports -silent    # get ports from OUD config
-        echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:">>${OUDTAB}
+        echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}">>${OUDTAB}
         echo "WARN : Add ${OUD_INSTANCE} to ${OUDTAB} please review ports"
     else # print error and keep current setting
         echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUDTAB} or ${OUD_INSTANCE_BASE}"
