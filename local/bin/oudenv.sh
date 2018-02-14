@@ -58,7 +58,9 @@ export OUD_BACKUP_BASE=${OUD_BACKUP_BASE:-"${OUD_DATA}/backup"}
 
 export ORACLE_HOME=${ORACLE_HOME:-"$(find ${ORACLE_BASE} ! -readable -prune -o -name oud-setup -print |sed 's/\/oud\/oud-setup$//'|head -n 1)"}
 export ORACLE_FMW_HOME=${ORACLE_FMW_HOME:-"$(find ${ORACLE_BASE} ! -readable -prune -o -name oudsm-wlst.jar -print|sed -r 's/(\/[^\/]+){3}\/oudsm-wlst.jar//g'|head -n 1)"}
-export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(find ${ORACLE_BASE} /usr/java ! -readable -prune -o -type f -name java -print |head -1)| sed "s:/bin/java::")}
+SYSTEM_JAVA=$(if [ -d "/usr/java" ]; then echo "/usr/java"; fi)
+export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(find ${ORACLE_BASE} ${SYSTEM_JAVA} ! -readable -prune -o -type f -name java -print |head -1) 2>/dev/null| sed "s:/bin/java::")}
+
 
 # set directory type
 export DIRECTORY_TYPE=OUD
@@ -91,6 +93,11 @@ fi
 if [ "${OUD_BASE}" = "" ] || [ ! -d "${OUD_BASE}" ]; then
     echo "ERROR: OUD_BASE not set or \$OUD_BASE not available"
     return 1
+fi
+
+# Check if JAVA_HOME is defined
+if [ "${JAVA_HOME}" == "" ]; then
+    echo "WARN : JAVA_HOME is not set or could not be determined automatically"
 fi
 
 # store PATH on first execution otherwise reset it
@@ -244,12 +251,10 @@ function get_oracle_home {
             if [ -d ${ORACLE_HOME} ]; then
                 ORACLE_HOME=$(dirname ${ORACLE_HOME})
             else
-                echo "WARN : Can not determin ORACLE_HOME from OUD Instance."
-                echo "       Please explicitly set ORACLE_HOME"
+                echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
             fi
         else
-            echo "WARN : Can not determin ORACLE_HOME from OUD Instance."
-            echo "       Please explicitly set ORACLE_HOME"
+            echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
         fi
         export ORACLE_HOME
         if [ "${Silent}" == "" ]; then
@@ -272,8 +277,7 @@ function get_ports {
             PORT_SSL=$(sed -n '/LDAPS Connection Handler/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
             PORT_REP=$(sed -n '/LDAP Replication Connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
         else
-            echo "WARN : Can not determin config.ldif from OUD Instance."
-            echo "       Please explicitly set your PORTS"
+            echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set your PORTS."
         fi
         # export the port variables and set default values with not specified
         export PORT_ADMIN=${PORT_ADMIN:-"4444"}
@@ -367,6 +371,18 @@ function relpath {
     BaseDirectory=$1
     TargetDirectory=$2
 
+    if [ "${BaseDirectory}" == "" ]; then
+        echo "WARN : BaseDirectory in relpath is empty."
+        caller
+        return 1
+    fi
+    
+    if [ "${TargetDirectory}" == "" ]; then
+        echo "WARN : TargetDirectory in relpath is empty."
+        caller
+        return 1
+    fi
+    
     CommonPart=$BaseDirectory # for now
     Result="" # for now
 
@@ -434,7 +450,7 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
     else # print error and keep current setting
         echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUDTAB} or ${OUD_INSTANCE_BASE}"
         export OUD_INSTANCE=${OUD_INSTANCE_LAST}
-        return 1
+        exit 1
     fi
 else # check if the requested OUD Instance exists in oudbase
     if [ -d "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD" ]; then
@@ -445,7 +461,7 @@ else # check if the requested OUD Instance exists in oudbase
     else # print error and keep current setting
         echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUD_INSTANCE_BASE}"
         export OUD_INSTANCE=${OUD_INSTANCE_LAST}
-        return 1
+        exit 1
     fi
 fi
 
