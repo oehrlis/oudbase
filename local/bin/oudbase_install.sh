@@ -244,6 +244,11 @@ export ORACLE_FMW_HOME=${INSTALL_ORACLE_FMW_HOME:-"${DEFAULT_ORACLE_FMW_HOME}"}
 DEFAULT_JAVA_HOME=$(readlink -f $(find ${ORACLE_BASE} /usr/java -type f -name java 2>/dev/null |head -1)| sed "s:/bin/java::")
 export JAVA_HOME=${INSTALL_JAVA_HOME:-"${DEFAULT_JAVA_HOME}"}
 
+if [ ! "${INSTALL_ORACLE_HOME}" == "" ]; then
+    export ORACLE_PRODUCT=$(dirname $DEFAULT_ORACLE_FMW_HOME)
+fi
+
+
 # Print some information on the defined variables
 DoMsg "INFO : Using the following variable for installation"
 DoMsg "INFO : ORACLE_BASE          = $ORACLE_BASE"
@@ -273,7 +278,8 @@ for i in    ${LOG_BASE} \
             ${ETC_BASE} \
             ${ORACLE_BASE}/local \
             ${OUD_BACKUP_BASE} \
-            ${OUD_INSTANCE_BASE}; do
+            ${OUD_INSTANCE_BASE} \
+            ${ORACLE_PRODUCT}; do
     mkdir -pv ${i} >/dev/null 2>&1 && DoMsg "INFO : Create Directory ${i}" || CleanAndQuit 41 ${i}
 done
 
