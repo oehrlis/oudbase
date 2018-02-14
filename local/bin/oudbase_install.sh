@@ -278,6 +278,7 @@ fi
 for i in    ${LOG_BASE} \
             ${ETC_BASE} \
             ${ORACLE_BASE}/local \
+            ${ORACLE_BASE}/admin \
             ${OUD_BACKUP_BASE} \
             ${OUD_INSTANCE_BASE} \
             ${ORACLE_PRODUCT}; do
