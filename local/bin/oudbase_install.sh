@@ -370,14 +370,9 @@ for i in    OUD_ADMIN_BASE \
     variable="INSTALL_${i}"
     if [ ! "${!variable}" == "" ]; then
         DoMsg "INFO : save customization for $i (${!variable})"
-        #sed -i -e "/$i=/{s/.*/$i=${!variable}/;:a;n;:ba;q}" -e "a$i=${!variable}" ${ETC_CORE}/${OUD_CORE_CONFIG}
-        
         grep -q "^$i" ${ETC_CORE}/${OUD_CORE_CONFIG} && \
             sed -i "s/^$i.*/$i={!variable}/" ${ETC_CORE}/${OUD_CORE_CONFIG} || \
-            echo "$i={!variable}" >> ${ETC_CORE}/${OUD_CORE_CONFIG}
-
-        #sed -i "/<INSTALL_CUSTOMIZATION>/a $i=${!variable}" \
-        #${ETC_CORE}/${OUD_CORE_CONFIG} && DoMsg "INFO : save customization for $i (${!variable})"
+            echo "$i=${!variable}" >> ${ETC_CORE}/${OUD_CORE_CONFIG}
     fi
 done
 
