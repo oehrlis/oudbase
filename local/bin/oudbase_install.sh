@@ -382,37 +382,37 @@ if [ "${APPEND_PROFILE}" = "TRUE" ]; then
         CleanAndQuit 20
     fi
     DoMsg "Append to profile ${PROFILE}"
-    echo '# Check OUD_BASE and load if necessary'             >>"${PROFILE}"
-    echo 'if [ "${OUD_BASE}" = "" ]; then'                    >>"${PROFILE}"
-    echo '  if [ -f "${HOME}/.OUD_BASE" ]; then'              >>"${PROFILE}"
-    echo '    . "${HOME}/.OUD_BASE"'                          >>"${PROFILE}"
-    echo '  else'                                             >>"${PROFILE}"
-    echo '    echo "ERROR: Could not load ${HOME}/.OUD_BASE"' >>"${PROFILE}"
-    echo '  fi'                                               >>"${PROFILE}"
-    echo 'fi'                                                 >>"${PROFILE}"
-    echo ''                                                   >>"${PROFILE}"
-    echo '# define an oudenv alias'                           >>"${PROFILE}"
-    echo 'alias oud=". ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh"'      >>"${PROFILE}"
-    echo ''                                                   >>"${PROFILE}"
-    echo '# source oud environment'                           >>"${PROFILE}"
-    echo '. ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh'                  >>"${PROFILE}"
+    echo "# Check OUD_BASE and load if necessary"                       >>"${PROFILE}"
+    echo "if [ \"\${OUD_BASE}\" = \"\" ]; then"                         >>"${PROFILE}"
+    echo "  if [ -f \"\${HOME}/.OUD_BASE\" ]; then"                     >>"${PROFILE}"
+    echo "    . \"\${HOME}/.OUD_BASE\""                                 >>"${PROFILE}"
+    echo "  else"                                                       >>"${PROFILE}"
+    echo "    echo \"ERROR: Could not load \${HOME}/.OUD_BASE\""        >>"${PROFILE}"
+    echo "  fi"                                                         >>"${PROFILE}"
+    echo "fi"                                                           >>"${PROFILE}"
+    echo ""                                                             >>"${PROFILE}"
+    echo "# define an oudenv alias"                                     >>"${PROFILE}"
+    echo "alias oud=\". \${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh\""  >>"${PROFILE}"
+    echo ""                                                             >>"${PROFILE}"
+    echo "# source oud environment"                                     >>"${PROFILE}"
+    echo ". \${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh"  >>"${PROFILE}"
 else
     DoMsg "INFO : Please manual adjust your .bash_profile to load / source your OUD Environment"
     DoMsg "INFO : using the following code"
-    DoMsg '# Check OUD_BASE and load if necessary'
-    DoMsg 'if [ "${OUD_BASE}" = "" ]; then'
-    DoMsg '  if [ -f "${HOME}/.OUD_BASE" ]; then'
-    DoMsg '    . "${HOME}/.OUD_BASE"'
-    DoMsg '  else'
-    DoMsg '    echo "ERROR: Could not load ${HOME}/.OUD_BASE"'
-    DoMsg '  fi'
-    DoMsg 'fi'
-    DoMsg ''
-    DoMsg '# define an oudenv alias'
-    DoMsg 'alias oud=". ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh"'
-    DoMsg ''
-    DoMsg '# source oud environment'
-    DoMsg '. ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh'
+    DoMsg "# Check OUD_BASE and load if necessary"
+    DoMsg "if [ \"\${OUD_BASE}\" = \"\" ]; then"
+    DoMsg "  if [ -f \"\${HOME}/.OUD_BASE\" ]; then"
+    DoMsg "    . \"\${HOME}/.OUD_BASE\""
+    DoMsg "  else'"
+    DoMsg "    echo \"ERROR: Could not load \${HOME}/.OUD_BASE\""
+    DoMsg "  fi"
+    DoMsg "fi"
+    DoMsg ""
+    DoMsg "# define an oudenv alias"
+    DoMsg "alias oud=\". \${OUD_BASE}/{DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh\""
+    DoMsg ""
+    DoMsg "# source oud environment"
+    DoMsg ". ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh"
 fi
 
 touch $HOME/.OUD_BASE 2>/dev/null
