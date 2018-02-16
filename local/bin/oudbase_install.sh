@@ -369,7 +369,7 @@ for i in    OUD_ADMIN_BASE \
             JAVA_HOME; do
     variable="INSTALL_${i}"
     if [ ! "${!variable}" == "" ]; then
-        if [ $(grep -q "^$i" ${ETC_CORE}/${OUD_CORE_CONFIG}) ]; then
+        if [ $(grep -c "^$i" ${ETC_CORE}/${OUD_CORE_CONFIG}) -gt 0 ]; then
             DoMsg "INFO : update customization for $i (${!variable})"
             sed -i "s|^$i.*|$i=${!variable}|" ${ETC_CORE}/${OUD_CORE_CONFIG}
         else
