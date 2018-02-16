@@ -30,7 +30,20 @@ SCRIPT_NAME=$(basename $0)                             # Basename of the script
 SCRIPT_FQN=$(readlink -f $0)                           # Full qualified script name
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
-CONFIG_FILES="oudtab oudenv.conf oud._DEFAULT_.conf"
+OUD_CORE_CONFIG="oudenv_core.conf"
+CONFIG_FILES="oudtab oudenv.conf oud._DEFAULT_.conf ${OUD_CORE_CONFIG}"
+
+# a few core default values.
+DEFAULT_ORACLE_BASE="/u00/app/oracle"
+SYSTEM_JAVA_PATH=$(if [ -d "/usr/java" ]; then echo "/usr/java"; fi)
+DEFAULT_OUD_DATA="/u01"
+DEFAULT_OUD_ADMIN_BASE_NAME="admin"
+DEFAULT_OUD_BACKUP_BASE_NAME="backup"
+DEFAULT_OUD_INSTANCE_BASE_NAME="instances"
+DEFAULT_OUD_LOCAL_BASE_NAME="local"
+DEFAULT_PRODUCT_BASE_NAME="product"
+DEFAULT_ORACLE_HOME_NAME="oud12.2.1.3.0"
+DEFAULT_ORACLE_FMW_HOME_NAME="fmw12.2.1.3.0"
 # - End of Default Values ---------------------------------------------------
 
 # - Functions ---------------------------------------------------------------
@@ -54,6 +67,7 @@ function Usage()
     DoMsg "INFO :   -d <OUD_DATA>               OUD_DATA Directory. (default /u01 if available otherwise \$ORACLE_BASE). "
     DoMsg "INFO :                               This directory has to be specified to distinct persistant data from software "
     DoMsg "INFO :                               eg. in a docker containers"
+    DoMsg "INFO :   -A <OUD_ADMIN_BASE>         Base directory for OUD admin (default \$OUD_DATA/admin)"
     DoMsg "INFO :   -B <OUD_BACKUP_BASE>        Base directory for OUD backups (default \$OUD_DATA/backup)"
     DoMsg "INFO :   -i <OUD_INSTANCE_BASE>      Base directory for OUD instances (default \$OUD_DATA/instances)"
     DoMsg "INFO :   -m <ORACLE_HOME>            Oracle home directory for OUD binaries (default \$ORACLE_BASE/products)"
@@ -178,7 +192,7 @@ fi
 
 # usage and getopts
 DoMsg "INFO : processing commandline parameter"
-while getopts hvab:o:d:i:m:B:E:f:j: arg; do
+while getopts hvab:o:d:i:m:A:B:E:f:j: arg; do
     case $arg in
       h) Usage 0;;
       v) VERBOSE="TRUE";;
@@ -187,6 +201,7 @@ while getopts hvab:o:d:i:m:B:E:f:j: arg; do
       o) INSTALL_OUD_BASE="${OPTARG}";;
       d) INSTALL_OUD_DATA="${OPTARG}";;
       i) INSTALL_OUD_INSTANCE_BASE="${OPTARG}";;
+      A) INSTALL_OUD_ADMIN_BASE="${OPTARG}";;
       B) INSTALL_OUD_BACKUP_BASE="${OPTARG}";;
       j) INSTALL_JAVA_HOME="${OPTARG}";;
       m) INSTALL_ORACLE_HOME="${OPTARG}";;
@@ -216,47 +231,78 @@ if [ ! "${INSTALL_OUD_DATA}" = "" ] && [ ! -d "${INSTALL_OUD_DATA}" ]; then
     CleanAndQuit 44 ${INSTALL_OUD_DATA}
 fi
 
+DoMsg "INFO : Define default values"
 # define default values for a couple of directories and set the real 
 # directories based on the cli or default values
-DEFAULT_ORACLE_BASE="/u01/app/oracle"
+
+# define ORACLE_BASE basically this should not be used since -b is a mandatory parameter
 export ORACLE_BASE=${INSTALL_ORACLE_BASE:-"${DEFAULT_ORACLE_BASE}"}
 
+# define OUD_BASE
 DEFAULT_OUD_BASE="${ORACLE_BASE}"
 export OUD_BASE=${INSTALL_OUD_BASE:-"${DEFAULT_OUD_BASE}"}
 
-DEFAULT_OUD_DATA=$(if [ -d "/u01" ]; then echo "/u01"; else echo "${ORACLE_BASE}"; fi)
+# define OUD_DATA
+DEFAULT_OUD_DATA=$(if [ -d "${DEFAULT_OUD_DATA}" ]; then echo ${DEFAULT_OUD_DATA}; else echo "${ORACLE_BASE}"; fi)
 export OUD_DATA=${INSTALL_OUD_DATA:-"${DEFAULT_OUD_DATA}"}
 
-DEFAULT_OUD_INSTANCE_BASE="${OUD_DATA}/instances"
+# define OUD_INSTANCE_BASE
+DEFAULT_OUD_INSTANCE_BASE="${OUD_DATA}/${DEFAULT_OUD_INSTANCE_BASE_NAME}"
 export OUD_INSTANCE_BASE=${INSTALL_OUD_INSTANCE_BASE:-"${DEFAULT_OUD_INSTANCE_BASE}"}
 
-DEFAULT_OUD_BACKUP_BASE="${OUD_DATA}/backup"
+# define OUD_BACKUP_BASE
+DEFAULT_OUD_BACKUP_BASE="${OUD_DATA}/${DEFAULT_OUD_BACKUP_BASE_NAME}"
 export OUD_BACKUP_BASE=${INSTALL_OUD_BACKUP_BASE:-"${DEFAULT_OUD_BACKUP_BASE}"}
 
-DEFAULT_ORACLE_HOME="${ORACLE_BASE}/product/fmw12.2.1.3.0"
+# define ORACLE_HOME
+DEFAULT_ORACLE_HOME=$(find ${ORACLE_BASE} ! -readable -prune -o -name oud-setup -print |sed 's/\/oud\/oud-setup$//'|head -n 1)
+DEFAULT_ORACLE_HOME=${DEFAULT_ORACLE_HOME:-"${ORACLE_BASE}/${DEFAULT_PRODUCT_BASE_NAME}/${DEFAULT_ORACLE_HOME_NAME}"}
 export ORACLE_HOME=${INSTALL_ORACLE_HOME:-"${DEFAULT_ORACLE_HOME}"}
 
-DEFAULT_ORACLE_FMW_HOME="${ORACLE_BASE}/product/fmw12.2.1.3.0"
+# define ORACLE_FMW_HOME
+DEFAULT_ORACLE_FMW_HOME=$(find ${ORACLE_BASE} ! -readable -prune -o -name oudsm-wlst.jar -print|sed -r 's/(\/[^\/]+){3}\/oudsm-wlst.jar//g'|head -n 1)
+DEFAULT_ORACLE_FMW_HOME=${DEFAULT_ORACLE_FMW_HOME:-"${ORACLE_BASE}/${DEFAULT_PRODUCT_BASE_NAME}/${DEFAULT_ORACLE_FMW_HOME_NAME}"}
 export ORACLE_FMW_HOME=${INSTALL_ORACLE_FMW_HOME:-"${DEFAULT_ORACLE_FMW_HOME}"}
 
-SYSTEM_JAVA=$(if [ -d "/usr/java" ]; then echo "/usr/java"; fi)
-DEFAULT_JAVA_HOME=$(readlink -f $(find ${ORACLE_BASE} ${SYSTEM_JAVA} ! -readable -prune -o -type f -name java -print |head -1) 2>/dev/null| sed "s:/bin/java::")
-DEFAULT_JAVA_HOME=${DEFAULT_JAVA_HOME:-"${ORACLE_BASE}/product/java"}
+# define JAVA_HOME
+DEFAULT_JAVA_HOME=$(readlink -f $(find ${ORACLE_BASE} ${SYSTEM_JAVA_PATH} ! -readable -prune -o -type f -name java -print |head -1) 2>/dev/null| sed "s:/bin/java::")
 export JAVA_HOME=${INSTALL_JAVA_HOME:-"${DEFAULT_JAVA_HOME}"}
 
+# define OUD_BACKUP_BASE
+DEFAULT_OUD_ADMIN_BASE="${OUD_DATA}/${DEFAULT_OUD_ADMIN_BASE_NAME}"
+export OUD_ADMIN_BASE=${INSTALL_OUD_ADMIN_BASE:-"${DEFAULT_OUD_ADMIN_BASE}"}
+
+# define ORACLE_PRODUCT
 if [ "${INSTALL_ORACLE_HOME}" == "" ]; then
-    export ORACLE_PRODUCT=$(dirname $DEFAULT_ORACLE_HOME)
+    ORACLE_PRODUCT=$(dirname ${ORACLE_HOME})
 else
-    export ORACLE_PRODUCT
+    ORACLE_PRODUCT
+fi
+
+# set the core etc directory
+export ETC_CORE="${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/etc" 
+
+# adjust LOG_BASE and ETC_BASE depending on OUD_DATA
+if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
+    export LOG_BASE="${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/log"
+    export ETC_BASE="${ETC_CORE}"
+else
+    export LOG_BASE="${OUD_DATA}/log"
+    export ETC_BASE="${OUD_DATA}/etc"
 fi
 
 # Print some information on the defined variables
 DoMsg "INFO : Using the following variable for installation"
 DoMsg "INFO : ORACLE_BASE          = $ORACLE_BASE"
 DoMsg "INFO : OUD_BASE             = $OUD_BASE"
+DoMsg "INFO : LOG_BASE             = $LOG_BASE"
+DoMsg "INFO : ETC_CORE             = $ETC_CORE"
+DoMsg "INFO : ETC_BASE             = $ETC_BASE"
 DoMsg "INFO : OUD_DATA             = $OUD_DATA"
 DoMsg "INFO : OUD_INSTANCE_BASE    = $OUD_INSTANCE_BASE"
+DoMsg "INFO : OUD_ADMIN_BASE       = $OUD_ADMIN_BASE"
 DoMsg "INFO : OUD_BACKUP_BASE      = $OUD_BACKUP_BASE"
+DoMsg "INFO : ORACLE_PRODUCT       = $ORACLE_PRODUCT"
 DoMsg "INFO : ORACLE_HOME          = $ORACLE_HOME"
 DoMsg "INFO : ORACLE_FMW_HOME      = $ORACLE_FMW_HOME"
 DoMsg "INFO : JAVA_HOME            = $JAVA_HOME"
@@ -266,19 +312,10 @@ DoMsg "INFO : SCRIPT_FQN           = $SCRIPT_FQN"
 DoMsg "INFO : Installing OUD Environment"
 DoMsg "INFO : Create required directories in ORACLE_BASE=${ORACLE_BASE}"
 
-# adjust LOG_BASE and ETC_BASE depending on OUD_DATA
-if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
-    export LOG_BASE=${ORACLE_BASE}/local/log
-    export ETC_BASE=${ORACLE_BASE}/local/etc
-else
-    export LOG_BASE=${OUD_DATA}/log
-    export ETC_BASE=${OUD_DATA}/etc
-fi
-
 for i in    ${LOG_BASE} \
             ${ETC_BASE} \
-            ${ORACLE_BASE}/local \
-            ${ORACLE_BASE}/admin \
+            ${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME} \
+            ${OUD_ADMIN_BASE} \
             ${OUD_BACKUP_BASE} \
             ${OUD_INSTANCE_BASE} \
             ${ORACLE_PRODUCT}; do
@@ -287,40 +324,42 @@ done
 
 # backup config files if the exits. Just check if ${OUD_BASE}/local/etc
 # does exist
-if [ -d ${OUD_BASE}/local/etc ]; then
+if [ -d ${ETC_BASE} ]; then
     DoMsg "INFO : Backup existing config files"
     SAVE_CONFIG="TRUE"
     for i in ${CONFIG_FILES}; do
-        if [ -f ${OUD_BASE}/local/etc/$i ]; then
+        if [ -f ${ETC_BASE}/$i ]; then
             DoMsg "INFO : Backup $i to $i.save"
-            cp ${OUD_BASE}/local/etc/$i ${OUD_BASE}/local/etc/$i.save
+            cp ${ETC_BASE}/$i ${ETC_BASE}/$i.save
         fi
     done
 fi
 
-DoMsg "INFO : Extracting file into ${ORACLE_BASE}/local"
+DoMsg "INFO : Extracting file into ${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}"
 # take the tarfile and pipe it into tar
-tail -n +$SKIP $SCRIPT_FQN | tar -xzv --exclude="._*"  -C ${ORACLE_BASE}/local
+tail -n +$SKIP $SCRIPT_FQN | tar -xzv --exclude="._*"  -C ${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}
 
 # restore customized config files
 if [ "${SAVE_CONFIG}" = "TRUE" ]; then
     DoMsg "INFO : Restore cusomized config files"
     for i in ${CONFIG_FILES}; do
-        if [ -f ${OUD_BASE}/local/etc/$i.save ]; then
-            if ! cmp ${OUD_BASE}/local/etc/$i.save ${OUD_BASE}/local/etc/$i >/dev/null 2>&1 ; then
+        if [ -f ${ETC_BASE}/$i.save ]; then
+            if ! cmp ${ETC_BASE}/$i.save ${ETC_BASE}/$i >/dev/null 2>&1 ; then
                 DoMsg "INFO : Restore $i.save to $i"
-                cp ${OUD_BASE}/local/etc/$i ${OUD_BASE}/local/etc/$i.new
-                cp ${OUD_BASE}/local/etc/$i.save ${OUD_BASE}/local/etc/$i
-                rm ${OUD_BASE}/local/etc/$i.save
+                cp ${ETC_BASE}/$i ${ETC_BASE}/$i.new
+                cp ${ETC_BASE}/$i.save ${ETC_BASE}/$i
+                rm ${ETC_BASE}/$i.save
             else
-                rm ${OUD_BASE}/local/etc/$i.save
+                rm ${ETC_BASE}/$i.save
             fi
         fi
     done
 fi
 
 # Store install customization
-for i in    OUD_BACKUP_BASE \
+DoMsg "INFO : Store customization in core config file ${ETC_CORE}/${OUD_CORE_CONFIG}"
+for i in    OUD_ADMIN_BASE \
+            OUD_BACKUP_BASE \
             OUD_INSTANCE_BASE \
             OUD_DATA \
             OUD_BASE \
@@ -331,7 +370,7 @@ for i in    OUD_BACKUP_BASE \
     variable="INSTALL_${i}"
     if [ ! "${!variable}" == "" ]; then
         sed -i "/<INSTALL_CUSTOMIZATION>/a $i=${!variable}" \
-        ${ORACLE_BASE}/local/bin/oudenv.sh && DoMsg "INFO : Store customization for $i (${!variable})"
+        ${ETC_CORE}/${OUD_CORE_CONFIG} && DoMsg "INFO : save customization for $i (${!variable})"
     fi
 done
 
@@ -353,10 +392,10 @@ if [ "${APPEND_PROFILE}" = "TRUE" ]; then
     echo 'fi'                                                 >>"${PROFILE}"
     echo ''                                                   >>"${PROFILE}"
     echo '# define an oudenv alias'                           >>"${PROFILE}"
-    echo 'alias oud=". ${OUD_BASE}/local/bin/oudenv.sh"'      >>"${PROFILE}"
+    echo 'alias oud=". ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh"'      >>"${PROFILE}"
     echo ''                                                   >>"${PROFILE}"
     echo '# source oud environment'                           >>"${PROFILE}"
-    echo '. ${OUD_BASE}/local/bin/oudenv.sh'                  >>"${PROFILE}"
+    echo '. ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh'                  >>"${PROFILE}"
 else
     DoMsg "INFO : Please manual adjust your .bash_profile to load / source your OUD Environment"
     DoMsg "INFO : using the following code"
@@ -370,10 +409,10 @@ else
     DoMsg 'fi'
     DoMsg ''
     DoMsg '# define an oudenv alias'
-    DoMsg 'alias oud=". ${OUD_BASE}/local/bin/oudenv.sh"'
+    DoMsg 'alias oud=". ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh"'
     DoMsg ''
     DoMsg '# source oud environment'
-    DoMsg '. ${OUD_BASE}/local/bin/oudenv.sh'
+    DoMsg '. ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh'
 fi
 
 touch $HOME/.OUD_BASE 2>/dev/null

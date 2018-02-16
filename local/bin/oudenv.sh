@@ -20,58 +20,50 @@
 # 10.11.2017   soe  Add support for OUD_DATA to distinct persistant files for docker
 # 13.11.2017   soe  Add get_ports and create oudtab entry
 # ---------------------------------------------------------------------------
-#
-# - Customization -----------------------------------------------------------
-# - Below you may set some variables explicit. In general this customization 
-# - should not be necessary. It's recommended to set the variable before using
-# - oudenv.sh eg. in .bash_profile. 
-# - The installation script oudbase_install will add available variable bellow 
-# - the tag INSTALL_CUSTOMIZATION.
-# 
-# - Possible variables for customization
-# - ORACLE_BASE       define the Oracle base directory, defaults to /u00/app/oracle
-# - OUD_BASE          define the oud base directory, defaults to ORACLE_BASE
-# - OUD_DATA          define oud directory for data, instance, configurations
-# - OUD_INSTANCE_BASE define the instance base directory, defaults OUD_DATA/instances
-# - OUD_BACKUP_BASE   define the backup base directory, defaults OUD_DATA/backup
-# - ORACLE_HOME       define the backup base directory, defaults to ORACLE_BASE/middleware
-# - ORACLE_FMW_HOME   define the backup base directory, defaults to ORACLE_HOME
-# - JAVA_HOME         define the java home
-# - LOG_BASE          alternative log directory, defaults to OUD_BASE/local/log
-# - ETC_BASE          alternative etc/config directory, defaults to OUD_BASE/local/etc
-#
-# - Do not change anything below the customization section.
-# ---------------------------------------------------------------------------
-# <INSTALL_CUSTOMIZATION>
-
-# - End of Customization ----------------------------------------------------
 
 # - Environment Variables ---------------------------------------------------
 # - Set default values for environment variables if not yet defined. 
 # ---------------------------------------------------------------------------
 export HOST=$(hostname)
+
+# default values for file and folder names
+DEFAULT_OUD_ADMIN_BASE_NAME="admin"
+DEFAULT_OUD_BACKUP_BASE_NAME="backup"
+DEFAULT_OUD_INSTANCE_BASE_NAME="instances"
+DEFAULT_OUD_LOCAL_BASE_NAME="local"
+DEFAULT_PRODUCT_BASE_NAME="product"
+DEFAULT_ORACLE_HOME_NAME="fmw12.2.1.3.0"
+DEFAULT_ORACLE_FMW_HOME_NAME="fmw12.2.1.3.0"
+OUD_CORE_CONFIG="oudenv_core.conf"
+
+# default ORACLE_BASE 
 export ORACLE_BASE=${ORACLE_BASE:-"${OUD_BASE}"}
+export OUD_LOCAL="${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}"
+
+# set the ETC_CORE to the oud local directory
+export ETC_CORE=${OUD_LOCAL}/etc
+
+# source the core oudenv customizaition
+if [ -f "${ETC_CORE}/${OUD_CORE_CONFIG}" ]; then
+    . "${ETC_CORE}/${OUD_CORE_CONFIG}"
+fi
+
+# define location of base location for OUD data
 export OUD_DATA=${OUD_DATA:-"${ORACLE_BASE}"}
-export OUD_LOCAL="${OUD_BASE}/local"            # sowiesoe
-export OUD_INSTANCE_BASE=${OUD_INSTANCE_BASE:-"${OUD_DATA}/instances"}
-export OUD_INSTANCE_ADMIN_BASE=${OUD_INSTANCE_ADMIN_BASE:-"${OUD_DATA}/admin"}
-export OUD_BACKUP_BASE=${OUD_BACKUP_BASE:-"${OUD_DATA}/backup"}
 
-export ORACLE_HOME=${ORACLE_HOME:-"$(find ${ORACLE_BASE} ! -readable -prune -o -name oud-setup -print |sed 's/\/oud\/oud-setup$//'|head -n 1)"}
-export ORACLE_FMW_HOME=${ORACLE_FMW_HOME:-"$(find ${ORACLE_BASE} ! -readable -prune -o -name oudsm-wlst.jar -print|sed -r 's/(\/[^\/]+){3}\/oudsm-wlst.jar//g'|head -n 1)"}
-SYSTEM_JAVA=$(if [ -d "/usr/java" ]; then echo "/usr/java"; fi)
-export JAVA_HOME=${JAVA_HOME:-$(readlink -f $(find ${ORACLE_BASE} ${SYSTEM_JAVA} ! -readable -prune -o -type f -name java -print |head -1) 2>/dev/null| sed "s:/bin/java::")}
+# define misc base directories
+export OUD_ADMIN_BASE=${OUD_ADMIN_BASE:-"${OUD_DATA}/${DEFAULT_OUD_ADMIN_BASE_NAME}"}
+export OUD_BACKUP_BASE=${OUD_BACKUP_BASE:-"${OUD_DATA}/${DEFAULT_OUD_BACKUP_BASE_NAME}"}
+export OUD_INSTANCE_BASE=${OUD_INSTANCE_BASE:-"${OUD_DATA}/${DEFAULT_OUD_INSTANCE_BASE_NAME}"}
 
+# define default home directories
+export ORACLE_HOME=${ORACLE_HOME:-"${ORACLE_BASE}/${DEFAULT_PRODUCT_BASE_NAME}/${DEFAULT_ORACLE_HOME_NAME}"}
+export ORACLE_FMW_HOME=${ORACLE_FMW_HOME:-"${ORACLE_BASE}/${DEFAULT_PRODUCT_BASE_NAME}/${DEFAULT_ORACLE_FMW_HOME_NAME}"}
+export JAVA_HOME=${JAVA_HOME:-"${ORACLE_BASE}/${DEFAULT_PRODUCT_BASE_NAME}/java"}
 
 # set directory type
-export DEFAULT_DIRECTORY_TYPE="OUD"
+DEFAULT_DIRECTORY_TYPE="OUD"
 export DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
-if [ "$(find ${ORACLE_BASE} ! -readable -prune -o -name dsadm -printf '%f\n')" = "dsadm" ]; then
-    export DIRECTORY_TYPE=ODSEE
-    # fallback for ODSEE home...
-    export ORACLE_HOME=${ORACLE_HOME:-"$(find ${ORACLE_BASE} ! -readable -prune -o -name dsadm -print |sed 's/\/bin\/dsadm$//'|head -n 1)"}
-    echo "Directory type is ${DIRECTORY_TYPE}"
-fi
 # - EOF Environment Variables -----------------------------------------------
 
 # - Initialization ----------------------------------------------------------
@@ -110,9 +102,6 @@ else
         export PATH=${OUDSAVED_PATH}
     fi
 fi
-
-# set the ETC_CORE to the oud local directory
-export ETC_CORE=${OUD_LOCAL}/etc
 
 # set the log and etc base directory depending on OUD_DATA
 if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
@@ -217,31 +206,40 @@ function oud_status {
 }
 
 # ---------------------------------------------------------------------------
-function oudup {
+function oud_up {
 # Purpose....: display the status of the OUD instances
 # ---------------------------------------------------------------------------
-    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-        echo "TYPE  INSTANCE     STATUS PORTS          HOME"
-        echo "----- ------------ ------ -------------- ----------------------------------"
-        for i in ${OUD_INST_LIST}; do
-            STATUS="$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
-                        grep org.opends.server.core.DirectoryServer|\
-                        grep -c $i ) -gt 0 ]; \
-                        then echo 'up'; else echo 'down'; fi)"
-            # oudtab ohne instance home
-            PORT_ADMIN=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f4)
-            PORT=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f2)
-            PORT_SSL=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f3)
-            DIRECTORY_TYPE=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f6)
-            DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
-            printf '%-5s %-12s %-6s %-14s %-s\n' ${DIRECTORY_TYPE} ${i} ${STATUS} \
-                "${PORT}/${PORT_SSL}/${PORT_ADMIN}" "${OUD_INSTANCE_BASE}/$i"
-        done
-        echo ""
-    fi
+    echo "TYPE  INSTANCE     STATUS PORTS          HOME"
+    echo "----- ------------ ------ -------------- ----------------------------------"
+    for i in ${OUD_INST_LIST}; do
+        # oudtab ohne instance home
+        PORT_ADMIN=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f4)
+        PORT=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f2)
+        PORT_SSL=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f3)
+        DIRECTORY_TYPE=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f6)
+        DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
+        STATUS=$(get_status)
+        printf '%-5s %-12s %-6s %-14s %-s\n' ${DIRECTORY_TYPE} ${i} ${STATUS} \
+            "$(join_by / ${PORT} ${PORT_SSL} ${PORT_ADMIN})" "${OUD_INSTANCE_BASE}/$i"
+    done
+    echo ""
 }
 
 # ---------------------------------------------------------------------------
+function get_status { 
+# Purpose....: get the current instance / process status
+# ---------------------------------------------------------------------------
+# input parameter aktuelle instanz... fallback auf ${OUD_INSTANCE}
+    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+        echo "$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
+                grep org.opends.server.core.DirectoryServer|\
+                grep -c ${OUD_INSTANCE} ) -gt 0 ]; \
+                then echo 'up'; else echo 'down'; fi)"
+    else
+        echo "n/a"
+    fi
+}
+
 function get_oracle_home {
 # Purpose....: get the corresponding ORACLE_HOME from OUD Instance
 # ---------------------------------------------------------------------------
@@ -366,6 +364,13 @@ fi
 }
 
 # ---------------------------------------------------------------------------
+function join_by { 
+# Purpose....: Join array elements
+# ---------------------------------------------------------------------------
+    local IFS="$1"; shift; echo "$*"; 
+}
+
+# ---------------------------------------------------------------------------
 function relpath {
 # Purpose....: get the relative path of DIR1 from DIR2
 # ---------------------------------------------------------------------------
@@ -434,7 +439,7 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
         DIRECTORY_TYPE=$(echo ${OUD_CONF_STR}|cut -d: -f6)
         DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
         export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
-        export OUD_INSTANCE_ADMIN=${OUD_INSTANCE_ADMIN_BASE}/${OUD_INSTANCE}
+        export OUD_INSTANCE_ADMIN=${OUD_ADMIN_BASE}/${OUD_INSTANCE}
 
         # get_oracle_home 
         get_oracle_home -silent    # get oracle home from OUD instance
@@ -447,7 +452,7 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
     elif [ -d "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD" ]; then
         # fallback to OUD_INSTANCE_BASE Instance directory
         export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
-        export OUD_INSTANCE_ADMIN=${OUD_INSTANCE_ADMIN_BASE}/${OUD_INSTANCE}
+        export OUD_INSTANCE_ADMIN=${OUD_ADMIN_BASE}/${OUD_INSTANCE}
         echo "WARN : Set Instance based on ${OUD_INSTANCE_HOME}"
         get_oracle_home -silent    # get oracle home from OUD instance
         get_ports -silent    # get ports from OUD config
@@ -461,7 +466,7 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
 else # check if the requested OUD Instance exists in oudbase
     if [ -d "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD" ]; then
         export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
-        export OUD_INSTANCE_ADMIN=${OUD_INSTANCE_ADMIN_BASE}/${OUD_INSTANCE}
+        export OUD_INSTANCE_ADMIN=${OUD_ADMIN_BASE}/${OUD_INSTANCE}
         get_oracle_home -silent    # get oracle home from OUD instance
         get_ports -silent    # get ports from OUD config
         export INSTANCE_NAME=$(relpath "${ORACLE_HOME}" "${OUD_INSTANCE_HOME}")
@@ -470,6 +475,14 @@ else # check if the requested OUD Instance exists in oudbase
         export OUD_INSTANCE=${OUD_INSTANCE_LAST}
         exit 1
     fi
+fi
+
+RECREATE="TRUE"
+# re-create instance admin directory
+if [ ! -d "${OUD_INSTANCE_ADMIN}" ] && [ "${RECREATE}" = "TRUE" ]; then
+    mkdir -p "${OUD_INSTANCE_ADMIN}" >/dev/null 2>&1
+    mkdir -p "${OUD_INSTANCE_ADMIN}/create" >/dev/null 2>&1
+    mkdir -p "${OUD_INSTANCE_ADMIN}/log" >/dev/null 2>&1
 fi
 
 # set the new PATH
@@ -512,7 +525,6 @@ if [ -f ${ETC_BASE}/${OUD_INSTANCE}_pwd.txt ]; then
 else
     export PWD_FILE=${ETC_BASE}/pwd.txt
 fi
-
 
 if [ ${pTTY} -eq 0 ] && [ "${SILENT}" = "" ]; then
     echo "Source environment for ${DIRECTORY_TYPE} Instance ${OUD_INSTANCE}"

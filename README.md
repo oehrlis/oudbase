@@ -20,7 +20,9 @@ oracle@oud:~/ [oud_cdse] /u01/shared/oudbase_install.sh -h
 2017-11-13_14:28:58  INFO :   -o <OUD_BASE>               OUD_BASE Directory. (default $OUD_BASE).
 2017-11-13_14:28:58  INFO :   -d <OUD_DATA>               OUD_DATA Directory. (default $ORACLE_BASE). This directory has to be 
 2017-11-13_14:28:58  INFO                                 specified to distinct persistant data from software eg. in a docker containers
-2017-11-13_14:28:58  INFO :   -i <ORACLE_INSTANCE_BASE>   Base directory for OUD instances (default $OUD_DATA/instances)
+2017-11-13_14:28:58  INFO :   -A <OUD_ADMIN_BASE>         Base directory for OUD admin (default $OUD_DATA/admin)"
+2017-11-13_14:28:58  INFO :   -B <OUD_BACKUP_BASE>        Base directory for OUD backups (default $OUD_DATA/backup)"
+2017-11-13_14:28:58  INFO :   -i <OUD_INSTANCE_BASE>      Base directory for OUD instances (default $OUD_DATA/instances)
 2017-11-13_14:28:58  INFO :   -m <ORACLE_HOME_BASE>       Base directory for OUD binaries (default $ORACLE_BASE/middleware)
 2017-11-13_14:28:58  INFO :   -B <OUD_BACKUP_BASE>        Base directory for OUD backups (default $OUD_DATA/backup)
 2017-11-13_14:28:58  INFO : 
@@ -30,57 +32,95 @@ oracle@oud:~/ [oud_cdse] /u01/shared/oudbase_install.sh -h
 Installation example to install **OUD base** in a OUD docker container in verbose mode. **-b** is used to specify the **ORACLE_BASE** directory where **-d** is used to specify */u01* (configured as docker volume) as **OUD_DATA** base folder to store instance data, configuration files etc. 
 
 ```bash
-oracle@oud:~/ [oud_cdse] /u01/shared/oudbase_install.sh -v -b /u00/app/oracle -d /u01
-2017-11-13_14:29:23  START: Start of oudbase_install.sh (Version 0.1) with -v -b /u00/app/oracle -d /u01
-2017-11-13_14:29:23  INFO : processing commandline parameter
-2017-11-13_14:29:23  Using the following variable for installation
-2017-11-13_14:29:23  ORACLE_BASE          = /u00/app/oracle
-2017-11-13_14:29:23  OUD_BASE             = /u00/app/oracle
-2017-11-13_14:29:23  OUD_DATA             = /u01
-2017-11-13_14:29:23  ORACLE_INSTANCE_BASE = /u01/instances
-2017-11-13_14:29:23  ORACLE_HOME_BASE     = /u00/app/oracle/middleware
-2017-11-13_14:29:23  OUD_BACKUP_BASE      = /u01/backup
-2017-11-13_14:29:23  SCRIPT_FQN           = /u01/shared/oudbase_install.sh
-2017-11-13_14:29:23  Installing OUD Environment
-2017-11-13_14:29:23  Create required directories in ORACLE_BASE=/u00/app/oracle
-2017-11-13_14:29:23  Create Directory /u01/etc
-2017-11-13_14:29:23  Create Directory /u01/log
-2017-11-13_14:29:23  Create Directory /u00/app/oracle/local
-2017-11-13_14:29:23  Create Directory /u01/backup
-2017-11-13_14:29:23  Create Directory /u01/instances
-2017-11-13_14:29:23  Extracting file into /u00/app/oracle/local
+oracle@oudeng:/u00/app/oracle/ [oud_docker] /u01/scripts/oudbase_install.sh -v -b /u00/app/oracle -o /u00/app/oracle -d /u01
+2018-02-16_10:54:05  START: Start of oudbase_install.sh (Version 1.0.0) with -v -b /u00/app/oracle -o /u00/app/oracle -d /u01
+2018-02-16_10:54:05  INFO : processing commandline parameter
+2018-02-16_10:54:05  INFO : Define default values
+2018-02-16_10:54:05  INFO : Using the following variable for installation
+2018-02-16_10:54:05  INFO : ORACLE_BASE          = /u00/app/oracle
+2018-02-16_10:54:05  INFO : OUD_BASE             = /u00/app/oracle
+2018-02-16_10:54:05  INFO : LOG_BASE             = /u01/log
+2018-02-16_10:54:05  INFO : ETC_CORE             = /u00/app/oracle/local/etc
+2018-02-16_10:54:05  INFO : ETC_BASE             = /u01/etc
+2018-02-16_10:54:05  INFO : OUD_DATA             = /u01
+2018-02-16_10:54:05  INFO : OUD_INSTANCE_BASE    = /u01/instances
+2018-02-16_10:54:05  INFO : OUD_ADMIN_BASE       = /u01/admin
+2018-02-16_10:54:05  INFO : OUD_BACKUP_BASE      = /u01/backup
+2018-02-16_10:54:05  INFO : ORACLE_PRODUCT       = /u00/app/oracle/product
+2018-02-16_10:54:05  INFO : ORACLE_HOME          = /u00/app/oracle/product/fmw12.2.1.3.0
+2018-02-16_10:54:05  INFO : ORACLE_FMW_HOME      = /u00/app/oracle/product/fmw12.2.1.3.0
+2018-02-16_10:54:05  INFO : JAVA_HOME            = /usr/java/jdk1.8.0_162
+2018-02-16_10:54:05  INFO : SCRIPT_FQN           = /u01/scripts/oudbase_install.sh
+2018-02-16_10:54:05  INFO : Installing OUD Environment
+2018-02-16_10:54:05  INFO : Create required directories in ORACLE_BASE=/u00/app/oracle
+2018-02-16_10:54:05  INFO : Create Directory /u01/log
+2018-02-16_10:54:05  INFO : Create Directory /u01/etc
+2018-02-16_10:54:05  INFO : Create Directory /u00/app/oracle/local
+2018-02-16_10:54:05  INFO : Create Directory /u01/admin
+2018-02-16_10:54:05  INFO : Create Directory /u01/backup
+2018-02-16_10:54:05  INFO : Create Directory /u01/instances
+2018-02-16_10:54:05  INFO : Create Directory /u00/app/oracle/product
+2018-02-16_10:54:05  INFO : Backup existing config files
+2018-02-16_10:54:05  INFO : Backup oudtab to oudtab.save
+2018-02-16_10:54:05  INFO : Backup oudenv.conf to oudenv.conf.save
+2018-02-16_10:54:05  INFO : Backup oud._DEFAULT_.conf to oud._DEFAULT_.conf.save
+2018-02-16_10:54:05  INFO : Extracting file into /u00/app/oracle/local
 bin/
-bin/oud_backup.sh
-bin/oud_export.sh
 bin/oud_status.sh
+bin/oud_export.sh
+bin/oud_backup.sh
 bin/oudenv.sh
 config/
 certificates/
 doc/
 doc/README.md
 etc/
-etc/oud._DEFAULT_.conf
+etc/oudenv_core.conf
 etc/oudenv.conf
+etc/oudenv_custom.conf
 etc/oudtab
+etc/oud._DEFAULT_.conf
 lib/
 log/
 templates/
-templates/.bash_profile
-templates/cron.d/
-templates/etc/
 templates/ldif/
+templates/etc/
+templates/cron.d/
+templates/.bash_profile
 templates/logrotate.d/
+templates/create/
+templates/create/create_OUDSM.py
 templates/logrotate.d/oud
-templates/ldif/oud_pi_init.ldif
+templates/cron.d/oud
+templates/etc/wls_oudsm.service
 templates/etc/install.rsp
 templates/etc/oraInst.loc
 templates/etc/oud_instance.service
-templates/etc/wls_oudsm.service
-templates/cron.d/oud
-2017-11-13_14:29:23  Store customization for OUD_DATA (/u01)
-2017-11-13_14:29:23  Store customization for ORACLE_BASE (/u00/app/oracle)
-2017-11-13_14:29:23  Please manual adjust your .profile to load / source your OUD Environment
-2017-11-13_14:29:23  END  : of oudbase_install.sh
+templates/ldif/oud_pi_init.ldif
+2018-02-16_10:54:05  INFO : Restore cusomized config files
+2018-02-16_10:54:05  INFO : Store customization in core config file /u00/app/oracle/local/etc/oudenv_core.conf
+2018-02-16_10:54:05  INFO : save customization for OUD_DATA (/u01)
+2018-02-16_10:54:05  INFO : save customization for OUD_BASE (/u00/app/oracle)
+2018-02-16_10:54:05  INFO : save customization for ORACLE_BASE (/u00/app/oracle)
+2018-02-16_10:54:05  INFO : Please manual adjust your .bash_profile to load / source your OUD Environment
+2018-02-16_10:54:05  INFO : using the following code
+# Check OUD_BASE and load if necessary
+if [ "${OUD_BASE}" = "" ]; then
+  if [ -f "${HOME}/.OUD_BASE" ]; then
+    . "${HOME}/.OUD_BASE"
+  else
+    echo "ERROR: Could not load ${HOME}/.OUD_BASE"
+  fi
+fi
+
+# define an oudenv alias
+alias oud=". ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh"
+
+# source oud environment
+. ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh
+2018-02-16_10:54:05  INFO : Could not update your .OUD_BASE file /home/oracle/.OUD_BASE
+2018-02-16_10:54:05  INFO : make sure to add the right OUD_BASE directory
+2018-02-16_10:54:05  END  : of oudbase_install.sh
 ```
 
 The only manual step after installing *OUD Base* is to adjust the *.bash_profile / .profile script*. Just source the corresponding script as described in *$OUD_BASE/local/templates/.bash_profile*. 
@@ -115,6 +155,7 @@ The OUD Base does have the following configuration files.
 | ------------------- |----------------|
 | .OUD_BASE           | This is a simple file in the user home directory. It includes the pointer to the OUD Base directory. This file is used to initiate $OUD_BASE. |
 | oudtab              | oudtab is a simple file which includes all OUD instance and there ports eg. default LDAP port, admin port, SSL port and replication port.      |
+| oudenv_core.conf         | This is the configuration file is customized by the setup script with values specified during installation. It is loaded when an environment is set or changed. Location of oudenv_core.conf is $ETC_CORE respectively $OUD_BASE/local/etc |
 | oudenv.conf         | This is the main configuration file for environment variables and aliases. It is loaded when an environment is set or changed. Location of oudenv.conf is $ETC_BASE. |
 | oudenv_custom.conf  | This is the custom configuration file for environment variables and aliases. It is loaded after oudenv.conf when an environment is set or changed. Location of oudenv_custom.conf is $ETC_BASE. Every alias will be shown in oud_help (h) with the alias name and the comment as help text |
 | oud._DEFAULT_.conf  | This configuration file for custom environment variables. Location of oud._DEFAULT_.conf is $ETC_BASE. |
@@ -131,6 +172,7 @@ The following directory, environment variables and aliases are defined and used 
 | $OUD_DATA                 | cdob         | /u01, /u00/app/oracle              | Base directory for the OUD data. It is used to have OUD instances, config files, log files etc on a separate folder or mount point. In particular if OUD is used in a docker container. This allows to have the persistant data on a volume. It defaults to $OUD_BASE |
 | $OUD_LOCAL, $cdl          | cdl          | $OUD_BASE/local                    | OUD Base directory with the scripts, config etc |
 |                           | cdl.bin      | $OUD_LOCAL/bin                     | Scripts directory in OUD_BASE |
+| $ETC_CORE                 | n/a          | $OUD_LOCAL/etc                     | OUD core configuration directory $ETC_CORE is equal to $ETC_BASE for regular installations. |
 | $ETC_BASE, $etc           | etc, cdl.etc | $OUD_DATA/etc                      | OUD Base configuration directory |
 | $LOG_BASE, $log           | log, cdl.log | $OUD_DATA/log                      | OUD Base log directory |
 |                           | n/a          | $OUD_DATA/doc                      | OUD Base documentation directory |
