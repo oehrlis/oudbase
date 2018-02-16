@@ -485,6 +485,17 @@ if [ ! -d "${OUD_INSTANCE_ADMIN}" ] && [ "${RECREATE}" = "TRUE" ]; then
     mkdir -p "${OUD_INSTANCE_ADMIN}/log" >/dev/null 2>&1
 fi
 
+# re-create instance admin directory
+if [ ! -f "${ETC_BASE}/oud.${OUD_INSTANCE}.conf" ] && [ "${RECREATE}" = "TRUE" ]; then
+    echo "# ---------------------------------------------------------------------------" >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+    echo "# Instance Name      : ${OUD_INSTANCE}"      >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+    echo "# Instance Type      : ${DIRECTORY_TYPE}"    >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+    echo "# Instance Home      : ${OUD_INSTANCE_HOME}" >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+    echo "# Oracle Home        : ${ORACLE_HOME}"       >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+    echo "# ---------------------------------------------------------------------------" >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+    echo "export ORACLE_HOME=${ORACLE_HOME}"  >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+fi
+
 # set the new PATH
 export PATH=${OUD_LOCAL}/bin:${OUD_INSTANCE_HOME}/OUD/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
 
