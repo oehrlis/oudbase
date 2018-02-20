@@ -481,7 +481,6 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
     else # print error and keep current setting
         echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUDTAB} or ${OUD_INSTANCE_BASE}"
         export OUD_INSTANCE=${OUD_INSTANCE_LAST}
-        exit 1
     fi
 else # check if the requested OUD Instance exists in oudbase
     if [ -d "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD" ]; then
@@ -493,7 +492,6 @@ else # check if the requested OUD Instance exists in oudbase
     else # print error and keep current setting
         echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUD_INSTANCE_BASE}"
         export OUD_INSTANCE=${OUD_INSTANCE_LAST}
-        exit 1
     fi
 fi
 
@@ -503,6 +501,7 @@ if [ ! -d "${OUD_INSTANCE_ADMIN}" ] && [ "${RECREATE}" = "TRUE" ]; then
     mkdir -p "${OUD_INSTANCE_ADMIN}" >/dev/null 2>&1
     mkdir -p "${OUD_INSTANCE_ADMIN}/create" >/dev/null 2>&1
     mkdir -p "${OUD_INSTANCE_ADMIN}/log" >/dev/null 2>&1
+    mkdir -p "${OUD_INSTANCE_ADMIN}/etc" >/dev/null 2>&1
 fi
 
 # re-create instance admin directory
@@ -558,7 +557,7 @@ fi
 
 # set the password file variable based on ETC_BASE
 if [ -f ${ETC_BASE}/${OUD_INSTANCE}_pwd.txt ]; then
-    export PWD_FILE=${ETC_BASE}/${OUD_INSTANCE}_pwd.txt
+    export PWD_FILE=${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_pwd.txt
 else
     export PWD_FILE=${ETC_BASE}/pwd.txt
 fi
