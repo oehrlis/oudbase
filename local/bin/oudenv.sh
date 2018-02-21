@@ -26,23 +26,35 @@
 # ---------------------------------------------------------------------------
 export HOST=$(hostname)
 
+SCRIPT_NAME="$(basename $0)"                        # Basename of the script
+SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd -P )"     # Absolute path of script
+SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"           # Full qualified script name
+
 # default values for file and folder names
 DEFAULT_OUD_ADMIN_BASE_NAME="admin"
 DEFAULT_OUD_BACKUP_BASE_NAME="backup"
 DEFAULT_OUD_INSTANCE_BASE_NAME="instances"
 DEFAULT_OUDSM_DOMAIN_BASE_NAME="domains"
 DEFAULT_OUD_LOCAL_BASE_NAME="local"
+DEFAULT_OUD_LOCAL_BASE_BIN_NAME="bin"
+DEFAULT_OUD_LOCAL_BASE_ETC_NAME="etc"
+DEFAULT_OUD_LOCAL_BASE_LOG_NAME="log"
+DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME="templates"
 DEFAULT_PRODUCT_BASE_NAME="product"
 DEFAULT_ORACLE_HOME_NAME="fmw12.2.1.3.0"
 DEFAULT_ORACLE_FMW_HOME_NAME="fmw12.2.1.3.0"
 OUD_CORE_CONFIG="oudenv_core.conf"
 
-# default ORACLE_BASE 
-export ORACLE_BASE=${ORACLE_BASE:-"${OUD_BASE}"}
+DEFAULT_ORACLE_BASE=${SCRIPT_DIR%/${DEFAULT_OUD_LOCAL_BASE_NAME}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}}
+
+# default ORACLE_BASE or OUD_BASE
+export ORACLE_BASE=${ORACLE_BASE:-${OUD_BASE}}
+export ORACLE_BASE=${ORACLE_BASE:-${DEFAULT_ORACLE_BASE}}
+export OUD_BASE=${OUD_BASE:-${ORACLE_BASE}}
 export OUD_LOCAL="${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}"
 
 # set the ETC_CORE to the oud local directory
-export ETC_CORE=${OUD_LOCAL}/etc
+export ETC_CORE=${OUD_LOCAL}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
 
 # source the core oudenv customizaition
 if [ -f "${ETC_CORE}/${OUD_CORE_CONFIG}" ]; then
@@ -107,11 +119,11 @@ fi
 
 # set the log and etc base directory depending on OUD_DATA
 if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
-    export LOG_BASE=${OUD_LOCAL}/log
-    export ETC_BASE=${OUD_LOCAL}/etc
+    export LOG_BASE=${OUD_LOCAL}/${DEFAULT_OUD_LOCAL_BASE_LOG_NAME}
+    export ETC_BASE=${OUD_LOCAL}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
 else
-    export LOG_BASE=${OUD_DATA}/log
-    export ETC_BASE=${OUD_DATA}/etc
+    export LOG_BASE=${OUD_DATA}/${DEFAULT_OUD_LOCAL_BASE_LOG_NAME}
+    export ETC_BASE=${OUD_DATA}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
 fi
 
 # recreate missing directories
@@ -122,7 +134,7 @@ done
 # Create default config file in ETC_BASE in case they are missing...
 for i in oud._DEFAULT_.conf oudenv_custom.conf oudenv.conf oudtab; do
     if [ ! -f "${ETC_BASE}/${i}" ]; then
-        cp ${OUD_LOCAL}/templates/etc/${i} ${ETC_BASE}
+        cp ${OUD_LOCAL}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}/${i} ${ETC_BASE}
     fi
 done
 
@@ -518,11 +530,11 @@ fi
 
 # set the new PATH
 if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-    export PATH=${OUD_LOCAL}/bin:${OUD_INSTANCE_HOME}/OUD/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
+    export PATH=${OUD_LOCAL}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/OUD/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
 elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
-    export PATH=${OUD_LOCAL}/bin:${OUD_INSTANCE_HOME}/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
+    export PATH=${OUD_LOCAL}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
 elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
-    export PATH=${OUD_LOCAL}/bin:${OUD_INSTANCE_HOME}/OUD/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
+    export PATH=${OUD_LOCAL}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/OUD/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
 fi 
 
 # source oudenv.conf file from core etc directory if it exits
