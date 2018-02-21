@@ -36,7 +36,7 @@ cp ${BUILD_DIR}/../README.md ${BUILD_DIR}/../local/doc
 tar -zcvf ${BUILD_DIR}/oudbase_install.tgz \
     --exclude=bin/oudbase_install.sh \
     --exclude=log/*.log \
-    bin/ config/ certificates/ doc/ etc/ lib/ log/ templates/
+    bin/ doc/ etc/ log/ templates/
 cat bin/oudbase_install.sh ${BUILD_DIR}/oudbase_install.tgz >${BUILD_DIR}/oudbase_install.sh
 rm ${BUILD_DIR}/../local/doc/README.md
 chmod 755 ${BUILD_DIR}/oudbase_install.sh

@@ -128,6 +128,9 @@ function CleanAndQuit() {
     if [ -e ${TMP_FILE} ]; then
         DoMsg "INFO : Remove temp file ${TMP_FILE}"
         rm ${TMP_FILE} 2>/dev/null
+        # remove oud status temp file due to an oracle Bug
+        rm /tmp/oud-status*.log 2>/dev/null
+        rm /tmp/oud-replication*.log 2>/dev/null
     fi
     exit ${1}
 }
@@ -214,6 +217,8 @@ fi
 DoMsg "INFO : Run status on OUD Instance ${MyOUD_INSTANCE}"
 status --script-friendly --no-prompt --noPropertiesFile --bindDN "${MybindDN}" --bindPasswordFile ${MybindPasswordFile} --trustAll >${TMP_FILE} 2>&1
 OUD_ERROR=$?
+
+
 # handle errors from OUD status
 if [ ${OUD_ERROR} -gt 0 ]; then
     CleanAndQuit 41 ${OUD_ERROR}

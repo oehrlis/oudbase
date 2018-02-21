@@ -569,7 +569,7 @@ if [ -f "${ETC_BASE}/oud.${OUD_INSTANCE}.conf" ]; then
 fi
 
 # set the password file variable based on ETC_BASE
-if [ -f ${ETC_BASE}/${OUD_INSTANCE}_pwd.txt ]; then
+if [ -f "${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_pwd.txt" ]; then
     export PWD_FILE=${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_pwd.txt
 else
     export PWD_FILE=${ETC_BASE}/pwd.txt
