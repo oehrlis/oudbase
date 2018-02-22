@@ -231,16 +231,19 @@ function oud_status {
     echo " Instance Home ($DIR_STATUS) : ${OUD_INSTANCE_HOME} "
     echo " Oracle Home        : ${ORACLE_HOME}"
     echo " Instance Status    : ${STATUS}"
-    if [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+        echo " LDAP Port          : $PORT"
+        echo " LDAPS Port         : $PORT_SSL"
+        echo " Admin Port         : $PORT_ADMIN"
+        echo " Replication Port   : $PORT_REP"
+    elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
+        echo " LDAP Port          : $PORT"
+        echo " LDAPS Port         : $PORT_SSL"
+    elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then 
         echo " Console            : http://$(hostname):$PORT/oudsm"
         echo " HTTP               : $PORT"
         echo " HTTPS              : $PORT_SSL"
-    else 
-        echo " LDAP Port          : $PORT"
-        echo " LDAPS Port         : $PORT_SSL"
     fi
-    echo " Admin Port         : $PORT_ADMIN"
-    echo " Replication Port   : $PORT_REP"
     echo "--------------------------------------------------------------"
 }
 
