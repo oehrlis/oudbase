@@ -26,8 +26,10 @@ export LOG_BASE=${LOG_BASE-"/tmp"}
 VERSION=1.0.0
 DOAPPEND="TRUE"                                        # enable log file append
 VERBOSE="TRUE"                                         # enable verbose mode
-SCRIPT_NAME=$(basename $0)                             # Basename of the script
-SCRIPT_FQN=$(readlink -f $0)                           # Full qualified script name
+SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"                  # Basename of the script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of script
+SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"                    # Full qualified script name
+
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
 OUD_CORE_CONFIG="oudenv_core.conf"

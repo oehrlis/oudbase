@@ -17,27 +17,20 @@
 # Rev History:
 # 11.10.2016   soe  Initial version
 # ---------------------------------------------------------------------------
+SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"                  # Basename of the script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of script
+SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"                    # Full qualified script name
 
-function myreadlink() {
-  (
-  cd $(dirname $1)         # or  cd ${1%/*}
-  echo $PWD/$(basename $1) # or  echo $PWD/${1##*/}
-  )
-}
+echo "SCRIPT_FQN=$SCRIPT_FQN"
+echo "SCRIPT_DIR=$SCRIPT_DIR"
 
-ABS_NAME=$(myreadlink $0)
-BUILD_DIR=$(dirname ${ABS_NAME})
-
-echo "ABS_NAME=$ABS_NAME"
-echo "BUILD_DIR=$BUILD_DIR"
-
-cd ${BUILD_DIR}/../local
-cp ${BUILD_DIR}/../README.md ${BUILD_DIR}/../local/doc
-tar -zcvf ${BUILD_DIR}/oudbase_install.tgz \
+cd ${SCRIPT_DIR}/../local
+cp ${SCRIPT_DIR}/../README.md ${SCRIPT_DIR}/../local/doc
+tar -zcvf ${SCRIPT_DIR}/oudbase_install.tgz \
     --exclude=bin/oudbase_install.sh \
     --exclude=log/*.log \
     bin/ doc/ etc/ log/ templates/
-cat bin/oudbase_install.sh ${BUILD_DIR}/oudbase_install.tgz >${BUILD_DIR}/oudbase_install.sh
-rm ${BUILD_DIR}/../local/doc/README.md
-chmod 755 ${BUILD_DIR}/oudbase_install.sh
+cat bin/oudbase_install.sh ${SCRIPT_DIR}/oudbase_install.tgz >${SCRIPT_DIR}/oudbase_install.sh
+rm ${SCRIPT_DIR}/../local/doc/README.md
+chmod 755 ${SCRIPT_DIR}/oudbase_install.sh
 # - EOF ---------------------------------------------------------------------

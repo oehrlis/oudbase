@@ -25,10 +25,9 @@
 # - Set default values for environment variables if not yet defined. 
 # ---------------------------------------------------------------------------
 export HOST=$(hostname)
-
-SCRIPT_NAME="$(basename $0)"                        # Basename of the script
-SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd -P )"     # Absolute path of script
-SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"           # Full qualified script name
+SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"                  # Basename of the script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of script
+SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"                    # Full qualified script name
 
 # default values for file and folder names
 DEFAULT_OUD_ADMIN_BASE_NAME="admin"
