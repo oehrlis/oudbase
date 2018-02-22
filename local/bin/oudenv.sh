@@ -211,37 +211,44 @@ fi
 function oud_status {
 # Purpose....: just display the current OUD settings
 # ---------------------------------------------------------------------------
-    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-        STATUS="$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
-                  grep org.opends.server.core.DirectoryServer|\
-                  grep -c ${OUD_INSTANCE} ) -gt 0 ]; \
-                  then echo 'up'; else echo 'down'; fi)"
-        if [ -f ${OUD_INSTANCE_HOME}/OUD/config/config.ldif ]; then
-            DIR_STATUS="ok"
-        else
-            DIR_STATUS="??"
-            STATUS="not yet created..."
-        fi
-        get_ports "-silent"      # read ports from OUD config file
-        get_oracle_home "-silent"      # read oracle home from OUD install.path file
-        echo "--------------------------------------------------------------"
-        echo " Instance Name      : ${OUD_INSTANCE}"
-        echo " Instance Home ($DIR_STATUS) : ${OUD_INSTANCE_HOME} "
-        echo " Oracle Home        : ${ORACLE_HOME}"
-        echo " Instance Status    : ${STATUS}"
+    STATUS=$(get_status)
+    DIR_STATUS="ok"
+    if [ ${DIRECTORY_TYPE} == "OUD" ] && [ ! -f "${OUD_INSTANCE_HOME}/OUD/config/config.ldif" ]; then
+        DIR_STATUS="??"
+        STATUS="not yet created..."
+    elif [ ${DIRECTORY_TYPE} == "ODSEE" ] && [ ! -f "${OUD_INSTANCE_HOME}/config/dse.ldif" ]; then
+        DIR_STATUS="??"
+        STATUS="not yet created..."
+    elif [ ${DIRECTORY_TYPE} == "OUDSM" ] && [ ! -f "${OUD_INSTANCE_HOME}/config/config.xml" ]; then
+        DIR_STATUS="??"
+        STATUS="not yet created..."
+    fi
+    
+    get_ports "-silent"      # read ports from OUD config file
+    get_oracle_home "-silent"      # read oracle home from OUD install.path file
+    echo "--------------------------------------------------------------"
+    echo " Instance Name      : ${OUD_INSTANCE}"
+    echo " Instance Home ($DIR_STATUS) : ${OUD_INSTANCE_HOME} "
+    echo " Oracle Home        : ${ORACLE_HOME}"
+    echo " Instance Status    : ${STATUS}"
+    if [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+        echo " Console            : http://$(hostname):$PORT/oudsm"
+        echo " HTTP               : $PORT"
+        echo " HTTPS              : $PORT_SSL"
+    else 
         echo " LDAP Port          : $PORT"
         echo " LDAPS Port         : $PORT_SSL"
-        echo " Admin Port         : $PORT_ADMIN"
-        echo " Replication Port   : $PORT_REP"
-        echo "--------------------------------------------------------------"
     fi
+    echo " Admin Port         : $PORT_ADMIN"
+    echo " Replication Port   : $PORT_REP"
+    echo "--------------------------------------------------------------"
 }
 
 # ---------------------------------------------------------------------------
 function oud_up {
 # Purpose....: display the status of the OUD instances
 # ---------------------------------------------------------------------------
-    echo "TYPE  INSTANCE     STATUS PORTS          HOME"
+    echo "TYPE  INSTANCE     STATUS PORTS          INSTANCE HOME"
     echo "----- ------------ ------ -------------- ----------------------------------"
     for i in ${OUD_INST_LIST}; do
         # oudtab ohne instance home
@@ -250,9 +257,14 @@ function oud_up {
         PORT_SSL=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f3)
         DIRECTORY_TYPE=$(grep -v '^#' ${OUDTAB}|grep -i ${i} |head -1|cut -d: -f6)
         DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
-        STATUS=$(get_status)
+        STATUS=$(get_status ${i})
+        if [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+            INSTANCE_HOME="${OUDSM_DOMAIN_BASE}/$i"
+        else
+            INSTANCE_HOME="${OUD_INSTANCE_BASE}/$i"
+        fi
         printf '%-5s %-12s %-6s %-14s %-s\n' ${DIRECTORY_TYPE} ${i} ${STATUS} \
-            "$(join_by / ${PORT} ${PORT_SSL} ${PORT_ADMIN})" "${OUD_INSTANCE_BASE}/$i"
+            "$(join_by / ${PORT} ${PORT_SSL} ${PORT_ADMIN})" "${INSTANCE_HOME}"
     done
     echo ""
 }
@@ -261,11 +273,22 @@ function oud_up {
 function get_status { 
 # Purpose....: get the current instance / process status
 # ---------------------------------------------------------------------------
-# input parameter aktuelle instanz... fallback auf ${OUD_INSTANCE}
+    InstanceName=${1:-${OUD_INSTANCE}}
+
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         echo "$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
                 grep org.opends.server.core.DirectoryServer|\
-                grep -c ${OUD_INSTANCE} ) -gt 0 ]; \
+                grep -c ${InstanceName} ) -gt 0 ]; \
+                then echo 'up'; else echo 'down'; fi)"
+    elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
+        echo "$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
+                grep ns-slapd|\
+                grep -c ${InstanceName} ) -gt 0 ]; \
+                then echo 'up'; else echo 'down'; fi)"
+    elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+        echo "$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
+                grep wlserver|\
+                grep -c ${InstanceName} ) -gt 0 ]; \
                 then echo 'up'; else echo 'down'; fi)"
     else
         echo "n/a"
@@ -364,6 +387,7 @@ echo "  ORACLE_BASE         = ${ORACLE_BASE-n/a}"
 echo "  ORACLE_FMW_HOME     = ${ORACLE_FMW_HOME-'n/a'}"
 echo "  ORACLE_HOME         = ${ORACLE_HOME-n/a}"
 echo "  OUD_INSTANCE        = ${OUD_INSTANCE-n/a}"
+echo "  OUDSM_DOMAIN_BASE   = ${OUDSM_DOMAIN_BASE-n/a}"
 echo "  OUD_INSTANCE_BASE   = ${OUD_INSTANCE_BASE-n/a}"
 echo "  OUD_INSTANCE_HOME   = ${OUD_INSTANCE_HOME-n/a}"
 echo "  PORT                = ${PORT-n/a}"
@@ -470,7 +494,16 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
         PORT_REP=$(echo ${OUD_CONF_STR}|cut -d: -f5)
         DIRECTORY_TYPE=$(echo ${OUD_CONF_STR}|cut -d: -f6)
         DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
-        export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
+        
+        # set the instance home based on directory type
+        if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+            OUD_INSTANCE_HOME="${OUD_INSTANCE_BASE}/${OUD_INSTANCE}"
+        elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+            OUD_INSTANCE_HOME="${OUDSM_DOMAIN_BASE}/${OUD_INSTANCE}"
+        else
+            OUD_INSTANCE_HOME="${OUD_INSTANCE_BASE}/${OUD_INSTANCE}"
+        fi
+        export OUD_INSTANCE_HOME
         export OUD_INSTANCE_ADMIN=${OUD_ADMIN_BASE}/${OUD_INSTANCE}
 
         # get_oracle_home 
