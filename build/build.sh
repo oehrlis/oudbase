@@ -26,6 +26,7 @@ echo "SCRIPT_DIR=$SCRIPT_DIR"
 
 cd ${SCRIPT_DIR}/../local
 cp ${SCRIPT_DIR}/../README.md ${SCRIPT_DIR}/../local/doc
+find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" \) -print0 | xargs -0 shasum -p >${SCRIPT_DIR}/../local/doc/.oudbase.sha
 tar -zcvf ${SCRIPT_DIR}/oudbase_install.tgz \
     --exclude=bin/oudbase_install.sh \
     --exclude=log/*.log \
