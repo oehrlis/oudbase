@@ -22,9 +22,5 @@ d513db989f35e9b5fb9d184e8e2b474fcae064b9 ?./templates/etc/oud_instance.service
 282053063fc527abfb2e5bfb40587da6fe6fe677 ?./templates/.bash_profile
 50eb8ea4a50fb6383e6331109c09c31e5a05c944 ?./templates/logrotate.d/oud
 236bf6e905e7ea366af44cfebbd89c32cae990d9 ?./templates/create/create_OUDSM.py
-1e302b3727a9fe0882f00d9e6348715b54b31241 ?./log/oud_export.log
-87cf1c9487fce8173c14516100e9cba521999ce8 ?./log/oud_backup.log
-1f308fcf61395265091c6c151628f014926bbc7e ?./log/oud_status.log
-5458f1efa4ffaa62d905d1c2316a63bbc33ca100 ?./log/oudbase_install.log
 6b60014847e31544a156d208504b6a7ac546e0fb ?./doc/README.md
-5147253af01aab8b9e981d2b992657f5e4c266d6 ?./doc/.version
+e3829b5205f1abfdb42589ba92f7ad329863b9cb ?./doc/.version
