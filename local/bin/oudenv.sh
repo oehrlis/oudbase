@@ -198,7 +198,7 @@ fi
 # use default OUD Instance if none has been specified as parameter
 if [ "${1}" = "" ]; then
     export OUD_INSTANCE=${OUD_DEFAULT_INSTANCE}
-elif [ "${1}" = "SILENT" ]; then
+elif [ "${1}" == "SILENT" ]; then
     export OUD_INSTANCE=${OUD_DEFAULT_INSTANCE}  
     export SILENT="SILENT"
 else
@@ -308,10 +308,14 @@ function get_oracle_home {
             if [ -d ${ORACLE_HOME} ]; then
                 ORACLE_HOME=$(dirname ${ORACLE_HOME})
             else
-                echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
+                if [ "${Silent}" == "" ]; then
+                    echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
+                fi
             fi
         else
-            echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
+            if [ "${Silent}" == "" ]; then
+                echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
+            fi
         fi
         export ORACLE_HOME
         if [ "${Silent}" == "" ]; then
@@ -334,7 +338,9 @@ function get_ports {
             PORT_SSL=$(sed -n '/LDAPS Connection Handler/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
             PORT_REP=$(sed -n '/LDAP Replication Connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
         else
-            echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set your PORTS."
+            if [ "${Silent}" == "" ]; then
+                echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set your PORTS."
+            fi
         fi
         # export the port variables and set default values with not specified
         export PORT_ADMIN=${PORT_ADMIN:-"4444"}
