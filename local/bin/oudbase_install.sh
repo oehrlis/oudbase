@@ -33,7 +33,7 @@ SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"                    # Full qualified sc
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
 OUD_CORE_CONFIG="oudenv_core.conf"
-CONFIG_FILES="oudtab oudenv.conf oud._DEFAULT_.conf ${OUD_CORE_CONFIG}"
+CONFIG_FILES="oudtab oud._DEFAULT_.conf"
 
 # a few core default values.
 DEFAULT_ORACLE_BASE="/u00/app/oracle"
