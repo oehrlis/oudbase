@@ -41,12 +41,14 @@ After=network.target
  
 [Service]
 Type=simple
-User=oracle
-Group=oinstall
+User=oud
+Group=oud
 WorkingDirectory=/u00/app/oracle/user_projects/domains/ODSM_domain
 ExecStart=/u00/app/oracle/user_projects/domains/ODSM_domain/startWebLogic.sh
 ExecStop=/u00/app/oracle/user_projects/domains/ODSM_domain/bin/stopWebLogic.sh
-StandardOutput=syslog
+TimeoutSec=300
+StandardOutput=syslog+console
+StandardError=syslog+console
  
 [Install]
 WantedBy=multi-user.target

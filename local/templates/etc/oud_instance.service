@@ -41,13 +41,15 @@ After=network.target
  
 [Service]
 Type=simple
-User=oracle
-Group=oinstall
+User=oud
+Group=oud
 Environment=OPENDS_JAVA_HOME="/usr/java/jdk1.8.0_144/"
 ExecStart=/u01/instances/oud_cdse/OUD/bin/start-ds --quiet
 ExecStop=/u01/instances/oud_cdse/OUD/bin/stop-ds --quiet
 ExecReload=/u01/instances/oud_cdse/OUD/bin/stop-ds --restart --quiet
-StandardOutput=syslog
+TimeoutSec=300
+StandardOutput=syslog+console
+StandardError=syslog+console
 
  
 [Install]
