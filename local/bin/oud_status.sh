@@ -152,7 +152,7 @@ if [ "${OUD_BASE}" = "" ] || [ ! -d "${OUD_BASE}" ]; then
 fi
 
 # Load OUD environment
-. $(find $OUD_BASE -name oudenv.sh) ${OUD_INSTANCE} SILENT
+. ${OUD_BASE}/local/bin/oudenv.sh ${OUD_INSTANCE} SILENT
 
 # Define Logfile
 LOGFILE="${LOG_BASE}/$(basename ${SCRIPT_NAME} .sh).log"
@@ -193,7 +193,7 @@ if [ "${MyOUD_INSTANCE}" == "" ]; then
 fi
 
 # set OUD Instance
-. "${OUD_BASE}/local/bin/oudenv.sh" $MyOUD_INSTANCE SILENT > /dev/null 2>&1
+. ${OUD_BASE}/local/bin/oudenv.sh $MyOUD_INSTANCE SILENT > /dev/null 2>&1
 OUD_ERROR=$?
 # handle errors from oudenv
 if [ ${OUD_ERROR} -gt 0 ]; then

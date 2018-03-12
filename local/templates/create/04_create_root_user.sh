@@ -25,6 +25,37 @@
 LDIFFILE="$(basename $0 .sh).ldif"          # LDIF file based on script name
 CONFIGFILE="$(basename $0 .sh).conf"        # config file based on script name
 
+# generate a password
+if [ -z ${ADMIN_PASSWORD} ]; then
+    # Auto generate a password
+    while true; do
+        s=$(cat /dev/urandom | tr -dc "A-Za-z0-9" | fold -w 10 | head -n 1)
+        if [[ ${#s} -ge 8 && "$s" == *[A-Z]* && "$s" == *[a-z]* && "$s" == *[0-9]*  ]]; then
+            echo "Passwort does Match the criteria => $s"
+            break
+        else
+            echo "Password does not Match the criteria, re-generating..."
+        fi
+    done
+    echo "---------------------------------------------------------------"
+    echo "    Oracle Unified Directory Server auto generated instance"
+    echo "    admin password :"
+    echo "    ----> Directory Admin : ${ADMIN_USER} "
+    echo "    ----> Admin password  : $s"
+    echo "---------------------------------------------------------------"
+else
+    s=${ADMIN_PASSWORD}
+    echo "---------------------------------------------------------------"
+    echo "    Oracle Unified Directory Server auto generated instance"
+    echo "    admin password :"
+    echo "    ----> Directory Admin : ${ADMIN_USER} "
+    echo "    ----> Admin password  : $s"
+    echo "---------------------------------------------------------------"
+fi
+
+# write password file
+echo "$s" > ${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_pwd.txt
+
 # - configure instance ------------------------------------------------------
 echo "Add root user to OUD instance ${OUD_INSTANCE} using:"
 echo "OUD_INSTANCE_HOME : ${OUD_INSTANCE_HOME}"
