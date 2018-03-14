@@ -117,11 +117,13 @@ function CleanAndQuit() {
         30) DoMsg "ERR  : Exit Code ${1}. Some Export failed";;
         40) DoMsg "ERR  : Exit Code ${1}. Error not defined";;
         41) DoMsg "ERR  : Exit Code ${1}. Error ${2} running status command";;
-        42) DoMsg "ERR  : Exit Code ${1}. Error ${2} running dsreplication command";;
+        42) DoMsg "ERR  : Exit Code ${1}. Error ${2} running dsreplication command";;    
+        44) DoMsg "ERR  : Exit Code ${1}. unknown directory type ${2}, can not check status";;
         43) DoMsg "ERR  : Exit Code ${1}. Missing bind password file";;
         50) DoMsg "ERR  : Exit Code ${1}. OUD Instance ${2} not running";;
         51) DoMsg "ERR  : Exit Code ${1}. Connection Handler ${2} is not enabled on ${OUD_INSTANCE}";;
         52) DoMsg "ERR  : Exit Code ${1}. Error in Replication for OUD Instance ${OUD_INSTANCE}. Check replication log ${ORACLE_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/logs for more information";;
+        53) DoMsg "ERR  : Exit Code ${1}. Error OUDSM console ${2} is not available";;
         99) DoMsg "INFO : Just wanna say hallo.";;
         ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
     esac
@@ -207,74 +209,91 @@ else
     CleanAndQuit 11 ${TMP_FILE} # Define a clean exit
 fi
 
-# Check if we have a bindPasswordFile
-MybindDN=${MybindDN:-"cn=Directory Manager"}
-MybindPasswordFile=${MybindPasswordFile:-"${PWD_FILE}"}
-if [ ! -f "${MybindPasswordFile}" ]; then
-    CleanAndQuit 43 ${MyOUD_INSTANCE}
-fi  
+if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+	DoMsg "INFO : Identify directory type ${DIRECTORY_TYPE}"
+    # Check if we have a bindPasswordFile
+    MybindDN=${MybindDN:-"cn=Directory Manager"}
+    MybindPasswordFile=${MybindPasswordFile:-"${PWD_FILE}"}
+    if [ ! -f "${MybindPasswordFile}" ]; then
+        CleanAndQuit 43 ${MyOUD_INSTANCE}
+    fi  
 
-DoMsg "INFO : Run status on OUD Instance ${MyOUD_INSTANCE}"
-status --script-friendly --no-prompt --noPropertiesFile --bindDN "${MybindDN}" --bindPasswordFile ${MybindPasswordFile} --trustAll >${TMP_FILE} 2>&1
-OUD_ERROR=$?
-
-
-# handle errors from OUD status
-if [ ${OUD_ERROR} -gt 0 ]; then
-    CleanAndQuit 41 ${OUD_ERROR}
-fi
-
-# adjust temp file 
-# and add a - at the end
-sed -i 's/^$/-/' ${TMP_FILE}
-# join Backend ID with multiple lines
-sed -i '/OracleContext for$/{N;s/\n/ /;}' ${TMP_FILE}
-# join Base DN with multiple lines
-sed -i '/^Base DN:$/{N;s/\n/                      /;}' ${TMP_FILE}
-
-DoMsg "INFO : Process ${TMP_FILE} file"
-# check Server Run Status
-if [ $(grep -ic 'Server Run Status: Started' ${TMP_FILE}) -eq 0 ]; then
-    cat ${TMP_FILE} >> ${LOGFILE}
-    CleanAndQuit 50 ${OUD_INSTANCE}
-fi
-
-# check if connection handler are enabled
-for i in LDAP LDAPS; do
-    DoMsg "INFO : Check connection handler ${i}"
-    AWK_OUT=$(awk 'BEGIN{RS="\n-\n";FS="\n";IGNORECASE=1; Error=51} $1 ~ /^Address/ && $2 ~ /\<'${i}'\>/ {if ($3 ~ /\<Enabled\>/) Error=0; } END{exit Error}' ${TMP_FILE} )
+    DoMsg "INFO : Run status on OUD Instance ${MyOUD_INSTANCE}"
+    status --script-friendly --no-prompt --noPropertiesFile --bindDN "${MybindDN}" --bindPasswordFile ${MybindPasswordFile} --trustAll >${TMP_FILE} 2>&1
     OUD_ERROR=$?
-    if [ ${OUD_ERROR} -eq 51 ]; then
-        cat ${TMP_FILE} >> ${LOGFILE}
-        CleanAndQuit 51 ${i}
-    fi
-done
 
-if [ "${REPLICATION}" = "TRUE" ]; then
-    i="Replication"
-    DoMsg "INFO : Check connection handler ${i}"
-    AWK_OUT=$(awk 'BEGIN{RS="\n-\n";FS="\n";IGNORECASE=1; Error=51} $1 ~ /^Address/ && $2 ~ /\<'${i}'\>/ {if ($3 ~ /\<Enabled\>/) Error=0; } END{exit Error}' ${TMP_FILE} )
-    OUD_ERROR=$?
-    if [ ${OUD_ERROR} -eq 51 ]; then
-        cat ${TMP_FILE} >> ${LOGFILE}
-        CleanAndQuit 51 ${i}
-    fi
-    
-    # check if there are errors in replications
-    DoMsg "INFO : Run dsreplication status on OUD Instance ${MyOUD_INSTANCE}"
-    dsreplication status --no-prompt --noPropertiesFile --port $PORT_ADMIN --trustAll --bindDN "${MybindDN}" --adminPasswordFile ${MybindPasswordFile} >${TMP_FILE} 2>&1
-    OUD_ERROR=$?
-    # handle errors from OUD dsreplication
+    # handle errors from OUD status
     if [ ${OUD_ERROR} -gt 0 ]; then
-        cat ${TMP_FILE} >> ${LOGFILE}
-        CleanAndQuit 42 ${OUD_ERROR}
+        CleanAndQuit 41 ${OUD_ERROR}
     fi
 
-    CAT_OUT=$(cat ${TMP_FILE}|awk 'BEGIN{FS=":";Error=0} /${OUD_ROOT_DN}/ {if ($7 !~/\<Normal\>/ ) Error=52; } END{exit Error}' )
-    OUD_ERROR=$?
-    if [ ${OUD_ERROR} -eq 52 ]; then
-        CleanAndQuit 52 ${i}
+    # adjust temp file 
+    # and add a - at the end
+    sed -i 's/^$/-/' ${TMP_FILE}
+    # join Backend ID with multiple lines
+    sed -i '/OracleContext for$/{N;s/\n/ /;}' ${TMP_FILE}
+    # join Base DN with multiple lines
+    sed -i '/^Base DN:$/{N;s/\n/                      /;}' ${TMP_FILE}
+
+    DoMsg "INFO : Process ${TMP_FILE} file"
+    # check Server Run Status
+    if [ $(grep -ic 'Server Run Status: Started' ${TMP_FILE}) -eq 0 ]; then
+        cat ${TMP_FILE} >> ${LOGFILE}
+        CleanAndQuit 50 ${OUD_INSTANCE}
     fi
+
+    # check if connection handler are enabled
+    for i in LDAP LDAPS; do
+        DoMsg "INFO : Check connection handler ${i}"
+        AWK_OUT=$(awk 'BEGIN{RS="\n-\n";FS="\n";IGNORECASE=1; Error=51} $1 ~ /^Address/ && $2 ~ /\<'${i}'\>/ {if ($3 ~ /\<Enabled\>/) Error=0; } END{exit Error}' ${TMP_FILE} )
+        OUD_ERROR=$?
+        if [ ${OUD_ERROR} -eq 51 ]; then
+            cat ${TMP_FILE} >> ${LOGFILE}
+            CleanAndQuit 51 ${i}
+        fi
+    done
+
+    if [ "${REPLICATION}" = "TRUE" ]; then
+        i="Replication"
+        DoMsg "INFO : Check connection handler ${i}"
+        AWK_OUT=$(awk 'BEGIN{RS="\n-\n";FS="\n";IGNORECASE=1; Error=51} $1 ~ /^Address/ && $2 ~ /\<'${i}'\>/ {if ($3 ~ /\<Enabled\>/) Error=0; } END{exit Error}' ${TMP_FILE} )
+        OUD_ERROR=$?
+        if [ ${OUD_ERROR} -eq 51 ]; then
+            cat ${TMP_FILE} >> ${LOGFILE}
+            CleanAndQuit 51 ${i}
+        fi
+    
+        # check if there are errors in replications
+        DoMsg "INFO : Run dsreplication status on OUD Instance ${MyOUD_INSTANCE}"
+        dsreplication status --no-prompt --noPropertiesFile --port $PORT_ADMIN --trustAll --bindDN "${MybindDN}" --adminPasswordFile ${MybindPasswordFile} >${TMP_FILE} 2>&1
+        OUD_ERROR=$?
+        # handle errors from OUD dsreplication
+        if [ ${OUD_ERROR} -gt 0 ]; then
+            cat ${TMP_FILE} >> ${LOGFILE}
+            CleanAndQuit 42 ${OUD_ERROR}
+        fi
+
+        CAT_OUT=$(cat ${TMP_FILE}|awk 'BEGIN{FS=":";Error=0} /${OUD_ROOT_DN}/ {if ($7 !~/\<Normal\>/ ) Error=52; } END{exit Error}' )
+        OUD_ERROR=$?
+        if [ ${OUD_ERROR} -eq 52 ]; then
+            CleanAndQuit 52 ${i}
+        fi
+    fi
+elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+    DoMsg "INFO : Identify directory type ${DIRECTORY_TYPE}"
+    URL="http://$(hostname):$PORT/oudsm/"
+    DoMsg "INFO : Check status of OUDSM console ${URL}"
+    
+    # run OUD status check
+    curl -sSf ${URL} 2>&1 >/dev/null 
+
+    # normalize output for docker....
+    OUD_ERROR=$?
+    if [ ${OUD_ERROR} -gt 0 ]; then
+        CleanAndQuit 53 ${URL}
+    fi
+else
+    CleanAndQuit 44 ${DIRECTORY_TYPE}
 fi
 
 CleanAndQuit 0

@@ -23,9 +23,7 @@
 # - Set default values for environment variables if not yet defined. 
 # ---------------------------------------------------------------------------
 export HOST=$(hostname)
-SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"                  # Basename of the script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of script
-SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"                    # Full qualified script name
 
 # default values for file and folder names
 DEFAULT_OUD_ADMIN_BASE_NAME="admin"
@@ -558,6 +556,7 @@ if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudt
     else # print error and keep current setting
         echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUDTAB} or ${OUD_INSTANCE_BASE}"
         export OUD_INSTANCE=${OUD_INSTANCE_LAST}
+        return 1
     fi
 else # check if the requested OUD Instance exists in oudbase
     if [ -d "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD" ]; then
@@ -569,6 +568,7 @@ else # check if the requested OUD Instance exists in oudbase
     else # print error and keep current setting
         echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUD_INSTANCE_BASE}"
         export OUD_INSTANCE=${OUD_INSTANCE_LAST}
+        return 1
     fi
 fi
 

@@ -44,8 +44,9 @@ function Usage() {
     DoMsg "INFO : Usage, ${SCRIPT_NAME} [-hv -i <OUD_INSTANCES> -t <TYPE> -m <MAILADDRESSES>]"
     DoMsg "INFO :   -h                 Usage (this message"
     DoMsg "INFO :   -v                 enable verbose mode"
-    DoMsg "INFO :   -i <OUD_INSTANCES> List of OUD instances"
-    DoMsg "INFO :   -t <TYPE>          Backup Type FULL or INCREMENTAL"
+    DoMsg "INFO :   -i <OUD_INSTANCES> List of OUD instances (default ALL)"
+    DoMsg "INFO :   -t <TYPE>          Backup Type FULL or INCREMENTAL (default FULL)"
+    DoMsg "INFO :   -k <WEEKS>         Number of weeks to keep old backups (default 4)"
     DoMsg "INFO :   -m <MAILADDRESSES> List of Mail Addresses"
     DoMsg "INFO : Logfile : ${LOGFILE}"
     if [ ${1} -gt 0 ]; then
@@ -158,11 +159,12 @@ fi
 
 # usage and getopts
 DoMsg "INFO : processing commandline parameter"
-while getopts hvt:i:m:E: arg; do
+while getopts hvt:k:i:m:E: arg; do
     case $arg in
         h) Usage 0;;
         v) VERBOSE="TRUE";;
         t) TYPE="${OPTARG}";;
+        k) KEEP="${OPTARG}";;
         i) MyOUD_INSTANCES="${OPTARG}";;
         m) MAILADDRESS=$(echo "${OPTARG}"|sed s/\,/\ /g);;
         E) CleanAndQuit "${OPTARG}";;
@@ -170,6 +172,11 @@ while getopts hvt:i:m:E: arg; do
     esac
 done
 
+# Set a minimal value for KEEP to 1 eg. 1 week
+if [ ${KEEP} -lt 1 ]; then
+		KEEP=1
+fi
+	
 if [ "$MyOUD_INSTANCES" = "" ]; then
     # Load list of OUD Instances from oudtab
     DoMsg "INFO : Load list of OUD instances"
@@ -213,13 +220,23 @@ DoMsg "INFO : Define backup set to be purged for week ${OLD_WEEKNO} as ${OLD_BAC
 
 # Loop over OUD Instances
 for oud_inst in ${OUD_INST_LIST}; do
+    # Load OUD environment
+    . "${OUDENV}" $oud_inst SILENT 2>&1 >/dev/null
+    if [ $? -ne 0 ]; then
+        DoMsg "ERROR: [$oud_inst] Can not source environment for ${oud_inst}. Skip backup for this instance"
+        continue 
+    fi
+
+    # check directory type
+    if [ ! ${DIRECTORY_TYPE} == "OUD" ]; then
+        DoMsg "WARN : [$oud_inst] Instance $oud_inst is not of type OUD. Skip backup for this instance."
+        continue
+    fi
     DoMsg "INFO : [$oud_inst] Check if $oud_inst is running"
-    if [ $(ps -ef | egrep -v "ps -ef|grep " | grep org.opends.server.core.DirectoryServer|grep -c $oud_inst ) -gt 0 ]; then 
+    STATUS=$(get_status $oud_inst)
+    if [ "${STATUS^^}" == "UP" ]; then
         INST_LOG_FILE="/tmp/$(basename ${SCRIPT_NAME} .sh)_${oud_inst}.log"
-        DoMsg "INFO : [$oud_inst] OUD Instance $oud_inst up, source environment."
-        
-        # Load OUD environment
-        . "${OUDENV}" $oud_inst SILENT
+        DoMsg "INFO : [$oud_inst] OUD Instance $oud_inst up."
         
         # create directory for a dedicated backup set
         mkdir -p ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}
@@ -256,7 +273,7 @@ for oud_inst in ${OUD_INST_LIST}; do
             fi
         fi
     else 
-        DoMsg "INFO : [$oud_inst] OUD Instance $oud_inst down, no backup will be performed." 
+        DoMsg "WARN : [$oud_inst] OUD Instance $oud_inst down, no backup will be performed." 
     fi
 done
 

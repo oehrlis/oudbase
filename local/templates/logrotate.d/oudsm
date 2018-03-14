@@ -17,13 +17,29 @@
 # Modified...:
 # see git revision history with git log for more information on changes/updates
 # -----------------------------------------------------------------------------
-LOG_BASE/oud_backup.log
-LOG_BASE/oud_export.log
-LOG_BASE/oud_status.log
-LOG_BASE/oudenv.log
+OUDSM_DOMAIN_HOME/servers/AdminServer/logs/access.log
+OUDSM_DOMAIN_HOME/servers/AdminServer/logs/AdminServer-diagnostic.log
+OUDSM_DOMAIN_HOME/servers/AdminServer/logs/AdminServer.log
+OUDSM_DOMAIN_HOME/servers/AdminServer/logs/oudsm_domain.log
 {
+    copytruncate
+    compress
+    weekly
+    missingok
+    rotate=7
+    maxsize=50M
+}
+
+OUDSM_DOMAIN_HOME/servers/AdminServer/logs/AdminServer-clickhistory.log
+OUDSM_DOMAIN_HOME/servers/AdminServer/logs/DMSEventTraceLoggerDestination-event.log
+OUDSM_DOMAIN_HOME/servers/AdminServer/logs/oracle.dms.strace-event.log
+OUDSM_DOMAIN_HOME/common/db/derby.log
+OUDSM_DOMAIN_HOME/derby.log
+{
+    copytruncate
     compress
     missingok
-    rotate=5
-    size=500k
+    rotate=7
+    size=5M
 }
+

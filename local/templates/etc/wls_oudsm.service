@@ -6,8 +6,8 @@
 # Author.....: Stefan Oehrli, stefan.oehrli at trivadis.com
 # Date.......: 2017.09.07. 
 # Revision...: 1.0
-# Purpose....: Unit file for ODSM domain
-# Usage......: systemctl enable wls_odsm.service
+# Purpose....: Unit file for OUDSM domain
+# Usage......: systemctl enable wls_OUDSM.service
 # Notes......: 
 # License....: GPL-3.0+
 #           This is a template file for a systemd service for Oracle Unified 
@@ -37,7 +37,7 @@
 # ---------------------------------------------------------------------------
 
 [Unit]
-Description=WLS ODSM Instance
+Description=WLS OUDSM Instance
 Wants=network.target
 After=network.target
  
@@ -45,9 +45,9 @@ After=network.target
 Type=simple
 User=oud
 Group=oud
-WorkingDirectory=/u00/app/oracle/user_projects/domains/ODSM_domain
-ExecStart=/u00/app/oracle/user_projects/domains/ODSM_domain/startWebLogic.sh
-ExecStop=/u00/app/oracle/user_projects/domains/ODSM_domain/bin/stopWebLogic.sh
+WorkingDirectory=OUDSM_DOMAIN_HOME
+ExecStart=OUDSM_DOMAIN_HOME/startWebLogic.sh
+ExecStop=OUDSM_DOMAIN_HOME/bin/stopWebLogic.sh
 TimeoutSec=300
 StandardOutput=syslog+console
 StandardError=syslog+console
