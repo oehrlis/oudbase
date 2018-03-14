@@ -13,12 +13,10 @@
 # Purpose....: Bash Script to backup all running OUD Instances
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
 # ---------------------------------------------------------------------------
-# Rev History:
-# 06.06.2016   soe  Initial version
-# 19.07.2016   soe  Major changes to include oudenv.conf and oud.<INSTANCE>.conf
-# 12.11.2017   soe  Adjust to latest verson of oudenv.sh
-# 13.11.2017   soe  introduce -i parameter to specify instance list
+# Modified...:
+# see git revision history with git log for more information on changes/updates
 # ---------------------------------------------------------------------------
 # - Customization -----------------------------------------------------------
 

@@ -13,9 +13,10 @@
 # Notes......: Das Script stoppt die Instanz und fuehrt ein offline import
 #              mit import-ldif durch. Anschliesend wird die Instanz wieder gestartet.
 # Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
 # ---------------------------------------------------------------------------
-# Rev History:
-# 07.03.2018   soe  Initial version
+# Modified...:
+# see git revision history with git log for more information on changes/updates
 # ---------------------------------------------------------------------------
 
 # - load instance environment -----------------------------------------------

@@ -207,10 +207,11 @@ Variable besides the ones mentioned above.
 
 | Alias                     | Description                            |
 | ------------------------- | -------------------------------------- |
+| backup_changed            | Create a TAR file of the changed/added files in $ORACLE_BASE/local. The TAR file will be stored in $OUD_BACKUP_BASE |
 | dsc                       | dsconfig including hostname, $PORT_ADMIN and $PWD_FILE |
 | dsrs                      | dsreplication status |
 | oud_pi                    | OUD Base does generate an alias for each OUD instance based on its name. This allows to easily change the environment from one to an other OUD instance. |
-| oud INSTANCE              | Use oud INSTANCE name to change the environment to a particular OUD instance |
+| oud <INSTANCE>            | Use oud INSTANCE name to change the environment to a particular OUD instance |
 | taa                       | taa will do a tail -f on the OUD instance access log |
 | tae                       | tae will do a tail -f on the OUD instance error log |
 | tas                       | tas will do a tail -f on the OUD instance server.out log |
@@ -218,12 +219,22 @@ Variable besides the ones mentioned above.
 | task                      | task does run a manage-tasks with hostname, port etc parameter |
 | u                         | u runs oudup to display the current OUD Instances |
 | vio                       | vio opens the oudtab file eg. ${ETC_BASE}/oudtab |
+| version                   | Display version of OUD base and list changed files in $OUD_LOCAL|
 
 ### Functions
 
-| Function                  | Description                            |
+| Function                  | Alias   | Description                  |
 | ------------------------- | -------------------------------------- |
-| oud_help                  | Display a short help for important variable and aliases. If custom aliases has been specified in oudenv_custom.conf the will be shown as well. The alias name will be displayed by side a help text. The help text is taken from the line comment of the alias command if available otherwise oud_help will just display n/a |
+| gen_password <LENGTH>     | gen_pwd | Generate a password string. The password is 10 characters long and contains number as well as upper and lower case characters. The length of the password can be changed by specify a parameter eg. ```gen_password 8``` for an 8 character password |
+| get_oracle_home           | goh     | Get the corresponding ORACLE_HOME from OUD Instance. |
+| get_ports                 | gp      | Get the corresponding PORTS from OUD Instance. |
+| get_status                | n/a     | Get the process status of the current OUD instance or OUDSM domain. Internally used to get the *UP* or *DOWN*.|
+| join_by                   | n/a     | Internally used to join array elements. |
+| oud_help                  | h       | Display a short help for important variable and aliases. If custom aliases has been specified in oudenv_custom.conf the will be shown as well. The alias name will be displayed by side a help text. The help text is taken from the line comment of the alias command if available otherwise oud_help will just display n/a |
+| oud_status                | os      | Display the current OUD or OUDSM status with instance name, instance home, ports etc.|
+| oud_up                    | u, ou   | Display up/down status of all OUD instances and OUDSM domains. |
+| relpath <DIR1> <DIR2>     | n/a     | Internally used to get the relative path of DIR1 from DIR2 |
+| update_oudtab             | n/a     | Update OUD tab (${ETC_BASE}/oudtab) for the current OUD instance. Adjust Ports or add the instance to the OUD tab. |
 
 ## Issues
 Please file your bug reports, enhancement requests, questions and other support requests within [Github's issue tracker](https://help.github.com/articles/about-issues/):

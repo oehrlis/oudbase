@@ -10,10 +10,11 @@
 # Revision...: $LastChangedRevision: $
 # Purpose....: Default Directory Structure for an empty OUD Instance
 # Notes......: --
-# Reference..: --
-# -----------------------------------------------------------------------------
-# Rev History:
-# 11.10.2016   soe  Initial version
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
+# ---------------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes/updates
 # -----------------------------------------------------------------------------
 
 dn: dc=postgasse,dc=org

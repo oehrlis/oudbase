@@ -13,9 +13,10 @@
 # Purpose....: This script is used as base install script for the OUD Environment
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
 # ---------------------------------------------------------------------------
-# Rev History:
-# 11.10.2016   soe  Initial version
+# Modified...:
+# see git revision history with git log for more information on changes/updates
 # ---------------------------------------------------------------------------
 
 # - Customization -----------------------------------------------------------

@@ -14,9 +14,10 @@
 #              fuehrt die dsconfig Kommandos aus 02_configure_instance.config
 #              als Batch aus. Diese lassen sich bei Bedarf auch einzel ausführen.
 # Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
 # ---------------------------------------------------------------------------
-# Rev History:
-# 07.03.2018   soe  Initial version
+# Modified...:
+# see git revision history with git log for more information on changes/updates
 # ---------------------------------------------------------------------------
 
 # - load instance environment -----------------------------------------------

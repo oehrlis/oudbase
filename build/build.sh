@@ -12,10 +12,11 @@
 # Revision...: $LastChangedRevision: $
 # Purpose....: Simple build script for the OUD Base Package
 # Notes......: This script is used as base install script for the OUD Environment
-# Reference..: --
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
 # ---------------------------------------------------------------------------
-# Rev History:
-# 11.10.2016   soe  Initial version
+# Modified...:
+# see git revision history with git log for more information on changes/updates
 # ---------------------------------------------------------------------------
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"                  # Basename of the script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of script
@@ -26,6 +27,7 @@ echo "SCRIPT_DIR=$SCRIPT_DIR"
 
 cd ${SCRIPT_DIR}/../local
 cp ${SCRIPT_DIR}/../README.md ${SCRIPT_DIR}/../local/doc
+cp ${SCRIPT_DIR}/../LICENSE ${SCRIPT_DIR}/../local/doc
 find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" ! -iname "*.log" ! -iname "oudbase_install.sh" \) \
   -print0 | xargs -0 shasum -p >${SCRIPT_DIR}/../local/doc/.oudbase.sha
 tar -zcvf ${SCRIPT_DIR}/oudbase_install.tgz \
@@ -34,5 +36,6 @@ tar -zcvf ${SCRIPT_DIR}/oudbase_install.tgz \
     bin/ doc/ etc/ log/ templates/
 cat bin/oudbase_install.sh ${SCRIPT_DIR}/oudbase_install.tgz >${SCRIPT_DIR}/oudbase_install.sh
 rm ${SCRIPT_DIR}/../local/doc/README.md
+rm ${SCRIPT_DIR}/../local/doc/LICENSE
 chmod 755 ${SCRIPT_DIR}/oudbase_install.sh
 # - EOF ---------------------------------------------------------------------

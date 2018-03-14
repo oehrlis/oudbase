@@ -13,12 +13,10 @@
 # Purpose....: Bash Source File to set the environment for OUD Instances
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
 # ---------------------------------------------------------------------------
-# Rev History:
-# 06.06.2016   soe  Initial version
-# 19.07.2016   soe  Major changes to include oudenv.conf and oud.<INSTANCE>.conf
-# 10.11.2017   soe  Add support for OUD_DATA to distinct persistant files for docker
-# 13.11.2017   soe  Add get_ports and create oudtab entry
+# Modified...:
+# see git revision history with git log for more information on changes/updates
 # ---------------------------------------------------------------------------
 
 # - Environment Variables ---------------------------------------------------
@@ -376,6 +374,28 @@ function update_oudtab {
         fi
     fi
 }
+
+# ---------------------------------------------------------------------------
+function gen_password {
+# Purpose....: generate a password string
+# ---------------------------------------------------------------------------
+	Length=${1:-10}
+	
+	# make sure, that the password length is not shorter than 4 characters
+	if [ ${Length} -lt 4 ]; then
+		Length=4
+	fi
+	
+	# Auto generate a password
+    while true; do
+        s=$(cat /dev/urandom | tr -dc "A-Za-z0-9" | fold -w ${Length} | head -n 1)
+        if [[ ${#s} -ge ${Length} && "$s" == *[A-Z]* && "$s" == *[a-z]* && "$s" == *[0-9]*  ]]; then
+            echo "$s"
+            break
+        fi
+    done
+}
+
 # ---------------------------------------------------------------------------
 function oud_help {
 # Purpose....: just display help for OUD environment
@@ -406,6 +426,7 @@ echo "  PORT_SSL            = ${PORT_SSL-n/a}"
 echo ""
 echo "--- Default Aliases ---------------------------------------------------"
 echo "  backup_changed  Create a TAR file of the changed/added file in \$ORACLE_BASE/local"
+echo "  gen_pwd         Generate a password string (gen_password)"
 echo "  goh             Get oracle home of current oud instance"
 echo "  gp              Get ports of current oud instance"
 echo "  oudup           List OUD instances and there status short form u"
@@ -595,7 +616,14 @@ if [ -f "${ETC_BASE}/oudenv.conf" ]; then
     . "${ETC_BASE}/oudenv.conf"
 else
     echo "WARN : Could not source ${ETC_BASE}/oudenv.conf"
-fi  
+fi
+
+# set the password file variable based on ETC_BASE
+if [ -f "${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_pwd.txt" ]; then
+    export PWD_FILE=${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_pwd.txt
+else
+    export PWD_FILE=${ETC_BASE}/pwd.txt
+fi
 
 if [ -f "${ETC_BASE}/oudenv_custom.conf" ]; then
     . "${ETC_BASE}/oudenv_custom.conf"
@@ -609,13 +637,6 @@ fi
 # source oud.<OUD_INSTANCE>.conf if exists
 if [ -f "${ETC_BASE}/oud.${OUD_INSTANCE}.conf" ]; then
     . "${ETC_BASE}/oud.${OUD_INSTANCE}.conf"
-fi
-
-# set the password file variable based on ETC_BASE
-if [ -f "${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_pwd.txt" ]; then
-    export PWD_FILE=${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_pwd.txt
-else
-    export PWD_FILE=${ETC_BASE}/pwd.txt
 fi
 
 if [ ${pTTY} -eq 0 ] && [ "${SILENT}" = "" ]; then

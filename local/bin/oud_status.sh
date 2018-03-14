@@ -13,10 +13,10 @@
 # Purpose....: Bash Script to get the instance status as retun code
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
 # ---------------------------------------------------------------------------
-# Rev History:
-# 01.09.2016   soe  Initial version
-# 12.11.2017   soe  Adjust to latest verson of oudenv.sh
+# Modified...:
+# see git revision history with git log for more information on changes/updates
 # ---------------------------------------------------------------------------
 # - Customization -----------------------------------------------------------
 export OUD_ROOT_DN=${OUD_ROOT_DN:-"postgasse.org"}

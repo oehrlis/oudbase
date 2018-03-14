@@ -13,11 +13,10 @@
 # Purpose....: Bash Script to export all running OUD Instances
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
 # ---------------------------------------------------------------------------
-# Rev History:
-# 08.08.2016   soe  Initial version
-# 12.11.2017   soe  Adjust to latest verson of oudenv.sh
-# 13.11.2017   soe  introduce -i parameter to specify instance list
+# Modified...:
+# see git revision history with git log for more information on changes/updates
 # ---------------------------------------------------------------------------
 # - Customization -----------------------------------------------------------
 

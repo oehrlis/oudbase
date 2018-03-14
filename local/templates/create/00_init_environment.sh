@@ -14,10 +14,11 @@
 #              basieren die folgenden Script auf der OUD Base Umgebung. Ggf ist
 #              diese Datei anzupassen.
 # Notes......:
-# Reference..:
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
 # ---------------------------------------------------------------------------
-# Rev History:
-# 08.03.2018   soe  Initial version
+# Modified...:
+# see git revision history with git log for more information on changes/updates
 # ---------------------------------------------------------------------------
 # - Default Environment Variables -------------------------------------------
 # Diese sollte bereits durch OUD Base korrekt gesetzt sein daher an der Stelle

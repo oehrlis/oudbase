@@ -12,9 +12,10 @@
 # Purpose....: Script zum erweitern der Replikation auf einem zusaetzlichen Node
 # Notes......:
 # Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
 # ---------------------------------------------------------------------------
-# Rev History:
-# 23.01.2018   soe  Initial version
+# Modified...:
+# see git revision history with git log for more information on changes/updates
 # ---------------------------------------------------------------------------
 
 # - load instance environment -----------------------------------------------

@@ -9,12 +9,11 @@
 # Revision...:
 # Purpose....: Script to create OUDSM Domain
 # Notes......:
-# Reference..: --
-# License....: CDDL 1.0 + GPL 2.0
-# ----------------------------------------------------------------------
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
+# ---------------------------------------------------------------------------
 # Modified...:
-# see git revision history for more information on changes/updates
-# TODO.......:
+# see git revision history with git log for more information on changes/updates
 # ----------------------------------------------------------------------
 import os
 

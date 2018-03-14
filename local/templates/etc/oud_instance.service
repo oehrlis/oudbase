@@ -1,14 +1,15 @@
 # -----------------------------------------------------------------------
-#  Trivadis AG, Infrastructure Managed Services
-#  Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# Trivadis AG, Infrastructure Managed Services
+# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # -----------------------------------------------------------------------
-#  File-Name........: oud_instance.service
-#  Author...........: Stefan Oehrli, stefan.oehrli at trivadis.com
-#  Date.............: 07. Sept 2017
-#  Revision.........: 1.0
-#  Purpose..........: Unit file for ODSM domain
-#  Usage............: systemctl enable wls_odsm.service
-#  Notes............: 
+# File-Name..: oud_instance.service
+# Author.....: Stefan Oehrli, stefan.oehrli at trivadis.com
+# Date.......: 2017.09.07.  
+# Revision...: 1.0
+# Purpose....: Unit file for ODSM domain
+# Usage......: systemctl enable wls_odsm.service
+# Notes......: 
+# Reference..:
 #           This is a template file for a systemd service for Oracle Unified 
 #           Directory instance. Adjust user, group, service name 
 #           directory path before using it.
@@ -28,11 +29,12 @@
 #           Stop the service manual:
 #           sudo systemctl stop oud_instance.service
 #
-# -----------------------------------------------------------------------
-#  Revision history.:  
-#  07.09.2017  soe     initial release
-#  10.11.2017  soe     Add notes how to use it
-# -----------------------------------------------------------------------
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
+# ---------------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes/updates
+# ---------------------------------------------------------------------------
 
 [Unit]
 Description=OUD Instance
