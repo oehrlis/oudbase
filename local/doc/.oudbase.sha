@@ -35,5 +35,5 @@ d885aeb4db9c95cd8dbf802839cc35749531775e ?./templates/create/10_enable_replicati
 af0e2c2febcb5d903ee038cc47991d7967a088cd ?./templates/create/04_create_root_user.conf
 c0fc51fe0821269c5863b8beaced0ccecbeb8055 ?./templates/create/02_configure_instance.conf
 8624bcdae55baeef00cd11d5dfcfa60f68710a02 ?./doc/LICENSE
-4f32aabe5b0dba45e265fc9a01b9d354aef98235 ?./doc/README.md
+3db97bdaacfb1fc28c27f93bceda238135caed1b ?./doc/README.md
 8be10739591c8074326bf60f6a21f534766f2d60 ?./doc/.version
