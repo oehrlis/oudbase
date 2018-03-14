@@ -224,7 +224,7 @@ Variable besides the ones mentioned above.
 ### Functions
 
 | Function                  | Alias   | Description                  |
-| ------------------------- | -------------------------------------- |
+| ------------------------- | --------|----------------------------- |
 | gen_password <LENGTH>     | gen_pwd | Generate a password string. The password is 10 characters long and contains number as well as upper and lower case characters. The length of the password can be changed by specify a parameter eg. ```gen_password 8``` for an 8 character password |
 | get_oracle_home           | goh     | Get the corresponding ORACLE_HOME from OUD Instance. |
 | get_ports                 | gp      | Get the corresponding PORTS from OUD Instance. |
