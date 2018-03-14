@@ -21,7 +21,7 @@
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"                  # Basename of the script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of script
 SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"                    # Full qualified script name
-
+export COPYFILE_DISABLE=true
 echo "SCRIPT_FQN=$SCRIPT_FQN"
 echo "SCRIPT_DIR=$SCRIPT_DIR"
 
@@ -33,6 +33,7 @@ find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" ! -iname "*.log" 
 tar -zcvf ${SCRIPT_DIR}/oudbase_install.tgz \
     --exclude=bin/oudbase_install.sh \
     --exclude=log/*.log \
+    --exclude=.DS_Store \
     bin/ doc/ etc/ log/ templates/
 cat bin/oudbase_install.sh ${SCRIPT_DIR}/oudbase_install.tgz >${SCRIPT_DIR}/oudbase_install.sh
 rm ${SCRIPT_DIR}/../local/doc/README.md
