@@ -1,6 +1,6 @@
 d8e1c7aef6cefb7bf1c11450fed02079200f435c ?./bin/oud_status.sh
-7567ba087871591e7ed9a6ce09e2e673d74fdee7 ?./bin/oud_export.sh
-4ea2d008073e122a0473e110303df4e8ebb494f0 ?./bin/oud_backup.sh
+797632ffbf00615d161c6bce7483b192bff3a98c ?./bin/oud_export.sh
+6bd74ef29e0020c0d914b1b97e5b24961a818121 ?./bin/oud_backup.sh
 a8fe71736bd0154ad03b83217d60282cef9a0f2f ?./bin/oudenv.sh
 65238ac85ba935bcec503b0cc9153cd083c1f904 ?./etc/oudenv_core.conf
 f1b02bcf2c028f7b81a3a163f26e59b4b97ad598 ?./etc/oudenv.conf
@@ -38,4 +38,4 @@ af0e2c2febcb5d903ee038cc47991d7967a088cd ?./templates/create/04_create_root_user
 c0fc51fe0821269c5863b8beaced0ccecbeb8055 ?./templates/create/02_configure_instance.conf
 8624bcdae55baeef00cd11d5dfcfa60f68710a02 ?./doc/LICENSE
 3db97bdaacfb1fc28c27f93bceda238135caed1b ?./doc/README.md
-8c4c714ef92448b4f016373bb254911ab4b44847 ?./doc/.version
+2a2f9ef12285cbe7c72eade851b7e4f83cbb235f ?./doc/.version

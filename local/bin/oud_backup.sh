@@ -19,9 +19,9 @@
 # see git revision history with git log for more information on changes/updates
 # ---------------------------------------------------------------------------
 # - Customization -----------------------------------------------------------
-
+ 
 # - End of Customization ----------------------------------------------------
-
+ 
 # - Default Values ----------------------------------------------------------
 VERSION=0.1
 DOAPPEND="TRUE"                                        # enable log file append
@@ -34,7 +34,7 @@ TYPE="FULL"                                            # Default Backup Type
 KEEP=4                                                 # Number of Weeks to keep
 compress="--compress"                                  # set --compress Flag
 # - End of Default Values ---------------------------------------------------
-
+ 
 # - Functions ---------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # Purpose....: Display Usage
@@ -48,15 +48,16 @@ function Usage() {
     DoMsg "INFO :   -t <TYPE>          Backup Type FULL or INCREMENTAL (default FULL)"
     DoMsg "INFO :   -k <WEEKS>         Number of weeks to keep old backups (default 4)"
     DoMsg "INFO :   -m <MAILADDRESSES> List of Mail Addresses"
+    DoMsg "INFO :   -f <BACKUPPATH>    Directory used to store the backups (default: \$OUD_BACKUP_DIR)"
     DoMsg "INFO : Logfile : ${LOGFILE}"
     if [ ${1} -gt 0 ]; then
         CleanAndQuit ${1} ${2}
     else
         VERBOSE="FALSE"
-        CleanAndQuit 0 
+        CleanAndQuit 0
     fi
 }
-
+ 
 # ---------------------------------------------------------------------------
 # Purpose....: Display Message with time stamp
 # ---------------------------------------------------------------------------
@@ -98,11 +99,11 @@ function DoMsg()
         done
     fi
 }
-
+ 
 # ---------------------------------------------------------------------------
 # Purpose....: Clean up before exit
 # ---------------------------------------------------------------------------
-function CleanAndQuit(){ 
+function CleanAndQuit(){
     if [ ${1} -gt 0 ]; then
         VERBOSE="TRUE"
     fi
@@ -114,32 +115,34 @@ function CleanAndQuit(){
         11) DoMsg "ERR  : Exit Code ${1}. Could not touch file ${2}";;
         21) DoMsg "ERR  : Exit Code ${1}. Could not load \${HOME}/.OUD_BASE";;
         30) DoMsg "ERR  : Exit Code ${1}. Some Backup failed";;
+        44) DoMsg "ERR  : Exit Code ${1}. Can not create directory ${2}";;
+        45) DoMsg "ERR  : Exit Code ${1}. Directory ${2} is not writeable";;
         99) DoMsg "INFO : Just wanna say hallo.";;
         ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
     esac
     exit ${1}
 }
 # - EOF Functions -----------------------------------------------------------
-
+ 
 # - Initialization ----------------------------------------------------------
 # Check OUD_BASE and load if necessary
 if [ "${OUD_BASE}" = "" ]; then
     if [ -f "${HOME}/.OUD_BASE" ]; then
         . "${HOME}/.OUD_BASE"
     else
-        CleanAndQuit 21 
+        CleanAndQuit 21
     fi
-fi  
-
+fi
+ 
 # Check if OUD_BASE exits
 if [ "${OUD_BASE}" = "" ] || [ ! -d "${OUD_BASE}" ]; then
     CleanAndQuit 10
 fi
-
+ 
 OUDENV=$(find $OUD_BASE -name oudenv.sh)
 # Load OUD environment
 . "${OUDENV}" SILENT
-
+ 
 # Define Logfile
 LOGFILE="${LOG_BASE}/$(basename ${SCRIPT_NAME} .sh).log"
 touch ${LOGFILE} 2>/dev/null
@@ -148,18 +151,15 @@ if [ $? -eq 0 ] && [ -w "${LOGFILE}" ]; then
 else
     CleanAndQuit 11 ${LOGFILE} # Define a clean exit
 fi
-
+ 
 # - EOF Initialization ------------------------------------------------------
-
+ 
 # - Main --------------------------------------------------------------------
 DoMsg "${START_HEADER}"
-if [ $# -lt 1 ]; then
-    Usage 1 
-fi
-
+ 
 # usage and getopts
 DoMsg "INFO : processing commandline parameter"
-while getopts hvt:k:i:m:E: arg; do
+while getopts hvt:k:i:m:f:E: arg; do
     case $arg in
         h) Usage 0;;
         v) VERBOSE="TRUE";;
@@ -167,20 +167,21 @@ while getopts hvt:k:i:m:E: arg; do
         k) KEEP="${OPTARG}";;
         i) MyOUD_INSTANCES="${OPTARG}";;
         m) MAILADDRESS=$(echo "${OPTARG}"|sed s/\,/\ /g);;
+        f) MyBackupPath="${OPTARG}";;
         E) CleanAndQuit "${OPTARG}";;
         ?) Usage 2 $*;;
     esac
 done
-
+ 
 # Set a minimal value for KEEP to 1 eg. 1 week
 if [ ${KEEP} -lt 1 ]; then
-		KEEP=1
+KEEP=1
 fi
-	
+ 
 if [ "$MyOUD_INSTANCES" = "" ]; then
     # Load list of OUD Instances from oudtab
     DoMsg "INFO : Load list of OUD instances"
-    if [ -f "${ETC_BASE}/oudtab" ]; then 
+    if [ -f "${ETC_BASE}/oudtab" ]; then
         # create a OUD Instance Liste based on oudtab
         export OUDTAB=${ETC_BASE}/oudtab
         export OUD_INST_LIST=$(grep -v '^#' ${OUDTAB}|cut -f1 -d:)
@@ -198,18 +199,18 @@ else
     # use list of OUD Instances from command line
     OUD_INST_LIST=$(echo "${MyOUD_INSTANCES}" |tr ',' ' ')
 fi
-
+ 
 # remove newline in OUD_INST_LIST
 OUD_INST_LIST=$(echo ${OUD_INST_LIST}|tr '\n' ' ')
 DoMsg "INFO : Initiate backup for OUD instances ${OUD_INST_LIST}"
-
+ 
 # define backup type
 if [ "${TYPE}" = "INCREMENTAL" ]; then
     incremental="--incremental"
 else
     incremental=""
 fi
-
+ 
 # define backup set as modulo 5 of week number
 NEW_WEEKNO=$(date "+%U")
 OLD_WEEKNO=$((${NEW_WEEKNO}-${KEEP}))
@@ -217,16 +218,16 @@ NEW_BACKUP_SET="backup_set$(( ${NEW_WEEKNO} % (${KEEP}+1)))"
 OLD_BACKUP_SET="backup_set$(( ${OLD_WEEKNO} % (${KEEP}+1)))"
 DoMsg "INFO : Define backup set for week ${NEW_WEEKNO} as ${NEW_BACKUP_SET}"
 DoMsg "INFO : Define backup set to be purged for week ${OLD_WEEKNO} as ${OLD_BACKUP_SET}"
-
+ 
 # Loop over OUD Instances
 for oud_inst in ${OUD_INST_LIST}; do
     # Load OUD environment
     . "${OUDENV}" $oud_inst SILENT 2>&1 >/dev/null
     if [ $? -ne 0 ]; then
         DoMsg "ERROR: [$oud_inst] Can not source environment for ${oud_inst}. Skip backup for this instance"
-        continue 
+        continue
     fi
-
+ 
     # check directory type
     if [ ! ${DIRECTORY_TYPE} == "OUD" ]; then
         DoMsg "WARN : [$oud_inst] Instance $oud_inst is not of type OUD. Skip backup for this instance."
@@ -235,27 +236,47 @@ for oud_inst in ${OUD_INST_LIST}; do
     DoMsg "INFO : [$oud_inst] Check if $oud_inst is running"
     STATUS=$(get_status $oud_inst)
     if [ "${STATUS^^}" == "UP" ]; then
-        INST_LOG_FILE="/tmp/$(basename ${SCRIPT_NAME} .sh)_${oud_inst}.log"
         DoMsg "INFO : [$oud_inst] OUD Instance $oud_inst up."
-        
+ 
+        # set the export path to MyExportPath or fallback to the default $OUD_EXPORT_DIR
+        OUD_BACKUP_DIR=${MyBackupPath:-"${OUD_BACKUP_DIR}"}
+        # check and create directory
+        if [ ! -d "${OUD_BACKUP_DIR}" ]; then
+            mkdir -p ${OUD_BACKUP_DIR} >/dev/null 2>&1 || CleanAndQuit 44 ${OUD_BACKUP_DIR}
+        elif [ ! -w "${OUD_BACKUP_DIR}" ]; then
+            CleanAndQuit 45 ${OUD_BACKUP_DIR}
+        fi
+ 
+        # define a instance backup log file
+        INST_LOG_FILE="${OUD_BACKUP_DIR}/$(basename ${SCRIPT_NAME} .sh)_${oud_inst}.log"
+ 
         # create directory for a dedicated backup set
-        mkdir -p ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}
+        mkdir -p ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET} >/dev/null 2>&1 || CleanAndQuit 44 ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}
+ 
         DoMsg "INFO : [$oud_inst] start backup for $oud_inst for Week ${NEW_WEEKNO}"
+        DoMsg "INFO : [$oud_inst] backup log file ${INST_LOG_FILE}"
+ 
         BACKUP_COMMAND="${OUD_BIN}/backup -a ${compress} ${incremental} -d ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}"
         DoMsg "INFO : [$oud_inst] ${BACKUP_COMMAND}"
-        ${BACKUP_COMMAND} >${INST_LOG_FILE} 2>&1       
-        OUD_ERROR=$? 
-        
+        echo -e "\n${BACKUP_COMMAND}" >${INST_LOG_FILE} 2>&1
+        ${BACKUP_COMMAND} >>${INST_LOG_FILE} 2>&1
+        OUD_ERROR=$?
+ 
         # Backup the Config directory
         DoMsg "INFO : [$oud_inst] backup config directory"
-        tar -Pzcf ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/${oud_inst}_config.tgz $OUD_CONF >>${INST_LOG_FILE} 2>&1  
-        
+        TAR_COMMAND="tar -Pzcvf ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/${oud_inst}_config.tgz $OUD_CONF"
+        echo -e "\n${TAR_COMMAND}" >>${INST_LOG_FILE} 2>&1
+        ${TAR_COMMAND} >>${INST_LOG_FILE} 2>&1
+ 
         # Backup the current log files
         DoMsg "INFO : [$oud_inst] backup current log files"
-        tar -Pzcf ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/${oud_inst}_logs.tgz \
-            $OUD_LOG/access $OUD_LOG/admin $OUD_LOG/audit $OUD_LOG/errors \
-            $OUD_LOG/replication $OUD_LOG/server.out $OUD_LOG/server.pid >>${INST_LOG_FILE} 2>&1
-        
+        TAR_COMMAND="tar -Pzcvf ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/${oud_inst}_logs.tgz $(find $OUD_LOG -type f)"
+        echo -e "\n${TAR_COMMAND}" >>${INST_LOG_FILE} 2>&1
+        ${TAR_COMMAND} >>${INST_LOG_FILE} 2>&1
+ 
+        DoMsg "INFO : [$oud_inst] cat of backup log ${INST_LOG_FILE}"
+        DoMsg "$(cat ${INST_LOG_FILE})"
+ 
         # handle backup errors
         if [ $OUD_ERROR -lt 0 ]; then
             DoMsg "WARN : [$oud_inst] Backup for $oud_inst failed with error ${OUD_ERROR}"
@@ -263,7 +284,7 @@ for oud_inst in ${OUD_INST_LIST}; do
             export ERROR=$((ERROR+1))
         else
             DoMsg "INFO : [$oud_inst] Backup for $oud_inst successfully finished"
-            
+ 
             # Automaticaly purge backup's older than KEEP weeks
             if [ -d ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET} ]; then
                 DoMsg "INFO : [$oud_inst] Remove old backup set ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET} of week ${OLD_WEEKNO}"
@@ -272,16 +293,16 @@ for oud_inst in ${OUD_INST_LIST}; do
                 DoMsg "INFO : [$oud_inst] No old backup found (eg. ${OLD_BACKUP_SET} week ${OLD_WEEKNO})"
             fi
         fi
-    else 
-        DoMsg "WARN : [$oud_inst] OUD Instance $oud_inst down, no backup will be performed." 
+    else
+        DoMsg "WARN : [$oud_inst] OUD Instance $oud_inst down, no backup will be performed."
     fi
 done
-
+ 
 if [ $ERROR -lt 0 ]; then
     DoMsg "WARN : send e-Mail due to error "
-    tail -400 ${LOGFILE} |mailx -s "ERROR: OUD Script ${SCRIPT_NAME}" ${MAILADDRESS}     
-else 
+    tail -400 ${LOGFILE} |mailx -s "ERROR: OUD Script ${SCRIPT_NAME}" ${MAILADDRESS}
+else
     CleanAndQuit 0
 fi
-
+ 
 # - EOF ---------------------------------------------------------------------

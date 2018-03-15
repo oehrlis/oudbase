@@ -33,7 +33,8 @@ find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" ! -iname "*.log" 
 tar -zcvf ${SCRIPT_DIR}/oudbase_install.tgz \
     --exclude=bin/oudbase_install.sh \
     --exclude=log/*.log \
-    --exclude=.DS_Store \
+    --exclude='.DS_Store' \
+    --exclude='._*'  \
     bin/ doc/ etc/ log/ templates/
 cat bin/oudbase_install.sh ${SCRIPT_DIR}/oudbase_install.tgz >${SCRIPT_DIR}/oudbase_install.sh
 rm ${SCRIPT_DIR}/../local/doc/README.md
