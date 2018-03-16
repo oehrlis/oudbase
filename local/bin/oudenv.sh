@@ -22,7 +22,7 @@
 # - Environment Variables ---------------------------------------------------
 # - Set default values for environment variables if not yet defined. 
 # ---------------------------------------------------------------------------
-VERSION="v1.2.1"
+VERSION="v1.2.2"
 export HOST=$(hostname)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of script
 
@@ -333,7 +333,9 @@ function get_ports {
             PORT_ADMIN=$(sed -n '/LDAP Administration Connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
             PORT=$(sed -n '/LDAP Connection Handler/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
             PORT_SSL=$(sed -n '/LDAPS Connection Handler/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
-            PORT_REP=$(sed -n '/LDAP Replication Connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+            PORT_REP=$(grep -i ds-cfg-replication-port $CONFIG|cut -d' ' -f2)
+
+            grep -i ds-cfg-replication-port ${OUD_INSTANCE_HOME}/OUD/config/config.ldif
         else
             if [ "${Silent}" == "" ]; then
                 echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set your PORTS."
