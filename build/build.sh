@@ -26,6 +26,7 @@ echo "SCRIPT_FQN=$SCRIPT_FQN"
 echo "SCRIPT_DIR=$SCRIPT_DIR"
 
 # Remove .DS_Store files
+echo "Remove .DS_Store files"
 find ${SCRIPT_DIR}/.. -name .DS_Store -exec rm {} \;
 
 # change workding directory
@@ -34,10 +35,12 @@ cp ${SCRIPT_DIR}/../README.md ${SCRIPT_DIR}/../local/doc
 cp ${SCRIPT_DIR}/../LICENSE ${SCRIPT_DIR}/../local/doc
 
 # create sha hash's
+echo "Create sha hashs for all files"
 find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" ! -iname "*.log" ! -iname "oudbase_install.sh" \) \
   -print0 | xargs -0 shasum -p >${SCRIPT_DIR}/../local/doc/.oudbase.sha
 
 # Tar all together
+echo "Put all together in a tar"
 tar -zcvf ${SCRIPT_DIR}/oudbase_install.tgz \
     --exclude=bin/oudbase_install.sh \
     --exclude=log/*.log \
@@ -46,9 +49,11 @@ tar -zcvf ${SCRIPT_DIR}/oudbase_install.tgz \
     bin/ doc/ etc/ log/ templates/
 
 # build this nice executable shell script with an embeded TAR
+echo "Create this fancy shell with embedded tar"
 cat bin/oudbase_install.sh ${SCRIPT_DIR}/oudbase_install.tgz >${SCRIPT_DIR}/oudbase_install.sh
 
 # clean up
+echo "Clean up...."
 rm ${SCRIPT_DIR}/../local/doc/README.md
 rm ${SCRIPT_DIR}/../local/doc/LICENSE
 chmod 755 ${SCRIPT_DIR}/oudbase_install.sh
