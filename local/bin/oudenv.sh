@@ -332,8 +332,6 @@ function get_ports {
             PORT=$(sed -n '/LDAP Connection Handler/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
             PORT_SSL=$(sed -n '/LDAPS Connection Handler/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
             PORT_REP=$(grep -i ds-cfg-replication-port $CONFIG|cut -d' ' -f2)
-
-            grep -i ds-cfg-replication-port ${OUD_INSTANCE_HOME}/OUD/config/config.ldif
         else
             if [ "${Silent}" == "" ]; then
                 echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set your PORTS."
