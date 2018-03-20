@@ -1,41 +1,40 @@
 #!/bin/bash
-# ---------------------------------------------------------------------------
-# $Id: $
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Name.......: oud_export.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
-# Editor.....: $LastChangedBy: $
-# Date.......: $LastChangedDate: $
-# Revision...: $LastChangedRevision: $
+# Editor.....: Stefan Oehrli
+# Date.......: 2018.03.18
+# Revision...: --
 # Purpose....: Bash Script to export all running OUD Instances
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Modified...:
-# see git revision history with git log for more information on changes/updates
-# ---------------------------------------------------------------------------
-# - Customization -----------------------------------------------------------
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
+# - Customization -------------------------------------------------------
  
-# - End of Customization ----------------------------------------------------
+# - End of Customization ------------------------------------------------
  
-# - Default Values ----------------------------------------------------------
+# - Default Values ------------------------------------------------------
 VERSION="v1.2.2"
-DOAPPEND="TRUE"                                     # enable log file append
-VERBOSE="FALSE"                                     # enable verbose mode
+DOAPPEND="TRUE"                                 # enable log file append
+VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 MAILADDRESS=""
 ERROR=0
-# - End of Default Values ---------------------------------------------------
+HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)   # Hostname
+# - End of Default Values -----------------------------------------------
  
-# - Functions ---------------------------------------------------------------
-# ---------------------------------------------------------------------------
+# - Functions -----------------------------------------------------------
+# -----------------------------------------------------------------------
 # Purpose....: Display Usage
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function Usage() {
     VERBOSE="TRUE"
     DoMsg "INFO : Usage, ${SCRIPT_NAME} [-hv -i <OUD_INSTANCES> -m <MAILADDRESSES>]"
@@ -55,9 +54,9 @@ function Usage() {
     fi
 }
  
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Purpose....: Display Message with time stamp
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function DoMsg() {
     INPUT=${1%:*}                         # Take everything behinde
     case ${INPUT} in                    # Define a nice time stamp for ERR, END
@@ -96,9 +95,9 @@ function DoMsg() {
     fi
 }
  
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Purpose....: Clean up before exit
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function CleanAndQuit() {
     STATUS="INFO"
     if [ ${1} -gt 0 ]; then
@@ -142,9 +141,9 @@ function CleanAndQuit() {
     fi
     exit ${1}
 }
-# - EOF Functions -----------------------------------------------------------
+# - EOF Functions -------------------------------------------------------
  
-# - Initialization ----------------------------------------------------------
+# - Initialization ------------------------------------------------------
 # Check OUD_BASE and load if necessary
 if [ "${OUD_BASE}" = "" ]; then
     if [ -f "${HOME}/.OUD_BASE" ]; then
@@ -172,9 +171,9 @@ else
     CleanAndQuit 11 ${LOGFILE} # Define a clean exit
 fi
  
-# - EOF Initialization --------------------------------------------------------
+# - EOF Initialization --------------------------------------------------
  
-# - Main ----------------------------------------------------------------------
+# - Main ----------------------------------------------------------------
 DoMsg "${START_HEADER}"
  
 # get pointer / linenumber from logfile with the latest header line
@@ -280,7 +279,7 @@ for oud_inst in ${OUD_INST_LIST}; do
             DoMsg "INFO : [$oud_inst] start export for $oud_inst backendID ${backend}"
             DoMsg "INFO : [$oud_inst] export log file ${INST_LOG_FILE}"
  
-            EXPORT_COMMAND="${OUD_BIN}/export-ldif --hostname localhost --port $PORT_ADMIN --trustAll --bindPasswordFile ${MybindPasswordFile} --backendID ${backend} ${includeBranch} --ldifFile ${OUD_EXPORT_DIR}/export_${oud_inst}_${backend}_Day$(date '+%u').ldif"
+            EXPORT_COMMAND="${OUD_BIN}/export-ldif --hostname ${HOST} --port $PORT_ADMIN --trustAll --bindPasswordFile ${MybindPasswordFile} --backendID ${backend} ${includeBranch} --ldifFile ${OUD_EXPORT_DIR}/export_${oud_inst}_${backend}_Day$(date '+%u').ldif"
             DoMsg "INFO : [$oud_inst] ${EXPORT_COMMAND}"
             echo -e "\n${EXPORT_COMMAND}" >>${INST_LOG_FILE}
             ${EXPORT_COMMAND} >>${INST_LOG_FILE} 2>&1
@@ -311,4 +310,4 @@ if [ "${ERROR}" -gt 0 ]; then
 else
     CleanAndQuit 0
 fi
-# - EOF -----------------------------------------------------------------------
+# - EOF -----------------------------------------------------------------

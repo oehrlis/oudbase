@@ -1,27 +1,26 @@
 # -----------------------------------------------------------------------------
-# $Id: $
-# -----------------------------------------------------------------------------
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Name.......: oud
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
-# Editor.....: $LastChangedBy: $
-# Date.......: $LastChangedDate: $
-# Revision...: $LastChangedRevision: $
+# Editor.....: Stefan Oehrli
+# Date.......: 2018.03.18
+# Revision...: --
 # Purpose....: Logrotate configuration file for OUD Environment
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Modified...:
-# see git revision history with git log for more information on changes/updates
-# -----------------------------------------------------------------------------
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
 LOG_BASE/oud_backup.log
 LOG_BASE/oud_export.log
 LOG_BASE/oud_status.log
 LOG_BASE/oudenv.log
 {
+    su USER GROUP
     compress
     missingok
     rotate=5

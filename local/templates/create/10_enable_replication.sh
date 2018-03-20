@@ -1,31 +1,30 @@
-# ---------------------------------------------------------------------------
-# $Id: $
-# ---------------------------------------------------------------------------
+#!/bin/bash
+# -----------------------------------------------------------------------
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Name.......: 10_enable_replication.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
-# Editor.....: $LastChangedBy: $
-# Date.......: $LastChangedDate: $
-# Revision...: $LastChangedRevision: $
+# Editor.....: Stefan Oehrli
+# Date.......: 2018.03.18
+# Revision...: --
 # Purpose....: Script zum einschalten und initialisieren der Replication
 # Notes......:
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Modified...:
-# see git revision history with git log for more information on changes/updates
-# ---------------------------------------------------------------------------
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
 
-# - load instance environment -----------------------------------------------
+# - load instance environment -------------------------------------------
 . "$(dirname $0)/00_init_environment.sh"
 
-# - Enable replication ------------------------------------------------------
+# - Enable replication --------------------------------------------------
 echo "Enable replication ${OUD_INSTANCE} using:"
 echo "OUD_INSTANCE_HOME : ${OUD_INSTANCE_HOME}"
 echo "PWD_FILE          : ${PWD_FILE}"
-echo "HOSTNAME          : $(hostname)"
+echo "HOSTNAME          : ${HOST}"
 echo "HOST1             : ${HOST1}"
 echo "HOST2             : ${HOST2}"
 echo "PORT              : ${PORT}"
@@ -53,4 +52,4 @@ ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication status -h ${HOST1} -p ${PORT_ADMIN} \
 --adminUID "${REPMAN}" --adminPasswordFile "${PWD_FILE}" \
 --trustAll --no-prompt --noPropertiesFile
 
-# - EOF ---------------------------------------------------------------------
+# - EOF -----------------------------------------------------------------

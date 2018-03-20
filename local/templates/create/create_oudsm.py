@@ -11,9 +11,9 @@
 # Notes......:
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Modified...:
-# see git revision history with git log for more information on changes/updates
+# see git revision history with git log for more information on changes
 # ----------------------------------------------------------------------
 import os
 
@@ -40,4 +40,4 @@ createOUDSMDomain(domainLocation        = domain_path,
                   weblogicUserName      = admin_user,
                   weblogicUserPassword  = admin_pass);
 
-# Exit WLST
+# - EOF -----------------------------------------------------------------

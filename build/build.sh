@@ -1,23 +1,22 @@
 #!/bin/bash
-# ---------------------------------------------------------------------------
-# $Id: $
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Trivadis AG, Infrastructure Managed Services
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Name.......: build.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: $LastChangedBy: $
 # Date.......: $LastChangedDate: $
 # Revision...: $LastChangedRevision: $
 # Purpose....: Simple build script for the OUD Base Package
-# Notes......: This script is used as base install script for the OUD Environment
+# Notes......: This script is used as base install script for the OUD 
+#              Environment
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Modified...:
-# see git revision history with git log for more information on changes/updates
-# ---------------------------------------------------------------------------
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"                  # Basename of the script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of script
 SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"                    # Full qualified script name

@@ -1,29 +1,27 @@
 #!/bin/bash
-# ---------------------------------------------------------------------------
-# $Id: $
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Name.......: oudenv.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
-# Editor.....: $LastChangedBy: $
-# Date.......: $LastChangedDate: $
-# Revision...: $LastChangedRevision: $
+# Editor.....: Stefan Oehrli
+# Date.......: 2018.03.18
+# Revision...: --
 # Purpose....: Bash Source File to set the environment for OUD Instances
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Modified...:
-# see git revision history with git log for more information on changes/updates
-# ---------------------------------------------------------------------------
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
 
-# - Environment Variables ---------------------------------------------------
+# - Environment Variables -----------------------------------------------
 # - Set default values for environment variables if not yet defined. 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 VERSION="v1.2.2"
-export HOST=$(hostname)
+export HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)    # Hostname
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of script
 
 # default values for file and folder names
@@ -74,9 +72,9 @@ export JAVA_HOME=${JAVA_HOME:-"${ORACLE_BASE}/${DEFAULT_PRODUCT_BASE_NAME}/java"
 # set directory type
 DEFAULT_DIRECTORY_TYPE="OUD"
 export DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
-# - EOF Environment Variables -----------------------------------------------
+# - EOF Environment Variables -------------------------------------------
 
-# - Initialization ----------------------------------------------------------
+# - Initialization ------------------------------------------------------
 tty >/dev/null 2>&1
 pTTY=$?
 export SILENT=${2}
@@ -201,13 +199,13 @@ elif [ "${1}" == "SILENT" ]; then
 else
     export OUD_INSTANCE=${1}
 fi
-# - EOF Initialization ------------------------------------------------------
+# - EOF Initialization --------------------------------------------------
 
-# - Functions ---------------------------------------------------------------
-# ---------------------------------------------------------------------------
+# - Functions -----------------------------------------------------------
+# -----------------------------------------------------------------------
 function oud_status {
 # Purpose....: just display the current OUD settings
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
     STATUS=$(get_status)
     DIR_STATUS="ok"
     if [ ${DIRECTORY_TYPE} == "OUD" ] && [ ! -f "${OUD_INSTANCE_HOME}/OUD/config/config.ldif" ]; then
@@ -237,17 +235,17 @@ function oud_status {
         echo " LDAP Port          : $PORT"
         echo " LDAPS Port         : $PORT_SSL"
     elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then 
-        echo " Console            : http://$(hostname):$PORT/oudsm"
+        echo " Console            : http://${HOST}:$PORT/oudsm"
         echo " HTTP               : $PORT"
         echo " HTTPS              : $PORT_SSL"
     fi
     echo "--------------------------------------------------------------"
 }
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function oud_up {
 # Purpose....: display the status of the OUD instances
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
     echo "TYPE  INSTANCE     STATUS PORTS          INSTANCE HOME"
     echo "----- ------------ ------ -------------- ----------------------------------"
     for i in ${OUD_INST_LIST}; do
@@ -269,10 +267,10 @@ function oud_up {
     echo ""
 }
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function get_status { 
 # Purpose....: get the current instance / process status
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
     InstanceName=${1:-${OUD_INSTANCE}}
 
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
@@ -297,7 +295,7 @@ function get_status {
 
 function get_oracle_home {
 # Purpose....: get the corresponding ORACLE_HOME from OUD Instance
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         Silent=$1
         if [ -r "${OUD_INSTANCE_HOME}/OUD/install.path" ]; then
@@ -321,10 +319,10 @@ function get_oracle_home {
     fi
 }
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function get_ports {
 # Purpose....: get the corresponding PORTS from OUD Instance
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         Silent=$1
         CONFIG="${OUD_INSTANCE_HOME}/OUD/config/config.ldif"
@@ -359,10 +357,10 @@ function get_ports {
     fi
 }
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function update_oudtab {
 # Purpose....: update OUD tab
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         get_ports -silent
         if [ -f "${OUDTAB}" ]; then
@@ -376,10 +374,10 @@ function update_oudtab {
     fi
 }
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function gen_password {
 # Purpose....: generate a password string
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 	Length=${1:-10}
 	
 	# make sure, that the password length is not shorter than 4 characters
@@ -397,10 +395,10 @@ function gen_password {
     done
 }
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function oud_help {
 # Purpose....: just display help for OUD environment
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 echo "--- OUD Instances -----------------------------------------------------"
 echo ""
 echo "--- ENV Variables -----------------------------------------------------"
@@ -452,17 +450,17 @@ if [ -s "${ETC_BASE}/oudenv_custom.conf" ]; then
 fi
 }
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function join_by { 
 # Purpose....: Join array elements
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
     local IFS="$1"; shift; echo "$*"; 
 }
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function relpath {
 # Purpose....: get the relative path of DIR1 from DIR2
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
     BaseDirectory=$1
     TargetDirectory=$2
 
@@ -511,9 +509,9 @@ function relpath {
     fi
     echo "$Result"
 }
-# - EOF Functions -----------------------------------------------------------
+# - EOF Functions -------------------------------------------------------
 
-# - Main --------------------------------------------------------------------
+# - Main ----------------------------------------------------------------
 
 # Load OUD config from oudtab
 if [ -f "${OUDTAB}" ]; then # check if the requested OUD Instance exists in oudtab
@@ -646,4 +644,4 @@ if [ ${pTTY} -eq 0 ] && [ "${SILENT}" = "" ]; then
     echo "Source environment for ${DIRECTORY_TYPE} Instance ${OUD_INSTANCE}"
     oud_status
 fi
-# - EOF ---------------------------------------------------------------------
+# - EOF -----------------------------------------------------------------

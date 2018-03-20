@@ -1,48 +1,47 @@
 #!/bin/bash
 # ---------------------------------------------------------------------------
-# $Id: $
-# ---------------------------------------------------------------------------
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # ---------------------------------------------------------------------------
 # Name.......: oud_status.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
-# Editor.....: $LastChangedBy: $
-# Date.......: $LastChangedDate: $
-# Revision...: $LastChangedRevision: $
+# Editor.....: Stefan Oehrli
+# Date.......: 2018.03.18
+# Revision...: --
 # Purpose....: Bash Script to get the instance status as retun code
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Modified...:
-# see git revision history with git log for more information on changes/updates
-# ---------------------------------------------------------------------------
-# - Customization -----------------------------------------------------------
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
+# - Customization -------------------------------------------------------
 export OUD_ROOT_DN=${OUD_ROOT_DN:-"postgasse.org"}
-# - End of Customization ----------------------------------------------------
+# - End of Customization ------------------------------------------------
 
-# - Default Values ----------------------------------------------------------
+# - Default Values ------------------------------------------------------
 VERSION="v1.2.2"
-DOAPPEND="TRUE"                                        # enable log file append
-VERBOSE="FALSE"                                        # enable verbose mode
+DOAPPEND="TRUE"                                 # enable log file append
+VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
 TMP_DIRECTORY="/tmp"
 TMP_FILE="${TMP_DIRECTORY}/$(basename $0).$$"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 MAILADDRESS=oud@oradba.ch
 ERROR=0
+HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)    # Hostname
 
-# - End of Default Values ---------------------------------------------------
+# - End of Default Values -----------------------------------------------
 
-# - Functions ---------------------------------------------------------------
-# ---------------------------------------------------------------------------
+# - Functions -----------------------------------------------------------
+# -----------------------------------------------------------------------
 function Usage() {
 # Purpose....: Display Usage
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
     VERBOSE="TRUE"
     DoMsg "INFO : Usage, ${SCRIPT_NAME} [-hvr -i <OUD_INSTANCE> -D <bindDN> -j <bindPasswordFile> ]"
-    DoMsg "INFO :   -h                    Usage (this message"
+    DoMsg "INFO :   -h                    Usage this message"
     DoMsg "INFO :   -v                    enable verbose mode"
     DoMsg "INFO :   -r                    check for replication"
     DoMsg "INFO :   -D <bindDN>           Default value: cn=Directory Manager"
@@ -57,9 +56,9 @@ function Usage() {
     fi
 }
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Purpose....: Display Message with time stamp
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function DoMsg()
 {
     INPUT=${1%:*}                         # Take everything behinde
@@ -99,10 +98,10 @@ function DoMsg()
     fi
 }
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function CleanAndQuit() { 
 # Purpose....: Clean up before exit
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
     if [ ${1} -gt 0 ]; then
         VERBOSE="TRUE"
     fi
@@ -136,9 +135,9 @@ function CleanAndQuit() {
     fi
     exit ${1}
 }
-# - EOF Functions -----------------------------------------------------------
+# - EOF Functions -------------------------------------------------------
 
-# - Initialization ----------------------------------------------------------
+# - Initialization ------------------------------------------------------
 # Check OUD_BASE and load if necessary
 if [ "${OUD_BASE}" = "" ]; then
     if [ -f "${HOME}/.OUD_BASE" ]; then
@@ -165,9 +164,9 @@ else
     CleanAndQuit 11 ${LOGFILE} # Define a clean exit
 fi
 
-# - EOF Initialization ------------------------------------------------------
+# - EOF Initialization --------------------------------------------------
 
-# - Main --------------------------------------------------------------------
+# - Main ----------------------------------------------------------------
 #trap "CleanAndQuit 40" ERR
 
 DoMsg "${START_HEADER}"
@@ -281,7 +280,7 @@ if [ ${DIRECTORY_TYPE} == "OUD" ]; then
     fi
 elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
     DoMsg "INFO : Identify directory type ${DIRECTORY_TYPE}"
-    URL="http://$(hostname):$PORT/oudsm/"
+    URL="http://${HOST}:$PORT/oudsm/"
     DoMsg "INFO : Check status of OUDSM console ${URL}"
     
     # run OUD status check
@@ -297,4 +296,4 @@ else
 fi
 
 CleanAndQuit 0
-# - EOF ---------------------------------------------------------------------
+# - EOF -----------------------------------------------------------------

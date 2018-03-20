@@ -31,10 +31,10 @@
 #
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Modified...:
-# see git revision history with git log for more information on changes/updates
-# ---------------------------------------------------------------------------
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
 
 [Unit]
 Description=OUD Instance
@@ -56,3 +56,4 @@ StandardError=syslog+console
  
 [Install]
 WantedBy=multi-user.target
+# - EOF -----------------------------------------------------------------

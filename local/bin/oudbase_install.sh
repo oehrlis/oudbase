@@ -1,35 +1,34 @@
 #!/bin/bash
-# ---------------------------------------------------------------------------
-# $Id: $
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Trivadis AG, Infrastructure Managed Services
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Name.......: oudbase_install.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
-# Editor.....: $LastChangedBy: $
-# Date.......: $LastChangedDate: $
-# Revision...: $LastChangedRevision: $
-# Purpose....: This script is used as base install script for the OUD Environment
+# Editor.....: Stefan Oehrli
+# Date.......: 2018.03.18
+# Revision...: --
+# Purpose....: This script is used as base install script for the OUD 
+#              Environment
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Modified...:
-# see git revision history with git log for more information on changes/updates
-# ---------------------------------------------------------------------------
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
 
-# - Customization -----------------------------------------------------------
+# - Customization -------------------------------------------------------
 export LOG_BASE=${LOG_BASE-"/tmp"}
-# - End of Customization ----------------------------------------------------
+# - End of Customization ------------------------------------------------
 
-# - Default Values ----------------------------------------------------------
+# - Default Values ------------------------------------------------------
 VERSION="v1.2.2"
-DOAPPEND="TRUE"                                        # enable log file append
-VERBOSE="TRUE"                                         # enable verbose mode
-SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"                  # Basename of the script
+DOAPPEND="TRUE"                                 # enable log file append
+VERBOSE="TRUE"                                  # enable verbose mode
+SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"     # Basename of the script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of script
-SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"                    # Full qualified script name
+SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"       # Full qualified script name
 
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
@@ -47,13 +46,13 @@ DEFAULT_OUD_LOCAL_BASE_NAME="local"
 DEFAULT_PRODUCT_BASE_NAME="product"
 DEFAULT_ORACLE_HOME_NAME="oud12.2.1.3.0"
 DEFAULT_ORACLE_FMW_HOME_NAME="fmw12.2.1.3.0"
-# - End of Default Values ---------------------------------------------------
+# - End of Default Values -----------------------------------------------
 
-# - Functions ---------------------------------------------------------------
+# - Functions -----------------------------------------------------------
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Purpose....: Display Usage
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function Usage()
 {
     VERBOSE="TRUE"
@@ -87,9 +86,9 @@ function Usage()
     fi
 }
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Purpose....: Display Message with time stamp
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function DoMsg()
 {
     INPUT=${1}
@@ -131,9 +130,9 @@ function DoMsg()
     fi
 }
 
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Purpose....: Clean up before exit
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function CleanAndQuit()
 {
     if [ ${1} -gt 0 ]; then
@@ -157,9 +156,9 @@ function CleanAndQuit()
     esac
     exit ${1}
 }
-# - EOF Functions -----------------------------------------------------------
+# - EOF Functions -------------------------------------------------------
 
-# - Initialization ----------------------------------------------------------
+# - Initialization ------------------------------------------------------
 tty >/dev/null 2>&1
 pTTY=$?
 
@@ -182,7 +181,7 @@ SKIP=$(awk '/^__TARFILE_FOLLOWS__/ { print NR + 1; exit 0; }' $0)
 # count the lines of our file name
 LINES=$(wc -l <$SCRIPT_FQN)
 
-# - Main --------------------------------------------------------------------
+# - Main ----------------------------------------------------------------
 DoMsg "${START_HEADER}"
 if [ $# -lt 1 ]; then
     Usage 1
@@ -439,5 +438,5 @@ fi
 CleanAndQuit 0
 
 # NOTE: Don't place any newline characters after the last line below.
-# - EOF Script --------------------------------------------------------------
+# - EOF Script ----------------------------------------------------------
 __TARFILE_FOLLOWS__

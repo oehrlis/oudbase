@@ -1,44 +1,42 @@
 #!/bin/bash
-# ---------------------------------------------------------------------------
-# $Id: $
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Name.......: oud_backup.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
-# Editor.....: $LastChangedBy: $
-# Date.......: $LastChangedDate: $
-# Revision...: $LastChangedRevision: $
+# Editor.....: Stefan Oehrli
+# Date.......: 2018.03.18
+# Revision...: --
 # Purpose....: Bash Script to backup all running OUD Instances
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Modified...:
-# see git revision history with git log for more information on changes/updates
-# ---------------------------------------------------------------------------
-# - Customization -----------------------------------------------------------
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
+# - Customization -------------------------------------------------------
  
-# - End of Customization ----------------------------------------------------
+# - End of Customization ------------------------------------------------
  
-# - Default Values ----------------------------------------------------------
+# - Default Values ------------------------------------------------------
 VERSION="v1.2.2"
-DOAPPEND="TRUE"                                        # enable log file append
-VERBOSE="FALSE"                                        # enable verbose mode
+DOAPPEND="TRUE"                                 # enable log file append
+VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 MAILADDRESS=""
 ERROR=0
-TYPE="FULL"                                            # Default Backup Type
-KEEP=4                                                 # Number of Weeks to keep
-compress="--compress"                                  # set --compress Flag
-# - End of Default Values ---------------------------------------------------
+TYPE="FULL"                                     # Default Backup Type
+KEEP=4                                          # Number of Weeks to keep
+compress="--compress"                           # set --compress Flag
+# - End of Default Values -----------------------------------------------
  
-# - Functions ---------------------------------------------------------------
-# ---------------------------------------------------------------------------
+# - Functions -----------------------------------------------------------
+# -----------------------------------------------------------------------
 # Purpose....: Display Usage
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function Usage() {
     VERBOSE="TRUE"
     DoMsg "INFO : Usage, ${SCRIPT_NAME} [-hv -i <OUD_INSTANCES> -t <TYPE> -m <MAILADDRESSES>]"
@@ -58,13 +56,13 @@ function Usage() {
     fi
 }
  
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Purpose....: Display Message with time stamp
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function DoMsg()
 {
-    INPUT=${1%:*}                         # Take everything behinde
-    case ${INPUT} in                    # Define a nice time stamp for ERR, END
+    INPUT=${1%:*}           # Take everything behinde
+    case ${INPUT} in        # Define a nice time stamp for ERR, END
         "END ")  TIME_STAMP=$(date "+%Y-%m-%d_%H:%M:%S");;
         "ERR ")  TIME_STAMP=$(date "+%n%Y-%m-%d_%H:%M:%S");;
         "START") TIME_STAMP=$(date "+%Y-%m-%d_%H:%M:%S");;
@@ -100,9 +98,9 @@ function DoMsg()
     fi
 }
  
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Purpose....: Clean up before exit
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 function CleanAndQuit() {
     STATUS="INFO"
     if [ ${1} -gt 0 ]; then
@@ -146,9 +144,9 @@ function CleanAndQuit() {
     fi
     exit ${1}
 }
-# - EOF Functions -----------------------------------------------------------
+# - EOF Functions -------------------------------------------------------
  
-# - Initialization ----------------------------------------------------------
+# - Initialization ------------------------------------------------------
 # Check OUD_BASE and load if necessary
 if [ "${OUD_BASE}" = "" ]; then
     if [ -f "${HOME}/.OUD_BASE" ]; then
@@ -176,9 +174,9 @@ else
     CleanAndQuit 11 ${LOGFILE} # Define a clean exit
 fi
  
-# - EOF Initialization ------------------------------------------------------
+# - EOF Initialization --------------------------------------------------
  
-# - Main --------------------------------------------------------------------
+# - Main ----------------------------------------------------------------
 DoMsg "${START_HEADER}"
  
 # get pointer / linenumber from logfile with the latest header line
@@ -336,4 +334,4 @@ if [ "${ERROR}" -gt 0 ]; then
 else
     CleanAndQuit 0
 fi
-# - EOF ---------------------------------------------------------------------
+# - EOF -----------------------------------------------------------------

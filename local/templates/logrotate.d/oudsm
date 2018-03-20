@@ -1,27 +1,26 @@
-# -----------------------------------------------------------------------------
-# $Id: $
-# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Name.......: oud
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
-# Editor.....: $LastChangedBy: $
-# Date.......: $LastChangedDate: $
-# Revision...: $LastChangedRevision: $
+# Editor.....: Stefan Oehrli
+# Date.......: 2018.03.18
+# Revision...: --
 # Purpose....: Logrotate configuration file for OUD Environment
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Modified...:
-# see git revision history with git log for more information on changes/updates
-# -----------------------------------------------------------------------------
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
 OUDSM_DOMAIN_HOME/servers/AdminServer/logs/access.log
 OUDSM_DOMAIN_HOME/servers/AdminServer/logs/AdminServer-diagnostic.log
 OUDSM_DOMAIN_HOME/servers/AdminServer/logs/AdminServer.log
 OUDSM_DOMAIN_HOME/servers/AdminServer/logs/oudsm_domain.log
 {
+    su USER GROUP
     copytruncate
     compress
     weekly
@@ -36,6 +35,7 @@ OUDSM_DOMAIN_HOME/servers/AdminServer/logs/oracle.dms.strace-event.log
 OUDSM_DOMAIN_HOME/common/db/derby.log
 OUDSM_DOMAIN_HOME/derby.log
 {
+    su USER GROUP
     copytruncate
     compress
     missingok

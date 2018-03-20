@@ -1,31 +1,30 @@
-# ---------------------------------------------------------------------------
-# $Id: $
-# ---------------------------------------------------------------------------
+#!/bin/bash
+# -----------------------------------------------------------------------
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Name.......: 01_create_instance.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
-# Editor.....: $LastChangedBy: $
-# Date.......: $LastChangedDate: $
-# Revision...: $LastChangedRevision: $
+# Editor.....: Stefan Oehrli
+# Date.......: 2018.03.18
+# Revision...: --
 # Purpose....: Script zum erstellen der OUD Instanz
-# Notes......:
+# Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
-# ---------------------------------------------------------------------------
+# -----------------------------------------------------------------------
 # Modified...:
-# see git revision history with git log for more information on changes/updates
-# ---------------------------------------------------------------------------
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
 
-# - load instance environment -----------------------------------------------
+# - load instance environment -------------------------------------------
 . "$(dirname $0)/00_init_environment.sh"
 
-# - create instance ---------------------------------------------------------
+# - create instance -----------------------------------------------------
 echo "Create OUD instance ${OUD_INSTANCE} using:"
 echo "OUD_INSTANCE_HOME : ${OUD_INSTANCE_HOME}"
 echo "PWD_FILE          : ${PWD_FILE}"
-echo "HOSTNAME          : $(hostname)"
+echo "HOSTNAME          : ${HOST}"
 echo "PORT              : ${PORT}"
 echo "PORT_SSL          : ${PORT_SSL}"
 echo "PORT_ADMIN        : ${PORT_ADMIN}"
@@ -37,7 +36,7 @@ ${ORACLE_HOME}/oud/oud-setup \
   --instancePath "${OUD_INSTANCE_HOME}/OUD" \
   --rootUserDN "${DIRMAN}" \
   --rootUserPasswordFile "${PWD_FILE}" \
-  --hostname $(hostname) \
+  --hostname ${HOST} \
   --ldapPort ${PORT} \
   --ldapsPort ${PORT_SSL} \
   --adminConnectorPort ${PORT_ADMIN} \
@@ -49,4 +48,4 @@ ${ORACLE_HOME}/oud/oud-setup \
   --no-prompt \
   --noPropertiesFile
 
-# - EOF ---------------------------------------------------------------------
+# - EOF -----------------------------------------------------------------
