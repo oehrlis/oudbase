@@ -272,25 +272,12 @@ function get_status {
 # Purpose....: get the current instance / process status
 # -----------------------------------------------------------------------
     InstanceName=${1:-${OUD_INSTANCE}}
-
-    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-        echo "$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
-                grep org.opends.server.core.DirectoryServer|\
-                grep -c ${InstanceName} ) -gt 0 ]; \
-                then echo 'up'; else echo 'down'; fi)"
-    elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
-        echo "$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
-                grep ns-slapd|\
-                grep -c ${InstanceName} ) -gt 0 ]; \
-                then echo 'up'; else echo 'down'; fi)"
-    elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
-        echo "$(if [ $(ps -ef | egrep -v 'ps -ef|grep ' | \
-                grep wlserver|\
-                grep -c ${InstanceName} ) -gt 0 ]; \
-                then echo 'up'; else echo 'down'; fi)"
-    else
-        echo "n/a"
-    fi
+    case ${DIRECTORY_TYPE} in
+        "OUD")      echo $(if [ $(pgrep -acf "org.opends.server.core.DirectoryServer.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+        "ODSEE")    echo $(if [ $(pgrep -acf "ns-slapd.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+        "OUDSM")    echo $(if [ $(pgrep -acf "wlserver.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+        *)          echo "n/a";;
+    esac
 }
 
 function get_oracle_home {
