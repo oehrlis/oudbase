@@ -400,10 +400,10 @@ if [ "${APPEND_PROFILE}" = "TRUE" ]; then
     echo "fi"                                                           >>"${PROFILE}"
     echo ""                                                             >>"${PROFILE}"
     echo "# define an oudenv alias"                                     >>"${PROFILE}"
-    echo "alias oud='. \${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh'"  >>"${PROFILE}"
+    echo "alias oud='. \${OUD_BASE}/bin/oudenv.sh'"                     >>"${PROFILE}"
     echo ""                                                             >>"${PROFILE}"
     echo "# source oud environment"                                     >>"${PROFILE}"
-    echo ". \${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh"  >>"${PROFILE}"
+    echo ". \${OUD_BASE}/bin/oudenv.sh"                                 >>"${PROFILE}"
 else
     DoMsg "INFO : Please manual adjust your .bash_profile to load / source your OUD Environment"
     DoMsg "INFO : using the following code"
@@ -417,10 +417,10 @@ else
     DoMsg "fi"
     DoMsg ""
     DoMsg "# define an oudenv alias"
-    DoMsg "alias oud='. \${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh'"
+    DoMsg "alias oud='. \${OUD_BASE}/bin/oudenv.sh'"
     DoMsg ""
     DoMsg "# source oud environment"
-    DoMsg ". ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh"
+    DoMsg ". ${OUD_BASE}/bin/oudenv.sh"
 fi
 
 touch $HOME/.OUD_BASE 2>/dev/null

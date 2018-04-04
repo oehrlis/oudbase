@@ -5,9 +5,8 @@ dc5f30c2febca7d0c26c750d910eda0ccf2f7ebb ?./bin/oudenv.sh
 eae0291c2f607231f369bdbedd2dc7bf0c318d54 ?./etc/oudenv_core.conf
 9ea3127af755510934a9c5cd713cd519b681996f ?./etc/oudenv.conf
 2ea0c0069dd86f9aaae99c274f38182c981e2113 ?./etc/oudenv_custom.conf
-50f22338eeab45f9f6a101020669427aa5ffdc3b ?./etc/oudtab
+ef2a6ff1dfb0d3c5604cd5a4565b1358cac54137 ?./etc/oudtab
 5db71a75ccbd45f85f4dbbaba286a222d2b2a760 ?./etc/oud._DEFAULT_.conf
-50f22338eeab45f9f6a101020669427aa5ffdc3b ?./etc/oudtab.orig
 8c1112a8541a51368a708ed903b9994e31492547 ?./templates/ldif/oud_pi_init.ldif
 b11ba7558dc9f97e5a2545fe672b82fc0a346615 ?./templates/etc/wls_oudsm.service
 52265a8fd3f28504fe0483ac2800d3660265d8d7 ?./templates/etc/oudenv_core.conf

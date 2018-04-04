@@ -5,12 +5,4 @@
 #  4: OUD Admin Port
 #  5: OUD Replication Port
 #  6: Directory type eg. OUD, OID, ODSEE or OUDSM
-# ----------------------------------------------- 
-oud_docker:1389:1636:4444:8989:OUD
-oud_docker:1389:1636:4444:8989:OUDDDD
-oid_docker:1389:1636:4444:8989:OID
-odsee_docker:1389:1636:4444:8989:ODSEE
-oudsm_domain:7001:7002:::OUDSM
-oud_.docker:1389:1636:4444:8989:OUD
-
-   
+# -----------------------------------------------
