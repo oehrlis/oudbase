@@ -340,7 +340,7 @@ fi
 
 DoMsg "INFO : Extracting file into ${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}"
 # take the tarfile and pipe it into tar
-tail -n +$SKIP $SCRIPT_FQN | tar -xzv --exclude="._*"  -C ${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}
+tail -n +$SKIP $SCRIPT_FQN | tar -xzv --exclude="._*"  -C ${OUD_BASE}
 
 # restore customized config files
 if [ "${SAVE_CONFIG}" = "TRUE" ]; then
