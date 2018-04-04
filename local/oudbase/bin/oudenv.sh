@@ -18,14 +18,21 @@
 # -----------------------------------------------------------------------
  
 # - Environment Variables -----------------------------------------------
-# - Set default values for environment variables if not yet defined.
-# -----------------------------------------------------------------------
-VERSION="v1.2.2"
-export HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)    # Hostname
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of script
- 
-# Default values for OUDTAB
+# Definition of default values for environment variables, if not defined 
+# externally. In principle, these variables should not be changed at this 
+# point. The customization should be done externally in.bash_profile or 
+# in oudenv_core.conf.
+VERSION="v1.3.4"
+# hostname based on hostname or $HOSTNAME whatever works
+export HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)
+# Absolute path of script directory
+OUDENV_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
+# Recreate admin directory and *.conf files
+RECREATE="TRUE"
+
+# OUDTAB string pattern used to search entries
 ORATAB_PATTERN='^[a-zA-Z0-9_-]*:([0-9]*:){4}O(UD|UDSM|ID|DSEE)$'
+# OUDTAB header
 OUDTAB_COMMENT=$(cat <<COMMENT
 # OUD Config File
 #  1: OUD Instance Name
@@ -38,7 +45,7 @@ OUDTAB_COMMENT=$(cat <<COMMENT
 COMMENT
 )
  
-# default values for file and folder names
+# Default values for file and folder names
 DEFAULT_OUD_BASE_NAME="oudbase"
 DEFAULT_OUD_ADMIN_BASE_NAME="admin"
 DEFAULT_OUD_BACKUP_BASE_NAME="backup"
@@ -53,23 +60,24 @@ DEFAULT_PRODUCT_BASE_NAME="product"
 DEFAULT_ORACLE_HOME_NAME="fmw12.2.1.3.0"
 DEFAULT_ORACLE_FMW_HOME_NAME="fmw12.2.1.3.0"
 OUD_CORE_CONFIG="oudenv_core.conf"
- 
-DEFAULT_ORACLE_BASE=${SCRIPT_DIR%%/${DEFAULT_OUD_LOCAL_BASE_NAME}/${DEFAULT_OUD_BASE_NAME}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}}
- 
+
+# Default ORACLE_BASE based on script path
+DEFAULT_ORACLE_BASE=${OUDENV_SCRIPT_DIR%%/${DEFAULT_OUD_LOCAL_BASE_NAME}/${DEFAULT_OUD_BASE_NAME}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}}
+
 # default ORACLE_BASE or OUD_BASE
 export ORACLE_BASE=${ORACLE_BASE:-${DEFAULT_ORACLE_BASE}}
 export OUD_BASE=${OUD_BASE:-"${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/${DEFAULT_OUD_BASE_NAME}"}
 export OUD_LOCAL=${OUD_LOCAL:-"${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}"}
  
-# set the ETC_CORE to the oud local directory
+# set the ETC_CORE to the oud base directory
 export ETC_CORE=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
  
-# source the core oudenv customizaition
+# source the core oudenv customization
 if [ -f "${ETC_CORE}/${OUD_CORE_CONFIG}" ]; then
     . "${ETC_CORE}/${OUD_CORE_CONFIG}"
 fi
- 
-# define location of base location for OUD data
+
+# define location for OUD data
 export OUD_DATA=${OUD_DATA:-"${ORACLE_BASE}"}
  
 # define misc base directories
@@ -93,10 +101,13 @@ export DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
 function get_ports {
 # Purpose....: get the corresponding PORTS from OUD Instance
 # -----------------------------------------------------------------------
+    # define the function parameter
     OUD_INSTANCE=${1:-${OUD_INSTANCE}}
     DIRECTORY_TYPE=${2:-${DIRECTORY_TYPE}}
     Silent=$3
+    # get ports for OUD instance
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+        # check if instance home does use a /OUD directory or not
         if [ -r "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/config/config.ldif" ]; then
             CONFIG="${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/config/config.ldif"
         elif [ -r "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/config/config.ldif" ]; then
@@ -116,32 +127,28 @@ function get_ports {
         export PORT=${PORT:-"1389"}
         export PORT_SSL=${PORT_SSL:-"1636"}
         export PORT_REP=${PORT_REP:-"8989"}
- 
-        if [ "${Silent}" == "" ]; then
-            echo "--------------------------------------------------------------"
-            echo " Instance Name   : ${OUD_INSTANCE}"
-            echo " LDAP Port       : $PORT"
-            echo " LDAPS Port      : $PORT_SSL"
-            echo " Admin Port      : $PORT_ADMIN"
-            echo " Replication Port: $PORT_REP"
-            echo "--------------------------------------------------------------"
-        fi
+    # get ports for OUDSM domain
     elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+        # currently just use the default values for OUDSM 
         # export the port variables and set default values with not specified
         export PORT_ADMIN=""
         export PORT="7001"
         export PORT_SSL="7002"
         export PORT_REP=""
+    # get ports for ODSEE domain
     elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
+        # currently just use the default values for ODSEE 
         # export the port variables and set default values with not specified
         export PORT="1389"
         export PORT_SSL="1636"
         export PORT_ADMIN=""
         export PORT_REP=""
     fi
+    # display new settings if not set to silent
     if [ "${Silent}" == "" ]; then
         echo "--------------------------------------------------------------"
         echo " Instance Name   : ${OUD_INSTANCE}"
+        echo " Directory Type  : ${DIRECTORY_TYPE}"
         echo " LDAP Port       : $PORT"
         echo " LDAPS Port      : $PORT_SSL"
         echo " Admin Port      : $PORT_ADMIN"
@@ -149,24 +156,30 @@ function get_ports {
         echo "--------------------------------------------------------------"
     fi
 }
- 
+
 # -----------------------------------------------------------------------
 function update_oudtab {
 # Purpose....: update OUD tab
 # -----------------------------------------------------------------------
+    # define the function parameter
     OUD_INSTANCE=${1:-${OUD_INSTANCE}}
     DIRECTORY_TYPE=${2:-${DIRECTORY_TYPE}}
     Silent=$3
+    # get the ports for the instance
     get_ports ${OUD_INSTANCE} ${DIRECTORY_TYPE} ${Silent}
     if [ -f "${OUDTAB}" ]; then
+        # OUDTAB does exists so let's update / add an entry
         if [ $(grep -E $ORATAB_PATTERN "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -eq 1 ]; then
+            # update the OUDTAB entry
             [ "${Silent}" == "" ] && echo "INFO : update ${OUD_INSTANCE} in ${OUDTAB}"
             sed -i "/${OUD_INSTANCE}/c\\${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP:$DIRECTORY_TYPE" "${OUDTAB}"
         else
+            # add a new OUDTAB entry
             [ "${Silent}" == "" ] && echo "INFO : add ${OUD_INSTANCE} to ${OUDTAB}"
             echo "${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP:$DIRECTORY_TYPE" >>"${OUDTAB}"
         fi
     else
+        # recreate the OUDTAB and add a new entry
         echo "WARN : oudtab (${OUDTAB}) does not exist or is empty. Create a new one.."
         echo "${OUDTAB_COMMENT}" >"${OUDTAB}"
         [ "${Silent}" == "" ] && echo "INFO : add ${OUD_INSTANCE} to ${OUDTAB}"
@@ -189,9 +202,10 @@ function oud_status {
     elif [ ${DIRECTORY_TYPE} == "OUDSM" ] && [ -f "${OUD_INSTANCE_HOME}/config/config.xml" ]; then
         DIR_STATUS="ok"
     fi
-   
+
     get_ports ${OUD_INSTANCE} ${DIRECTORY_TYPE} silent       # read ports from OUD config file
     get_oracle_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} silent # read oracle home from OUD install.path file
+    # display the instance status
     echo "--------------------------------------------------------------"
     echo " Instance Name      : ${OUD_INSTANCE}"
     echo " Instance Home ($DIR_STATUS) : ${OUD_INSTANCE_HOME} "
@@ -219,13 +233,15 @@ function oud_up {
 # -----------------------------------------------------------------------
     echo "TYPE  INSTANCE     STATUS PORTS          INSTANCE HOME"
     echo "----- ------------ ------ -------------- ----------------------------------"
+    # loop through OUD instance list
     for i in ${OUD_INST_LIST}; do
-        # oudtab ohne instance home
+        # get the values from OUDTAB
         PORT_ADMIN=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${i} |head -1|cut -d: -f4)
         PORT=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${i} |head -1|cut -d: -f2)
         PORT_SSL=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${i} |head -1|cut -d: -f3)
         DIRECTORY_TYPE=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${i} |head -1|cut -d: -f6)
         DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
+        # get the instance status (up/down/n/a)
         STATUS=$(get_status ${i})
         if [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
             INSTANCE_HOME="${OUDSM_DOMAIN_BASE}/$i"
@@ -244,6 +260,7 @@ function get_status {
 # -----------------------------------------------------------------------
     InstanceName=${1:-${OUD_INSTANCE}}
     case ${DIRECTORY_TYPE} in
+        # check the process for each directory type
         "OUD")      echo $(if [ $(pgrep -acf "org.opends.server.core.DirectoryServer.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
         "ODSEE")    echo $(if [ $(pgrep -acf "ns-slapd.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
         "OUDSM")    echo $(if [ $(pgrep -acf "wlserver.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
@@ -254,10 +271,12 @@ function get_status {
 function get_oracle_home {
 # Purpose....: get the corresponding ORACLE_HOME from OUD Instance
 # -----------------------------------------------------------------------
+    # define the function parameter
     OUD_INSTANCE=${1:-${OUD_INSTANCE}}
     DIRECTORY_TYPE=${2:-${DIRECTORY_TYPE}}
     Silent=$3
- 
+    # get the ORACLE_HOME from the install.path currently just supported
+    # for directory type OUD
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         Silent=$1
         if [ -r "${OUD_INSTANCE_HOME}/OUD/install.path" ]; then
@@ -276,7 +295,7 @@ function get_oracle_home {
                 echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
             fi
         fi
- 
+        # Display the ORACLE_HOME
         if [ "${Silent}" == "" ]; then
             echo " Oracle Home    : ${ORACLE_HOME}"
         fi
@@ -287,16 +306,18 @@ function get_oracle_home {
 function gen_password {
 # Purpose....: generate a password string
 # -----------------------------------------------------------------------
-Length=${1:-10}
- 
-# make sure, that the password length is not shorter than 4 characters
-if [ ${Length} -lt 4 ]; then
-Length=4
-fi
- 
-# Auto generate a password
+    Length=${1:-10}
+
+    # make sure, that the password length is not shorter than 4 characters
+    if [ ${Length} -lt 4 ]; then
+        Length=4
+    fi
+
+    # Auto generate a password
     while true; do
+        # use urandom to generate a random string
         s=$(cat /dev/urandom | tr -dc "A-Za-z0-9" | fold -w ${Length} | head -n 1)
+        # check if the password meet the requirements
         if [[ ${#s} -ge ${Length} && "$s" == *[A-Z]* && "$s" == *[a-z]* && "$s" == *[0-9]*  ]]; then
             echo "$s"
             break
@@ -308,56 +329,57 @@ fi
 function oud_help {
 # Purpose....: just display help for OUD environment
 # -----------------------------------------------------------------------
-echo "--- OUD Instances -----------------------------------------------------"
-echo ""
-echo "--- ENV Variables -----------------------------------------------------"
-echo "  CUSTOM_ORA_LOG      = ${CUSTOM_ORA_LOG-n/a}"
-echo "  DIRECTORY_TYPE      = ${DIRECTORY_TYPE-n/a}"
-echo "  ETC_BASE            = ${ETC_BASE-n/a}"
-echo "  ETC_BASE            = ${ETC_BASE-n/a}"
-echo "  ETC_CORE            = ${ETC_CORE-n/a}"
-echo "  INSTANCE_BASE       = ${INSTANCE_BASE-n/a}"
-echo "  INSTANCE_BASE       = ${INSTANCE_BASE-n/a}"
-echo "  JAVA_HOME           = ${JAVA_HOME-n/a}"
-echo "  LOG_BASE            = ${LOG_BASE-n/a}"
-echo "  ORACLE_BASE         = ${ORACLE_BASE-n/a}"
-echo "  OUD_BASE            = ${OUD_BASE-n/a}"
-echo "  ORACLE_FMW_HOME     = ${ORACLE_FMW_HOME-'n/a'}"
-echo "  ORACLE_HOME         = ${ORACLE_HOME-n/a}"
-echo "  OUD_INSTANCE        = ${OUD_INSTANCE-n/a}"
-echo "  OUDSM_DOMAIN_BASE   = ${OUDSM_DOMAIN_BASE-n/a}"
-echo "  OUD_INSTANCE_BASE   = ${OUD_INSTANCE_BASE-n/a}"
-echo "  OUD_INSTANCE_HOME   = ${OUD_INSTANCE_HOME-n/a}"
-echo "  PORT                = ${PORT-n/a}"
-echo "  PORT_ADMIN          = ${PORT_ADMIN-n/a}"
-echo "  PORT_REP            = ${PORT_REP-n/a}"
-echo "  PORT_SSL            = ${PORT_SSL-n/a}"
-echo ""
-echo "--- Default Aliases ---------------------------------------------------"
-echo "  backup_changed  Create a TAR file of the changed/added file in \$ORACLE_BASE/local"
-echo "  gen_pwd         Generate a password string (gen_password)"
-echo "  goh             Get oracle home of current oud instance"
-echo "  gp              Get ports of current oud instance"
-echo "  oudup           List OUD instances and there status short form u"
-echo "  oud_help        Display OUD environment help short form h"
-echo "  oud_status      Display OUD status of current instance"
-echo "  version         Display OUD Base version and changed/added files"
-echo ""
-if [ -s "${ETC_BASE}/oudenv_custom.conf" ]; then
-    echo "--- Custom Aliases ---------------------------------------------------"
-    while read -r line; do
-#    If the line starts with alias then echo the line
-    if [[ $line == alias*  ]] ; then
-        ALIAS=$(echo $line|sed -r 's/^.*\s(.*)=('"'"'|").*/\1/' )
-        COMMENT=$(echo $line|sed -r 's/^.*(#(.*)$|(('"'"')|"))$/\2/')
-        COMMENT=${COMMENT:-"n/a"}
-        printf "  %-10s %-s\n" \
+    echo "--- OUD Instances -----------------------------------------------------"
+    echo ""
+    echo "--- ENV Variables -----------------------------------------------------"
+    echo "  CUSTOM_ORA_LOG      = ${CUSTOM_ORA_LOG-n/a}"
+    echo "  DIRECTORY_TYPE      = ${DIRECTORY_TYPE-n/a}"
+    echo "  ETC_BASE            = ${ETC_BASE-n/a}"
+    echo "  ETC_BASE            = ${ETC_BASE-n/a}"
+    echo "  ETC_CORE            = ${ETC_CORE-n/a}"
+    echo "  INSTANCE_BASE       = ${INSTANCE_BASE-n/a}"
+    echo "  INSTANCE_BASE       = ${INSTANCE_BASE-n/a}"
+    echo "  JAVA_HOME           = ${JAVA_HOME-n/a}"
+    echo "  LOG_BASE            = ${LOG_BASE-n/a}"
+    echo "  ORACLE_BASE         = ${ORACLE_BASE-n/a}"
+    echo "  OUD_BASE            = ${OUD_BASE-n/a}"
+    echo "  ORACLE_FMW_HOME     = ${ORACLE_FMW_HOME-'n/a'}"
+    echo "  ORACLE_HOME         = ${ORACLE_HOME-n/a}"
+    echo "  OUD_INSTANCE        = ${OUD_INSTANCE-n/a}"
+    echo "  OUDSM_DOMAIN_BASE   = ${OUDSM_DOMAIN_BASE-n/a}"
+    echo "  OUD_INSTANCE_BASE   = ${OUD_INSTANCE_BASE-n/a}"
+    echo "  OUD_INSTANCE_HOME   = ${OUD_INSTANCE_HOME-n/a}"
+    echo "  PORT                = ${PORT-n/a}"
+    echo "  PORT_ADMIN          = ${PORT_ADMIN-n/a}"
+    echo "  PORT_REP            = ${PORT_REP-n/a}"
+    echo "  PORT_SSL            = ${PORT_SSL-n/a}"
+    echo ""
+    echo "--- Default Aliases ---------------------------------------------------"
+    echo "  backup_changed  Create a TAR file of the changed/added file in \$ORACLE_BASE/local"
+    echo "  gen_pwd         Generate a password string (gen_password)"
+    echo "  goh             Get oracle home of current oud instance"
+    echo "  gp              Get ports of current oud instance"
+    echo "  oudup           List OUD instances and there status short form u"
+    echo "  oud_help        Display OUD environment help short form h"
+    echo "  oud_status      Display OUD status of current instance"
+    echo "  version         Display OUD Base version and changed/added files"
+    echo ""
+    if [ -s "${ETC_BASE}/oudenv_custom.conf" ]; then
+        echo "--- Custom Aliases ---------------------------------------------------"
+        while read -r line; do
+        # If the line starts with alias then echo the line
+        if [[ $line == alias*  ]] ; then
+            ALIAS=$(echo $line|sed -r 's/^.*\s(.*)=('"'"'|").*/\1/' )
+            COMMENT=$(echo $line|sed -r 's/^.*(#(.*)$|(('"'"')|"))$/\2/')
+            COMMENT=${COMMENT:-"n/a"}
+            printf "  %-10s %-s\n" \
                 ${ALIAS} \
                 "${COMMENT}"
+        fi
+        # read the custom config file to parse/display the comments
+        done < "${ETC_BASE}/oudenv_custom.conf"
+        echo ""
     fi
-    done < "${ETC_BASE}/oudenv_custom.conf"
-    echo ""
-fi
 }
  
 # -----------------------------------------------------------------------
@@ -371,6 +393,7 @@ function join_by {
 function relpath {
 # Purpose....: get the relative path of DIR1 from DIR2
 # -----------------------------------------------------------------------
+    # define the function parameter
     BaseDirectory=$1
     TargetDirectory=$2
  
@@ -454,15 +477,18 @@ if [ ${SOURCED} -le 1 ]; then
     export OUDSAVED_PATH=${PATH}
 else
     if [ ${OUDSAVED_PATH} ]; then
+        # reset PATH to inital PATH
         export PATH=${OUDSAVED_PATH}
     fi
 fi
  
 # set the log and etc base directory depending on OUD_DATA
 if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
+    # set LOG_BASE and ETC_BASE to OUD_BASE
     export LOG_BASE=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_LOG_NAME}
     export ETC_BASE=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
 else
+    # set LOG_BASE and ETC_BASE to OUD_DATA
     export LOG_BASE=${OUD_DATA}/${DEFAULT_OUD_LOCAL_BASE_LOG_NAME}
     export ETC_BASE=${OUD_DATA}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
 fi
@@ -495,14 +521,15 @@ fi
  
 # check if we have an oudtab file and it does have entries
 if [ -f "${OUDTAB}" ] && [ $(grep -c -E $ORATAB_PATTERN "${OUDTAB}") -gt 0 ]; then
-        # create a OUD Instance list based on oudtab and remove newlines|
-        export OUD_INST_LIST=$(grep -E $ORATAB_PATTERN "${OUDTAB}"|cut -f1 -d:|tr '\n' ' ')
+    # create a OUD Instance list based on oudtab and remove newlines|
+    export OUD_INST_LIST=$(grep -E $ORATAB_PATTERN "${OUDTAB}"|cut -f1 -d:|tr '\n' ' ')
 else
-    echo "WARN : oudtab (${OUDTAB}) does not exist or is empty. Create a new one.."
+    echo "WARN : oudtab (${OUDTAB}) does not exist or is empty. Create a new one."
     echo "${OUDTAB_COMMENT}" >"${OUDTAB}"
     unset OUD_INST_LIST
     # create a OUD Instance Liste based on OUD instance base
     for i in ${OUD_INSTANCE_BASE}/*/OUD/config/config.ldif ${OUD_INSTANCE_BASE}/*/config/config.ldif; do
+        # if the config.ldif file exists use it to get instance name
         if [ -f $i ]; then
             # remove leading OUD instance path
             i=${i##"$OUD_INSTANCE_BASE/"}
@@ -514,9 +541,9 @@ else
             export OUD_INST_LIST+="$(echo $i) "
         fi
     done
-    # TODO add odsee instances
     # create a list of ODSEE instance on OUD instance base
     for i in ${OUD_INSTANCE_BASE}/*/config/dse.ldif; do
+        # if the dse.ldif file exists use it to get instance name
         if [ -f $i ]; then
             # remove leading OUD instance path
             i=${i##"$OUD_INSTANCE_BASE/"}
@@ -529,6 +556,7 @@ else
     done
     # check for OUDSM Instances
     for i in ${OUDSM_DOMAIN_BASE}/*/config/config.xml; do
+        # if the config.xml file exists use it to get domain name
         if [ -f $i ]; then
             # remove leading OUD instance path
             i=${i##"$OUDSM_DOMAIN_BASE/"}
@@ -539,7 +567,6 @@ else
             export OUD_INST_LIST+="$(echo $i) "
         fi
     done
-    echo "INFO : OUD Instance $OUD_INST_LIST"
 fi
  
 # if not defined set default instance to first of OUD_INST_LIST
@@ -569,7 +596,7 @@ fi
  
 # Load OUD config from oudtab
 if [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -eq 1 ]; then
-    # set new environment based on oudtab
+    # set new environment based on oudtab values
     OUD_CONF_STR=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE}|head -1)
     OUD_INSTANCE=$(echo ${OUD_CONF_STR}|cut -d: -f1)
     PORT=$(echo ${OUD_CONF_STR}|cut -d: -f2)
@@ -577,24 +604,28 @@ if [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -eq 1 ]
     PORT_ADMIN=$(echo ${OUD_CONF_STR}|cut -d: -f4)
     PORT_REP=$(echo ${OUD_CONF_STR}|cut -d: -f5)
     DIRECTORY_TYPE=$(echo ${OUD_CONF_STR}|cut -d: -f6)
+    # make sure that we define a directory type even if it is missing in OUDTAB
     DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
-   
+
     # set the instance home based on directory type
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         OUD_INSTANCE_HOME="${OUD_INSTANCE_BASE}/${OUD_INSTANCE}"
+        # check which bin folder is availabe eg. workaround OUD folder issue
         if [ -d "${OUD_INSTANCE_HOME}/OUD/bin" ]; then
             OUD_INSTANCE_HOME_BIN="${OUD_INSTANCE_HOME}/OUD/bin"
         elif [ -d "${OUD_INSTANCE_HOME}/bin" ]; then
             OUD_INSTANCE_HOME_BIN="${OUD_INSTANCE_HOME}/bin"
         fi   
     elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+        # if directory type is OUDSM use a different base
         OUD_INSTANCE_HOME="${OUDSM_DOMAIN_BASE}/${OUD_INSTANCE}"
     else
         OUD_INSTANCE_HOME="${OUD_INSTANCE_BASE}/${OUD_INSTANCE}"
     fi
     export OUD_INSTANCE_HOME
     export OUD_INSTANCE_ADMIN=${OUD_ADMIN_BASE}/${OUD_INSTANCE}
- 
+
+    # get the Oracle home based on OUD instance home
     get_oracle_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} silent # get oracle home from OUD instance
     export INSTANCE_NAME=$(relpath "${ORACLE_HOME}" "${OUD_INSTANCE_HOME}")
     export PORT
@@ -602,8 +633,6 @@ if [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -eq 1 ]
     export PORT_ADMIN
     export PORT_REP
     export DIRECTORY_TYPE
-elif [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -gt 1 ]; then
-    echo "ERR  : Found multiple entries for ${OUD_INSTANCE} in ${OUDTAB} please fix manualy"
 elif [ -d "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}" ]; then
     # fallback to OUD_INSTANCE_BASE Instance directory
     export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
@@ -613,32 +642,40 @@ elif [ -d "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}" ]; then
     get_ports ${OUD_INSTANCE} ${DIRECTORY_TYPE} silent # get ports from OUD config
     echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}">>${OUDTAB}
     echo "WARN : Add ${OUD_INSTANCE} to ${OUDTAB} please review ports"
+elif [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -gt 1 ]; then
+    echo "ERROR: Found multiple entries for ${OUD_INSTANCE} in ${OUDTAB} please fix manualy"
+    RECREATE="FALSE"
+elif [ "${OUD_INSTANCE}" == "n/a" ]; then
+    echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUDTAB} or ${OUD_INSTANCE_BASE}"
+    RECREATE="FALSE"
 else # print error and keep current setting
     echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUDTAB} or ${OUD_INSTANCE_BASE}"
     export OUD_INSTANCE=${OUD_INSTANCE_LAST}
     return 1
 fi
- 
-RECREATE="TRUE"
-# re-create instance admin directory
-if [ ! -d "${OUD_INSTANCE_ADMIN}" ] && [ "${RECREATE}" = "TRUE" ]; then
-    mkdir -p "${OUD_INSTANCE_ADMIN}" >/dev/null 2>&1
-    mkdir -p "${OUD_INSTANCE_ADMIN}/create" >/dev/null 2>&1
-    mkdir -p "${OUD_INSTANCE_ADMIN}/log" >/dev/null 2>&1
-    mkdir -p "${OUD_INSTANCE_ADMIN}/etc" >/dev/null 2>&1
+
+# re-create a few stuff if necessary 
+if [ "${RECREATE}" = "TRUE" ]; then
+    # re-create instance admin directory
+    if [ ! -d "${OUD_INSTANCE_ADMIN}" ]; then
+        mkdir -p "${OUD_INSTANCE_ADMIN}"        >/dev/null 2>&1
+        mkdir -p "${OUD_INSTANCE_ADMIN}/create" >/dev/null 2>&1
+        mkdir -p "${OUD_INSTANCE_ADMIN}/log"    >/dev/null 2>&1
+        mkdir -p "${OUD_INSTANCE_ADMIN}/etc"    >/dev/null 2>&1
+    fi
+
+    # re-create instance admin directory
+    if [ ! -f "${ETC_BASE}/oud.${OUD_INSTANCE}.conf" ]; then
+        echo "# ----------------------------------------------------------------------" >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+        echo "# Instance Name : ${OUD_INSTANCE}"      >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+        echo "# Instance Type : ${DIRECTORY_TYPE}"    >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+        echo "# Instance Home : ${OUD_INSTANCE_HOME}" >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+        echo "# Oracle Home   : ${ORACLE_HOME}"       >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+        echo "# ----------------------------------------------------------------------" >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+        echo "export ORACLE_HOME=${ORACLE_HOME}"  >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
+    fi
 fi
- 
-# re-create instance admin directory
-if [ ! -f "${ETC_BASE}/oud.${OUD_INSTANCE}.conf" ] && [ "${RECREATE}" = "TRUE" ]; then
-    echo "# ---------------------------------------------------------------------------" >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
-    echo "# Instance Name      : ${OUD_INSTANCE}"      >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
-    echo "# Instance Type      : ${DIRECTORY_TYPE}"    >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
-    echo "# Instance Home      : ${OUD_INSTANCE_HOME}" >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
-    echo "# Oracle Home        : ${ORACLE_HOME}"       >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
-    echo "# ---------------------------------------------------------------------------" >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
-    echo "export ORACLE_HOME=${ORACLE_HOME}"  >>${ETC_BASE}/oud.${OUD_INSTANCE}.conf
-fi
- 
+
 # set the new PATH
 if [ ${DIRECTORY_TYPE} == "OUD" ]; then
     export PATH=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME_BIN}:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
@@ -647,7 +684,8 @@ elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
 elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
     export PATH=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/OUD/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
 fi
- 
+
+# start to source stuff from ETC_CORE
 # source oudenv.conf file from core etc directory if it exits
 if [ -f "${ETC_CORE}/oudenv.conf" ]; then
     . "${ETC_CORE}/oudenv.conf"
@@ -671,21 +709,22 @@ if [ -f "${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_pwd.txt" ]; then
 else
     export PWD_FILE=${ETC_BASE}/pwd.txt
 fi
- 
+
+# source custom config file
 if [ -f "${ETC_BASE}/oudenv_custom.conf" ]; then
     . "${ETC_BASE}/oudenv_custom.conf"
 fi 
- 
+
 # source oud._DEFAULT_.conf if exists
 if [ -f "${ETC_BASE}/oud._DEFAULT_.conf" ]; then
     . "${ETC_BASE}/oud._DEFAULT_.conf"
 fi
- 
+
 # source oud.<OUD_INSTANCE>.conf if exists
 if [ -f "${ETC_BASE}/oud.${OUD_INSTANCE}.conf" ]; then
     . "${ETC_BASE}/oud.${OUD_INSTANCE}.conf"
 fi
- 
+
 if [ ${pTTY} -eq 0 ] && [ "${SILENT}" = "" ]; then
     echo "Source environment for ${DIRECTORY_TYPE} Instance ${OUD_INSTANCE}"
     oud_status
