@@ -39,6 +39,7 @@ CONFIG_FILES="oudtab oud._DEFAULT_.conf"
 DEFAULT_ORACLE_BASE="/u00/app/oracle"
 SYSTEM_JAVA_PATH=$(if [ -d "/usr/java" ]; then echo "/usr/java"; fi)
 DEFAULT_OUD_DATA="/u01"
+DEFAULT_OUD_BASE_NAME="oudbase"
 DEFAULT_OUD_ADMIN_BASE_NAME="admin"
 DEFAULT_OUD_BACKUP_BASE_NAME="backup"
 DEFAULT_OUD_INSTANCE_BASE_NAME="instances"
@@ -241,7 +242,7 @@ DoMsg "INFO : Define default values"
 export ORACLE_BASE=${INSTALL_ORACLE_BASE:-"${DEFAULT_ORACLE_BASE}"}
 
 # define OUD_BASE
-DEFAULT_OUD_BASE="${ORACLE_BASE}"
+DEFAULT_OUD_BASE="${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/${DEFAULT_OUD_BASE_NAME}"
 export OUD_BASE=${INSTALL_OUD_BASE:-"${DEFAULT_OUD_BASE}"}
 
 # define OUD_DATA
@@ -282,11 +283,11 @@ else
 fi
 
 # set the core etc directory
-export ETC_CORE="${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/etc" 
+export ETC_CORE="${OUD_BASE}/etc" 
 
 # adjust LOG_BASE and ETC_BASE depending on OUD_DATA
 if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
-    export LOG_BASE="${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/log"
+    export LOG_BASE="${OUD_BASE}/log"
     export ETC_BASE="${ETC_CORE}"
 else
     export LOG_BASE="${OUD_DATA}/log"
