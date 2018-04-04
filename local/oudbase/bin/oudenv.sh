@@ -22,7 +22,7 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in.bash_profile or 
 # in oudenv_core.conf.
-VERSION="v1.3.4"
+VERSION="v1.3.5"
 # hostname based on hostname or $HOSTNAME whatever works
 export HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)
 # Absolute path of script directory
@@ -207,22 +207,22 @@ function oud_status {
     get_oracle_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} silent # read oracle home from OUD install.path file
     # display the instance status
     echo "--------------------------------------------------------------"
-    echo " Instance Name      : ${OUD_INSTANCE}"
-    echo " Instance Home ($DIR_STATUS) : ${OUD_INSTANCE_HOME} "
-    echo " Oracle Home        : ${ORACLE_HOME}"
-    echo " Instance Status    : ${STATUS}"
+    echo " Instance Name      : ${OUD_INSTANCE-n/a}"
+    echo " Instance Home ($DIR_STATUS) : ${OUD_INSTANCE_HOME-n/a}"
+    echo " Oracle Home        : ${ORACLE_HOME-n/a}"
+    echo " Instance Status    : ${STATUS-n/a}"
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-        echo " LDAP Port          : $PORT"
-        echo " LDAPS Port         : $PORT_SSL"
-        echo " Admin Port         : $PORT_ADMIN"
-        echo " Replication Port   : $PORT_REP"
+        echo " LDAP Port          : ${PORT-n/a}"
+        echo " LDAPS Port         : ${PORT_SSL-n/a}"
+        echo " Admin Port         : ${PORT_ADMIN-n/a}"
+        echo " Replication Port   : ${PORT_REP-n/a}"
     elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
-        echo " LDAP Port          : $PORT"
-        echo " LDAPS Port         : $PORT_SSL"
+        echo " LDAP Port          : ${PORT-n/a}"
+        echo " LDAPS Port         : ${PORT_SSL-n/a}"
     elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
         echo " Console            : http://${HOST}:$PORT/oudsm"
-        echo " HTTP               : $PORT"
-        echo " HTTPS              : $PORT_SSL"
+        echo " HTTP               : ${PORT-n/a}"
+        echo " HTTPS              : ${PORT_SSL-n/a}"
     fi
     echo "--------------------------------------------------------------"
 }
@@ -259,7 +259,9 @@ function get_status {
 # Purpose....: get the current instance / process status
 # -----------------------------------------------------------------------
     InstanceName=${1:-${OUD_INSTANCE}}
-    case ${DIRECTORY_TYPE} in
+    DirectoryType=${DIRECTORY_TYPE}
+    [ "${InstanceName}" == 'n/a' ] && DirectoryType=${InstanceName}
+    case ${DirectoryType} in
         # check the process for each directory type
         "OUD")      echo $(if [ $(pgrep -acf "org.opends.server.core.DirectoryServer.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
         "ODSEE")    echo $(if [ $(pgrep -acf "ns-slapd.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
@@ -281,24 +283,16 @@ function get_oracle_home {
         Silent=$1
         if [ -r "${OUD_INSTANCE_HOME}/OUD/install.path" ]; then
             read ORACLE_HOME < "${OUD_INSTANCE_HOME}/OUD/install.path"
+            export ORACLE_HOME=$(dirname ${ORACLE_HOME})
         elif [ -r "${OUD_INSTANCE_HOME}/install.path" ]; then
             read ORACLE_HOME < "${OUD_INSTANCE_HOME}/install.path"
+            export ORACLE_HOME=$(dirname ${ORACLE_HOME})
         else
-            unset ORACLE_HOME
+            [ "${Silent}" == "" ] && echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
         fi
-        # check if the new ORACLE_HOME is a directory
-        if [ -d ${ORACLE_HOME} ]; then
-            ORACLE_HOME=$(dirname ${ORACLE_HOME})
-            export ORACLE_HOME
-        else
-            if [ "${Silent}" == "" ]; then
-                echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
-            fi
-        fi
+
         # Display the ORACLE_HOME
-        if [ "${Silent}" == "" ]; then
-            echo " Oracle Home    : ${ORACLE_HOME}"
-        fi
+        [ "${Silent}" == "" ] && echo " Oracle Home    : ${ORACLE_HOME}"
     fi
 }
  
@@ -571,6 +565,7 @@ fi
  
 # if not defined set default instance to first of OUD_INST_LIST
 export OUD_DEFAULT_INSTANCE=${OUD_DEFAULT_INSTANCE:-$(echo "$OUD_INST_LIST"|cut -f1 -d' ')}
+export OUD_DEFAULT_INSTANCE=${OUD_DEFAULT_INSTANCE:-"n/a"}
  
 # set the last OUD instance to ...
 if [ "${OUD_INSTANCE}" = "" ]; then
@@ -646,7 +641,7 @@ elif [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -gt 1
     echo "ERROR: Found multiple entries for ${OUD_INSTANCE} in ${OUDTAB} please fix manualy"
     RECREATE="FALSE"
 elif [ "${OUD_INSTANCE}" == "n/a" ]; then
-    echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUDTAB} or ${OUD_INSTANCE_BASE}"
+    echo "WARN : No OUD Instance yet available or defined."
     RECREATE="FALSE"
 else # print error and keep current setting
     echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUDTAB} or ${OUD_INSTANCE_BASE}"
@@ -725,7 +720,7 @@ if [ -f "${ETC_BASE}/oud.${OUD_INSTANCE}.conf" ]; then
     . "${ETC_BASE}/oud.${OUD_INSTANCE}.conf"
 fi
 
-if [ ${pTTY} -eq 0 ] && [ "${SILENT}" = "" ]; then
+if [ ${pTTY} -eq 0 ] && [ "${SILENT}" = "" ] && [ ! "${OUD_INSTANCE}" == 'n/a' ]; then
     echo "Source environment for ${DIRECTORY_TYPE} Instance ${OUD_INSTANCE}"
     oud_status
 fi
