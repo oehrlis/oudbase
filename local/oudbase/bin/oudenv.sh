@@ -502,35 +502,41 @@ else
     unset OUD_INST_LIST
     # create a OUD Instance Liste based on OUD instance base
     for i in ${OUD_INSTANCE_BASE}/*/OUD/config/config.ldif ${OUD_INSTANCE_BASE}/*/config/config.ldif; do
-        # remove leading OUD instance path
-        i=${i##"$OUD_INSTANCE_BASE/"}
-        # remove trailing OUD* and config*
-        i=${i%%/O*.ldif}
-        i=${i%%/config*.ldif}
-        # add oudtab entry
-        update_oudtab $i OUD silent
-        export OUD_INST_LIST+="$(echo $i) "
+        if [ -f $i ]; then
+            # remove leading OUD instance path
+            i=${i##"$OUD_INSTANCE_BASE/"}
+            # remove trailing OUD* and config*
+            i=${i%%/O*.ldif}
+            i=${i%%/config*.ldif}
+            # add oudtab entry
+            update_oudtab $i OUD silent
+            export OUD_INST_LIST+="$(echo $i) "
+        fi
     done
     # TODO add odsee instances
     # create a list of ODSEE instance on OUD instance base
     for i in ${OUD_INSTANCE_BASE}/*/config/dse.ldif; do
-        # remove leading OUD instance path
-        i=${i##"$OUD_INSTANCE_BASE/"}
-        # remove trailing OUD* and config*
-        i=${i%%/config*.ldif}
-        # add oudtab entry
-        update_oudtab $i ODSEE silent
-        export OUD_INST_LIST+="$(echo $i) "
+        if [ -f $i ]; then
+            # remove leading OUD instance path
+            i=${i##"$OUD_INSTANCE_BASE/"}
+            # remove trailing OUD* and config*
+            i=${i%%/config*.ldif}
+            # add oudtab entry
+            update_oudtab $i ODSEE silent
+            export OUD_INST_LIST+="$(echo $i) "
+        fi
     done
     # check for OUDSM Instances
     for i in ${OUDSM_DOMAIN_BASE}/*/config/config.xml; do
-        # remove leading OUD instance path
-        i=${i##"$OUDSM_DOMAIN_BASE/"}
-        # remove trailing OUD* and config*
-        i=${i%%/config*.xml}
-        #add oudtab entry
-        update_oudtab $i OUDSM silent
-        export OUD_INST_LIST+="$(echo $i) "
+        if [ -f $i ]; then
+            # remove leading OUD instance path
+            i=${i##"$OUDSM_DOMAIN_BASE/"}
+            # remove trailing OUD* and config*
+            i=${i%%/config*.xml}
+            #add oudtab entry
+            update_oudtab $i OUDSM silent
+            export OUD_INST_LIST+="$(echo $i) "
+        fi
     done
     echo "INFO : OUD Instance $OUD_INST_LIST"
 fi
