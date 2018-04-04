@@ -1,4 +1,4 @@
-80ea50648cba3e3addefe138bd039c73dd511dd3 ?./bin/oud_status.sh
+0c52ca5b5a5b2788fdca013eb523ea8c9d0dc107 ?./bin/oud_status.sh
 7be9e1968dd25b85153ed3682df44297f60705b0 ?./bin/oud_export.sh
 43cfe64aa355b44a784168a8148b7a60b329d41e ?./bin/oud_backup.sh
 10f8a2a542e715a68bc83c635f18af23506a99c4 ?./bin/oudenv.sh
@@ -41,4 +41,4 @@ abe0a18757b04ca99c155b6018984bb26db496be ?./templates/create/10_enable_replicati
 39ddc950916cb748e9f042978a93a85272602221 ?./templates/create/02_configure_instance.conf
 8624bcdae55baeef00cd11d5dfcfa60f68710a02 ?./doc/LICENSE
 3db97bdaacfb1fc28c27f93bceda238135caed1b ?./doc/README.md
-e4c31161332cc313bf8ec435bffd8e73cebe43c8 ?./doc/.version
+01d0142e4fd5ff0c0e5b3cf70d728352e2a4b465 ?./doc/.version
