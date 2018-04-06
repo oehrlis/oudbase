@@ -22,7 +22,7 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in.bash_profile or 
 # in oudenv_core.conf.
-VERSION="v1.3.5"
+VERSION="v1.3.6"
 # hostname based on hostname or $HOSTNAME whatever works
 export HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)
 # Absolute path of script directory
@@ -97,6 +97,47 @@ export DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
 # - EOF Environment Variables -------------------------------------------
 
 # - Functions -----------------------------------------------------------
+
+# -----------------------------------------------------------------------
+function get_instance_real_home {
+# Purpose....: get the corresponding PORTS from OUD Instance
+# -----------------------------------------------------------------------
+ # define the function parameter
+    OUD_INSTANCE=${1:-${OUD_INSTANCE}}
+    DIRECTORY_TYPE=${2:-${DIRECTORY_TYPE}}
+    Silent=$3
+    # get ports for OUD instance
+    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+        # check if instance home does use a /OUD directory or not
+        if [ -r "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/config/config.ldif" ]; then
+            OUD_INSTANCE_REAL_HOME="${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD"
+        elif [ -r "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/config/config.ldif" ]; then
+            OUD_INSTANCE_REAL_HOME="${OUD_INSTANCE_BASE}/${OUD_INSTANCE}"
+        elif [ -r "${ORACLE_FMW_HOME}/${OUD_INSTANCE}/OUD/config/config.ldif" ]; then
+            OUD_INSTANCE_REAL_HOME="${ORACLE_FMW_HOME}/${OUD_INSTANCE}/OUD"
+        elif [ -r "${ORACLE_FMW_HOME}/${OUD_INSTANCE}/config/config.ldif" ]; then
+            OUD_INSTANCE_REAL_HOME="${ORACLE_FMW_HOME}/${OUD_INSTANCE}"
+        else
+            [ "${Silent}" == "" ] && echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set your PORTS."
+            return 1
+        fi
+    elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+        if [ -r "${OUDSM_DOMAIN_BASE}/${OUD_INSTANCE}/config/config.xml" ]; then
+            OUD_INSTANCE_REAL_HOME="${OUDSM_DOMAIN_BASE}/${OUD_INSTANCE}"
+        else
+            [ "${Silent}" == "" ] && echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set your PORTS."
+            return 1
+        fi
+    elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
+        if [ -r "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/config/dse.ldif" ]; then
+            OUD_INSTANCE_REAL_HOME="${OUD_INSTANCE_BASE}/${OUD_INSTANCE}"
+        else
+            [ "${Silent}" == "" ] && echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set your PORTS."
+            return 1
+        fi
+    fi
+    echo "${OUD_INSTANCE_REAL_HOME}"
+}
 # -----------------------------------------------------------------------
 function get_ports {
 # Purpose....: get the corresponding PORTS from OUD Instance
@@ -107,11 +148,10 @@ function get_ports {
     Silent=$3
     # get ports for OUD instance
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+        OUD_INSTANCE_REAL_HOME=$(get_instance_real_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} ${Silent})
         # check if instance home does use a /OUD directory or not
-        if [ -r "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/config/config.ldif" ]; then
-            CONFIG="${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/config/config.ldif"
-        elif [ -r "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/config/config.ldif" ]; then
-            CONFIG="${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/config/config.ldif"
+        if [ -r "${OUD_INSTANCE_REAL_HOME}/config/config.ldif" ]; then
+            CONFIG="${OUD_INSTANCE_REAL_HOME}/config/config.ldif"
         else
             [ "${Silent}" == "" ] && echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set your PORTS."
             return 1
@@ -193,13 +233,12 @@ function oud_status {
 # -----------------------------------------------------------------------
     STATUS=$(get_status)
     DIR_STATUS="??"
-    if [ ${DIRECTORY_TYPE} == "OUD" ] && [ -f "${OUD_INSTANCE_HOME}/OUD/config/config.ldif" ] ; then
+    OUD_INSTANCE_REAL_HOME=$(get_instance_real_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} ${Silent})
+    if [ ${DIRECTORY_TYPE} == "OUD" ] && [ -f "${OUD_INSTANCE_REAL_HOME}/config/config.ldif" ] ; then
         DIR_STATUS="ok"
-    elif [ ${DIRECTORY_TYPE} == "OUD" ] && [ -f "${OUD_INSTANCE_HOME}/config/config.ldif" ] ; then
+    elif [ ${DIRECTORY_TYPE} == "ODSEE" ] && [ -f "${OUD_INSTANCE_REAL_HOME}/config/dse.ldif" ]; then
         DIR_STATUS="ok"
-    elif [ ${DIRECTORY_TYPE} == "ODSEE" ] && [ -f "${OUD_INSTANCE_HOME}/config/dse.ldif" ]; then
-        DIR_STATUS="ok"
-    elif [ ${DIRECTORY_TYPE} == "OUDSM" ] && [ -f "${OUD_INSTANCE_HOME}/config/config.xml" ]; then
+    elif [ ${DIRECTORY_TYPE} == "OUDSM" ] && [ -f "${OUD_INSTANCE_REAL_HOME}/config/config.xml" ]; then
         DIR_STATUS="ok"
     fi
 
@@ -281,16 +320,12 @@ function get_oracle_home {
     # for directory type OUD
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         Silent=$1
-        if [ -r "${OUD_INSTANCE_HOME}/OUD/install.path" ]; then
-            read ORACLE_HOME < "${OUD_INSTANCE_HOME}/OUD/install.path"
-            export ORACLE_HOME=$(dirname ${ORACLE_HOME})
-        elif [ -r "${OUD_INSTANCE_HOME}/install.path" ]; then
-            read ORACLE_HOME < "${OUD_INSTANCE_HOME}/install.path"
+        if [ -r "${OUD_INSTANCE_REAL_HOME}/install.path" ]; then
+            read ORACLE_HOME < "${OUD_INSTANCE_REAL_HOME}/install.path"
             export ORACLE_HOME=$(dirname ${ORACLE_HOME})
         else
             [ "${Silent}" == "" ] && echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
         fi
-
         # Display the ORACLE_HOME
         [ "${Silent}" == "" ] && echo " Oracle Home    : ${ORACLE_HOME}"
     fi
@@ -522,7 +557,10 @@ else
     echo "${OUDTAB_COMMENT}" >"${OUDTAB}"
     unset OUD_INST_LIST
     # create a OUD Instance Liste based on OUD instance base
-    for i in ${OUD_INSTANCE_BASE}/*/OUD/config/config.ldif ${OUD_INSTANCE_BASE}/*/config/config.ldif; do
+    for i in    ${OUD_INSTANCE_BASE}/*/OUD/config/config.ldif \
+                ${OUD_INSTANCE_BASE}/*/config/config.ldif \
+                ${ORACLE_FMW_HOME}/*/OUD/config/config.ldif \
+                ${ORACLE_FMW_HOME}/*/config/config.ldif ; do
         # if the config.ldif file exists use it to get instance name
         if [ -f $i ]; then
             # remove leading OUD instance path
