@@ -1,39 +1,17 @@
-!Build/
-.last_cover_stats
-/META.yml
-/META.json
-/MYMETA.*
-*.o
-*.pm.tdy
-*.bs
+# ignore binary packages and files
+**/*.rpm
+**/*.jar
+**/*.zip
+**/*.tar.gz
+**/*.tgz
 
-# Devel::Cover
-cover_db/
+# ignore mac OS resource forks
+**/*.DS_Store
 
-# Devel::NYTProf
-nytprof.out
+.idea/
 
-# Dizt::Zilla
-/.build/
-
-# Module::Build
-_build/
-Build
-Build.bat
-
-# Module::Install
-inc/
-
-# ExtUitls::MakeMaker
-/blib/
-/_eumm/
-/*.gz
-/Makefile
-/Makefile.old
-/MANIFEST.bak
-/pm_to_blib
-/*.zip
+# Eclipse stuff
 /.pydevproject
-/.settings/
-/.externalToolBuilders/
 /.project
+/Build tar and shell.launch
+/org.python.pydev.PyDevBuilder.launch
