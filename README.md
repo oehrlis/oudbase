@@ -4,6 +4,8 @@ Trivadis does have the TVD-BasEnv™ to standardizes and simplifies the handling
 *OUD Base* is basically just the **oudenv.sh** script, some configuration files and a bunch of aliases. The directory structure for the OUD binaries, scripts and configuration files is similar to what is use in TVD-BasEnv™ and based on OFA. It is written in bash and tested on Oracle Linux VM’s, OUD Docker container and Raspberry Pi’s with Raspbian Jessy/Stretch. It should also run on any other bash environment.
 
 ## Setup
+
+### Automatic Setup using shell script
 *OUD Base* is available as TAR file or as Bash installation file *oudbase_install.sh*. Wherein *oudbase_install.sh* is a TAR file with a wrappped Bash script.
 
 ```bash
@@ -143,6 +145,48 @@ alias oud=". $(find $OUD_BASE -name oudenv.sh)"
 # source oud environment
 . $(find $OUD_BASE -name oudenv.sh)
 ```
+
+### Manual setup TAR file
+
+Extract the TAR to your favorite folder.
+
+```
+tar -zxcd oudbase_install.tgz -C $ORACLE_BASE/local
+```
+
+Update the oudenv_core.conf and add some mandatory parameter eg. ORACLE_BASE, OUD_BASE, OUD_DATA, OUD_INSTANCE_BASE, OUD_BACKUP_BASE, ORACLE_HOME, ORACLE_FMW_HOME, JAVA_HOME, LOG_BASE or ETC_BASE. Where ORACLE_BASE is the minimal required parameter.
+
+```
+echo "ORACLE_BASE=$ORACLE_BASE" >> $ORACLE_BASE/local/etc/oudenv_core.conf
+```
+
+Add a .OUD_BASE file to the user home
+
+```
+echo echo "OUD_BASE=$OUD_BASE" >> $HOME/.OUD_BASE
+```
+
+Update .profile or .bash_profile to source the OUD environment
+
+```
+PROFILE=$HOME/.bash_profile
+echo "# Check OUD_BASE and load if necessary"                       >>"${PROFILE}"
+echo "if [ \"\${OUD_BASE}\" = \"\" ]; then"                         >>"${PROFILE}"
+echo "  if [ -f \"\${HOME}/.OUD_BASE\" ]; then"                     >>"${PROFILE}"
+echo "    . \"\${HOME}/.OUD_BASE\""                                 >>"${PROFILE}"
+echo "  else"                                                       >>"${PROFILE}"
+echo "    echo \"ERROR: Could not load \${HOME}/.OUD_BASE\""        >>"${PROFILE}"
+echo "  fi"                                                         >>"${PROFILE}"
+echo "fi"                                                           >>"${PROFILE}"
+echo ""                                                             >>"${PROFILE}"
+echo "# define an oudenv alias"                                     >>"${PROFILE}"
+echo "alias oud='. \${OUD_BASE}/bin/oudenv.sh'"                     >>"${PROFILE}"
+echo ""                                                             >>"${PROFILE}"
+echo "# source oud environment"                                     >>"${PROFILE}"
+echo ". \${OUD_BASE}/bin/oudenv.sh"                                 >>"${PROFILE}"
+```
+
+Open a new terminal to test OUDBase.
 
 ## Configuration and Architecture
 

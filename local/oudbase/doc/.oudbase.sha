@@ -40,5 +40,5 @@ abe0a18757b04ca99c155b6018984bb26db496be ?./templates/create/10_enable_replicati
 994f75086c57e4b0ecfb1b975cc04d53f37b31a4 ?./templates/create/04_create_root_user.conf
 39ddc950916cb748e9f042978a93a85272602221 ?./templates/create/02_configure_instance.conf
 8624bcdae55baeef00cd11d5dfcfa60f68710a02 ?./doc/LICENSE
-3db97bdaacfb1fc28c27f93bceda238135caed1b ?./doc/README.md
+e7c9d528e7902c20fbd5b2545db2d539db7d499f ?./doc/README.md
 42f56ae05e078dac0a85de87fc8e72e971d62db4 ?./doc/.version

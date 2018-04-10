@@ -19,3 +19,4 @@ build/oudbase_install.tgz
 /.project
 /Build tar and shell.launch
 /org.python.pydev.PyDevBuilder.launch
+/.externalToolBuilders/
