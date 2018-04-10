@@ -5,6 +5,10 @@
 **/*.tar.gz
 **/*.tgz
 
+# ignore build stuff
+build/oudbase_install.sh
+build/oudbase_install.tgz
+
 # ignore mac OS resource forks
 **/*.DS_Store
 
