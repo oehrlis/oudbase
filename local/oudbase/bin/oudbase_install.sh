@@ -23,7 +23,7 @@ export LOG_BASE=${LOG_BASE-"/tmp"}
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION="v1.3.6"
+VERSION="v1.3.7"
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="TRUE"                                  # enable verbose mode
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"     # Basename of the script
@@ -278,8 +278,6 @@ export OUD_ADMIN_BASE=${INSTALL_OUD_ADMIN_BASE:-"${DEFAULT_OUD_ADMIN_BASE}"}
 # define ORACLE_PRODUCT
 if [ "${INSTALL_ORACLE_HOME}" == "" ]; then
     ORACLE_PRODUCT=$(dirname ${ORACLE_HOME})
-else
-    ORACLE_PRODUCT
 fi
 
 # set the core etc directory
@@ -321,7 +319,8 @@ for i in    ${LOG_BASE} \
             ${OUD_ADMIN_BASE} \
             ${OUD_BACKUP_BASE} \
             ${OUD_INSTANCE_BASE} \
-            ${ORACLE_PRODUCT}; do
+            ${ORACLE_PRODUCT} \
+            ${OUD_BASE}; do
     mkdir -pv ${i} >/dev/null 2>&1 && DoMsg "INFO : Create Directory ${i}" || CleanAndQuit 41 ${i}
 done
 

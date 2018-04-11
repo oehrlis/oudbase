@@ -21,7 +21,7 @@ export OUD_ROOT_DN=${OUD_ROOT_DN:-"postgasse.org"}
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION="v1.3.6"
+VERSION="v1.3.7"
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
