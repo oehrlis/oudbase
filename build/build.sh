@@ -36,7 +36,7 @@ cp ${SCRIPT_DIR}/../LICENSE ${SCRIPT_DIR}/../local/oudbase/doc
 # create sha hash's
 echo "Create sha hashs for all files"
 find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" ! -iname "*.log" ! -iname "oudbase_install.sh" \) \
-  -print0 | xargs -0 shasum -p >${SCRIPT_DIR}/../local/oudbase/doc/.oudbase.sha
+  -print0 | xargs -0 shasum >${SCRIPT_DIR}/../local/oudbase/doc/.oudbase.sha
 
 # Tar all together
 echo "Put all together in a tar"
