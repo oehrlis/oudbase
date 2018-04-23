@@ -5,6 +5,8 @@ Trivadis does have the TVD-BasEnv™ to standardizes and simplifies the handling
 
 ## Setup
 
+Latest installation script or TAR file is available on the [releases](https://github.com/oehrlis/oudbase/releases) page.
+
 ### Automatic Setup using shell script
 *OUD Base* is available as TAR file or as Bash installation file *oudbase_install.sh*. Wherein *oudbase_install.sh* is a TAR file with a wrappped Bash script.
 
@@ -279,6 +281,35 @@ Variable besides the ones mentioned above.
 | oud_up                    | u, ou   | Display up/down status of all OUD instances and OUDSM domains. |
 | relpath <DIR1> <DIR2>     | n/a     | Internally used to get the relative path of DIR1 from DIR2 |
 | update_oudtab             | n/a     | Update OUD tab (${ETC_BASE}/oudtab) for the current OUD instance. Adjust Ports or add the instance to the OUD tab. |
+
+### Usage and Use Cases
+
+Display status of the current OUD instance.
+
+```
+oud@oudeng:~/ [oudtd] os
+--------------------------------------------------------------
+ Instance Name      : oud_docker
+ Instance Home (ok) : /u01/instances/oud_docker
+ Oracle Home        : /u00/app/oracle/product/oud12.2.1.3.0
+ Instance Status    : up
+ LDAP Port          : 1389
+ LDAPS Port         : 1636
+ Admin Port         : 4444
+ Replication Port   : 8989
+--------------------------------------------------------------
+```
+
+Show runing OUD and OUDSM instances
+
+```
+oud@uxltoud03:~/ [oudtd] u
+TYPE  INSTANCE     STATUS PORTS          INSTANCE HOME
+----- ------------ ------ -------------- ----------------------------------
+OUD   oud_docker   up     1389/1636/4444 /u01/instances/oud_docker
+OUD   oudtest      up     2389/2636/5444 /u01/instances/oudtest
+OUDSM oudsm_domain up     7001/7002      /u01/domains/oudsm_domain
+```
 
 ## Issues
 Please file your bug reports, enhancement requests, questions and other support requests within [Github's issue tracker](https://help.github.com/articles/about-issues/):

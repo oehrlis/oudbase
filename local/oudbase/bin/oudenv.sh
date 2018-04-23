@@ -292,7 +292,20 @@ function oud_up {
     done
     echo ""
 }
- 
+
+# -----------------------------------------------------------------------
+function proc_grep {
+# Purpose....: simulate pgrep to get the OUD / OUDSM process status
+# -----------------------------------------------------------------------
+    GrepString=${1}
+    if [ -n GrepString ]; then
+        GrepString=$(echo ${GrepString}|sed 's/\(.\)/[\1]/1')
+        find /proc -maxdepth 2 -type f -regex ".*/[0-9]*/cmdline" -exec grep -i -a -e ${GrepString} {} \;| tr "\0" " "|wc -l
+    else
+        echo 0
+    fi
+}
+
 # -----------------------------------------------------------------------
 function get_status {
 # Purpose....: get the current instance / process status
@@ -300,15 +313,18 @@ function get_status {
     InstanceName=${1:-${OUD_INSTANCE}}
     DirectoryType=${DIRECTORY_TYPE}
     [ "${InstanceName}" == 'n/a' ] && DirectoryType=${InstanceName}
+    PGREP="pgrep -acf"
+    pgrep -h > /dev/null 2>&1|| PGREP="proc_grep"
     case ${DirectoryType} in
         # check the process for each directory type
-        "OUD")      echo $(if [ $(pgrep -acf "org.opends.server.core.DirectoryServer.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
-        "ODSEE")    echo $(if [ $(pgrep -acf "ns-slapd.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
-        "OUDSM")    echo $(if [ $(pgrep -acf "wlserver.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+        "OUD")      echo $(if [ $(${PGREP} "org.opends.server.core.DirectoryServer.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+        "ODSEE")    echo $(if [ $(${PGREP} "ns-slapd.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+        "OUDSM")    echo $(if [ $(${PGREP} "wlserver.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
         *)          echo "n/a";;
     esac
 }
- 
+
+
 function get_oracle_home {
 # Purpose....: get the corresponding ORACLE_HOME from OUD Instance
 # -----------------------------------------------------------------------
@@ -345,7 +361,7 @@ function gen_password {
     # Auto generate a password
     while true; do
         # use urandom to generate a random string
-        s=$(cat /dev/urandom | tr -dc "A-Za-z0-9" | fold -w ${Length} | head -n 1)
+        s=$(cat /dev/random | tr -dc "A-Za-z0-9" | fold -w ${Length} | head -n 1)
         # check if the password meet the requirements
         if [[ ${#s} -ge ${Length} && "$s" == *[A-Z]* && "$s" == *[a-z]* && "$s" == *[0-9]*  ]]; then
             echo "$s"
@@ -353,7 +369,7 @@ function gen_password {
         fi
     done
 }
- 
+
 # -----------------------------------------------------------------------
 function oud_help {
 # Purpose....: just display help for OUD environment
