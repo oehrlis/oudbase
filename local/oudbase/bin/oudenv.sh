@@ -22,7 +22,7 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in.bash_profile or 
 # in oudenv_core.conf.
-VERSION="v1.4.2"
+VERSION="v1.4.3"
 # hostname based on hostname or $HOSTNAME whatever works
 export HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)
 # Absolute path of script directory
@@ -298,9 +298,28 @@ function proc_grep {
 # Purpose....: simulate pgrep to get the OUD / OUDSM process status
 # -----------------------------------------------------------------------
     GrepString=${1}
-    if [ -n GrepString ]; then
+    if [ -n "$GrepString" ]; then
         GrepString=$(echo ${GrepString}|sed 's/\(.\)/[\1]/1')
-        find /proc -maxdepth 2 -type f -regex ".*/[0-9]*/cmdline" -exec grep -i -a -e ${GrepString} {} \;| tr "\0" " "|wc -l
+        find /proc -maxdepth 2 -type f -regex ".*/[0-9]*/cmdline" -exec grep -iH -o -a -e ${GrepString} {} \;| tr "\0" " "
+    else
+        echo 0
+    fi
+}
+
+# -----------------------------------------------------------------------
+function oud_pgrep {
+# Purpose....: simulate pgrep to get the OUD / OUDSM process status
+# -----------------------------------------------------------------------
+    GrepString=${1}
+    if [ -n "$GrepString" ]; then
+        GrepString=$(echo ${GrepString}|sed 's/\(.\)/[\1]/1')
+        for i in $(find /proc -maxdepth 2 -type f -regex ".*/[0-9]*/cmdline" -exec grep -il -o -a -e ${GrepString} {} \;); do
+            pid=$(echo "${i//[^0-9]/}")
+            ppid=$(grep -i ppid status|cut -d: -f2| xargs)
+            user=$(grep $(cat /proc/${pid}/loginuid)  /etc/passwd | cut -f1 -d:)
+            cmdline=$(cat ${i})
+            printf '%-5s %-12s %-10s %-s\n' $user $pid  $ppid $cmdline
+        done
     else
         echo 0
     fi
@@ -311,19 +330,24 @@ function get_status {
 # Purpose....: get the current instance / process status
 # -----------------------------------------------------------------------
     InstanceName=${1:-${OUD_INSTANCE}}
-    DirectoryType=${DIRECTORY_TYPE}
     [ "${InstanceName}" == 'n/a' ] && DirectoryType=${InstanceName}
-    PGREP="pgrep -acf"
-    pgrep -h > /dev/null 2>&1|| PGREP="proc_grep"
-    case ${DirectoryType} in
-        # check the process for each directory type
-        "OUD")      echo $(if [ $(${PGREP} "org.opends.server.core.DirectoryServer.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
-        "ODSEE")    echo $(if [ $(${PGREP} "ns-slapd.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
-        "OUDSM")    echo $(if [ $(${PGREP} "wlserver.*${InstanceName}") -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
-        *)          echo "n/a";;
-    esac
+    # check if the instance is in the oud tab
+    if [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${InstanceName}) -eq 1 ]; then
+        # get the directory type from OUDTAB
+        DirectoryType=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${InstanceName}|head -1|cut -d: -f6)
+        PGREP="pgrep -af"
+        pgrep -h > /dev/null 2>&1|| PGREP="proc_grep"
+        case ${DirectoryType} in
+            # check the process for each directory type
+            "OUD")      echo $(if [ $(${PGREP} "org.opends.server.core.DirectoryServer.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+            "ODSEE")    echo $(if [ $(${PGREP} "ns-slapd.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+            "OUDSM")    echo $(if [ $(${PGREP} "wlserver.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+            *)          echo "n/a";;
+        esac
+    else
+        echo  "n/a"
+    fi
 }
-
 
 function get_oracle_home {
 # Purpose....: get the corresponding ORACLE_HOME from OUD Instance
