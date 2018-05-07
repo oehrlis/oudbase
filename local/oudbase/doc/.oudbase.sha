@@ -1,7 +1,7 @@
-95d3aea69d503407c5c0db421a959e1c04a49664  ./bin/oud_status.sh
-b4610790f403ecea05a489df9b8e5719857736cf  ./bin/oud_export.sh
-75155361cd6ea62c89730c87e9f6dee6940a3e81  ./bin/oud_backup.sh
-dc8b56188e83106d8b7427642fb2ade914e924ce  ./bin/oudenv.sh
+899c57ff1131eee7a9018c56e149ee7c615b030f  ./bin/oud_status.sh
+39447c777e6c97c9b472a6cfe8e4176672433a74  ./bin/oud_export.sh
+b1cdb663b85c7300d0ed8004fc6ccd0f067ee68b  ./bin/oud_backup.sh
+3e272278903030b26222c3bd2f8e1874f87e80df  ./bin/oudenv.sh
 eae0291c2f607231f369bdbedd2dc7bf0c318d54  ./etc/oudenv_core.conf
 0dc896bc673a7ecf9d476736e3065abe47d5cbbf  ./etc/oudenv.conf
 2ea0c0069dd86f9aaae99c274f38182c981e2113  ./etc/oudenv_custom.conf
@@ -10,14 +10,16 @@ ef2a6ff1dfb0d3c5604cd5a4565b1358cac54137  ./etc/oudtab
 8c1112a8541a51368a708ed903b9994e31492547  ./templates/ldif/oud_pi_init.ldif
 b11ba7558dc9f97e5a2545fe672b82fc0a346615  ./templates/etc/wls_oudsm.service
 52265a8fd3f28504fe0483ac2800d3660265d8d7  ./templates/etc/oudenv_core.conf
+5dcad6edfe3a34c071779a73d22a147c303b54e2  ./templates/etc/housekeeping.conf
 03fcc0fbc2cd3435e11b8a04767b087ea10dfc73  ./templates/etc/install.rsp
 ef58125ad4db5264e90fccc0f76d420a6122fa6b  ./templates/etc/oudenv.conf
 5e9de046f186d9930f145b5a5158116959104d2d  ./templates/etc/oraInst.loc
 5c559c7e035e5c31fbbc3a6e3ca208b61c75fb42  ./templates/etc/oudenv_custom.conf
 ef2a6ff1dfb0d3c5604cd5a4565b1358cac54137  ./templates/etc/oudtab
 5db71a75ccbd45f85f4dbbaba286a222d2b2a760  ./templates/etc/oud._DEFAULT_.conf
+bee2da88ae85319aa1dab2a6816b83563f1627bb  ./templates/etc/oud.crontab
 ed23a6c7573b87d4a49f3d78a718b14777924225  ./templates/etc/oud_instance.service
-8407fb21690782d03bc9d0f514c7dd2aa23fac60  ./templates/cron.d/oud
+7d0eea2ac7c7d0fa21ce30b2b71c5e830a7b66b4  ./templates/cron.d/oud
 282053063fc527abfb2e5bfb40587da6fe6fe677  ./templates/.bash_profile
 b8fda5240323ee307fcff0f813ee9096270ad5aa  ./templates/logrotate.d/oudsm
 a08b4174eba98bb9861bbce2b13b7da5202fece4  ./templates/logrotate.d/oud
@@ -41,4 +43,4 @@ abe0a18757b04ca99c155b6018984bb26db496be  ./templates/create/10_enable_replicati
 2d26fd37756fc53552d7df45cc5acbc1c4bedd40  ./templates/create/02_configure_instance.conf
 8624bcdae55baeef00cd11d5dfcfa60f68710a02  ./doc/LICENSE
 d5935d1391358970b173cc409c2e578adb82ed8f  ./doc/README.md
-d3608acd284ccb70d11c6ee10784f1cf8c566b67  ./doc/.version
+5fbfdb30b34a9ffb47d0b0d2303932afc485d17e  ./doc/.version

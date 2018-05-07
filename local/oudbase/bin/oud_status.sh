@@ -21,7 +21,7 @@ export OUD_ROOT_DN=${OUD_ROOT_DN:-"postgasse.org"}
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION="v1.4.4"
+VERSION="v1.4.5"
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
@@ -43,6 +43,7 @@ function Usage() {
     DoMsg "INFO : Usage, ${SCRIPT_NAME} [-hvr -i <OUD_INSTANCE> -D <bindDN> -j <bindPasswordFile> ]"
     DoMsg "INFO :   -h                    Usage this message"
     DoMsg "INFO :   -v                    enable verbose mode"
+    DoMsg "INFO :   -l                    enable instance log file in \$OUD_ADMIN_BASE/\$OUD_INSTANCE/"
     DoMsg "INFO :   -r                    check for replication"
     DoMsg "INFO :   -D <bindDN>           Default value: cn=Directory Manager"
     DoMsg "INFO :   -j <bindPasswordFile> Bind password file"
@@ -61,8 +62,8 @@ function Usage() {
 # -----------------------------------------------------------------------
 function DoMsg()
 {
-    INPUT=${1%:*}                         # Take everything behinde
-    case ${INPUT} in                    # Define a nice time stamp for ERR, END
+    INPUT=${1%:*}                         # Take everything behind
+    case ${INPUT} in                      # Define a nice time stamp for ERR, END
         "END ")  TIME_STAMP=$(date "+%Y-%m-%d_%H:%M:%S");;
         "ERR ")  TIME_STAMP=$(date "+%n%Y-%m-%d_%H:%M:%S");;
         "START") TIME_STAMP=$(date "+%Y-%m-%d_%H:%M:%S");;
@@ -71,14 +72,14 @@ function DoMsg()
     esac
     if [ "${VERBOSE}" = "TRUE" ]; then
         if [ "${DOAPPEND}" = "TRUE" ]; then
-            echo "${TIME_STAMP}  ${1}" |tee -a ${LOGFILE}
+            echo "${TIME_STAMP}  ${1}" |tee -a ${LOGFILE} ${INSTANCE_LOGFILE}
         else
             echo "${TIME_STAMP}  ${1}"
         fi
         shift
         while [ "${1}" != "" ]; do
             if [ "${DOAPPEND}" = "TRUE" ]; then
-                echo "               ${1}" |tee -a ${LOGFILE}
+                echo "               ${1}" |tee -a ${LOGFILE} ${INSTANCE_LOGFILE}
             else
                 echo "               ${1}"
             fi
@@ -86,12 +87,12 @@ function DoMsg()
         done
     else
         if [ "${DOAPPEND}" = "TRUE" ]; then
-            echo "${TIME_STAMP}  ${1}" >> ${LOGFILE}
+            echo "${TIME_STAMP}  ${1}" |tee -a ${LOGFILE} ${INSTANCE_LOGFILE} > /dev/null
         fi
         shift
         while [ "${1}" != "" ]; do
             if [ "${DOAPPEND}" = "TRUE" ]; then
-                echo "               ${1}" >> ${LOGFILE}
+                echo "               ${1}"|tee -a ${LOGFILE} ${INSTANCE_LOGFILE} > /dev/null
             fi
             shift
         done
@@ -102,15 +103,16 @@ function DoMsg()
 function CleanAndQuit() { 
 # Purpose....: Clean up before exit
 # -----------------------------------------------------------------------
-    if [ ${1} -gt 0 ]; then
-        VERBOSE="TRUE"
-    fi
     if [ -e ${TMP_FILE} ]; then
         DoMsg "INFO : Remove temp file ${TMP_FILE}"
         rm ${TMP_FILE} 2>/dev/null
         # remove oud status temp file due to an oracle Bug
         rm /tmp/oud-status*.log 2>/dev/null
         rm /tmp/oud-replication*.log 2>/dev/null
+    fi
+    # set verbose output incase of error >0
+    if [ ${1} -gt 0 ]; then
+        VERBOSE="TRUE"
     fi
     case ${1} in
         0)  DoMsg "END  : Successfully quit of ${SCRIPT_NAME}";;
@@ -164,6 +166,8 @@ else
     CleanAndQuit 11 ${LOGFILE} # Define a clean exit
 fi
 
+# default output for scripts
+OUTPUT="${LOGFILE}"
 # - EOF Initialization --------------------------------------------------
 
 # - Main ----------------------------------------------------------------
@@ -174,11 +178,11 @@ if [ $# -lt 1 ]; then
 fi
 
 # usage and getopts
-DoMsg "INFO : processing commandline parameter"
-while getopts hvi:D:j:E:r arg; do
+while getopts hvli:D:j:E:r arg; do
     case $arg in
         h) Usage 0;;
         v) VERBOSE="TRUE";;
+        l) INSTANCE_LOG="TRUE";;
         i) MyOUD_INSTANCE="${OPTARG}";;
         D) MybindDN="${OPTARG}";;
         j) MybindPasswordFile="${OPTARG}";;
@@ -188,8 +192,21 @@ while getopts hvi:D:j:E:r arg; do
     esac
 done
 
-# display start header
-DoMsg "${START_HEADER}"
+# append oud instance status log file
+if [ "${INSTANCE_LOG}" == "TRUE" ]; then
+    INSTANCE_LOGFILE="$OUD_ADMIN_BASE/$OUD_INSTANCE/log/$(basename $SCRIPT_NAME .sh)_$OUD_INSTANCE.log"
+    # adjust output for scripts
+    OUTPUT="${INSTANCE_LOGFILE}"
+    touch ${INSTANCE_LOGFILE} 2>/dev/null
+    if [ $? -ne 0 ] && [ ! -w "${INSTANCE_LOGFILE}" ]; then
+        CleanAndQuit 11 ${INSTANCE_LOGFILE} # Define a clean exit
+    fi
+    # display start header
+    DoMsg "${START_HEADER}"
+    DoMsg "INFO : Append verbose log ouptut to instance status log file ${INSTANCE_LOGFILE}"
+else
+    DoMsg "${START_HEADER}"
+fi
 
 # fallback to current instance if ${MyOUD_INSTANCE} is undefined
 if [ "${MyOUD_INSTANCE}" == "" ]; then
@@ -241,7 +258,7 @@ if [ ${DIRECTORY_TYPE} == "OUD" ]; then
     DoMsg "INFO : Process ${TMP_FILE} file"
     # check Server Run Status
     if [ $(grep -ic 'Server Run Status: Started' ${TMP_FILE}) -eq 0 ]; then
-        cat ${TMP_FILE} >> ${LOGFILE}
+        cat ${TMP_FILE} >> "${INSTANCE_LOGFILE}"
         CleanAndQuit 50 ${OUD_INSTANCE}
     fi
 
@@ -251,7 +268,7 @@ if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         AWK_OUT=$(awk 'BEGIN{RS="\n-\n";FS="\n";IGNORECASE=1; Error=51} $1 ~ /^Address/ && $2 ~ /\<'${i}'\>/ {if ($3 ~ /\<Enabled\>/) Error=0; } END{exit Error}' ${TMP_FILE} )
         OUD_ERROR=$?
         if [ ${OUD_ERROR} -eq 51 ]; then
-            cat ${TMP_FILE} >> ${LOGFILE}
+            cat ${TMP_FILE} >> "${INSTANCE_LOGFILE}"
             CleanAndQuit 51 ${i}
         fi
     done
@@ -262,7 +279,7 @@ if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         AWK_OUT=$(awk 'BEGIN{RS="\n-\n";FS="\n";IGNORECASE=1; Error=51} $1 ~ /^Address/ && $2 ~ /\<'${i}'\>/ {if ($3 ~ /\<Enabled\>/) Error=0; } END{exit Error}' ${TMP_FILE} )
         OUD_ERROR=$?
         if [ ${OUD_ERROR} -eq 51 ]; then
-            cat ${TMP_FILE} >> ${LOGFILE}
+            cat ${TMP_FILE} >> "${INSTANCE_LOGFILE}"
             CleanAndQuit 51 ${i}
         fi
     
@@ -272,7 +289,7 @@ if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         OUD_ERROR=$?
         # handle errors from OUD dsreplication
         if [ ${OUD_ERROR} -gt 0 ]; then
-            cat ${TMP_FILE} >> ${LOGFILE}
+            cat ${TMP_FILE} >> "${INSTANCE_LOGFILE}"
             CleanAndQuit 42 ${OUD_ERROR}
         fi
 
@@ -300,5 +317,6 @@ else
 fi
 
 DoMsg "INFO : OK, status on OUD Instance ${MyOUD_INSTANCE}"
+
 CleanAndQuit 0
 # - EOF -----------------------------------------------------------------
