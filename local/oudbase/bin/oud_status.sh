@@ -21,7 +21,7 @@ export OUD_ROOT_DN=${OUD_ROOT_DN:-"postgasse.org"}
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION="v1.4.3"
+VERSION="v1.4.4"
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
@@ -105,8 +105,15 @@ function CleanAndQuit() {
     if [ ${1} -gt 0 ]; then
         VERBOSE="TRUE"
     fi
+    if [ -e ${TMP_FILE} ]; then
+        DoMsg "INFO : Remove temp file ${TMP_FILE}"
+        rm ${TMP_FILE} 2>/dev/null
+        # remove oud status temp file due to an oracle Bug
+        rm /tmp/oud-status*.log 2>/dev/null
+        rm /tmp/oud-replication*.log 2>/dev/null
+    fi
     case ${1} in
-        0)  DoMsg "END  : of ${SCRIPT_NAME}";;
+        0)  DoMsg "END  : Successfully quit of ${SCRIPT_NAME}";;
         1)  DoMsg "ERR  : Exit Code ${1}. Wrong amount of arguments. See usage for correct one.";;
         2)  DoMsg "ERR  : Exit Code ${1}. Wrong arguments (${2}). See usage for correct one.";;
         5)  DoMsg "ERR  : Exit Code ${1}. OUD Instance ${2} does not exits in ${OUDTAB} or ${ORACLE_INSTANCE_BASE}";;
@@ -126,13 +133,6 @@ function CleanAndQuit() {
         99) DoMsg "INFO : Just wanna say hallo.";;
         ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
     esac
-    if [ -e ${TMP_FILE} ]; then
-        DoMsg "INFO : Remove temp file ${TMP_FILE}"
-        rm ${TMP_FILE} 2>/dev/null
-        # remove oud status temp file due to an oracle Bug
-        rm /tmp/oud-status*.log 2>/dev/null
-        rm /tmp/oud-replication*.log 2>/dev/null
-    fi
     exit ${1}
 }
 # - EOF Functions -------------------------------------------------------
@@ -169,7 +169,6 @@ fi
 # - Main ----------------------------------------------------------------
 #trap "CleanAndQuit 40" ERR
 
-DoMsg "${START_HEADER}"
 if [ $# -lt 1 ]; then
     DoMsg "INFO : Use current OUD instance"
 fi
@@ -189,7 +188,12 @@ while getopts hvi:D:j:E:r arg; do
     esac
 done
 
+# display start header
+DoMsg "${START_HEADER}"
+
+# fallback to current instance if ${MyOUD_INSTANCE} is undefined
 if [ "${MyOUD_INSTANCE}" == "" ]; then
+    DoMsg "INFO : Use current OUD instance"
     MyOUD_INSTANCE=${OUD_INSTANCE}
 fi
 
@@ -295,5 +299,6 @@ else
     CleanAndQuit 44 ${DIRECTORY_TYPE}
 fi
 
+DoMsg "INFO : OK, status on OUD Instance ${MyOUD_INSTANCE}"
 CleanAndQuit 0
 # - EOF -----------------------------------------------------------------

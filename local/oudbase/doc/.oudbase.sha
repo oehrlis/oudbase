@@ -1,7 +1,7 @@
-5d00a09c5afaae646794a62564013d762b40cfde  ./bin/oud_status.sh
-c00d71815f44885a1edcb974381b6c1110f97965  ./bin/oud_export.sh
-696862cdfa20d13f974985c38952768b6affe404  ./bin/oud_backup.sh
-1dde5c22ce6f792d75ba3c5606064b9d87fda814  ./bin/oudenv.sh
+95d3aea69d503407c5c0db421a959e1c04a49664  ./bin/oud_status.sh
+b4610790f403ecea05a489df9b8e5719857736cf  ./bin/oud_export.sh
+75155361cd6ea62c89730c87e9f6dee6940a3e81  ./bin/oud_backup.sh
+dc8b56188e83106d8b7427642fb2ade914e924ce  ./bin/oudenv.sh
 eae0291c2f607231f369bdbedd2dc7bf0c318d54  ./etc/oudenv_core.conf
 0dc896bc673a7ecf9d476736e3065abe47d5cbbf  ./etc/oudenv.conf
 2ea0c0069dd86f9aaae99c274f38182c981e2113  ./etc/oudenv_custom.conf
@@ -41,4 +41,4 @@ abe0a18757b04ca99c155b6018984bb26db496be  ./templates/create/10_enable_replicati
 2d26fd37756fc53552d7df45cc5acbc1c4bedd40  ./templates/create/02_configure_instance.conf
 8624bcdae55baeef00cd11d5dfcfa60f68710a02  ./doc/LICENSE
 d5935d1391358970b173cc409c2e578adb82ed8f  ./doc/README.md
-529dd638c2b0ec1c937fe3f04dd8e783bfdc4d0a  ./doc/.version
+d3608acd284ccb70d11c6ee10784f1cf8c566b67  ./doc/.version

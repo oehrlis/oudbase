@@ -22,7 +22,7 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in.bash_profile or 
 # in oudenv_core.conf.
-VERSION="v1.4.3"
+VERSION="v1.4.4"
 # hostname based on hostname or $HOSTNAME whatever works
 export HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)
 # Absolute path of script directory
@@ -32,6 +32,7 @@ RECREATE="TRUE"
 
 # OUDTAB string pattern used to search entries
 ORATAB_PATTERN='^[a-zA-Z0-9_-]*:([0-9]*:){4}O(UD|UDSM|ID|DSEE)$'
+ORATAB_PATTERN_OUD='^[a-zA-Z0-9_-]*:([0-9]*:){4}OUD$'
 # OUDTAB header
 OUDTAB_COMMENT=$(cat <<COMMENT
 # OUD Config File
@@ -592,6 +593,7 @@ fi
 if [ -f "${OUDTAB}" ] && [ $(grep -c -E $ORATAB_PATTERN "${OUDTAB}") -gt 0 ]; then
     # create a OUD Instance list based on oudtab and remove newlines|
     export OUD_INST_LIST=$(grep -E $ORATAB_PATTERN "${OUDTAB}"|cut -f1 -d:|tr '\n' ' ')
+    export REAL_OUD_INST_LIST=$(grep -E $ORATAB_PATTERN_OUD "${OUDTAB}"|cut -f1 -d:|tr '\n' ' ')
 else
     echo "WARN : oudtab (${OUDTAB}) does not exist or is empty. Create a new one."
     echo "${OUDTAB_COMMENT}" >"${OUDTAB}"

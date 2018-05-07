@@ -21,12 +21,13 @@
 # - End of Customization ------------------------------------------------
  
 # - Default Values ------------------------------------------------------
-VERSION="v1.4.3"
+VERSION="v1.4.4"
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 MAILADDRESS=""
+SEND_MAIL="FALSE"                               # don't send mails by default
 ERROR=0
 TYPE="FULL"                                     # Default Backup Type
 KEEP=4                                          # Number of Weeks to keep
@@ -45,6 +46,7 @@ function Usage() {
     DoMsg "INFO :   -i <OUD_INSTANCES> List of OUD instances (default ALL)"
     DoMsg "INFO :   -t <TYPE>          Backup Type FULL or INCREMENTAL (default FULL)"
     DoMsg "INFO :   -k <WEEKS>         Number of weeks to keep old backups (default 4)"
+    DoMsg "INFO :   -o                 force to send mails. Requires -m <MAILADDRESSES>"
     DoMsg "INFO :   -m <MAILADDRESSES> List of Mail Addresses"
     DoMsg "INFO :   -f <BACKUPPATH>    Directory used to store the backups (default: \$OUD_BACKUP_DIR)"
     DoMsg "INFO : Logfile : ${LOGFILE}"
@@ -108,7 +110,7 @@ function CleanAndQuit() {
       SEND_MAIL="TRUE"
       STATUS="ERROR"
     fi
- 
+
     # log info in case we do send e-mails
     if [ "${SEND_MAIL}" = "TRUE" ]; then
         if [ -n "${MAILADDRESS}" ]; then
@@ -131,6 +133,7 @@ function CleanAndQuit() {
         45) DoMsg "ERR  : Exit Code ${1}. Directory ${2} is not writeable";;
         50) DoMsg "ERR  : Exit Code ${1}. Error while performing exports";;
         51) DoMsg "ERR  : Exit Code ${1}. Error while performing backups";;
+        60) DoMsg "ERR  : Exit Code ${1}. Force mail enabled but no e-Mail adress specified";;
         99) DoMsg "INFO : Just wanna say hallo.";;
         ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
     esac
@@ -184,12 +187,13 @@ LOG_START=$(($(grep -ni "${START_HEADER}" "${LOGFILE}"|cut -d: -f1 |tail -1)-1))
  
 # usage and getopts
 DoMsg "INFO : processing commandline parameter"
-while getopts hvt:k:i:m:f:E: arg; do
+while getopts hvt:k:oi:m:f:E: arg; do
     case $arg in
         h) Usage 0;;
         v) VERBOSE="TRUE";;
         t) TYPE="${OPTARG}";;
         k) KEEP="${OPTARG}";;
+        o) SEND_MAIL="TRUE";;
         i) MyOUD_INSTANCES="${OPTARG}";;
         m) MAILADDRESS=$(echo "${OPTARG}"|sed s/\,/\ /g);;
         f) MyBackupPath="${OPTARG}";;
@@ -197,6 +201,11 @@ while getopts hvt:k:i:m:f:E: arg; do
         ?) Usage 2 $*;;
     esac
 done
+
+# log info in case we do send e-mails
+if [ "${SEND_MAIL}" = "TRUE" ] && [ -z "${MAILADDRESS}" ]; then
+    DoMsg "WARN : SEND_MAIL is TRUE, but can not send e-Mail. No address specified."
+fi
  
 # Set a minimal value for KEEP to 1 eg. 1 week
 if [ ${KEEP} -lt 1 ]; then
@@ -279,7 +288,7 @@ for oud_inst in ${OUD_INST_LIST}; do
         # create directory for a dedicated backup set
         mkdir -p ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET} >/dev/null 2>&1 || CleanAndQuit 44 ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}
  
-       DoMsg "INFO : [$oud_inst] start backup for $oud_inst for Week ${NEW_WEEKNO}"
+        DoMsg "INFO : [$oud_inst] start backup for $oud_inst for Week ${NEW_WEEKNO}"
         DoMsg "INFO : [$oud_inst] backup log file ${INST_LOG_FILE}"
  
         BACKUP_COMMAND="${OUD_BIN}/backup -a ${compress} ${incremental} -d ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}"
@@ -310,12 +319,16 @@ for oud_inst in ${OUD_INST_LIST}; do
             # in case we do have an e-mail address we send a mail
             if [ -n "${MAILADDRESS}" ]; then
                 DoMsg "INFO : [$oud_inst] Send instance logfile ${INST_LOG_FILE} to ${MAILADDRESS}"
-                cat ${INST_LOG_FILE}|mailx -s "ERROR: Backup OUD Instance ${OUD_INSTANCE}" ${MAILADDRESS}
+                cat ${INST_LOG_FILE}|mailx -s "ERROR: Backup OUD Instance ${OUD_INSTANCE} failed" ${MAILADDRESS}
             fi
             ERROR=$((ERROR+1))
         else
             DoMsg "INFO : [$oud_inst] Backup for $oud_inst successfully finished"
- 
+            # in case we do have an e-mail address and force mails is true we send a mail
+            if  [ "${SEND_MAIL}" = "TRUE" ] && [ -n "${MAILADDRESS}" ]; then
+                DoMsg "INFO : [$oud_inst] Send instance logfile ${INST_LOG_FILE} to ${MAILADDRESS}"
+                cat ${INST_LOG_FILE}|mailx -s "INFO : Backup OUD Instance ${OUD_INSTANCE} successfully finished" ${MAILADDRESS}
+            fi
             # Automaticaly purge backup's older than KEEP weeks
             if [ -d ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET} ]; then
                 DoMsg "INFO : [$oud_inst] Remove old backup set ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET} of week ${OLD_WEEKNO}"
@@ -326,6 +339,10 @@ for oud_inst in ${OUD_INST_LIST}; do
         fi
     else
         DoMsg "WARN : [$oud_inst] OUD Instance $oud_inst down, no backup will be performed."
+        # in case we do have an e-mail address and force mails is true we send a mail
+        if [ "${SEND_MAIL}" = "TRUE" ] && [ -n "${MAILADDRESS}" ]; then
+            echo "Warning OUD instance $oud_inst is down, no backup will be performed." |mailx -s "WARNING : Backup OUD Instance ${OUD_INSTANCE} failed" ${MAILADDRESS}
+        fi
     fi
 done
  
