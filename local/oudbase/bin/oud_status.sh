@@ -21,7 +21,7 @@ export OUD_ROOT_DN=${OUD_ROOT_DN:-"postgasse.org"}
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION="v1.4.5"
+VERSION="v1.4.6"
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
@@ -192,6 +192,20 @@ while getopts hvli:D:j:E:r arg; do
     esac
 done
 
+# fallback to current instance if ${MyOUD_INSTANCE} is undefined
+if [ "${MyOUD_INSTANCE}" == "" ]; then
+    DoMsg "INFO : Use current OUD instance"
+    MyOUD_INSTANCE=${OUD_INSTANCE}
+fi
+
+# set OUD Instance
+. ${OUD_BASE}/bin/oudenv.sh $MyOUD_INSTANCE SILENT > /dev/null 2>&1
+OUD_ERROR=$?
+# handle errors from oudenv
+if [ ${OUD_ERROR} -gt 0 ]; then
+    CleanAndQuit 5 ${MyOUD_INSTANCE}    
+fi
+
 # append oud instance status log file
 if [ "${INSTANCE_LOG}" == "TRUE" ]; then
     INSTANCE_LOGFILE="$OUD_ADMIN_BASE/$OUD_INSTANCE/log/$(basename $SCRIPT_NAME .sh)_$OUD_INSTANCE.log"
@@ -206,20 +220,6 @@ if [ "${INSTANCE_LOG}" == "TRUE" ]; then
     DoMsg "INFO : Append verbose log ouptut to instance status log file ${INSTANCE_LOGFILE}"
 else
     DoMsg "${START_HEADER}"
-fi
-
-# fallback to current instance if ${MyOUD_INSTANCE} is undefined
-if [ "${MyOUD_INSTANCE}" == "" ]; then
-    DoMsg "INFO : Use current OUD instance"
-    MyOUD_INSTANCE=${OUD_INSTANCE}
-fi
-
-# set OUD Instance
-. ${OUD_BASE}/bin/oudenv.sh $MyOUD_INSTANCE SILENT > /dev/null 2>&1
-OUD_ERROR=$?
-# handle errors from oudenv
-if [ ${OUD_ERROR} -gt 0 ]; then
-    CleanAndQuit 5 ${MyOUD_INSTANCE}    
 fi
 
 touch ${TMP_FILE} 2>/dev/null
