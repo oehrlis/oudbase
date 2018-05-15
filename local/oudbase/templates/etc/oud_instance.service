@@ -52,6 +52,7 @@ ExecStop=OUD_INSTANCE_HOME/OUD/bin/stop-ds --quiet
 ExecReload=OUD_INSTANCE_HOME/OUD/bin/stop-ds --restart --quiet
 RestartSec=42s
 Restart=on-failure
+SuccessExitStatus=143 SIGTERM
 TimeoutSec=300
 StandardOutput=syslog+console
 StandardError=syslog+console
