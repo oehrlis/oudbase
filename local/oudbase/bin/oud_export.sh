@@ -21,12 +21,13 @@
 # - End of Customization ------------------------------------------------
  
 # - Default Values ------------------------------------------------------
-VERSION="v1.4.6"
+VERSION="v1.4.7"
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 MAILADDRESS=""
+SEND_MAIL="FALSE"                               # don't send mails by default
 ERROR=0
 HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)   # Hostname
 # - End of Default Values -----------------------------------------------
@@ -42,6 +43,7 @@ function Usage() {
     DoMsg "INFO :   -v                 enable verbose mode"
     DoMsg "INFO :   -i <OUD_INSTANCES> List of OUD instances"
     DoMsg "INFO :   -m <MAILADDRESSES> List of Mail Addresses"
+    DoMsg "INFO :   -o                 force to send mails. Requires -m <MAILADDRESSES>"
     DoMsg "INFO :   -D <BINDDN>        Bind DN used for the export (default: cn=Directory Manager)"
     DoMsg "INFO :   -j <PWDFILE>       Password file used for the export (default: \$PWD_FILE)"
     DoMsg "INFO :   -f <EXPORTPATH>    Directory used to store the exports (default: \$OUD_EXPORT_DIR)"
@@ -105,7 +107,7 @@ function CleanAndQuit() {
       SEND_MAIL="TRUE"
       STATUS="ERROR"
     fi
- 
+
     # log info in case we do send e-mails
     if [ "${SEND_MAIL}" = "TRUE" ]; then
         if [ -n "${MAILADDRESS}" ]; then
@@ -187,6 +189,7 @@ while getopts hvm:i:E:D:j:f: arg; do
         v) VERBOSE="TRUE";;
         i) MyOUD_INSTANCES="${OPTARG}";;
         m) MAILADDRESS=$(echo "${OPTARG}"|sed s/\,/\ /g);;
+        o) SEND_MAIL="TRUE";;
         D) MybindDN="${OPTARG}";;
         j) MybindPasswordFile="${OPTARG}";;
         f) MyExportPath="${OPTARG}";;
@@ -293,7 +296,7 @@ for oud_inst in ${OUD_INST_LIST}; do
                 # in case we do have an e-mail address we send a mail
                 if [ -n "${MAILADDRESS}" ]; then
                     DoMsg "INFO : [$oud_inst] Send instance logfile ${INST_LOG_FILE} to ${MAILADDRESS}"
-                    cat ${INST_LOG_FILE}|mailx -s "ERROR: Export OUD Instance ${OUD_INSTANCE}" ${MAILADDRESS}
+                    cat ${INST_LOG_FILE}|mailx -s "ERROR: Export OUD Instance ${OUD_INSTANCE} failed" ${MAILADDRESS}
                 fi
             ERROR=$((ERROR+1))
             else
@@ -301,7 +304,11 @@ for oud_inst in ${OUD_INST_LIST}; do
             fi
         done
     else
-        DoMsg "INFO : [$oud_inst] OUD Instance $oud_inst down, no export will be performed."
+        DoMsg "WARN : [$oud_inst] OUD Instance $oud_inst down, no export will be performed."
+        # in case we do have an e-mail address and force mails is true we send a mail
+        if [ "${SEND_MAIL}" = "TRUE" ] && [ -n "${MAILADDRESS}" ]; then
+            echo "Warning OUD instance $oud_inst is down, no export will be performed." |mailx -s "WARNING : Export OUD Instance ${OUD_INSTANCE} failed" ${MAILADDRESS}
+        fi
     fi
 done
  

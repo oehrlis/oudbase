@@ -8,6 +8,7 @@
 # ignore build stuff
 build/oudbase_install.sh
 build/oudbase_install.tgz
+build/gh-md-toc
 
 # ignore mac OS resource forks
 **/*.DS_Store

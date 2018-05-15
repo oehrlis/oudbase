@@ -15,19 +15,19 @@
 #           directory path before using it.
 #
 #           Install the script:
-#           sudo cp oud_instance.service /usr/lib/systemd/system/
+#           sudo cp oud_OUD_INSTANCE.service /usr/lib/systemd/system/
 #
 #           Enable the service:
-#           sudo systemctl enable oud_instance.service
+#           sudo systemctl enable oud_OUD_INSTANCE.service
 #
 #           Disable and deactivate the service:
-#           sudo systemctl disable oud_instance.service
+#           sudo systemctl disable oud_OUD_INSTANCE.service
 #
 #           Start the service manual:
-#           sudo systemctl start oud_instance.service
+#           sudo systemctl start oud_OUD_INSTANCE.service
 #
 #           Stop the service manual:
-#           sudo systemctl stop oud_instance.service
+#           sudo systemctl stop oud_OUD_INSTANCE.service
 #
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
@@ -42,12 +42,16 @@ Wants=network.target
 After=network.target
  
 [Service]
-Type=simple
+Type=forking
 User=oud
 Group=oud
+WorkingDirectory=OUD_INSTANCE_HOME/OUD
+PIDFile=OUD_INSTANCE_HOME/OUD/logs/server.pid
 ExecStart=OUD_INSTANCE_HOME/OUD/bin/start-ds --quiet
 ExecStop=OUD_INSTANCE_HOME/OUD/bin/stop-ds --quiet
 ExecReload=OUD_INSTANCE_HOME/OUD/bin/stop-ds --restart --quiet
+RestartSec=42s
+Restart=on-failure
 TimeoutSec=300
 StandardOutput=syslog+console
 StandardError=syslog+console
