@@ -21,7 +21,7 @@
 # - End of Customization ------------------------------------------------
  
 # - Default Values ------------------------------------------------------
-VERSION="v1.4.8"
+VERSION="v1.4.9"
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)

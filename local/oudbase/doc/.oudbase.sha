@@ -1,7 +1,7 @@
-39e6866f29df4d0a174d83ff895d997466682ae9  ./bin/oud_status.sh
-0b23ecf724be8824ec76a897de8613bc9d01ceb5  ./bin/oud_export.sh
-38b80022fa9f1278b92ae084acfb6b217e1f4e06  ./bin/oud_backup.sh
-991cb6cb310338a2e7196fe7642b7c0ab427f8f9  ./bin/oudenv.sh
+fa9facabb2937fb87c384b241be9788c032379de  ./bin/oud_status.sh
+c3fcad1ac7a3b382638b08eb9c784a4a3c432e72  ./bin/oud_export.sh
+ebd0133b646d3bd6454facd55ad26de2fad13a18  ./bin/oud_backup.sh
+b98330c54af1f86d409fc1826be56faf0ad90222  ./bin/oudenv.sh
 eae0291c2f607231f369bdbedd2dc7bf0c318d54  ./etc/oudenv_core.conf
 0dc896bc673a7ecf9d476736e3065abe47d5cbbf  ./etc/oudenv.conf
 2ea0c0069dd86f9aaae99c274f38182c981e2113  ./etc/oudenv_custom.conf
@@ -10,7 +10,7 @@ ef2a6ff1dfb0d3c5604cd5a4565b1358cac54137  ./etc/oudtab
 8c1112a8541a51368a708ed903b9994e31492547  ./templates/ldif/oud_pi_init.ldif
 b11ba7558dc9f97e5a2545fe672b82fc0a346615  ./templates/etc/wls_oudsm.service
 52265a8fd3f28504fe0483ac2800d3660265d8d7  ./templates/etc/oudenv_core.conf
-5dcad6edfe3a34c071779a73d22a147c303b54e2  ./templates/etc/housekeeping.conf
+6edcda9a4c7dbbe5c5fb0157ad2330d8ef7259ac  ./templates/etc/housekeeping.conf
 03fcc0fbc2cd3435e11b8a04767b087ea10dfc73  ./templates/etc/install.rsp
 ef58125ad4db5264e90fccc0f76d420a6122fa6b  ./templates/etc/oudenv.conf
 5e9de046f186d9930f145b5a5158116959104d2d  ./templates/etc/oraInst.loc
@@ -26,6 +26,7 @@ a08b4174eba98bb9861bbce2b13b7da5202fece4  ./templates/logrotate.d/oud
 061b1cf9a14f0b2e52c071bfb821b0435a747a42  ./templates/logrotate.d/oudbase
 927a5696fa2c3758c0c83d06518508944e03cb1b  ./templates/create/01_create_instance.sh
 79cdccf401d372f1fb3da6384dc4d8e84a4c4a4a  ./templates/create/04_create_root_user.ldif
+8d273baf5b604d94ac2d19a7e817532c588d1422  ./templates/create/90_pre_migration.sh
 7bfdd1e2636ebd61dc76c1aef0fa4b3f5200b797  ./templates/create/00_init_environment.sh
 933c860b44bba4b3b2294bce34ae2e3c9b2a1572  ./templates/create/02_configure_instance.sh
 9c41ca6360ca2afd3c470fafe096a4a1d63259b4  ./templates/create/02_configure_instance.ldif
@@ -33,7 +34,10 @@ a08b4174eba98bb9861bbce2b13b7da5202fece4  ./templates/logrotate.d/oud
 46e9f815e41864c3ff1d25611c69de6a12cac505  ./templates/create/21_initialize_host1.sh
 2c056851e4a29a68177bf198c50bab4760c5a4fa  ./templates/create/22_initialize_host2.sh
 da39a3ee5e6b4b0d3255bfef95601890afd80709  ./templates/create/03_import_data_offline.ldif
+1c4cff1cfb6b93e96c820d682f887adc1e8de4b1  ./templates/create/95_post_migration.sh
+4fefe2ec97b7e1f9b86719d7e4d9e9429039e039  ./templates/create/91_import_data_offline.sh
 ec8f5617caebf5504874ae98831812674cc3bbc3  ./templates/create/13_replication_add_host3.sh
+da39a3ee5e6b4b0d3255bfef95601890afd80709  ./templates/create/91_import_data_offline.ldif
 d4de62499176b04abd7cf02c1b8023ebdb9ab080  ./templates/create/04_create_root_user.sh
 c67db0413f3d6b2787809a4da00d1dc13be901d0  ./templates/create/23_initialize_host3.sh
 1337ac35543d467a1e9516d26e0bd99d6b83a967  ./templates/create/create_oudsm.py
@@ -43,4 +47,4 @@ abe0a18757b04ca99c155b6018984bb26db496be  ./templates/create/10_enable_replicati
 a88392daa3b738f97663090324a3daee4c058c79  ./templates/create/02_configure_instance.conf
 8624bcdae55baeef00cd11d5dfcfa60f68710a02  ./doc/LICENSE
 d5935d1391358970b173cc409c2e578adb82ed8f  ./doc/README.md
-5350fd660397cd5ded17a89d703be2c5866bfb68  ./doc/.version
+3a2cb4cea82f48967bf37af8fa065f6806e94a34  ./doc/.version

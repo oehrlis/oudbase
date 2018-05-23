@@ -22,7 +22,7 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in.bash_profile or 
 # in oudenv_core.conf.
-VERSION="v1.4.8"
+VERSION="v1.4.9"
 # hostname based on hostname or $HOSTNAME whatever works
 export HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)
 # Absolute path of script directory
@@ -147,6 +147,11 @@ function get_ports {
     OUD_INSTANCE=${1:-${OUD_INSTANCE}}
     DIRECTORY_TYPE=${2:-${DIRECTORY_TYPE}}
     Silent=$3
+    # get default ports from oudtab
+    DEFAULT_PORT=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f2)
+    DEFAULT_PORT_SSL=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f3)
+    DEFAULT_PORT_ADMIN=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f4)
+    DEFAULT_PORT_REP=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f5)
     # get ports for OUD instance
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         OUD_INSTANCE_REAL_HOME=$(get_instance_real_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} ${Silent})
@@ -164,24 +169,24 @@ function get_ports {
         PORT_REP=$(grep -i ds-cfg-replication-port $CONFIG|cut -d' ' -f2)
  
         # export the port variables and set default values with not specified
-        export PORT_ADMIN=${PORT_ADMIN:-"4444"}
-        export PORT=${PORT:-"1389"}
-        export PORT_SSL=${PORT_SSL:-"1636"}
-        export PORT_REP=${PORT_REP:-"8989"}
+        export PORT=${PORT:-$DEFAULT_PORT}
+        export PORT_SSL=${PORT_SSL:-$DEFAULT_PORT_SSL}
+        export PORT_ADMIN=${PORT_ADMIN:-$DEFAULT_PORT_ADMIN}
+        export PORT_REP=${PORT_REP:-$DEFAULT_PORT_REP}
     # get ports for OUDSM domain
     elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
         # currently just use the default values for OUDSM 
         # export the port variables and set default values with not specified
+        export PORT=$DEFAULT_PORT
+        export PORT_SSL=$DEFAULT_PORT_SSL
         export PORT_ADMIN=""
-        export PORT="7001"
-        export PORT_SSL="7002"
         export PORT_REP=""
     # get ports for ODSEE domain
     elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
         # currently just use the default values for ODSEE 
         # export the port variables and set default values with not specified
-        export PORT="1389"
-        export PORT_SSL="1636"
+        export PORT=$DEFAULT_PORT
+        export PORT_SSL=$DEFAULT_PORT_SSL
         export PORT_ADMIN=""
         export PORT_REP=""
     fi
