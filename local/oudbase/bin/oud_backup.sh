@@ -47,6 +47,7 @@ function Usage() {
     DoMsg "INFO :   -t <TYPE>          Backup Type FULL or INCREMENTAL (default FULL)"
     DoMsg "INFO :   -k <WEEKS>         Number of weeks to keep old backups (default 4)"
     DoMsg "INFO :   -o                 force to send mails. Requires -m <MAILADDRESSES>"
+    DoMsg "INFO :   -L                 Backup current instance log files (default: no logfile backup)"
     DoMsg "INFO :   -m <MAILADDRESSES> List of Mail Addresses"
     DoMsg "INFO :   -f <BACKUPPATH>    Directory used to store the backups (default: \$OUD_BACKUP_DIR)"
     DoMsg "INFO : Logfile : ${LOGFILE}"
@@ -187,13 +188,14 @@ LOG_START=$(($(grep -ni "${START_HEADER}" "${LOGFILE}"|cut -d: -f1 |tail -1)-1))
  
 # usage and getopts
 DoMsg "INFO : processing commandline parameter"
-while getopts hvt:k:oi:m:f:E: arg; do
+while getopts hvt:k:oLi:m:f:E: arg; do
     case $arg in
         h) Usage 0;;
         v) VERBOSE="TRUE";;
         t) TYPE="${OPTARG}";;
         k) KEEP="${OPTARG}";;
         o) SEND_MAIL="TRUE";;
+        L) BACKUP_LOGS="TRUE";;
         i) MyOUD_INSTANCES="${OPTARG}";;
         m) MAILADDRESS=$(echo "${OPTARG}"|sed s/\,/\ /g);;
         f) MyBackupPath="${OPTARG}";;
@@ -302,13 +304,14 @@ for oud_inst in ${OUD_INST_LIST}; do
         TAR_COMMAND="tar -Pzcvf ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/${oud_inst}_config.tgz $OUD_CONF"
         echo -e "\n${TAR_COMMAND}" >>${INST_LOG_FILE} 2>&1
         ${TAR_COMMAND} >>${INST_LOG_FILE} 2>&1
- 
+
         # Backup the current log files
-        DoMsg "INFO : [$oud_inst] backup current log files"
-        TAR_COMMAND="tar -Pzcvf ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/${oud_inst}_logs.tgz $(find $OUD_LOG -type f)"
-        echo -e "\n${TAR_COMMAND}" >>${INST_LOG_FILE} 2>&1
-        ${TAR_COMMAND} >>${INST_LOG_FILE} 2>&1
- 
+        if [ "${BACKUP_LOGS}" = "TRUE" ]; then
+            DoMsg "INFO : [$oud_inst] backup current log files"
+            TAR_COMMAND="tar -Pzcvf ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/${oud_inst}_logs.tgz $(find $OUD_LOG -type f ! -iname '*Z')"
+            echo -e "\n${TAR_COMMAND}" >>${INST_LOG_FILE} 2>&1
+            ${TAR_COMMAND} >>${INST_LOG_FILE} 2>&1
+        fi
         DoMsg "INFO : [$oud_inst] cat of backup log ${INST_LOG_FILE}"
         DoMsg "$(cat ${INST_LOG_FILE})"
  

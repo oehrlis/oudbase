@@ -183,7 +183,7 @@ LOG_START=$(($(grep -ni "${START_HEADER}" "${LOGFILE}"|cut -d: -f1 |tail -1)-1))
  
 # usage and getopts
 DoMsg "INFO : processing commandline parameter"
-while getopts hvm:i:E:D:j:f: arg; do
+while getopts hvm:oi:E:D:j:f: arg; do
     case $arg in
         h) Usage 0;;
         v) VERBOSE="TRUE";;
