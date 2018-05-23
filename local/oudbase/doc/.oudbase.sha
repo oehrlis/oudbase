@@ -44,7 +44,7 @@ c67db0413f3d6b2787809a4da00d1dc13be901d0  ./templates/create/23_initialize_host3
 af6577182dabe2ce6c73dd184f9f1ba543a6a9b5  ./templates/create/12_replication_add_host2.sh
 abe0a18757b04ca99c155b6018984bb26db496be  ./templates/create/10_enable_replication.sh
 47a241d65e4bbeb98007e1208c59912c74bb5024  ./templates/create/04_create_root_user.conf
-a88392daa3b738f97663090324a3daee4c058c79  ./templates/create/02_configure_instance.conf
+a68053fcf81f624eb35e3212faf1118f906feea8  ./templates/create/02_configure_instance.conf
 8624bcdae55baeef00cd11d5dfcfa60f68710a02  ./doc/LICENSE
 d5935d1391358970b173cc409c2e578adb82ed8f  ./doc/README.md
 3a2cb4cea82f48967bf37af8fa065f6806e94a34  ./doc/.version
