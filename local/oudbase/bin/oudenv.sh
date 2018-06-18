@@ -22,9 +22,9 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in.bash_profile or 
 # in oudenv_core.conf.
-VERSION="v1.4.10"
+VERSION="v1.4.11"
 # hostname based on hostname or $HOSTNAME whatever works
-export HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)
+export HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)
 # Absolute path of script directory
 OUDENV_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 # Recreate admin directory and *.conf files

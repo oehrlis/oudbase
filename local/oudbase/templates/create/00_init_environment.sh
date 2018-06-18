@@ -54,7 +54,7 @@ export NICKNAME="NICKNAME"
 export PIN="PIN"
 
 # - Hosts
-export HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)    # Hostname
+export HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)    # Hostname
 export HOST1="HOST1"
 export HOST2="HOST2"
 export HOST3="HOST3"

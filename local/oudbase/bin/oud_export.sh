@@ -21,7 +21,7 @@
 # - End of Customization ------------------------------------------------
  
 # - Default Values ------------------------------------------------------
-VERSION="v1.4.10"
+VERSION="v1.4.11"
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
@@ -29,7 +29,7 @@ START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 MAILADDRESS=""
 SEND_MAIL="FALSE"                               # don't send mails by default
 ERROR=0
-HOST=$(hostname 2>/dev/null ||echo $HOSTNAME)   # Hostname
+HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)  # Hostname
 # - End of Default Values -----------------------------------------------
  
 # - Functions -----------------------------------------------------------
