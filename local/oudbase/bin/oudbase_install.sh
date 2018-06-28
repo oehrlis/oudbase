@@ -23,7 +23,7 @@ export LOG_BASE=${LOG_BASE-"/tmp"}
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION="v1.4.11"
+VERSION="v1.5.1"
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="TRUE"                                  # enable verbose mode
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"     # Basename of the script
