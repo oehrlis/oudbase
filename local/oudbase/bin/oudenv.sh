@@ -22,7 +22,7 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in.bash_profile or 
 # in oudenv_core.conf.
-VERSION="v1.4.11"
+VERSION="v1.5.1"
 # hostname based on hostname or $HOSTNAME whatever works
 export HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)
 # Absolute path of script directory
@@ -321,7 +321,7 @@ function oud_pgrep {
         GrepString=$(echo ${GrepString}|sed 's/\(.\)/[\1]/1')
         for i in $(find /proc -maxdepth 2 -type f -regex ".*/[0-9]*/cmdline" -exec grep -il -o -a -e ${GrepString} {} \;); do
             pid=$(echo "${i//[^0-9]/}")
-            ppid=$(grep -i ppid status|cut -d: -f2| xargs)
+            ppid=$(grep -i ppid /proc/${pid}/status|cut -d: -f2| xargs)
             user=$(grep $(cat /proc/${pid}/loginuid)  /etc/passwd | cut -f1 -d:)
             cmdline=$(cat ${i})
             printf '%-5s %-12s %-10s %-s\n' $user $pid  $ppid $cmdline
