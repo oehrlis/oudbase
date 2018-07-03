@@ -22,7 +22,7 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in.bash_profile or 
 # in oudenv_core.conf.
-VERSION="v1.5.1"
+VERSION="v1.5.2"
 # hostname based on hostname or $HOSTNAME whatever works
 export HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)
 # Absolute path of script directory

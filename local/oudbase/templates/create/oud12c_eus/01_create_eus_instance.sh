@@ -8,7 +8,7 @@
 # Editor.....: Stefan Oehrli
 # Date.......: 2018.03.18
 # Revision...: --
-# Purpose....: Script to create the OUD proxy instance with EUS context 
+# Purpose....: Script to create the OUD instance with EUS context 
 #              using oud-proxy-setup.
 # Notes......: Will skip oud-proxy-setup if config.ldif already exists
 # Reference..: https://github.com/oehrlis/oudbase
@@ -35,18 +35,21 @@ echo "BASEDN            : ${BASEDN}"
 # check if OUD instance config does not yet exists
 if [ ! -f "${OUD_INSTANCE_HOME}/OUD/config/config.ldif" ]; then
     echo "INFO: Create OUD proxy instance ${OUD_INSTANCE}"
-    ${ORACLE_HOME}/oud/oud-proxy-setup \
+    ${ORACLE_HOME}/oud/oud-setup \
         --cli \
         --instancePath "${OUD_INSTANCE_HOME}/OUD" \
         --rootUserDN "${DIRMAN}" \
         --rootUserPasswordFile "${PWD_FILE}" \
-        --hostname ${HOST} \
+        --adminConnectorPort ${PORT_ADMIN} \
         --ldapPort ${PORT} \
         --ldapsPort ${PORT_SSL} \
-        --adminConnectorPort ${PORT_ADMIN} \
-        --enableStartTLS \
         --generateSelfSignedCertificate \
-        --eusContext ${BASEDN} \
+        --enableStartTLS \
+        --hostname ${HOST} \
+        --baseDN "${BASEDN}" \
+        --integration EUS \
+        --serverTuning jvm-default \
+        --offlineToolsTuning autotune \
         --no-prompt \
         --noPropertiesFile
 else
