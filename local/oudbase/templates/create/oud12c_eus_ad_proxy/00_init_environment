@@ -42,13 +42,12 @@
 # - Instance information
 export DIRMAN="cn=Directory Manager"
 export REPMAN=admin
-export BASEDN="dc=postgasse,dc=org"
-export EUSCONTEXT=TRUE
+export BASEDN="dc=example,dc=comorg"
 
 # group OU below base DN in active directory eg ou=groups,dc=postgasse,dc=org
-export GROUP_OU="ou=groups"
+export GROUP_OU="ou=Groups,dc=example,dc=com"
 # user OU below base DN in active directory eg ou=people,dc=postgasse,dc=org
-export USER_OU="ou=people"
+export USER_OU="ou=People,dc=example,dc=com"
 
 # - AD integration information
 # set the host name of your primary domain controller (PDC)

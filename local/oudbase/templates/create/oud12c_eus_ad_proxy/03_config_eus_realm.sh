@@ -32,8 +32,8 @@ echo "  LDIFFILE          : ${LDIFFILE}"
 if [[ "$BASEDN" != "dc=example,dc=com" ]]; then
   echo "  Different base DN than default ."
   echo "  Update LDIF files to match $BASEDN" 
-  sed -i "s/ou=groups,dc=example,dc=com/$GROUP_OU/" ${LDIFFILE}
-  sed -i "s/ou=people,dc=example,dc=com/$USER_OU/" ${LDIFFILE}
+  sed -i "s/ou=Groups,dc=example,dc=com/$GROUP_OU/" ${LDIFFILE}
+  sed -i "s/ou=People,dc=example,dc=com/$USER_OU/" ${LDIFFILE}
   sed -i "s/dc=example,dc=com/$BASEDN/" ${LDIFFILE}
 fi
 
