@@ -34,7 +34,7 @@ echo "BASEDN            : ${BASEDN}"
 
 # check if OUD instance config does not yet exists
 if [ ! -f "${OUD_INSTANCE_HOME}/OUD/config/config.ldif" ]; then
-    echo "INFO: Create OUD proxy instance ${OUD_INSTANCE}"
+    echo "INFO: Create OUD instance ${OUD_INSTANCE}"
     ${ORACLE_HOME}/oud/oud-setup \
         --cli \
         --instancePath "${OUD_INSTANCE_HOME}/OUD" \
@@ -50,8 +50,7 @@ if [ ! -f "${OUD_INSTANCE_HOME}/OUD/config/config.ldif" ]; then
         --integration EUS \
         --serverTuning jvm-default \
         --offlineToolsTuning autotune \
-        --no-prompt \
-        --noPropertiesFile
+        --no-prompt
 else
     echo "WARN: did found an instance configuration file"
     echo "      ${OUD_INSTANCE_HOME}/OUD/config/config.ldif"

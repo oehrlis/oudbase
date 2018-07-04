@@ -1,29 +1,29 @@
-# OUD 12c EUS AD Proxy
+# OUD 12c EUS
 
-Create and configuration scripts to setup an Oracle Unified Directory 12c proxy server with Oracle Enterprise User Security (EUS) and MS ActiveDirectory integration.
+Create and configuration scripts to setup an Oracle Unified Directory 12c directory server with Oracle Enterprise User Security (EUS) integration.
 
 ## Scripts
 
-| Script                          | Description                                                                                                                                                                 |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 00_init_environment             | File to set the instance-specific environment and parameter. Must be customized.                                                                                            |
-| 01_create_eus_proxy_instance.sh | Create the OUD proxy instance with EUS integration                                                                                                                          |
-| 02_config_eus_context.sh        | Configuration of the AD integration workflow eg. transformation, proxy, extensions etc. Does execute the the dsconfig commands in 02_config_eus_context.conf in batch mode. |
-| 02_config_eus_context.conf      | dsconfig commands to setup AD integration workflow                                                                                                                          |  |
-| 03_config_eus_realm.sh          | Adjust and load EUS realm configuration. Group and user search base is adjusted according to 00_init_environment.                                                           |
-| 03_config_eus_realm.ldif        | EUS realm configuration.                                                                                                                                                    |
-| 04_config_oud_ad_proxy.sh       | Fix a few EUS specific configurations eg. MOS Note 2001851.1. Does execute the the dsconfig commands in 04_config_oud_ad_proxy.conf in batch mode.                          |
-| 04_config_oud_ad_proxy.conf     | dsconfig commands to configure EUS specific configurations according MOS note 2001851.1                                                                                     |
-| 05_update_directory_manager.sh  | Update Directory Manager (cn=Directory Manager) and reset its password to create AES password storage scheme entry                                                          |
-| 06_create_root_users.sh         | Create additional root user cn=oudadmin, cn=useradmin and cn=eusadmin                                                                                                       |
-| 06_create_root_users.ldif       | definition of root users                                                                                                                                                    |
-| 07_create_eusadmin_users.sh     | Add cn=eusadmin to the EUS groups.                                                                                                                                          |
+| Script                         | Description                                                                                                                               |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| 00_init_environment            | File to set the instance-specific environment and parameter. Must be customized.                                                          |
+| 01_create_eus_instance.sh      | Create the OUD directory server instance with EUS integration                                                                             |
+| 02_config_basedn.sh            | Configuration of base DN and add ou's for users and groups and two test users. Base DN is adjusted according to 00_init_environment       |
+| 02_config_basedn.ldif          | LDIF file to configure base DN                                                                                                            |
+| 03_config_eus_realm.sh         | Adjust and load EUS realm configuration. Group and user search base is adjusted according to 00_init_environment.                         |
+| 03_config_eus_realm.ldif       | EUS realm configuration.                                                                                                                  |
+| 04_config_oud.sh               | Fix a few EUS specific configurations eg. MOS Note 2001851.1. Does execute the the dsconfig commands in 04_config_oud.conf in batch mode. |
+| 04_config_oud.conf             | dsconfig commands to configure EUS specific configurations according MOS note 2001851.1                                                   |
+| 05_update_directory_manager.sh | Update Directory Manager (cn=Directory Manager) and reset its password to create AES password storage scheme entry                        |
+| 06_create_root_users.sh        | Create additional root user cn=oudadmin, cn=useradmin and cn=eusadmin                                                                     |
+| 06_create_root_users.ldif      | definition of root users                                                                                                                  |
+| 07_create_eusadmin_users.sh    | Add cn=eusadmin to the EUS groups.                                                                                                        |
 
 ## Usage
 
 The scripts are always to be called sequentially, starting with 01. Either manually when interactively building an OUD instance or automatically when creating an OUD Docker container. When using to setup a OUD Docker container the scripts have to be put into the instance init folder. eg. $OUD_INSTANCE_INIT/setup or $OUD_INSTANCE_ADMIN/create 
 
-**Note:** It is highly recommended to at least review and adjust _00_init_environment_ file. This file contains all the default configuration values like Base DN, ports, AD credentials etc.
+**Note:** It is highly recommended to at least review and adjust _00_init_environment_ file. This file contains all the default configuration values like Base DN, ports etc.
 
 Define a bunch of default values:
 * _MY_VOLUME_ is the local folder used as volumne
@@ -33,7 +33,7 @@ Define a bunch of default values:
 ```
 export MY_VOLUME="/volume"
 export MY_CONTAINER=oudeng
-export MY_OUD_INSTANCE=oud_adproxy
+export MY_OUD_INSTANCE=oud_eus
 export MY_HOST=oudad.postgasse.org
 ```
 
@@ -41,7 +41,7 @@ create a volume directory for the Docker container and put the scripts into the 
 ```
 mkdir -p $MY_VOLUME/$MY_CONTAINER/admin/$MY_OUD_INSTANCE/create
 mkdir -p $MY_VOLUME/$MY_CONTAINER/admin/$MY_OUD_INSTANCE/etc
-cp oud12c_eus_ad_proxy/* $MY_VOLUME/$MY_CONTAINER/admin/$MY_OUD_INSTANCE/create
+cp oud12c_eus/* $MY_VOLUME/$MY_CONTAINER/admin/$MY_OUD_INSTANCE/create
 ```
 
 Optionally you may also create a password file, if you do not want to have auto generated passwords.
@@ -63,7 +63,7 @@ docker run --detach --volume $MY_VOLUME/$MY_CONTAINER:/u01 \
    --hostname $MY_HOST --name $MY_CONTAINER oracle/oud:12.2.1.3.180322
 ```
 
-Check the logs and enjoy the automatic setup of OUD EUS AD proxy.
+Check the logs and enjoy the automatic setup of OUD directory server with EUS integration.
 ```
 docker logs -f $MY_CONTAINER
 ```
