@@ -14,16 +14,18 @@
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
 # -----------------------------------------------------------------------
-# Modified...:
+# Modified...::175
 # see git revision history with git log for more information on changes
 # -----------------------------------------------------------------------
 
 # - Customization -------------------------------------------------------
 export LOG_BASE=${LOG_BASE-"/tmp"}
+export BASE64_BIN="/usr/bin/base64"
+export TAR_BIN="/usr/bin/tar"
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION="v1.5.3"
+VERSION="v1.5.4"
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="TRUE"                                  # enable verbose mode
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"     # Basename of the script
@@ -34,6 +36,8 @@ START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
 OUD_CORE_CONFIG="oudenv_core.conf"
 CONFIG_FILES="oudtab oud._DEFAULT_.conf"
+PAYLOAD_BINARY=0                                # default disable binary payload 
+PAYLOAD_BASE64=1                                # default enable base64 payload 
 
 # a few core default values.
 DEFAULT_ORACLE_BASE="/u00/app/oracle"
@@ -146,7 +150,7 @@ function CleanAndQuit()
         3)  DoMsg "ERR  : Exit Code ${1}. Missing mandatory argument ${2}. See usage for correct one.";;
         10) DoMsg "ERR  : Exit Code ${1}. OUD_BASE not set or $OUD_BASE not available.";;
         20) DoMsg "ERR  : Exit Code ${1}. Can not append to profile.";;
-        40) DoMsg "ERR  : Exit Code ${1}. This is not an Install package. Missing TAR section.";;
+        40) DoMsg "ERR  : Exit Code ${1}. This is not an Install package. Missing TAR payload or TAR file.";;
         41) DoMsg "ERR  : Exit Code ${1}. Error creating directory ${2}.";;
         42) DoMsg "ERR  : Exit Code ${1}. ORACEL_BASE directory not available";;
         43) DoMsg "ERR  : Exit Code ${1}. OUD_BASE directory not available";;
@@ -157,6 +161,42 @@ function CleanAndQuit()
     esac
     exit ${1}
 }
+
+# -----------------------------------------------------------------------
+# Purpose....: get the payload from script
+# -----------------------------------------------------------------------
+function UntarPayload()
+{
+    # default values for payload
+    PAYLOAD_BINARY=${PAYLOAD_BINARY:-0}
+    PAYLOAD_BASE64=${PAYLOAD_BASE64:-1}
+    DoMsg "INFO : Start processing the payload"
+    MATCH=$(grep --text --line-number '^__TAR_PAYLOAD__$' $0 | cut -d ':' -f 1)
+    PAYLOAD_START=$((MATCH + 1))
+    # check if we do have a payload
+    if [[ ${PAYLOAD_START} -gt 1 ]]; then
+        DoMsg "INFO : Payload is available as of line ${PAYLOAD_START}."
+        DoMsg "INFO : Extracting payload into ${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}"
+        if [[ ${PAYLOAD_BINARY} -ne 0 ]]; then
+            DoMsg "INFO : Payload is set to binary, just use untar."
+            tail -n +${PAYLOAD_START} ${SCRIPT_FQN} | ${TAR_BIN} -xzv --exclude="._*" -C ${OUD_BASE}
+        elif [[ ${PAYLOAD_BASE64} -ne 0 ]]; then
+            DoMsg "INFO : Payload is set to base64. Using base64 decode before untar."
+            tail -n +${PAYLOAD_START} ${SCRIPT_FQN} | ${BASE64_BIN} --decode - | ${TAR_BIN} -xzv --exclude="._*" -C ${OUD_BASE}
+        fi
+    # fall back to local tar file
+    else
+        DoMsg "WARN : Could not find any payload try to use local tar file."
+        TARFILE="$(dirname ${SCRIPT_FQN})/$(basename ${SCRIPT_FQN} .sh).tgz"      # LDIF file based on script name
+        if [[ -f ${TARFILE} ]]; then
+            DoMsg "INFO : Extracting local tar into ${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}"
+            ${TAR_BIN} -xzvf ${TARFILE} --exclude="._*" -C ${OUD_BASE}
+        else
+            CleanAndQuit 40
+        fi
+    fi
+}
+
 # - EOF Functions -------------------------------------------------------
 
 # - Initialization ------------------------------------------------------
@@ -176,21 +216,10 @@ else
     CleanAndQuit 11 ${LOGFILE} # Define a clean exit
 fi
 
-# searches for the line number where finish the script and start the tar.gz
-SKIP=$(awk '/^__TARFILE_FOLLOWS__/ { print NR + 1; exit 0; }' $0)
-
-# count the lines of our file name
-LINES=$(wc -l <$SCRIPT_FQN)
-
 # - Main ----------------------------------------------------------------
 DoMsg "${START_HEADER}"
 if [ $# -lt 1 ]; then
     Usage 1
-fi
-
-# Exit if there are less lines than the skip line marker (__TARFILE_FOLLOWS__)
-if [ ${LINES} -lt $SKIP ]; then
-    CleanAndQuit 40
 fi
 
 # usage and getopts
@@ -337,9 +366,8 @@ if [ -d ${ETC_BASE} ]; then
     done
 fi
 
-DoMsg "INFO : Extracting file into ${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}"
-# take the tarfile and pipe it into tar
-tail -n +$SKIP $SCRIPT_FQN | tar -xzv --exclude="._*"  -C ${OUD_BASE}
+# start to process payload
+UntarPayload
 
 # restore customized config files
 if [ "${SAVE_CONFIG}" = "TRUE" ]; then
@@ -439,4 +467,3 @@ CleanAndQuit 0
 
 # NOTE: Don't place any newline characters after the last line below.
 # - EOF Script ----------------------------------------------------------
-__TARFILE_FOLLOWS__
