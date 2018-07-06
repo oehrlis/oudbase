@@ -329,6 +329,7 @@ function oud_pgrep {
             pid=$(echo "${i//[^0-9]/}")
             ppid=$(grep -i ppid /proc/${pid}/status|cut -d: -f2| xargs)
             user=$(grep $(cat /proc/${pid}/loginuid)  /etc/passwd | cut -f1 -d:)
+            user=${user:-"undef"}
             cmdline=$(cat ${i})
             printf '%-5s %-12s %-10s %-s\n' $user $pid  $ppid $cmdline
         done
