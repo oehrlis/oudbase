@@ -38,7 +38,6 @@ if [[ "$1" == '--base64' ]]; then
     shift
 fi
 
-
 # Remove .DS_Store files
 echo "Remove .DS_Store files"
 find ${SCRIPT_DIR}/.. -name .DS_Store -exec rm {} \;
@@ -48,6 +47,13 @@ cd ${SCRIPT_DIR}/../local/oudbase
 cp ${SCRIPT_DIR}/../README.md ${SCRIPT_DIR}/../local/oudbase/doc
 cp ${SCRIPT_DIR}/../LICENSE ${SCRIPT_DIR}/../local/oudbase/doc
 
+# update version in *.sh files
+VERSION=$(grep -i "OUD Base Release" ./doc/.version |sed -E 's/.*(v[0-9]+.[0-9]+.[0-9]+).*/\1/')
+
+for i in ./bin/*.sh; do
+    echo "update version to ${VERSION} in file $i"
+    sed -i '' -E "s/^VERSION=.*/VERSION=${VERSION}/" $i 
+done
 # create sha hash's
 echo "Create sha hashs for all files"
 find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" ! -iname "*.log" ! -iname "oudbase_install.sh" \) \
@@ -64,7 +70,6 @@ tar -zcvf ${SCRIPT_DIR}/oudbase_install.tgz \
 
 # build this nice executable shell script with a TAR payload
 echo "Create this fancy shell with a tar payload"
-
 
 cat bin/oudbase_install.sh >${SCRIPT_DIR}/oudbase_install.sh
 
