@@ -18,6 +18,7 @@ build/gh-md-toc
 # Eclipse stuff
 /.pydevproject
 /.project
+/.vscode
 /Build tar and shell.launch
 /org.python.pydev.PyDevBuilder.launch
 /.externalToolBuilders/
