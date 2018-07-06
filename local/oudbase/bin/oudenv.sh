@@ -16,15 +16,21 @@
 # Modified...:
 # see git revision history with git log for more information on changes
 # -----------------------------------------------------------------------
- 
+
 # - Environment Variables -----------------------------------------------
 # Definition of default values for environment variables, if not defined 
 # externally. In principle, these variables should not be changed at this 
-# point. The customization should be done externally in.bash_profile or 
+# point. The customization should be done externally in .bash_profile or 
 # in oudenv_core.conf.
 VERSION="v1.5.4"
-# hostname based on hostname or $HOSTNAME whatever works
-export HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)
+
+# define some binaries for later user
+PGREP_BIN=$(command -v pgrep)                                   # get the binary for pgrep
+SHA1SUM_BIN=$(command -v sha1sum)                               # get the binary for sha1sum
+HOSTNAME_BIN=$(command -v hostname)                             # get the binary for hostname
+HOSTNAME_BIN=${HOSTNAME_BIN:-"cat /proc/sys/kernel/hostname"}   # fallback to /proc/sys/kernel/hostname
+export HOST=$(${HOSTNAME_BIN})
+
 # Absolute path of script directory
 OUDENV_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 # Recreate admin directory and *.conf files
@@ -341,13 +347,13 @@ function get_status {
     if [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${InstanceName}) -eq 1 ]; then
         # get the directory type from OUDTAB
         DirectoryType=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${InstanceName}|head -1|cut -d: -f6)
-        PGREP="pgrep -af"
-        pgrep -h > /dev/null 2>&1|| PGREP="proc_grep"
+        PGREP=${PGREP_BIN:-"proc_grep"}         # define the pgrep command, fall back to proc_grep
+        PGREP_PARAMETER=${PGREP_BIN:+"-f"}      # set pgrep parameter -f if using pgrep
         case ${DirectoryType} in
             # check the process for each directory type
-            "OUD")      echo $(if [ $(${PGREP} "org.opends.server.core.DirectoryServer.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
-            "ODSEE")    echo $(if [ $(${PGREP} "ns-slapd.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
-            "OUDSM")    echo $(if [ $(${PGREP} "wlserver.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+            "OUD")      echo $(if [ $(${PGREP} $PGREP_PARAMETER "org.opends.server.core.DirectoryServer.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+            "ODSEE")    echo $(if [ $(${PGREP} $PGREP_PARAMETER "ns-slapd.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+            "OUDSM")    echo $(if [ $(${PGREP} $PGREP_PARAMETER "wlserver.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
             *)          echo "n/a";;
         esac
     else
@@ -758,11 +764,11 @@ fi
 
 # set the new PATH
 if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-    export PATH=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME_BIN}:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
+    export PATH=${PATH}:${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME_BIN}:${ORACLE_HOME}:${JAVA_HOME}/bin
 elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
-    export PATH=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
+    export PATH=${PATH}:${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/bin:${ORACLE_HOME}:${JAVA_HOME}/bin
 elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
-    export PATH=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/OUD/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
+    export PATH=${PATH}:${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/OUD/bin:${ORACLE_HOME}:${JAVA_HOME}/bin
 fi
 
 # start to source stuff from ETC_CORE
