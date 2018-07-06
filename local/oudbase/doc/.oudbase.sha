@@ -1,9 +1,9 @@
 af9db8dad2602932f1fb0efa9655bea8eca4e81d  ./bin/oud_status.sh
 917e3f17dba605a1d0724aab261c42dfa048bbfa  ./bin/oud_export.sh
 96ea4c96c022d68f9dff788951d59e7a76cac55d  ./bin/oud_backup.sh
-e169777abf9493a96ee7bafa94176da1e1319ffa  ./bin/oudenv.sh
+e5901ac13f938711af22929a8420dbbaaf4857e2  ./bin/oudenv.sh
 eae0291c2f607231f369bdbedd2dc7bf0c318d54  ./etc/oudenv_core.conf
-649a59ccc775a77d8320c2efad62a0172d14cc24  ./etc/oudenv.conf
+1f46af6bed40f8fba434818a52d70f8d723aa2a7  ./etc/oudenv.conf
 2ea0c0069dd86f9aaae99c274f38182c981e2113  ./etc/oudenv_custom.conf
 ef2a6ff1dfb0d3c5604cd5a4565b1358cac54137  ./etc/oudtab
 5db71a75ccbd45f85f4dbbaba286a222d2b2a760  ./etc/oud._DEFAULT_.conf
