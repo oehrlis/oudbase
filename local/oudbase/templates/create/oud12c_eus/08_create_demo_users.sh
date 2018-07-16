@@ -3,12 +3,12 @@
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # -----------------------------------------------------------------------
-# Name.......: 02_config_basedn.sh
+# Name.......: 08_create_demo_users.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2018.06.27
 # Revision...: --
-# Purpose....: Script to configure base DN and add ou's for users and groups.
+# Purpose....: Script to create a couple of users and groups.
 # Notes......: BaseDN in 02_config_basedn.ldif will be updated before
 #              it is loaded using ldapmodify.
 # Reference..: https://github.com/oehrlis/oudbase
@@ -37,7 +37,7 @@ if [[ "$BASEDN" != "dc=example,dc=com" ]]; then
   sed -i "s/dc=example,dc=com/$BASEDN/" ${LDIFFILE}
 fi
 
-echo "  Create group and people entries"
+echo "  Create demo users and groups"
 ${OUD_INSTANCE_HOME}/OUD/bin/ldapmodify \
   --hostname ${HOST} \
   --port ${PORT} \
