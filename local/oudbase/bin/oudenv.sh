@@ -22,7 +22,7 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in .bash_profile or 
 # in oudenv_core.conf.
-VERSION=v1.5.5
+VERSION=v1.5.6
 
 # define some binaries for later user
 PGREP_BIN=$(command -v pgrep)                                   # get the binary for pgrep
@@ -37,8 +37,8 @@ OUDENV_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 RECREATE="TRUE"
 
 # OUDTAB string pattern used to search entries
-ORATAB_PATTERN='^[a-zA-Z0-9_-]*:([0-9]*:){4}O(UD|UDSM|ID|DSEE)$'
-ORATAB_PATTERN_OUD='^[a-zA-Z0-9_-]*:([0-9]*:){4}OUD$'
+ORATAB_PATTERN='^[a-zA-Z0-9_-]*:([0-9]*:){4}O(UD|UDSM|ID|DSEE)(:(N|Y|D))?$'
+ORATAB_PATTERN_OUD='^[a-zA-Z0-9_-]*:([0-9]*:){4}OUD(:(N|Y|D))?$'
 # OUDTAB header
 OUDTAB_COMMENT=$(cat <<COMMENT
 # OUD Config File
@@ -48,7 +48,8 @@ OUDTAB_COMMENT=$(cat <<COMMENT
 #  4: OUD Admin Port
 #  5: OUD Replication Port
 #  6: Directory type eg. OUD, OID, ODSEE or OUDSM
-# -----------------------------------------------
+#  7: Flag for start/stop eg. (N)o, (Y)es or (D)ummy
+# --------------------------------------------------
 COMMENT
 )
  
