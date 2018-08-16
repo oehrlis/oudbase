@@ -23,7 +23,7 @@ export LOG_BASE=${LOG_BASE-"/tmp"}
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v1.5.5
+VERSION=v1.5.6
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="TRUE"                                  # enable verbose mode
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"     # Basename of the script
@@ -412,6 +412,8 @@ done
 if [ "${APPEND_PROFILE}" = "TRUE" ]; then
     if [ -f "${HOME}/.bash_profile" ]; then
         PROFILE="${HOME}/.bash_profile"
+    elif [ -f "${HOME}/.profile" ]; then
+        PROFILE="${HOME}/.profile"
     else
         CleanAndQuit 20
     fi
