@@ -199,7 +199,11 @@ if [ "$MyOUD_INSTANCES" = "" ]; then
     if [ -f "${ETC_BASE}/oudtab" ]; then
         # create a OUD Instance Liste based on oudtab
         export OUDTAB=${ETC_BASE}/oudtab
-        export OUD_INST_LIST=$(grep -v '^#' ${OUDTAB}|grep -iEv ':(N|D)$'|cut -f1 -d:)
+        if [ "$MyActivity" == "START" ]; then
+            export OUD_INST_LIST=$(grep -v '^#' ${OUDTAB}|grep -iEv ':(N|D)$'|cut -f1 -d:)
+        else
+            export OUD_INST_LIST=$(grep -v '^#' ${OUDTAB}|cut -f1 -d:)
+        fi
     else
         DoMsg "WARN : Could not load OUD list from \${ETC_BASE}/oudtab"
         DoMsg "WARN : Fallback to \${OUD_DATA}/*/OUD"
