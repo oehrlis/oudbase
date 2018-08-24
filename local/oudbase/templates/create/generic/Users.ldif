@@ -1,0 +1,41 @@
+version: 1
+
+dn: dc=postgasse,dc=org
+objectClass: domain
+dc: postgasse
+o: postgasse.org
+
+dn: cn=admin,dc=postgasse,dc=org
+objectClass: organizationalRole
+cn: admin
+
+dn: ou=users,dc=postgasse,dc=org
+objectClass: organizationalUnit
+ou: users
+
+dn: ou=groups,dc=postgasse,dc=org
+objectClass: organizationalUnit
+ou: groups
+
+dn: uid=scott,ou=users,dc=postgasse,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Tiger Scott
+sn: Scott
+uid: scott
+userPassword:: e1NTSEF9UVp3dnluSWcwV2lNa25hb0hyZlNTclN6RVEyZHoyYmlJWXBJbnc9P
+ Q==
+
+dn: uid=king,ou=users,dc=postgasse,dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: Kong King
+sn: King
+uid: king
+userPassword:: e1NTSEF9YndjNERSZm1tNUFxUzlWUDNMUVFnMXM0WGI4T2hYN25vMTFhZkE9P
+ Q==
+
