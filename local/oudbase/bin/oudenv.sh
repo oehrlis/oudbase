@@ -22,7 +22,7 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in .bash_profile or 
 # in oudenv_core.conf.
-VERSION=v1.5.6
+VERSION=v1.5.7
 
 # define some binaries for later user
 PGREP_BIN=$(command -v pgrep)                                   # get the binary for pgrep
@@ -376,7 +376,14 @@ function get_oracle_home {
         Silent=$1
         if [ -r "${OUD_INSTANCE_REAL_HOME}/install.path" ]; then
             read ORACLE_HOME < "${OUD_INSTANCE_REAL_HOME}/install.path"
-            export ORACLE_HOME=$(dirname ${ORACLE_HOME})
+            # check if our install path contains an oud at the end
+            if [ $(basename ${ORACLE_HOME}) == "oud" ]; then
+                # seems we have an OUD 12 home
+                export ORACLE_HOME=$(dirname ${ORACLE_HOME})
+            else
+                # seems we have an OUD 11 home
+                export ORACLE_HOME=${ORACLE_HOME}
+            fi
         else
             [ "${Silent}" == "" ] && echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
         fi
@@ -570,12 +577,16 @@ if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
     # set LOG_BASE and ETC_BASE to OUD_BASE
     export LOG_BASE=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_LOG_NAME}
     export ETC_BASE=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
+    # set the OUDTAB to ETC_CORE since OUD_DATA is ORACLE_BASE
+    export OUDTAB=${ETC_CORE}/oudtab
 else
     # set LOG_BASE and ETC_BASE to OUD_DATA
     export LOG_BASE=${OUD_DATA}/${DEFAULT_OUD_LOCAL_BASE_LOG_NAME}
     export ETC_BASE=${OUD_DATA}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
+    # set the OUDTAB to ETC_BASE
+    export OUDTAB=${ETC_BASE}/oudtab
 fi
- 
+
 # recreate missing directories
 for i in ${OUD_ADMIN_BASE} ${OUD_BACKUP_BASE} ${OUD_INSTANCE_BASE} ${ETC_BASE} ${LOG_BASE}; do
     mkdir -p ${i}
@@ -594,14 +605,7 @@ for i in oudenv.conf; do
         ln -sf ${ETC_BASE}/${i} ${ETC_CORE}/${i}
     fi
 done
- 
-# set the OUDTAB to ETC_BASE or fallback to ETC_CORE
-if [ -f "${ETC_BASE}/oudtab" ]; then
-    export OUDTAB=${ETC_BASE}/oudtab
-else
-    export OUDTAB=${ETC_CORE}/oudtab
-fi
- 
+
 # check if we have an oudtab file and it does have entries
 if [ -f "${OUDTAB}" ] && [ $(grep -c -E $ORATAB_PATTERN "${OUDTAB}") -gt 0 ]; then
     # create a OUD Instance list based on oudtab and remove newlines|
