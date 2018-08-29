@@ -439,7 +439,7 @@ else
     DoMsg "if [ \"\${OUD_BASE}\" = \"\" ]; then"
     DoMsg "  if [ -f \"\${HOME}/.OUD_BASE\" ]; then"
     DoMsg "    . \"\${HOME}/.OUD_BASE\""
-    DoMsg "  else'"
+    DoMsg "  else"
     DoMsg "    echo \"ERROR: Could not load \${HOME}/.OUD_BASE\""
     DoMsg "  fi"
     DoMsg "fi"
