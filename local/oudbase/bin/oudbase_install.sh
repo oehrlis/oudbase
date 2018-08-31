@@ -23,7 +23,7 @@ export LOG_BASE=${LOG_BASE-"/tmp"}
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v1.5.7
+VERSION=v1.5.8
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="TRUE"                                  # enable verbose mode
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"     # Basename of the script
@@ -31,8 +31,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of 
 SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"       # Full qualified script name
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
-BASE64_BIN=$(command -v base64)                 # executable for base64
-TAR_BIN=$(command -v tar)                       # executable for tar
+BASE64_BIN=$(command -v -p base64)              # executable for base64
+TAR_BIN=$(command -v -p tar)                    # executable for tar
 OUD_CORE_CONFIG="oudenv_core.conf"
 CONFIG_FILES="oudtab oud._DEFAULT_.conf"
 PAYLOAD_BINARY=0                                # default disable binary payload 
@@ -169,6 +169,8 @@ function UntarPayload()
     # default values for payload
     PAYLOAD_BINARY=${PAYLOAD_BINARY:-0}
     PAYLOAD_BASE64=${PAYLOAD_BASE64:-1}
+    
+    
     DoMsg "INFO : Start processing the payload"
     MATCH=$(grep --text --line-number '^__TAR_PAYLOAD__$' $0 | cut -d ':' -f 1)
     PAYLOAD_START=$((MATCH + 1))
