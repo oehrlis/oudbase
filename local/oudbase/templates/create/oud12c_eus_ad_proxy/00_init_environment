@@ -42,7 +42,7 @@
 # - Instance information
 export DIRMAN="cn=Directory Manager"
 export REPMAN=admin
-export BASEDN="dc=example,dc=comorg"
+export BASEDN="dc=example,dc=com"
 
 # group OU below base DN in active directory eg ou=groups,dc=postgasse,dc=org
 export GROUP_OU="ou=Groups,dc=example,dc=com"
