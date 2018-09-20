@@ -3,6 +3,8 @@
 
 Here is my preamble paragraph, but I could really place the TOC anywhere! Lorem ipsum foo bar baz.
 
+toc::[]
+
 = Main Documentation
 == with a few
 notes on hw to blwa bal
@@ -15,4 +17,3 @@ notes on hw to blwa bal
 
 more to come
 
-toc::[]
