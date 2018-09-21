@@ -29,6 +29,10 @@ START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 MAILADDRESS=""
 SEND_MAIL="FALSE"                               # don't send mails by default
 ERROR=0
+KEEP=7                                          # Number of Days to keep
+COMPRESS=""                                     # set default value for compression
+SUFFIX="ldif"                                   # default suffix
+DATE_STRING=$(date '+%Y%m%d-%H%M%S')            # String used for the export files
 HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)  # Hostname
 # - End of Default Values -----------------------------------------------
  
@@ -44,6 +48,8 @@ function Usage() {
     DoMsg "INFO :   -i <OUD_INSTANCES> List of OUD instances"
     DoMsg "INFO :   -m <MAILADDRESSES> List of Mail Addresses"
     DoMsg "INFO :   -o                 force to send mails. Requires -m <MAILADDRESSES>"
+    DoMsg "INFO :   -c                 Compress LDIF file (default no compression)"
+    DoMsg "INFO :   -k <DAYS>          Number of days to keep old exports (default 7)"
     DoMsg "INFO :   -D <BINDDN>        Bind DN used for the export (default: cn=Directory Manager)"
     DoMsg "INFO :   -j <PWDFILE>       Password file used for the export (default: \$PWD_FILE)"
     DoMsg "INFO :   -f <EXPORTPATH>    Directory used to store the exports (default: \$OUD_EXPORT_DIR)"
@@ -183,11 +189,13 @@ LOG_START=$(($(grep -ni "${START_HEADER}" "${LOGFILE}"|cut -d: -f1 |tail -1)-1))
  
 # usage and getopts
 DoMsg "INFO : processing commandline parameter"
-while getopts hvm:oi:E:D:j:f: arg; do
+while getopts hvcm:oi:k:E:D:j:f: arg; do
     case $arg in
         h) Usage 0;;
         v) VERBOSE="TRUE";;
+        c) COMPRESS="--compress";;
         i) MyOUD_INSTANCES="${OPTARG}";;
+        k) KEEP="${OPTARG}";;
         m) MAILADDRESS=$(echo "${OPTARG}"|sed s/\,/\ /g);;
         o) SEND_MAIL="TRUE";;
         D) MybindDN="${OPTARG}";;
@@ -197,15 +205,24 @@ while getopts hvm:oi:E:D:j:f: arg; do
         ?) Usage 2 $*;;
     esac
 done
- 
 # Set the default Bind DN to cn=Directory Manager if not specified
 MybindDN=${MybindDN:-"cn=Directory Manager"}
- 
+
+# change suffix 
+if [ "${COMPRESS}" == "--compress" ]; then
+    SUFFIX="ldif.gz"
+fi
+
 # Check if the provided password file does exits
 if [[ -n "${MybindPasswordFile}" ]] && [[ ! -f "${MybindPasswordFile}" ]]; then
     CleanAndQuit 43 ${MyOUD_INSTANCE}
 fi
- 
+
+# Set a minimal value for KEEP to 1 eg. 2 days
+if [ ${KEEP} -lt 2 ]; then
+KEEP=2
+fi
+
 if [ "$MyOUD_INSTANCES" = "" ]; then
     # Load list of OUD Instances from oudtab
     DoMsg "INFO : Load list of OUD instances"
@@ -282,7 +299,7 @@ for oud_inst in ${OUD_INST_LIST}; do
             DoMsg "INFO : [$oud_inst] start export for $oud_inst backendID ${backend}"
             DoMsg "INFO : [$oud_inst] export log file ${INST_LOG_FILE}"
  
-            EXPORT_COMMAND="${OUD_BIN}/export-ldif --hostname ${HOST} --port $PORT_ADMIN --trustAll --bindPasswordFile ${MybindPasswordFile} --backendID ${backend} ${includeBranch} --ldifFile ${OUD_EXPORT_DIR}/export_${oud_inst}_${backend}_Day$(date '+%u').ldif"
+            EXPORT_COMMAND="${OUD_BIN}/export-ldif --hostname ${HOST} --port $PORT_ADMIN ${COMPRESS} --trustAll --bindPasswordFile ${MybindPasswordFile} --backendID ${backend} ${includeBranch} --ldifFile ${OUD_EXPORT_DIR}/export_${oud_inst}_${backend}_${DATE_STRING}.${SUFFIX}"
             DoMsg "INFO : [$oud_inst] ${EXPORT_COMMAND}"
             echo -e "\n${EXPORT_COMMAND}" >>${INST_LOG_FILE}
             ${EXPORT_COMMAND} >>${INST_LOG_FILE} 2>&1
@@ -303,6 +320,14 @@ for oud_inst in ${OUD_INST_LIST}; do
                 DoMsg "INFO : [$oud_inst] Export for $oud_inst backendID ${backend} successfully finished"
             fi
         done
+
+        # purge old export files
+        if [ $(find ${OUD_EXPORT_DIR} -type f -mtime +${KEEP} -ls|wc -l) -lt 0 ]; then
+            DoMsg "INFO : [$oud_inst] Purge exports older than ${KEEP} days"
+            find ${OUD_EXPORT_DIR} -type f -mtime +${KEEP} -exec rm -v {} \;
+        else
+            DoMsg "INFO : [$oud_inst] No old export files found to purge (keep is set to ${KEEP} days)"
+        fi
     else
         DoMsg "WARN : [$oud_inst] OUD Instance $oud_inst down, no export will be performed."
         # in case we do have an e-mail address and force mails is true we send a mail
@@ -311,6 +336,8 @@ for oud_inst in ${OUD_INST_LIST}; do
         fi
     fi
 done
+
+
  
 if [ "${ERROR}" -gt 0 ]; then
     CleanAndQuit 51
