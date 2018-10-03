@@ -151,7 +151,7 @@ function CleanAndQuit()
         20) DoMsg "ERR  : Exit Code ${1}. Can not append to profile.";;
         40) DoMsg "ERR  : Exit Code ${1}. This is not an Install package. Missing TAR payload or TAR file.";;
         41) DoMsg "ERR  : Exit Code ${1}. Error creating directory ${2}.";;
-        42) DoMsg "ERR  : Exit Code ${1}. ORACEL_BASE directory not available";;
+        42) DoMsg "ERR  : Exit Code ${1}. ORACEL_BASE directory not available ${2}";;
         43) DoMsg "ERR  : Exit Code ${1}. OUD_BASE directory not available";;
         44) DoMsg "ERR  : Exit Code ${1}. OUD_DATA directory not available";;
         11) DoMsg "ERR  : Exit Code ${1}. Could not touch file ${2}";;
