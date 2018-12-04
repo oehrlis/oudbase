@@ -18,6 +18,7 @@
 # -----------------------------------------------------------------------
 # - Customization -------------------------------------------------------
 export OUD_ROOT_DN=${OUD_ROOT_DN:-"postgasse.org"}
+export OPENDS_JAVA_ARGS=-Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
