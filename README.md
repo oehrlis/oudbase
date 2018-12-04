@@ -15,7 +15,7 @@ oracle@oud:~/ [oud_cdse] /u01/shared/oudbase_install.sh -h
 2017-11-13_14:28:58  START: Start of oudbase_install.sh (Version 0.1) with -h
 2017-11-13_14:28:58  INFO : processing commandline parameter
 2017-11-13_14:28:58  INFO : Usage, oudbase_install.sh [-hv] [-b <ORACLE_BASE>] 
-2017-11-13_14:28:58  INFO :   [-i <ORACLE_INSTANCE_BASE>] [-m <ORACLE_HOME_BASE>] [-B <OUD_BACKUP_BASE>]
+2017-11-13_14:28:58  INFO :   [-i <O⁄RACLE_INSTANCE_BASE>] [-m <ORACLE_HOME_BASE>] [-B <OUD_BACKUP_BASE>]
 2017-11-13_14:28:58  INFO : 
 2017-11-13_14:28:58  INFO :   -h                          Usage (this message)
 2017-11-13_14:28:58  INFO :   -v                          enable verbose mode
