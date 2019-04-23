@@ -1,0 +1,49 @@
+#!/bin/sh
+# -----------------------------------------------------------------------
+# Trivadis AG, Business Development & Support (BDS)
+# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# -----------------------------------------------------------------------
+# Name.......: oud_start_stop.sh
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Editor.....: Stefan Oehrli
+# Date.......: 2019.04.23
+# Revision...: --
+# Purpose....: Born Shell Script to start/stop OUD Instances 
+# Notes......: This script is mainly used for environment without TVD-Basenv
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
+# -----------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
+# - Customization -------------------------------------------------------
+export OPENDS_JAVA_ARGS=-Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true
+# - End of Customization ------------------------------------------------
+ 
+# - Default Values ------------------------------------------------------
+# Set the path to the Oracle Unified Directory instance to manage
+. /home/oracle/.OUD_BASE
+# - End of Default Values -----------------------------------------------
+ 
+# Determine what action should be performed on the server
+case "${1}" in
+start)
+    /bin/su - oracle -- "${OUD_BASE}/bin/oud_start_stop.sh" -a start
+    exit ${?}
+    ;;
+stop)
+    /bin/su - oracle -- "${OUD_BASE}/bin/oud_start_stop.sh" -a stop
+    exit ${?}
+    ;;
+restart)
+    /bin/su - oracle -- "${OUD_BASE}/bin/oud_start_stop.sh" -a stop
+    /bin/su - oracle -- "${OUD_BASE}/bin/oud_start_stop.sh" -a start 
+    exit ${?}
+    ;;
+*)
+    echo "Usage:  $0 { start | stop | restart }"
+    exit 1
+    ;;
+esac
+
+# - EOF -----------------------------------------------------------------
