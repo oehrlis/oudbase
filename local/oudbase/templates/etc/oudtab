@@ -5,4 +5,5 @@
 #  4: OUD Admin Port
 #  5: OUD Replication Port
 #  6: Directory type eg. OUD, OID, ODSEE or OUDSM
+#  7: Flag for start/stop eg. (N)o, (Y)es or (D)ummy
 # -----------------------------------------------
