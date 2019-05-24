@@ -259,7 +259,7 @@ if [ ${DIRECTORY_TYPE} == "OUD" ]; then
     DoMsg "INFO : Process ${TMP_FILE} file"
     # check Server Run Status
     if [ $(grep -ic 'Server Run Status: Started' ${TMP_FILE}) -eq 0 ]; then
-        cat ${TMP_FILE} >> "${INSTANCE_LOGFILE}"
+        cat ${TMP_FILE} >> "${OUTPUT}"
         CleanAndQuit 50 ${OUD_INSTANCE}
     fi
 
@@ -269,7 +269,7 @@ if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         AWK_OUT=$(awk 'BEGIN{RS="\n-\n";FS="\n";IGNORECASE=1; Error=51} $1 ~ /^Address/ && $2 ~ /\<'${i}'\>/ {if ($3 ~ /\<Enabled\>/) Error=0; } END{exit Error}' ${TMP_FILE} )
         OUD_ERROR=$?
         if [ ${OUD_ERROR} -eq 51 ]; then
-            cat ${TMP_FILE} >> "${INSTANCE_LOGFILE}"
+            cat ${TMP_FILE} >> "${OUTPUT}"
             CleanAndQuit 51 ${i}
         fi
     done
@@ -280,7 +280,7 @@ if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         AWK_OUT=$(awk 'BEGIN{RS="\n-\n";FS="\n";IGNORECASE=1; Error=51} $1 ~ /^Address/ && $2 ~ /\<'${i}'\>/ {if ($3 ~ /\<Enabled\>/) Error=0; } END{exit Error}' ${TMP_FILE} )
         OUD_ERROR=$?
         if [ ${OUD_ERROR} -eq 51 ]; then
-            cat ${TMP_FILE} >> "${INSTANCE_LOGFILE}"
+            cat ${TMP_FILE} >> "${OUTPUT}"
             CleanAndQuit 51 ${i}
         fi
     
@@ -290,7 +290,7 @@ if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         OUD_ERROR=$?
         # handle errors from OUD dsreplication
         if [ ${OUD_ERROR} -gt 0 ]; then
-            cat ${TMP_FILE} >> "${INSTANCE_LOGFILE}"
+            cat ${TMP_FILE} >> "${OUTPUT}"
             CleanAndQuit 42 ${OUD_ERROR}
         fi
 
