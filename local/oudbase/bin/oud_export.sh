@@ -21,7 +21,7 @@ export OPENDS_JAVA_ARGS=-Dcom.sun.jndi.ldap.object.disableEndpointIdentification
 # - End of Customization ------------------------------------------------
  
 # - Default Values ------------------------------------------------------
-VERSION=v1.5.9
+VERSION=v1.6.0
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
