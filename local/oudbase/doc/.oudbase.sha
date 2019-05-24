@@ -1,8 +1,8 @@
-9acf7f7bb9424b04db09c405cf08db14a79deb9b  ./bin/oud_status.sh
-adaedcd855214165c0076aa7eb0ce59b0c47a113  ./bin/oud_start_stop.sh
-5fb1b27189630ad5adcd70e746d8f8622c2329c8  ./bin/oud_export.sh
-506a809d952c8c823d54312df3aa5a5c591db5a3  ./bin/oud_backup.sh
-d43c76a4ae395e388766f67c47380d6ebb17e60f  ./bin/oudenv.sh
+6f452087415a5359db6627d31284194414687531  ./bin/oud_status.sh
+107b084fe3ea786643615af090d0a5a50144d73b  ./bin/oud_start_stop.sh
+a262e809225f9ca6f2359d167924ca56b3af3eaa  ./bin/oud_export.sh
+13d35071972ec27400fed7324d133487c9f89753  ./bin/oud_backup.sh
+6926ad1b05d1d8afa70a5cc6568e193e7d8824e7  ./bin/oudenv.sh
 eae0291c2f607231f369bdbedd2dc7bf0c318d54  ./etc/oudenv_core.conf
 afc472d77a2745d14fd36865e1f4a441d3e3e794  ./etc/oudenv.conf
 2ea0c0069dd86f9aaae99c274f38182c981e2113  ./etc/oudenv_custom.conf
@@ -13,9 +13,10 @@ eae0291c2f607231f369bdbedd2dc7bf0c318d54  ./templates/etc/oudenv_core.conf
 6edcda9a4c7dbbe5c5fb0157ad2330d8ef7259ac  ./templates/etc/housekeeping.conf
 03fcc0fbc2cd3435e11b8a04767b087ea10dfc73  ./templates/etc/install.rsp
 0dc896bc673a7ecf9d476736e3065abe47d5cbbf  ./templates/etc/oudenv.conf
+c97bede3316d8e62b3e5238bd6d3a7722f67bbf8  ./templates/etc/oracle_oud_all
 5e9de046f186d9930f145b5a5158116959104d2d  ./templates/etc/oraInst.loc
 2ea0c0069dd86f9aaae99c274f38182c981e2113  ./templates/etc/oudenv_custom.conf
-ef2a6ff1dfb0d3c5604cd5a4565b1358cac54137  ./templates/etc/oudtab
+8573d77a3358cc24d5c6345887d6d38bed20d61e  ./templates/etc/oudtab
 5db71a75ccbd45f85f4dbbaba286a222d2b2a760  ./templates/etc/oud._DEFAULT_.conf
 bee2da88ae85319aa1dab2a6816b83563f1627bb  ./templates/etc/oud.crontab
 57f4ba89cb20339fc560dcf75bf4e9971fe32049  ./templates/etc/oud_instance.service
@@ -77,4 +78,4 @@ c134289efbbfa0e9c8e4ea28a3ea12a705259a07  ./templates/create/oud12c_eus_ad_proxy
 a932ed4eab1c54db8d05024cea39fce289fee682  ./templates/create/oud12c_eus_ad_proxy/03_config_eus_realm.sh
 8624bcdae55baeef00cd11d5dfcfa60f68710a02  ./doc/LICENSE
 db0dad266fb7dab2083cccf1277a136ac35aca03  ./doc/README.md
-ef45ddca74def17a8d1b7d41fab226eeeaf6e7cc  ./doc/.version
+2e5a99a3e75000fb381b8f093bee7e303a4fdd35  ./doc/.version
