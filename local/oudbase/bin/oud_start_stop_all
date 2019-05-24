@@ -1,0 +1,28 @@
+#!/bin/bash
+# -----------------------------------------------------------------------
+# Trivadis AG, Business Development & Support (BDS)
+# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# -----------------------------------------------------------------------
+# Name.......: oud_start_stop_all
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Editor.....: Stefan Oehrli
+# Date.......: 2018.03.18
+# Revision...: --
+# Purpose....: Wrapper Script for oud_start_stop.sh to start/stop OUD Instances 
+# Notes......: This script is mainly used for environment without TVD-Basenv
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
+# -----------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
+
+# - Default Values ------------------------------------------------------
+VERSION=v1.6.1
+SCRIPT_NAME=$(basename $0)
+export OUDBASE_BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
+# - End of Default Values -----------------------------------------------
+
+# - Main ----------------------------------------------------------------
+${OUDBASE_BIN}/oud_start_stop.sh -v -a $1
+# - EOF -----------------------------------------------------------------
