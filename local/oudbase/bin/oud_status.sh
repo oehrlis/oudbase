@@ -306,7 +306,7 @@ elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
     DoMsg "INFO : Check status of OUDSM console ${URL}"
     
     # run OUD status check
-    curl -sSf ${URL} 2>&1 >/dev/null 
+    curl -sf ${URL} --output /dev/null 2>&1 >/dev/null 
 
     # normalize output for docker....
     OUD_ERROR=$?
