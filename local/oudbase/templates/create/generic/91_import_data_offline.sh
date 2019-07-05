@@ -19,7 +19,7 @@
 # ---------------------------------------------------------------------------
 
 # - load instance environment -----------------------------------------------
-. "$(dirname $0)/00_init_environment.sh"
+. "$(dirname $0)/00_init_environment"
 LDIFFILE="$(dirname $0)/$(basename $0 .sh).ldif"          # LDIF file based on script name
 
 # - configure instance ------------------------------------------------------
