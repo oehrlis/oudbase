@@ -1,0 +1,44 @@
+#!/bin/bash
+# -----------------------------------------------------------------------
+# Trivadis AG, Business Development & Support (BDS)
+# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# -----------------------------------------------------------------------
+# Name.......: setup_oud_instance
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Editor.....: Stefan Oehrli
+# Date.......: 2018.03.18
+# Revision...: --
+# Purpose....: Wrapper script to create the OUD instance with EUS context 
+#              using oud-proxy-setup.
+# Notes......: Will skip oud-proxy-setup if config.ldif already exists
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
+# -----------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
+
+# - load instance environment -------------------------------------------
+. "$(dirname $0)/00_init_environment"
+
+# - create instance -----------------------------------------------------
+echo "Create OUD instance ${OUD_INSTANCE} using:"
+echo "OUD_INSTANCE_HOME : ${OUD_INSTANCE_HOME}"
+echo "PWD_FILE          : ${PWD_FILE}"
+echo "HOSTNAME          : ${HOST}"
+echo "HOST1             : ${HOST1}"
+echo "HOST2             : ${HOST2}"
+echo "HOST3             : ${HOST3}"
+echo "PORT              : ${PORT}"
+echo "PORT_SSL          : ${PORT_SSL}"
+echo "PORT_ADMIN        : ${PORT_ADMIN}"
+echo "DIRMAN            : ${DIRMAN}"
+echo "BASEDN            : ${BASEDN}"
+echo "EUS_SUFFIX        : ${EUS_SUFFIX}"
+
+for i in $(dirname $0)/0?_*.sh $(dirname $0)/1?_*.sh; do 
+    echo "######################################################"
+    echo "### RUN $(basename $i)" 
+    $(dirname $0)/$(basename $i)
+done
+# - EOF -----------------------------------------------------------------
