@@ -18,6 +18,8 @@
 LOG_BASE/oud_backup.log
 LOG_BASE/oud_export.log
 LOG_BASE/oud_status.log
+LOG_BASE/oud_start_stop.log
+LOG_BASE/oud_start_stop_*.log
 LOG_BASE/oudenv.log
 {
     su USER GROUP
