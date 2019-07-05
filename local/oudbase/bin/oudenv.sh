@@ -22,7 +22,7 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in .bash_profile or 
 # in oudenv_core.conf.
-VERSION=v1.6.1
+VERSION=v1.6.2
 
 # define some binaries for later user
 PGREP_BIN=$(command -v pgrep)                                   # get the binary for pgrep
@@ -770,11 +770,11 @@ fi
 
 # set the new PATH
 if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-    export PATH=${PATH}:${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME_BIN}:${ORACLE_HOME}:${JAVA_HOME}/bin
+    export PATH=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME_BIN}:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
 elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
-    export PATH=${PATH}:${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/bin:${ORACLE_HOME}:${JAVA_HOME}/bin
+    export PATH=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
 elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
-    export PATH=${PATH}:${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/OUD/bin:${ORACLE_HOME}:${JAVA_HOME}/bin
+    export PATH=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/OUD/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
 fi
 
 # start to source stuff from ETC_CORE
