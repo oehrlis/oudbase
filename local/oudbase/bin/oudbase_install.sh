@@ -23,7 +23,7 @@ export LOG_BASE=${LOG_BASE-"/tmp"}
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v1.6.1
+VERSION=v1.6.2
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="TRUE"                                  # enable verbose mode
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"     # Basename of the script
@@ -31,7 +31,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of 
 SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"       # Full qualified script name
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
-BASE64_BIN=$(command -v -p base64)              # executable for base64
+BASE64_BIN=$(find /usr/bin -name base64 -print) # executable for base64
+BASE64_BIN=${BASE64_BIN:-"$(command -v -p base64)"} # executable for base64
 TAR_BIN=$(command -v -p tar)                    # executable for tar
 OUD_CORE_CONFIG="oudenv_core.conf"
 CONFIG_FILES="oudtab oud._DEFAULT_.conf"
