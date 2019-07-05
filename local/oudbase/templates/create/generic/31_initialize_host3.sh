@@ -3,7 +3,7 @@
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # -----------------------------------------------------------------------
-# Name.......: 12_replication_add_host2.sh
+# Name.......: 31_initialize_host3.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2018.03.18
@@ -18,7 +18,7 @@
 # -----------------------------------------------------------------------
 
 # - load instance environment -------------------------------------------
-. "$(dirname $0)/00_init_environment.sh"
+. "$(dirname $0)/00_init_environment"
 
 # - Enable Replication --------------------------------------------------
 echo "Enable replication ${OUD_INSTANCE} using:"
@@ -26,17 +26,17 @@ echo "OUD_INSTANCE_HOME : ${OUD_INSTANCE_HOME}"
 echo "PWD_FILE          : ${PWD_FILE}"
 echo "HOSTNAME          : ${HOST}"
 echo "HOST1             : ${HOST1}"
-echo "HOST2             : ${HOST2}"
+echo "HOST3             : ${HOST3}"
 echo "PORT              : ${PORT}"
 echo "PORT_ADMIN        : ${PORT_ADMIN}"
 echo "PORT_REP          : ${PORT_REP}"
 echo "DIRMAN            : ${DIRMAN}"
 echo "BASEDN            : ${BASEDN}"
 
-echo "initialize replication for ${BASEDN} on $HOST2 from $HOST1"
+echo "initialize replication for ${BASEDN} on $HOST3 from $HOST1"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication initialize \
 --hostSource $HOST1 --portSource $PORT_ADMIN \
---hostDestination $HOST2 --portDestination $PORT_ADMIN \
+--hostDestination $HOST3 --portDestination $PORT_ADMIN \
 --baseDN ${BASEDN} \
 --adminUID "$REPMAN" --adminPasswordFile "${PWD_FILE}" \
 --trustAll --no-prompt --noPropertiesFile

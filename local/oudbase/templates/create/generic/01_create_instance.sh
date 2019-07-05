@@ -18,7 +18,7 @@
 # -----------------------------------------------------------------------
 
 # - load instance environment -------------------------------------------
-. "$(dirname $0)/00_init_environment.sh"
+. "$(dirname $0)/00_init_environment"
 
 # - create instance -----------------------------------------------------
 echo "Create OUD instance ${OUD_INSTANCE} using:"

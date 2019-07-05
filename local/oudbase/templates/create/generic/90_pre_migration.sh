@@ -18,7 +18,7 @@
 # ---------------------------------------------------------------------------
 
 # - load instance environment -----------------------------------------------
-. "$(dirname $0)/00_init_environment.sh"
+. "$(dirname $0)/00_init_environment"
 
 # - Prepare Migration -------------------------------------------------------
 echo "Prepare replication ${OUD_INSTANCE} using:"
