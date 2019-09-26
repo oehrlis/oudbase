@@ -87,6 +87,7 @@ fi
 
 # define location for OUD data
 export OUD_DATA=${OUD_DATA:-"${ORACLE_BASE}"}
+export ORACLE_DATA=${ORACLE_DATA:-"${OUD_DATA}"}
  
 # define misc base directories
 export OUD_ADMIN_BASE=${OUD_ADMIN_BASE:-"${OUD_DATA}/${DEFAULT_OUD_ADMIN_BASE_NAME}"}
