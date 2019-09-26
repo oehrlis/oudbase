@@ -3,8 +3,8 @@ c9fb58a99556c0e8dbc44b8eb86ab8b7bf3764e8  ./bin/oud_status.sh
 cf8d80d0894db19b2daeb7ceaafe712253c93499  ./bin/oud_start_stop_all
 2b2d1211f643831064a391a0d6a2cb202927b3e7  ./bin/oud_export.sh
 e21cd2da47242c3263176f263edd7e49147ac050  ./bin/oud_backup.sh
-cd0654e70b70d931d8d064a502bbfa703e995f44  ./bin/oudenv.sh
-eae0291c2f607231f369bdbedd2dc7bf0c318d54  ./etc/oudenv_core.conf
+d45e1e55d176b98accf72a20f0afcb7aaa3ad855  ./bin/oudenv.sh
+c663fb651540b06c32791da7ac6f2d4297f85e7e  ./etc/oudenv_core.conf
 afc472d77a2745d14fd36865e1f4a441d3e3e794  ./etc/oudenv.conf
 2ea0c0069dd86f9aaae99c274f38182c981e2113  ./etc/oudenv_custom.conf
 0918d6399a2471a32a3598beadaf19a129e9d296  ./etc/oudtab
