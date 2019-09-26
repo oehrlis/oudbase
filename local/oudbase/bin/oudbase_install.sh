@@ -43,6 +43,7 @@ PAYLOAD_BASE64=1                                # default enable base64 payload
 DEFAULT_ORACLE_BASE="/u00/app/oracle"
 SYSTEM_JAVA_PATH=$(if [ -d "/usr/java" ]; then echo "/usr/java"; fi)
 DEFAULT_OUD_DATA="/u01"
+DEFAULT_ORACLE_DATA=${DEFAULT_OUD_DATA}
 DEFAULT_OUD_BASE_NAME="oudbase"
 DEFAULT_OUD_ADMIN_BASE_NAME="admin"
 DEFAULT_OUD_BACKUP_BASE_NAME="backup"
@@ -279,6 +280,7 @@ export OUD_BASE=${INSTALL_OUD_BASE:-"${DEFAULT_OUD_BASE}"}
 # define OUD_DATA
 DEFAULT_OUD_DATA=$(if [ -d "${DEFAULT_OUD_DATA}" ]; then echo ${DEFAULT_OUD_DATA}; else echo "${ORACLE_BASE}"; fi)
 export OUD_DATA=${INSTALL_OUD_DATA:-"${DEFAULT_OUD_DATA}"}
+export ORACLE_DATA=${ORACLE_DATA:-"${OUD_DATA}"}
 
 # define OUD_INSTANCE_BASE
 DEFAULT_OUD_INSTANCE_BASE="${OUD_DATA}/${DEFAULT_OUD_INSTANCE_BASE_NAME}"
@@ -331,6 +333,7 @@ DoMsg "INFO : LOG_BASE             = $LOG_BASE"
 DoMsg "INFO : ETC_CORE             = $ETC_CORE"
 DoMsg "INFO : ETC_BASE             = $ETC_BASE"
 DoMsg "INFO : OUD_DATA             = $OUD_DATA"
+DoMsg "INFO : ORACLE_DATA          = $ORACLE_DATA"
 DoMsg "INFO : OUD_INSTANCE_BASE    = $OUD_INSTANCE_BASE"
 DoMsg "INFO : OUD_ADMIN_BASE       = $OUD_ADMIN_BASE"
 DoMsg "INFO : OUD_BACKUP_BASE      = $OUD_BACKUP_BASE"
@@ -394,6 +397,7 @@ for i in    OUD_ADMIN_BASE \
             OUD_BACKUP_BASE \
             OUD_INSTANCE_BASE \
             OUD_DATA \
+            ORACLE_DATA \
             OUD_BASE \
             ORACLE_BASE \
             ORACLE_HOME \
