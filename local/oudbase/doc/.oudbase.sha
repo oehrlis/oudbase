@@ -1,9 +1,9 @@
-c9fb58a99556c0e8dbc44b8eb86ab8b7bf3764e8  ./bin/oud_status.sh
-0f8d79eb3703c7facd634cf32d8bd8e69db5fa41  ./bin/oud_start_stop.sh
+bf621a31c33e6d0c5cf12ee114985d85ac1f2455  ./bin/oud_status.sh
+e109eb8b9d2acf4f5705e4ec3dd386a47562b7da  ./bin/oud_start_stop.sh
 cf8d80d0894db19b2daeb7ceaafe712253c93499  ./bin/oud_start_stop_all
-2b2d1211f643831064a391a0d6a2cb202927b3e7  ./bin/oud_export.sh
-e21cd2da47242c3263176f263edd7e49147ac050  ./bin/oud_backup.sh
-d45e1e55d176b98accf72a20f0afcb7aaa3ad855  ./bin/oudenv.sh
+039edd3942442f3c0c5534c351fd9f4a0728f446  ./bin/oud_export.sh
+44c5accf1cad8ae52cee58dc27d2eef4eb1d890f  ./bin/oud_backup.sh
+7e005c2df75e4de2bc996dacefcf7a011119b7b2  ./bin/oudenv.sh
 c663fb651540b06c32791da7ac6f2d4297f85e7e  ./etc/oudenv_core.conf
 afc472d77a2745d14fd36865e1f4a441d3e3e794  ./etc/oudenv.conf
 2ea0c0069dd86f9aaae99c274f38182c981e2113  ./etc/oudenv_custom.conf
@@ -82,4 +82,4 @@ a9430dc47c10b9221ba5e709fc69088b3ad1aa83  ./templates/create/oud12c_eus_ad_proxy
 a932ed4eab1c54db8d05024cea39fce289fee682  ./templates/create/oud12c_eus_ad_proxy/03_config_eus_realm.sh
 8624bcdae55baeef00cd11d5dfcfa60f68710a02  ./doc/LICENSE
 db0dad266fb7dab2083cccf1277a136ac35aca03  ./doc/README.md
-48ab0b001c3500f397c2785fb8edba79a54f50a5  ./doc/.version
+348b0992775d01aee5c4da65d6acf75266143c2f  ./doc/.version
