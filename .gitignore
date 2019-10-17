@@ -1,6 +1,5 @@
 # ignore binary packages and files
 **/*.rpm
-**/*.jar
 **/*.zip
 **/*.tar.gz
 **/*.tgz
