@@ -66,7 +66,7 @@ tar -zcvf ${SCRIPT_DIR}/oudbase_install.tgz \
     --exclude=log/*.log \
     --exclude='.DS_Store' \
     --exclude='._*'  \
-    bin/ doc/ etc/ log/ templates/
+    bin/ doc/ etc/ log/ lib/ templates/
 
 # build this nice executable shell script with a TAR payload
 echo "Create this fancy shell with a tar payload"
