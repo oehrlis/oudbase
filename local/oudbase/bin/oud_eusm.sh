@@ -20,7 +20,7 @@
 # - Default Values ------------------------------------------------------
 VERSION=v1.7.0
 JRE_HOME=$JAVA_HOME/jre/
-EUSMLIBDIR=/u00/app/oracle/local/eusm/lib
+EUSMLIBDIR=$ORACLE_BASE/local/eusm/lib
 ORACLEPKI=$ORACLE_HOME/oracle_common/modules/oracle.pki/oraclepki.jar
 OSDT_CERT=$ORACLE_HOME/oracle_common/modules/oracle.osdt/osdt_cert.jar
 OSDT_CORE=$ORACLE_HOME/oracle_common/modules/oracle.osdt/osdt_core.jar
