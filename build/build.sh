@@ -52,7 +52,7 @@ VERSION=$(grep -i "OUD Base Release" ./doc/.version |sed -E 's/.*(v[0-9]+.[0-9]+
 
 for i in ./bin/*.sh; do
     echo "update version to ${VERSION} in file $i"
-    sed -i '' -E "s/^VERSION=.*/VERSION=${VERSION}/" $i 
+    sed -i -E "s/^VERSION=.*/VERSION=${VERSION}/" $i 
 done
 # create sha hash's
 echo "Create sha hashs for all files"
