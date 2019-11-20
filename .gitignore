@@ -14,6 +14,10 @@ build/gh-md-toc
 
 .idea/
 
+# ignore oracle lib's
+local/oudbase/lib/eusm.jar
+local/oudbase/lib/ldapjclnt19.jar
+
 # Eclipse stuff
 /.pydevproject
 /.project
