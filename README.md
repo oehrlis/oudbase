@@ -307,7 +307,7 @@ oud@uxltoud03:~/ [oudtd] u
 TYPE  INSTANCE     STATUS PORTS          INSTANCE HOME
 ----- ------------ ------ -------------- ----------------------------------
 OUD   oud_docker   up     1389/1636/4444 /u01/instances/oud_docker
-OUD   oudtest      up     2389/2636/5444 /u01/instances/oudtest
+OUD   oud_test     up     2389/2636/5444 /u01/instances/oudtest
 OUDSM oudsm_domain up     7001/7002      /u01/domains/oudsm_domain
 ```
 
