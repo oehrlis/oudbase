@@ -10,8 +10,6 @@ a1d091487b612ba58af260188e9eea587f6fe1f8  ./etc/oudenv.conf
 2ea0c0069dd86f9aaae99c274f38182c981e2113  ./etc/oudenv_custom.conf
 0918d6399a2471a32a3598beadaf19a129e9d296  ./etc/oudtab
 5db71a75ccbd45f85f4dbbaba286a222d2b2a760  ./etc/oud._DEFAULT_.conf
-7d54f5459b95dbb1ae9372fd10bac4714d2233ae  ./lib/ldapjclnt19.jar
-a6b18560cac46744f9614a54eff59147125fdf31  ./lib/eusm.jar
 b11ba7558dc9f97e5a2545fe672b82fc0a346615  ./templates/etc/wls_oudsm.service
 eae0291c2f607231f369bdbedd2dc7bf0c318d54  ./templates/etc/oudenv_core.conf
 6edcda9a4c7dbbe5c5fb0157ad2330d8ef7259ac  ./templates/etc/housekeeping.conf
