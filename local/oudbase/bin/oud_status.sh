@@ -22,7 +22,7 @@ export OPENDS_JAVA_ARGS=-Dcom.sun.jndi.ldap.object.disableEndpointIdentification
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v1.7.2
+VERSION=v1.7.3
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
@@ -156,7 +156,7 @@ if [ "${OUD_BASE}" = "" ] || [ ! -d "${OUD_BASE}" ]; then
 fi
 
 # Load OUD environment
-. ${OUD_BASE}/bin/oudenv.sh ${OUD_INSTANCE} SILENT
+. ${OUD_BASE}/bin/oudenv.sh ${OUD_INSTANCE} SILENT >/dev/null 2>&1
 
 # Define Logfile
 LOGFILE="${LOG_BASE}/$(basename ${SCRIPT_NAME} .sh).log"
