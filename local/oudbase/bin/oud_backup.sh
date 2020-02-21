@@ -32,6 +32,7 @@ ERROR=0
 TYPE="FULL"                                     # Default Backup Type
 KEEP=4                                          # Number of Weeks to keep
 compress="--compress"                           # set --compress Flag
+OUD_ERROR=0                                     # default value for error
 # - End of Default Values -----------------------------------------------
  
 # - Functions -----------------------------------------------------------
@@ -44,7 +45,7 @@ function Usage() {
     DoMsg "INFO :   -h                 Usage (this message"
     DoMsg "INFO :   -v                 enable verbose mode"
     DoMsg "INFO :   -i <OUD_INSTANCES> List of OUD instances (default ALL)"
-    DoMsg "INFO :   -t <TYPE>          Backup Type FULL or INCREMENTAL (default FULL)"
+    DoMsg "INFO :   -t <TYPE>          Backup Type FULL, INCREMENTAL or just CONFIG (default FULL)"
     DoMsg "INFO :   -k <WEEKS>         Number of weeks to keep old backups (default 4)"
     DoMsg "INFO :   -o                 force to send mails. Requires -m <MAILADDRESSES>"
     DoMsg "INFO :   -L                 Backup current instance log files (default: no logfile backup)"
@@ -240,8 +241,8 @@ fi
 OUD_INST_LIST=$(echo ${OUD_INST_LIST}|tr '\n' ' ')
 DoMsg "INFO : Initiate backup for OUD instances ${OUD_INST_LIST}"
  
-# define backup type
-if [ "${TYPE}" = "INCREMENTAL" ]; then
+# define backup type incremental
+if [ "${TYPE^^}" = "INCREMENTAL" ]; then
     incremental="--incremental"
 else
     incremental=""
@@ -270,6 +271,7 @@ for oud_inst in ${OUD_INST_LIST}; do
         DoMsg "WARN : [$oud_inst] Instance $oud_inst is not of type OUD. Skip backup for this instance."
         continue
     fi
+
     DoMsg "INFO : [$oud_inst] Check if $oud_inst is running"
     STATUS=$(get_status $oud_inst)
     if [ "${STATUS^^}" == "UP" ]; then
@@ -293,19 +295,25 @@ for oud_inst in ${OUD_INST_LIST}; do
         DoMsg "INFO : [$oud_inst] start backup for $oud_inst for Week ${NEW_WEEKNO}"
         DoMsg "INFO : [$oud_inst] backup log file ${INST_LOG_FILE}"
  
-        BACKUP_COMMAND="${OUD_BIN}/backup -a ${compress} ${incremental} -d ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}"
-        DoMsg "INFO : [$oud_inst] ${BACKUP_COMMAND}"
-        echo -e "\n${BACKUP_COMMAND}" >${INST_LOG_FILE} 2>&1
-        ${BACKUP_COMMAND} >>${INST_LOG_FILE} 2>&1
-        OUD_ERROR=$?
- 
-        # Backup the Config directory
+        # check if backup type is not config only e.g. CONFIG
+        # do a regular backup only if TYPE is not CONFIG
+        if [ "${TYPE^^}" != "CONFIG" ]; then
+            BACKUP_COMMAND="${OUD_BIN}/backup -a ${compress} ${incremental} -d ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}"
+            DoMsg "INFO : [$oud_inst] ${BACKUP_COMMAND}"
+            echo -e "\n${BACKUP_COMMAND}" >${INST_LOG_FILE} 2>&1
+            ${BACKUP_COMMAND} >>${INST_LOG_FILE} 2>&1
+            OUD_ERROR=$?
+        else
+            DoMsg "INFO : [$oud_inst] Backup type set to ${TYPE^^}, skip regular OUD backups    "
+        fi
+
+        # Backup the Config directory in any case
         DoMsg "INFO : [$oud_inst] backup config directory"
         TAR_COMMAND="tar -Pzcvf ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/${oud_inst}_config.tgz $OUD_CONF"
         echo -e "\n${TAR_COMMAND}" >>${INST_LOG_FILE} 2>&1
         ${TAR_COMMAND} >>${INST_LOG_FILE} 2>&1
 
-        # Backup the current log files
+        # Backup the current log files only if LOGFILE Flag is set
         if [ "${BACKUP_LOGS}" = "TRUE" ]; then
             DoMsg "INFO : [$oud_inst] backup current log files"
             TAR_COMMAND="tar -Pzcvf ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/${oud_inst}_logs.tgz $(find $OUD_LOG -type f ! -iname '*Z')"
