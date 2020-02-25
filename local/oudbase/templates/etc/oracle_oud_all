@@ -6,10 +6,11 @@
 # Name.......: oracle_oud_all
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2019.04.23
-# Revision...: --
-# Purpose....: Init.d Script to start / stop all OUD instances using oud_start_stop.sh 
-# Notes......: This script is mainly used for environment without TVD-Basenv
+# Date.......: 2020.02.25
+# chkconfig:   345 90 30
+# description: Init.d script to start / stop all OUD instances using oud_start_stop.sh 
+# Notes......: copy this script to /etc/init.d/oracle_oud_all
+#              activate it with: /sbin/chkconfig -add oracle_oud_all
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
 # -----------------------------------------------------------------------
@@ -23,7 +24,7 @@ export OUD_USER="oracle"
  
 # - Default Values ------------------------------------------------------
 # Set the path to the Oracle Unified Directory instance to manage
-. /home/oracle/.OUD_BASE
+. /home/${OUD_USER}/.OUD_BASE
 # - End of Default Values -----------------------------------------------
  
 # Determine what action should be performed on the server
