@@ -50,7 +50,7 @@ cp ${SCRIPT_DIR}/../LICENSE ${SCRIPT_DIR}/../local/oudbase/doc
 # update version in *.sh files
 VERSION=$(grep -i "OUD Base Release" ./doc/.version |sed -E 's/.*(v[0-9]+.[0-9]+.[0-9]+).*/\1/')
 
-for i in ./bin/*.sh; do
+for i in ./bin/*; do
     echo "update version to ${VERSION} in file $i"
     sed -i -E "s/^VERSION=.*/VERSION=${VERSION}/" $i 
 done
