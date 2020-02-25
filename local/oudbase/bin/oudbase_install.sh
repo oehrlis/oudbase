@@ -438,7 +438,11 @@ if [ "${APPEND_PROFILE}" = "TRUE" ]; then
     echo "alias oud='. \${OUD_BASE}/bin/oudenv.sh'"                     >>"${PROFILE}"
     echo ""                                                             >>"${PROFILE}"
     echo "# source oud environment"                                     >>"${PROFILE}"
-    echo ". \${OUD_BASE}/bin/oudenv.sh"                                 >>"${PROFILE}"
+    echo "if [ -z \"$PS1\" ]; then"                                     >>"${PROFILE}"
+    echo "    . \${OUD_BASE}/bin/oudenv.sh SILENT"                      >>"${PROFILE}"
+    echo "else"                                                         >>"${PROFILE}"
+    echo "    . \${OUD_BASE}/bin/oudenv.sh"                             >>"${PROFILE}"
+    echo "fi"                                                           >>"${PROFILE}"
 else
     DoMsg "INFO : Please manual adjust your .bash_profile to load / source your OUD Environment"
     DoMsg "INFO : using the following code"
@@ -455,7 +459,11 @@ else
     DoMsg "alias oud='. \${OUD_BASE}/bin/oudenv.sh'"
     DoMsg ""
     DoMsg "# source oud environment"
-    DoMsg ". ${OUD_BASE}/bin/oudenv.sh"
+    DoMsg "if [ -z \"$PS1\" ]; then"
+    DoMsg "    . \${OUD_BASE}/bin/oudenv.sh SILENT"
+    DoMsg "else"
+    DoMsg "    . \${OUD_BASE}/bin/oudenv.sh"
+    DoMsg "fi"
 fi
 
 touch $HOME/.OUD_BASE 2>/dev/null
