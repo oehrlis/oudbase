@@ -25,3 +25,4 @@ local/oudbase/lib/ldapjclnt19.jar
 /Build tar and shell.launch
 /org.python.pydev.PyDevBuilder.launch
 /.externalToolBuilders/
+doc/oudbase.code-workspace
