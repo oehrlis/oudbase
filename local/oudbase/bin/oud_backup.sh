@@ -30,7 +30,7 @@ MAILADDRESS=""
 SEND_MAIL="FALSE"                               # don't send mails by default
 ERROR=0
 TYPE="FULL"                                     # Default Backup Type
-KEEP=4                                          # Number of Weeks to keep
+KEEP=4                                          # Default number of Weeks to keep
 compress="--compress"                           # set --compress Flag
 OUD_ERROR=0                                     # default value for error
 # - End of Default Values -----------------------------------------------
@@ -212,7 +212,7 @@ fi
  
 # Set a minimal value for KEEP to 1 eg. 1 week
 if [ ${KEEP} -lt 1 ]; then
-KEEP=1
+    KEEP=1
 fi
  
 if [ "$MyOUD_INSTANCES" = "" ]; then
@@ -248,11 +248,16 @@ else
     incremental=""
 fi
  
+# set the default value for keep if not defined
+KEEP=${KEEP:-4}
 # define backup set as modulo 5 of week number
-NEW_WEEKNO=$(date "+%U")
+NEW_WEEKNO=$(date "+%U"|sed "s/^0*//g")
 OLD_WEEKNO=$((${NEW_WEEKNO}-${KEEP}))
 NEW_BACKUP_SET="backup_set$(( ${NEW_WEEKNO} % (${KEEP}+1)))"
 OLD_BACKUP_SET="backup_set$(( ${OLD_WEEKNO} % (${KEEP}+1)))"
+# set default value for NEW_BACKUP_SET
+NEW_BACKUP_SET=${NEW_BACKUP_SET:-"backup_set0"}
+
 DoMsg "INFO : Define backup set for week ${NEW_WEEKNO} as ${NEW_BACKUP_SET}"
 DoMsg "INFO : Define backup set to be purged for week ${OLD_WEEKNO} as ${OLD_BACKUP_SET}"
  
@@ -340,12 +345,18 @@ for oud_inst in ${OUD_INST_LIST}; do
                 DoMsg "INFO : [$oud_inst] Send instance logfile ${INST_LOG_FILE} to ${MAILADDRESS}"
                 cat ${INST_LOG_FILE}|mailx -s "INFO : Backup OUD Instance ${OUD_INSTANCE} successfully finished" ${MAILADDRESS}
             fi
-            # Automaticaly purge backup's older than KEEP weeks
-            if [ -d ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET} ]; then
-                DoMsg "INFO : [$oud_inst] Remove old backup set ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET} of week ${OLD_WEEKNO}"
-                rm -rf ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET}
+
+            # check if we do have a an old backup set defined
+            if [ -z "$OLD_BACKUP_SET" ]; then
+                DoMsg "WARN : [$oud_inst] old backup set not defined. Do not purge any backup."
             else
-                DoMsg "INFO : [$oud_inst] No old backup found (eg. ${OLD_BACKUP_SET} week ${OLD_WEEKNO})"
+                # Automaticaly purge backup's older than KEEP weeks
+                if [ -d ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET} ]; then
+                    DoMsg "INFO : [$oud_inst] Remove old backup set ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET} of week ${OLD_WEEKNO}"
+                    #rm -rf ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET}
+                else
+                    DoMsg "INFO : [$oud_inst] No old backup found (eg. ${OLD_BACKUP_SET} week ${OLD_WEEKNO})"
+                fi
             fi
         fi
     else
