@@ -24,4 +24,8 @@ fi
 alias oud=". ${OUD_BASE}/local/bin/oudenv.sh"
 
 # source oud environment
-. ${OUD_BASE}/local/bin/oudenv.sh
+if [ -z "$PS1" ]; then
+    . ${OUD_BASE}/bin/oudenv.sh SILENT
+else
+    . ${OUD_BASE}/bin/oudenv.sh
+fi
