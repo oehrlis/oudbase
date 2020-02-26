@@ -35,7 +35,7 @@ BASE64_BIN=$(find /usr/bin -name base64 -print) # executable for base64
 BASE64_BIN=${BASE64_BIN:-"$(command -v -p base64)"} # executable for base64
 TAR_BIN=$(command -v -p tar)                    # executable for tar
 OUD_CORE_CONFIG="oudenv_core.conf"
-CONFIG_FILES="oudtab oud._DEFAULT_.conf"
+CONFIG_FILES="oudtab oud._DEFAULT_.conf oudenv_core.conf"
 PAYLOAD_BINARY=0                                # default disable binary payload 
 PAYLOAD_BASE64=1                                # default enable base64 payload 
 
