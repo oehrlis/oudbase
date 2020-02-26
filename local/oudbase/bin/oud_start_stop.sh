@@ -25,6 +25,8 @@ VERSION=v1.7.4
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 FORCE="FALSE"                                   # enable force restart
+TIMEOUT=60                                      # default timeout in seconds
+WAIT_ITER=60                                    # default wait iternation
 SCRIPT_NAME=$(basename $0)
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
@@ -37,12 +39,14 @@ HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)  # Hostname
 # -----------------------------------------------------------------------
 function Usage() {
     VERBOSE="TRUE"
-    DoMsg "INFO : Usage, ${SCRIPT_NAME} [-hv -a <START|STOP> -i <OUD_INSTANCES>] [<START|STOP> <OUD_INSTANCES>]"
-    DoMsg "INFO :   -h                 Usage (this message"
-    DoMsg "INFO :   -v                 enable verbose mode"
-    DoMsg "INFO :   -f                 force startup will cause a restart if instance is running"
-    DoMsg "INFO :   -a <start|stop>    Activity either start or stop"
-    DoMsg "INFO :   -i <OUD_INSTANCES> List of OUD instances (default all market with Y in oudtab)"
+    DoMsg "INFO : Usage, ${SCRIPT_NAME} [-fhvw -t <TIMEOUT> -a <START|STOP|RESTART> -i <OUD_INSTANCES>]"
+    DoMsg "INFO :   -h                      Usage (this message"
+    DoMsg "INFO :   -v                      enable verbose mode"
+    DoMsg "INFO :   -f                      force startup will cause a restart if instance is running"
+    DoMsg "INFO :   -w                      wait for OUDSM to start (default nowait)"
+    DoMsg "INFO :   -t <TIMEOUT>            timeout when waiting for OUDSM (default ${TIMEOUT} seconds)"
+    DoMsg "INFO :   -a <start|stop|restart> Activity either start or stop"
+    DoMsg "INFO :   -i <OUD_INSTANCES>      List of OUD instances (default all market with Y in oudtab)"
     DoMsg "INFO : Logfile : ${LOGFILE}"
     if [ ${1} -gt 0 ]; then
         CleanAndQuit ${1} ${2}
@@ -169,12 +173,14 @@ fi
 
 # usage and getopts
 DoMsg "INFO : processing commandline parameter"
-while getopts hvfa:i:E: arg; do
+while getopts hvwft:a:i:E: arg; do
     case $arg in
         h) Usage 0;;
         v) VERBOSE="TRUE";;
         f) FORCE="TRUE";;
+        w) WAIT="TRUE";;
         a) MyActivity="${OPTARG}";;
+        t) TIMEOUT="${OPTARG}";;
         i) MyOUD_INSTANCES=$(echo "${OPTARG}"|sed s/\,/\ /g);;
         E) CleanAndQuit "${OPTARG}";;
         ?) Usage 2 $*;;
@@ -197,6 +203,10 @@ fi
 MyActivity=${MyActivity:-"START"}
 MyActivity=$(echo $MyActivity|sed "s/^start$/START/gi")
 MyActivity=$(echo $MyActivity|sed "s/^stop$/STOP/gi")
+MyActivity=$(echo $MyActivity|sed "s/^restart$/RESTART/gi")
+
+# set the timeout just in case
+TIMEOUT=${TIMEOUT:-10}
 
 if [ "$MyOUD_INSTANCES" = "" ]; then
     # Load list of OUD Instances from oudtab
@@ -243,13 +253,21 @@ for oud_inst in ${OUD_INST_LIST}; do
     fi
     INSTANCE_LOGFILE="${LOG_BASE}/$(basename ${SCRIPT_NAME} .sh)_${oud_inst}.log"
     DoMsg "INFO : Initiate $MyActivity for ${DIRECTORY_TYPE} instance ${oud_inst}"
-    DoMsg "INFO : Check the progress in instance logfile ${INSTANCE_LOGFILE}"
+    DoMsg "INFO : [$oud_inst] check the progress in instance logfile ${INSTANCE_LOGFILE}"
     if [ "$MyActivity" == "START" ]; then
         # check if instance is running
         ${OUDSTATUS} -i $oud_inst 2>&1 >/dev/null
         OUDSTATUS_ERROR=$?
         if [ ${OUDSTATUS_ERROR} -eq 0 ] && [ ${FORCE} == "TRUE" ]; then
-            DoMsg "WARN : Force not yet implemented"
+            if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+                DoMsg "INFO : [$oud_inst] Instance $oud_inst forced to restart."
+                $OUD_INSTANCE_HOME/OUD/bin/stop-ds >> ${INSTANCE_LOGFILE} 2>&1 
+                $OUD_INSTANCE_HOME/OUD/bin/start-ds >> ${INSTANCE_LOGFILE} 2>&1 
+            elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+                DoMsg "WARN : [$oud_inst] force not supported for OUDSM. Skip $MyActivity force for this instance."
+            else
+                DoMsg "WARN : [$oud_inst] Instance $oud_inst is not of type OUD/OUDSM. Skip $MyActivity for this instance."
+            fi 
         elif [ ${OUDSTATUS_ERROR} -eq 0 ] && [ ${FORCE} == "FALSE" ]; then
             DoMsg "WARN : Instance $oud_inst already running"
             ERROR=$((ERROR+1))
@@ -262,18 +280,89 @@ for oud_inst in ${OUD_INST_LIST}; do
                 find $OUD_INSTANCE_HOME/servers -name "*.lok" -exec rm -f {} \; 2>/dev/null
                 find $OUD_INSTANCE_HOME/servers -name "*.DAT" -exec rm -f {} \; 2>/dev/null
                 nohup $OUD_INSTANCE_HOME/startWebLogic.sh >> ${INSTANCE_LOGFILE} 2>&1 &
+                if [ ${WAIT} == "TRUE" ]; then
+                    DoMsg "INFO : [$oud_inst] Start OUDSM domain $oud_inst and wait for ${TIMEOUT} seconds."
+                    # OUDSM URL to check
+                    URL="http://${HOST}:$PORT/oudsm/"
+                    # check URL using curl
+                    curl -sf ${URL} --output /dev/null 2>&1 >/dev/null
+                    STARTING=$?                 # get return value
+                    # calculate sleeptime 
+                    WAIT_TIME=$(($TIMEOUT / $WAIT_ITER))
+                    NEXT_WAIT=1
+                    START_EPOCH=$(date "+%s")
+                    # start the until loop
+                    until [ $STARTING -eq 0 ] || [ $(($NEXT_WAIT*$WAIT_TIME)) -ge $TIMEOUT ]; do
+                        [[ ${VERBOSE} == "TRUE" ]] && echo -n "."
+                        sleep $WAIT_TIME        # Wait for the wait time
+                        # check oudsm url
+                        curl -sf ${URL} --output /dev/null 2>&1 >/dev/null
+                        STARTING=$?             # get return value
+                        let NEXT_WAIT++         # increment wait counter
+                    done
+                    END_EPOCH=$(date "+%s")
+                    # print a status if in verbose mode
+                    if [ $STARTING -eq 0 ]; then
+                        [[ ${VERBOSE} == "TRUE" ]] && echo " OK (after $(($END_EPOCH-$START_EPOCH)) seconds)"     # status is OK
+                    else
+                        [[ ${VERBOSE} == "TRUE" ]] && echo " timeout ( $TIMEOUT seconds)" # run into a timeout
+                    fi
+                else
+                    DoMsg "INFO : [$oud_inst] Start OUDSM domain $oud_inst in background."
+                fi
             else
                 DoMsg "WARN : [$oud_inst] Instance $oud_inst is not of type OUD/OUDSM. Skip $MyActivity for this instance."
             fi 
         fi
-   elif  [ "$MyActivity" == "STOP" ]; then 
+    elif  [ "$MyActivity" == "STOP" ]; then 
         if [ ${DIRECTORY_TYPE} == "OUD" ]; then
             $OUD_INSTANCE_HOME/OUD/bin/stop-ds >> ${INSTANCE_LOGFILE} 2>&1 
         elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
             nohup $OUD_INSTANCE_HOME/bin/stopWebLogic.sh >> ${INSTANCE_LOGFILE} 2>&1 &
+            if [ ${WAIT} == "TRUE" ]; then
+                DoMsg "INFO : [$oud_inst] Stop OUDSM domain $oud_inst and wait for ${TIMEOUT} seconds."
+                # OUDSM URL to check
+                URL="http://${HOST}:$PORT/oudsm/"
+                # check URL using curl
+                curl -sf ${URL} --output /dev/null 2>&1 >/dev/null
+                STARTING=$?                 # get return value
+                # calculate sleeptime 
+                WAIT_TIME=$(($TIMEOUT / $WAIT_ITER))
+                NEXT_WAIT=1
+                START_EPOCH=$(date "+%s")
+                # start the until loop
+                until [ $STARTING -ne 0 ] || [ $(($NEXT_WAIT*$WAIT_TIME)) -ge $TIMEOUT ]; do
+                    [[ ${VERBOSE} == "TRUE" ]] && echo -n "."
+                    sleep $WAIT_TIME        # Wait for the wait time
+                    # check oudsm url
+                    curl -sf ${URL} --output /dev/null 2>&1 >/dev/null
+                    STARTING=$?             # get return value
+                    let NEXT_WAIT++         # increment wait counter
+                done
+                END_EPOCH=$(date "+%s")
+                # print a status if in verbose mode
+                if [ $STARTING -ne 0 ]; then
+                    # status is OK
+                    [[ ${VERBOSE} == "TRUE" ]] && echo " OK (after $(($END_EPOCH-$START_EPOCH)) seconds)"
+                else
+                    # run into a timeout
+                    [[ ${VERBOSE} == "TRUE" ]] && echo " timeout ( $TIMEOUT seconds)"
+                fi
+            else
+                DoMsg "INFO : [$oud_inst] Stop OUDSM domain $oud_inst in background."
+            fi
             # clean up old WLS lok, DAT files
             find $OUD_INSTANCE_HOME/servers -name "*.lok" -exec rm -f {} \;
             find $OUD_INSTANCE_HOME/servers -name "*.DAT" -exec rm -f {} \;
+        else
+            DoMsg "WARN : [$oud_inst] Instance $oud_inst is not of type OUD/OUDSM. Skip $MyActivity for this instance."
+        fi
+    elif  [ "$MyActivity" == "RESTART" ]; then 
+        if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+            $OUD_INSTANCE_HOME/OUD/bin/stop-ds >> ${INSTANCE_LOGFILE} 2>&1 
+            $OUD_INSTANCE_HOME/OUD/bin/start-ds >> ${INSTANCE_LOGFILE} 2>&1 
+        elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+            DoMsg "WARN : [$oud_inst] $MyActivity not supported for OUDSM. Skip $MyActivity for this instance."
         else
             DoMsg "WARN : [$oud_inst] Instance $oud_inst is not of type OUD/OUDSM. Skip $MyActivity for this instance."
         fi
