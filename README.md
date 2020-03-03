@@ -36,78 +36,78 @@ oracle@oud:~/ [oud_cdse] /u01/shared/oudbase_install.sh -h
 Installation example to install **OUD base** in a OUD docker container in verbose mode. **-b** is used to specify the **ORACLE_BASE** directory where **-d** is used to specify */u01* (configured as docker volume) as **OUD_DATA** base folder to store instance data, configuration files etc. 
 
 ```bash
-oracle@oudeng:/u00/app/oracle/ [oud_docker] /u01/scripts/oudbase_install.sh -v -b /u00/app/oracle -o /u00/app/oracle -d /u01
-2018-02-16_10:54:05  START: Start of oudbase_install.sh (Version 1.0.0) with -v -b /u00/app/oracle -o /u00/app/oracle -d /u01
-2018-02-16_10:54:05  INFO : processing commandline parameter
-2018-02-16_10:54:05  INFO : Define default values
-2018-02-16_10:54:05  INFO : Using the following variable for installation
-2018-02-16_10:54:05  INFO : ORACLE_BASE          = /u00/app/oracle
-2018-02-16_10:54:05  INFO : OUD_BASE             = /u00/app/oracle
-2018-02-16_10:54:05  INFO : LOG_BASE             = /u01/log
-2018-02-16_10:54:05  INFO : ETC_CORE             = /u00/app/oracle/local/etc
-2018-02-16_10:54:05  INFO : ETC_BASE             = /u01/etc
-2018-02-16_10:54:05  INFO : OUD_DATA             = /u01
-2018-02-16_10:54:05  INFO : OUD_INSTANCE_BASE    = /u01/instances
-2018-02-16_10:54:05  INFO : OUD_ADMIN_BASE       = /u01/admin
-2018-02-16_10:54:05  INFO : OUD_BACKUP_BASE      = /u01/backup
-2018-02-16_10:54:05  INFO : ORACLE_PRODUCT       = /u00/app/oracle/product
-2018-02-16_10:54:05  INFO : ORACLE_HOME          = /u00/app/oracle/product/fmw12.2.1.3.0
-2018-02-16_10:54:05  INFO : ORACLE_FMW_HOME      = /u00/app/oracle/product/fmw12.2.1.3.0
-2018-02-16_10:54:05  INFO : JAVA_HOME            = /usr/java/jdk1.8.0_162
-2018-02-16_10:54:05  INFO : SCRIPT_FQN           = /u01/scripts/oudbase_install.sh
-2018-02-16_10:54:05  INFO : Installing OUD Environment
-2018-02-16_10:54:05  INFO : Create required directories in ORACLE_BASE=/u00/app/oracle
-2018-02-16_10:54:05  INFO : Create Directory /u01/log
-2018-02-16_10:54:05  INFO : Create Directory /u01/etc
-2018-02-16_10:54:05  INFO : Create Directory /u00/app/oracle/local
-2018-02-16_10:54:05  INFO : Create Directory /u01/admin
-2018-02-16_10:54:05  INFO : Create Directory /u01/backup
-2018-02-16_10:54:05  INFO : Create Directory /u01/instances
-2018-02-16_10:54:05  INFO : Create Directory /u00/app/oracle/product
-2018-02-16_10:54:05  INFO : Backup existing config files
-2018-02-16_10:54:05  INFO : Backup oudtab to oudtab.save
-2018-02-16_10:54:05  INFO : Backup oudenv.conf to oudenv.conf.save
-2018-02-16_10:54:05  INFO : Backup oud._DEFAULT_.conf to oud._DEFAULT_.conf.save
-2018-02-16_10:54:05  INFO : Extracting file into /u00/app/oracle/local
+oracle@eusoud:/u01/config/ [oud_eus] ./oudbase_install.sh -v -b /u00/app/oracle -o /u00/app/oracle -d /u01
+2020-03-02_21:55:12  START: Start of oudbase_install.sh (Version v1.7.5) with -v -b /u00/app/oracle -o /u00/app/oracle -d /u01
+2020-03-02_21:55:12  INFO : processing commandline parameter
+2020-03-02_21:55:12  INFO : Define default values
+2020-03-02_21:55:13  INFO : Using the following variable for installation
+2020-03-02_21:55:13  INFO : ORACLE_BASE          = /u00/app/oracle
+2020-03-02_21:55:13  INFO : OUD_BASE             = /u00/app/oracle
+2020-03-02_21:55:13  INFO : LOG_BASE             = /u01/log
+2020-03-02_21:55:13  INFO : ETC_CORE             = /u00/app/oracle/etc
+2020-03-02_21:55:13  INFO : ETC_BASE             = /u01/etc
+2020-03-02_21:55:13  INFO : OUD_DATA             = /u01
+2020-03-02_21:55:13  INFO : ORACLE_DATA          = /u01
+2020-03-02_21:55:13  INFO : OUD_INSTANCE_BASE    = /u01/instances
+2020-03-02_21:55:13  INFO : OUD_ADMIN_BASE       = /u01/admin
+2020-03-02_21:55:13  INFO : OUD_BACKUP_BASE      = /u01/backup
+2020-03-02_21:55:13  INFO : ORACLE_PRODUCT       = /u00/app/oracle/product
+2020-03-02_21:55:13  INFO : ORACLE_HOME          = /u00/app/oracle/product/fmw12.2.1.4.0
+2020-03-02_21:55:13  INFO : ORACLE_FMW_HOME      = /u00/app/oracle/product/fmw12.2.1.3.0
+2020-03-02_21:55:13  INFO : JAVA_HOME            = /usr/java/jdk1.8.0_241
+2020-03-02_21:55:13  INFO : SCRIPT_FQN           = /u01/config/oudbase_install.sh
+2020-03-02_21:55:13  INFO : Installing OUD Environment
+2020-03-02_21:55:13  INFO : Create required directories in ORACLE_BASE=/u00/app/oracle
+2020-03-02_21:55:13  INFO : Create Directory /u01/log
+2020-03-02_21:55:13  INFO : Create Directory /u01/etc
+2020-03-02_21:55:13  INFO : Create Directory /u00/app/oracle/local
+2020-03-02_21:55:13  INFO : Create Directory /u01/admin
+2020-03-02_21:55:13  INFO : Create Directory /u01/backup
+2020-03-02_21:55:13  INFO : Create Directory /u01/instances
+2020-03-02_21:55:13  INFO : Create Directory /u00/app/oracle/product
+2020-03-02_21:55:13  INFO : Create Directory /u00/app/oracle
+2020-03-02_21:55:13  INFO : Backup existing config files
+2020-03-02_21:55:13  INFO : Backup oudtab to oudtab.save
+2020-03-02_21:55:13  INFO : Backup oud._DEFAULT_.conf to oud._DEFAULT_.conf.save
+2020-03-02_21:55:13  INFO : Start processing the payload
+2020-03-02_21:55:13  INFO : Payload is available as of line 487.
+2020-03-02_21:55:13  INFO : Extracting payload into /u00/app/oracle/local
+2020-03-02_21:55:13  INFO : Payload is set to base64. Using base64 decode before untar.
 bin/
 bin/oud_status.sh
+bin/oud_start_stop.sh
+bin/oud_start_stop_all
 bin/oud_export.sh
 bin/oud_backup.sh
 bin/oudenv.sh
-config/
-certificates/
+bin/oud_eusm.sh
 doc/
+doc/LICENSE
 doc/README.md
+doc/.version
+doc/.oudbase.sha
 etc/
 etc/oudenv_core.conf
 etc/oudenv.conf
 etc/oudenv_custom.conf
 etc/oudtab
 etc/oud._DEFAULT_.conf
-lib/
 log/
+lib/
 templates/
-templates/ldif/
 templates/etc/
 templates/cron.d/
 templates/.bash_profile
 templates/logrotate.d/
 templates/create/
-templates/create/create_OUDSM.py
-templates/logrotate.d/oud
-templates/cron.d/oud
-templates/etc/wls_oudsm.service
-templates/etc/install.rsp
-templates/etc/oraInst.loc
-templates/etc/oud_instance.service
-templates/ldif/oud_pi_init.ldif
-2018-02-16_10:54:05  INFO : Restore cusomized config files
-2018-02-16_10:54:05  INFO : Store customization in core config file /u00/app/oracle/local/etc/oudenv_core.conf
-2018-02-16_10:54:05  INFO : save customization for OUD_DATA (/u01)
-2018-02-16_10:54:05  INFO : save customization for OUD_BASE (/u00/app/oracle)
-2018-02-16_10:54:05  INFO : save customization for ORACLE_BASE (/u00/app/oracle)
-2018-02-16_10:54:05  INFO : Please manual adjust your .bash_profile to load / source your OUD Environment
-2018-02-16_10:54:05  INFO : using the following code
+...
+2020-03-02_21:55:14  INFO : Restore cusomized config files
+2020-03-02_21:55:14  INFO : Store customization in core config file /u00/app/oracle/etc/oudenv_core.conf
+2020-03-02_21:55:14  INFO : save customization for OUD_DATA (/u01)
+2020-03-02_21:55:14  INFO : save customization for OUD_BASE (/u00/app/oracle)
+2020-03-02_21:55:14  INFO : save customization for ORACLE_BASE (/u00/app/oracle)
+2020-03-02_21:55:14  INFO : Please manual adjust your .bash_profile to load / source your OUD Environment
+2020-03-02_21:55:14  INFO : using the following code
 # Check OUD_BASE and load if necessary
 if [ "${OUD_BASE}" = "" ]; then
   if [ -f "${HOME}/.OUD_BASE" ]; then
@@ -118,13 +118,16 @@ if [ "${OUD_BASE}" = "" ]; then
 fi
 
 # define an oudenv alias
-alias oud=". ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh"
+alias oud='. ${OUD_BASE}/bin/oudenv.sh'
 
 # source oud environment
-. ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/bin/oudenv.sh
-2018-02-16_10:54:05  INFO : Could not update your .OUD_BASE file /home/oracle/.OUD_BASE
-2018-02-16_10:54:05  INFO : make sure to add the right OUD_BASE directory
-2018-02-16_10:54:05  END  : of oudbase_install.sh
+if [ -z "" ]; then
+    . ${OUD_BASE}/bin/oudenv.sh SILENT
+else
+    . ${OUD_BASE}/bin/oudenv.sh
+fi
+2020-03-02_21:55:14  INFO : update your .OUD_BASE file /home/oracle/.OUD_BASE
+2020-03-02_21:55:14  END  : of oudbase_install.sh
 ```
 
 The only manual step after installing *OUD Base* is to adjust the *.bash_profile / .profile script*. Just source the corresponding script as described in *$OUD_BASE/local/templates/.bash_profile*. 
