@@ -45,7 +45,7 @@ function Usage() {
     DoMsg "INFO :   -f                      force startup will cause a restart if instance is running"
     DoMsg "INFO :   -w                      wait for OUDSM to start (default nowait)"
     DoMsg "INFO :   -t <TIMEOUT>            timeout when waiting for OUDSM (default ${TIMEOUT} seconds)"
-    DoMsg "INFO :   -a <start|stop|restart> Activity either start or stop"
+    DoMsg "INFO :   -a <start|stop|restart> Activity either start, stop or restart (default start)"
     DoMsg "INFO :   -i <OUD_INSTANCES>      List of OUD instances (default all market with Y in oudtab)"
     DoMsg "INFO : Logfile : ${LOGFILE}"
     if [ ${1} -gt 0 ]; then
