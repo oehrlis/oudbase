@@ -1,13 +1,20 @@
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # -----------------------------------------------------------------------
-# Name.......: oud.crontab
+# Name.......: crontab.conf
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2018.03.18
 # Revision...: --
 # Purpose....: Cronjob File for OUD Environment
-# Notes......: --
+#   OUD_BASE        ${OUD_BASE}
+#   MAILADDRESS     your email
+#
+#   cp ${OUD_LOCAL}/talanx/template/etc/crontab.conf   ${ETC_BASE}/crontab.conf
+#   sed -i "s|OUD_BASE|${OUD_BASE}|"                   ${ETC_BASE}/crontab.conf
+#   sed -i "s|MAILADDRESS|your email|"                  ${ETC_BASE}/crontab.conf
+#   crontab ${ETC_BASE}/crontab.conf
+#
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
 # -----------------------------------------------------------------------
@@ -22,17 +29,17 @@
 # --------------------------------------------------+--------------------
 # weekly full backup of all running instances       | Sunday at 7:00 p.m.
 # --------------------------------------------------+--------------------
-0 19 * * 0     OUD_BASE/bin/oud_backup.sh -t FULL -m oud@oradba.ch >/dev/null 2>&1
+#0 19 * * 0     OUD_BASE/bin/oud_backup.sh -t FULL -m MAILADDRESS >/dev/null 2>&1
 
 # --------------------------------------------------+--------------------
 # daily incremental backup of all running instances | Mo-Sa at 7:00 p.m.|
 # --------------------------------------------------+--------------------
-0 19 * * 1-6   OUD_BASE/bin/oud_backup.sh -t INCREMENTAL -m oud@oradba.ch >/dev/null 2>&1
+#0 19 * * 1-6   OUD_BASE/bin/oud_backup.sh -t INCREMENTAL -m MAILADDRESS >/dev/null 2>&1
 
 # --------------------------------------------------+--------------------
 # daily export of all running instances             | daily at 10 p.m. 
 # --------------------------------------------------+--------------------
-0 22 * * *    OUD_BASE/bin/oud_export.sh -m oud@oradba.ch >/dev/null 2>&1
+#0 22 * * *    OUD_BASE/bin/oud_export.sh -m MAILADDRESS >/dev/null 2>&1
 
 # --------------------------------------------------+--------------------
 # daily housekeeping of log file                    | daily at 11 p.m. 
@@ -42,4 +49,4 @@
 # --------------------------------------------------+--------------------
 # regular instance status check                     | every 5 minutes 
 # --------------------------------------------------+--------------------
-# */5 * * * *  OUD_BASE/bin/oud_status.sh -i OUD_INSTANCE -r -l >/dev/null 2>&1
+#*/5 * * * *  OUD_BASE/bin/oud_status.sh -i OUD_INSTANCE -r -l >/dev/null 2>&1
