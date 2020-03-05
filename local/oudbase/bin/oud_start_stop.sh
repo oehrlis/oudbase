@@ -28,104 +28,35 @@ FORCE="FALSE"                                   # enable force restart
 TIMEOUT=60                                      # default timeout in seconds
 WAIT_ITER=60                                    # default wait iternation
 SCRIPT_NAME=$(basename $0)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
 HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)  # Hostname
 # - End of Default Values -----------------------------------------------
  
 # - Functions -----------------------------------------------------------
+# source common functions from oud_functions.sh
+. ${SCRIPT_DIR}/oud_functions.sh
 # -----------------------------------------------------------------------
 # Purpose....: Display Usage
 # -----------------------------------------------------------------------
 function Usage() {
     VERBOSE="TRUE"
-    DoMsg "INFO : Usage, ${SCRIPT_NAME} [-fhvw -t <TIMEOUT> -a <START|STOP|RESTART> -i <OUD_INSTANCES>]"
-    DoMsg "INFO :   -h                      Usage (this message"
-    DoMsg "INFO :   -v                      enable verbose mode"
-    DoMsg "INFO :   -f                      force startup will cause a restart if instance is running"
-    DoMsg "INFO :   -w                      wait for OUDSM to start (default nowait)"
-    DoMsg "INFO :   -t <TIMEOUT>            timeout when waiting for OUDSM (default ${TIMEOUT} seconds)"
-    DoMsg "INFO :   -a <start|stop|restart> Activity either start, stop or restart (default start)"
-    DoMsg "INFO :   -i <OUD_INSTANCES>      List of OUD instances (default all market with Y in oudtab)"
-    DoMsg "INFO : Logfile : ${LOGFILE}"
+    DoMsg " Usage, ${SCRIPT_NAME} [-fhvw -t <TIMEOUT> -a <START|STOP|RESTART> -i <OUD_INSTANCES>]"
+    DoMsg "    -h                      Usage (this message"
+    DoMsg "    -v                      enable verbose mode"
+    DoMsg "    -f                      force startup will cause a restart if instance is running"
+    DoMsg "    -w                      wait for OUDSM to start (default nowait)"
+    DoMsg "    -t <TIMEOUT>            timeout when waiting for OUDSM (default ${TIMEOUT} seconds)"
+    DoMsg "    -a <start|stop|restart> Activity either start, stop or restart (default start)"
+    DoMsg "    -i <OUD_INSTANCES>      List of OUD instances (default all market with Y in oudtab)"
+    DoMsg "    Logfile : ${LOGFILE}"
     if [ ${1} -gt 0 ]; then
         CleanAndQuit ${1} ${2}
     else
         VERBOSE="FALSE"
         CleanAndQuit 0
     fi
-}
- 
-# -----------------------------------------------------------------------
-# Purpose....: Display Message with time stamp
-# -----------------------------------------------------------------------
-function DoMsg() {
-    INPUT=${1%:*}                         # Take everything behinde
-    case ${INPUT} in                    # Define a nice time stamp for ERR, END
-        "END ")  TIME_STAMP=$(date "+%Y-%m-%d_%H:%M:%S");;
-        "ERR ")  TIME_STAMP=$(date "+%n%Y-%m-%d_%H:%M:%S");;
-        "START") TIME_STAMP=$(date "+%Y-%m-%d_%H:%M:%S");;
-        "OK")    TIME_STAMP="";;
-        "*")     TIME_STAMP="....................";;
-    esac
-    if [ "${VERBOSE}" = "TRUE" ]; then
-        if [ "${DOAPPEND}" = "TRUE" ]; then
-            echo "${TIME_STAMP}  ${1}" |tee -a ${LOGFILE}
-        else
-            echo "${TIME_STAMP}  ${1}"
-        fi
-        shift
-        while [ "${1}" != "" ]; do
-            if [ "${DOAPPEND}" = "TRUE" ]; then
-                echo "               ${1}" |tee -a ${LOGFILE}
-            else
-                echo "               ${1}"
-            fi
-            shift
-        done
-    else
-        if [ "${DOAPPEND}" = "TRUE" ]; then
-            echo "${TIME_STAMP}  ${1}" >> ${LOGFILE}
-        fi
-        shift
-        while [ "${1}" != "" ]; do
-            if [ "${DOAPPEND}" = "TRUE" ]; then
-                echo "               ${1}" >> ${LOGFILE}
-            fi
-            shift
-        done
-    fi
-}
- 
-# -----------------------------------------------------------------------
-# Purpose....: Clean up before exit
-# -----------------------------------------------------------------------
-function CleanAndQuit() {
-    STATUS="INFO"
-    if [ ${1} -gt 0 ]; then
-      VERBOSE="TRUE"
-      STATUS="ERROR"
-    fi
-
-    case ${1} in
-        0)  DoMsg "END  : of ${SCRIPT_NAME}";;
-        1)  DoMsg "ERR  : Exit Code ${1}. Wrong amount of arguments. See usage for correct one.";;
-        2)  DoMsg "ERR  : Exit Code ${1}. Wrong arguments (${2}). See usage for correct one.";;
-        10) DoMsg "ERR  : Exit Code ${1}. OUD_BASE not set or $OUD_BASE not available.";;
-        11) DoMsg "ERR  : Exit Code ${1}. Could not touch file ${2}";;
-        21) DoMsg "ERR  : Exit Code ${1}. Could not load \${HOME}/.OUD_BASE";;
-        30) DoMsg "ERR  : Exit Code ${1}. Some backups failed";;
-        31) DoMsg "ERR  : Exit Code ${1}. Some exports failed";;
-        43) DoMsg "ERR  : Exit Code ${1}. Missing bind password file";;
-        44) DoMsg "ERR  : Exit Code ${1}. Can not create directory ${2}";;
-        45) DoMsg "ERR  : Exit Code ${1}. Directory ${2} is not writeable";;
-        50) DoMsg "ERR  : Exit Code ${1}. Error while performing exports";;
-        51) DoMsg "ERR  : Exit Code ${1}. Error while starting instances";;
-        52) DoMsg "ERR  : Exit Code ${1}. Error unknown activity ${2}";;
-        99) DoMsg "INFO : Just wanna say hallo.";;
-        ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
-    esac
-    exit ${1}
 }
 # - EOF Functions -------------------------------------------------------
  

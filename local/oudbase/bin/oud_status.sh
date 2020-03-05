@@ -26,6 +26,7 @@ VERSION=v1.7.5
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 TMP_DIRECTORY="/tmp"
 TMP_FILE="${TMP_DIRECTORY}/$(basename $0).$$"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
@@ -36,107 +37,28 @@ HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)    # Hostname
 # - End of Default Values -----------------------------------------------
 
 # - Functions -----------------------------------------------------------
+# source common functions from oud_functions.sh
+. ${SCRIPT_DIR}/oud_functions.sh
 # -----------------------------------------------------------------------
 function Usage() {
 # Purpose....: Display Usage
 # -----------------------------------------------------------------------
     VERBOSE="TRUE"
-    DoMsg "INFO : Usage, ${SCRIPT_NAME} [-hvr -i <OUD_INSTANCE> -D <bindDN> -j <bindPasswordFile> ]"
-    DoMsg "INFO :   -h                    Usage this message"
-    DoMsg "INFO :   -v                    enable verbose mode"
-    DoMsg "INFO :   -l                    enable instance log file in \$OUD_ADMIN_BASE/\$OUD_INSTANCE/"
-    DoMsg "INFO :   -r                    check for replication"
-    DoMsg "INFO :   -D <bindDN>           Default value: cn=Directory Manager"
-    DoMsg "INFO :   -j <bindPasswordFile> Bind password file"
-    DoMsg "INFO :   -i <OUD_INSTANCE>     OUD Instance"
-    DoMsg "INFO : Logfile : ${LOGFILE}"
+    DoMsg "Usage, ${SCRIPT_NAME} [-hvr -i <OUD_INSTANCE> -D <bindDN> -j <bindPasswordFile> ]"
+    DoMsg "    -h                    Usage this message"
+    DoMsg "    -v                    enable verbose mode"
+    DoMsg "    -l                    enable instance log file in \$OUD_ADMIN_BASE/\$OUD_INSTANCE/"
+    DoMsg "    -r                    check for replication"
+    DoMsg "    -D <bindDN>           Default value: cn=Directory Manager"
+    DoMsg "    -j <bindPasswordFile> Bind password file"
+    DoMsg "    -i <OUD_INSTANCE>     OUD Instance"
+    DoMsg "    Logfile : ${LOGFILE}"
     if [ ${1} -gt 0 ]; then
         CleanAndQuit ${1} ${2}
     else
         VERBOSE="FALSE"
         CleanAndQuit 0 
     fi
-}
-
-# -----------------------------------------------------------------------
-# Purpose....: Display Message with time stamp
-# -----------------------------------------------------------------------
-function DoMsg()
-{
-    INPUT=${1%:*}                         # Take everything behind
-    case ${INPUT} in                      # Define a nice time stamp for ERR, END
-        "END ")  TIME_STAMP=$(date "+%Y-%m-%d_%H:%M:%S");;
-        "ERR ")  TIME_STAMP=$(date "+%n%Y-%m-%d_%H:%M:%S");;
-        "START") TIME_STAMP=$(date "+%Y-%m-%d_%H:%M:%S");;
-        "OK")    TIME_STAMP="";;
-        "*")     TIME_STAMP="....................";;
-    esac
-    if [ "${VERBOSE}" = "TRUE" ]; then
-        if [ "${DOAPPEND}" = "TRUE" ]; then
-            echo "${TIME_STAMP}  ${1}" |tee -a ${LOGFILE} ${INSTANCE_LOGFILE}
-        else
-            echo "${TIME_STAMP}  ${1}"
-        fi
-        shift
-        while [ "${1}" != "" ]; do
-            if [ "${DOAPPEND}" = "TRUE" ]; then
-                echo "               ${1}" |tee -a ${LOGFILE} ${INSTANCE_LOGFILE}
-            else
-                echo "               ${1}"
-            fi
-            shift
-        done
-    else
-        if [ "${DOAPPEND}" = "TRUE" ]; then
-            echo "${TIME_STAMP}  ${1}" |tee -a ${LOGFILE} ${INSTANCE_LOGFILE} > /dev/null
-        fi
-        shift
-        while [ "${1}" != "" ]; do
-            if [ "${DOAPPEND}" = "TRUE" ]; then
-                echo "               ${1}"|tee -a ${LOGFILE} ${INSTANCE_LOGFILE} > /dev/null
-            fi
-            shift
-        done
-    fi
-}
-
-# -----------------------------------------------------------------------
-function CleanAndQuit() { 
-# Purpose....: Clean up before exit
-# -----------------------------------------------------------------------
-    if [ -e ${TMP_FILE} ]; then
-        DoMsg "INFO : Remove temp file ${TMP_FILE}"
-        rm ${TMP_FILE} 2>/dev/null
-        # remove oud status temp file due to an oracle Bug
-        rm /tmp/oud-status*.log 2>/dev/null
-        rm /tmp/oud-replication*.log 2>/dev/null
-    fi
-    # set verbose output incase of error >0
-    if [ ${1} -gt 0 ]; then
-        VERBOSE="TRUE"
-    fi
-    case ${1} in
-        0)  DoMsg "END  : Successfully quit of ${SCRIPT_NAME}";;
-        1)  DoMsg "ERR  : Exit Code ${1}. Wrong amount of arguments. See usage for correct one.";;
-        2)  DoMsg "ERR  : Exit Code ${1}. Wrong arguments (${2}). See usage for correct one.";;
-        5)  DoMsg "ERR  : Exit Code ${1}. OUD Instance ${2} does not exits in ${OUDTAB} or ${ORACLE_INSTANCE_BASE}";;
-        10) DoMsg "ERR  : Exit Code ${1}. OUD_BASE not set or $OUD_BASE not available.";;
-        11) DoMsg "ERR  : Exit Code ${1}. Could not touch file ${2}";;
-        21) DoMsg "ERR  : Exit Code ${1}. Could not load \${HOME}/.OUD_BASE";;
-        30) DoMsg "ERR  : Exit Code ${1}. Some Export failed";;
-        40) DoMsg "ERR  : Exit Code ${1}. Error not defined";;
-        41) DoMsg "ERR  : Exit Code ${1}. Error ${2} running status command";;
-        42) DoMsg "ERR  : Exit Code ${1}. Error ${2} running dsreplication command";;    
-        44) DoMsg "ERR  : Exit Code ${1}. unknown directory type ${2}, can not check status";;
-        43) DoMsg "ERR  : Exit Code ${1}. Missing bind password file";;
-        50) DoMsg "ERR  : Exit Code ${1}. OUD Instance ${2} not running";;
-        51) DoMsg "ERR  : Exit Code ${1}. Connection Handler ${2} is not enabled on ${OUD_INSTANCE}";;
-        52) DoMsg "ERR  : Exit Code ${1}. Error in Replication for OUD Instance ${OUD_INSTANCE}. Check replication log ${ORACLE_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/logs for more information";;
-        53) DoMsg "ERR  : Exit Code ${1}. Error OUDSM console ${2} is not available";;
-        99) DoMsg "INFO : Just wanna say hallo.";;
-        ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
-    esac
-    exit ${1}
 }
 # - EOF Functions -------------------------------------------------------
 
