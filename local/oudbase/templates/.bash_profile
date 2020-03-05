@@ -21,7 +21,7 @@ if [ "${OUD_BASE}" = "" ]; then
 fi
 
 # define an oudenv alias
-alias oud=". ${OUD_BASE}/local/bin/oudenv.sh"
+alias oud=". ${OUD_BASE}/bin/oudenv.sh"
 
 # source oud environment
 if [ -z "$PS1" ]; then
