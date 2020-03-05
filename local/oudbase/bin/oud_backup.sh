@@ -25,6 +25,7 @@ VERSION=v1.7.5
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 MAILADDRESS=""
 SEND_MAIL="FALSE"                               # don't send mails by default
@@ -36,118 +37,30 @@ OUD_ERROR=0                                     # default value for error
 # - End of Default Values -----------------------------------------------
  
 # - Functions -----------------------------------------------------------
+# source common functions from oud_functions.sh
+. ${SCRIPT_DIR}/oud_functions.sh
 # -----------------------------------------------------------------------
 # Purpose....: Display Usage
 # -----------------------------------------------------------------------
 function Usage() {
     VERBOSE="TRUE"
-    DoMsg "INFO : Usage, ${SCRIPT_NAME} [-hv -i <OUD_INSTANCES> -t <TYPE> -m <MAILADDRESSES>]"
-    DoMsg "INFO :   -h                 Usage (this message"
-    DoMsg "INFO :   -v                 enable verbose mode"
-    DoMsg "INFO :   -i <OUD_INSTANCES> List of OUD instances (default ALL)"
-    DoMsg "INFO :   -t <TYPE>          Backup Type FULL, INCREMENTAL or just CONFIG (default FULL)"
-    DoMsg "INFO :   -k <WEEKS>         Number of weeks to keep old backups (default 4)"
-    DoMsg "INFO :   -o                 force to send mails. Requires -m <MAILADDRESSES>"
-    DoMsg "INFO :   -L                 Backup current instance log files (default: no logfile backup)"
-    DoMsg "INFO :   -m <MAILADDRESSES> List of Mail Addresses"
-    DoMsg "INFO :   -f <BACKUPPATH>    Directory used to store the backups (default: \$OUD_BACKUP_DIR)"
-    DoMsg "INFO : Logfile : ${LOGFILE}"
+    DoMsg "Usage, ${SCRIPT_NAME} [-hv -i <OUD_INSTANCES> -t <TYPE> -m <MAILADDRESSES>]"
+    DoMsg "    -h                 Usage (this message"
+    DoMsg "    -v                 enable verbose mode"
+    DoMsg "    -i <OUD_INSTANCES> List of OUD instances (default ALL)"
+    DoMsg "    -t <TYPE>          Backup Type FULL, INCREMENTAL or just CONFIG (default FULL)"
+    DoMsg "    -k <WEEKS>         Number of weeks to keep old backups (default 4)"
+    DoMsg "    -o                 force to send mails. Requires -m <MAILADDRESSES>"
+    DoMsg "    -L                 Backup current instance log files (default: no logfile backup)"
+    DoMsg "    -m <MAILADDRESSES> List of Mail Addresses"
+    DoMsg "    -f <BACKUPPATH>    Directory used to store the backups (default: \$OUD_BACKUP_DIR)"
+    DoMsg "    Logfile : ${LOGFILE}"
     if [ ${1} -gt 0 ]; then
         CleanAndQuit ${1} ${2}
     else
         VERBOSE="FALSE"
         CleanAndQuit 0
     fi
-}
- 
-# -----------------------------------------------------------------------
-# Purpose....: Display Message with time stamp
-# -----------------------------------------------------------------------
-function DoMsg()
-{
-    INPUT=${1%:*}           # Take everything behinde
-    case ${INPUT} in        # Define a nice time stamp for ERR, END
-        "END ")  TIME_STAMP=$(date "+%Y-%m-%d_%H:%M:%S");;
-        "ERR ")  TIME_STAMP=$(date "+%n%Y-%m-%d_%H:%M:%S");;
-        "START") TIME_STAMP=$(date "+%Y-%m-%d_%H:%M:%S");;
-        "OK")    TIME_STAMP="";;
-        "*")     TIME_STAMP="....................";;
-    esac
-    if [ "${VERBOSE}" = "TRUE" ]; then
-        if [ "${DOAPPEND}" = "TRUE" ]; then
-            echo "${TIME_STAMP}  ${1}" |tee -a ${LOGFILE}
-        else
-            echo "${TIME_STAMP}  ${1}"
-        fi
-        shift
-        while [ "${1}" != "" ]; do
-            if [ "${DOAPPEND}" = "TRUE" ]; then
-                echo "               ${1}" |tee -a ${LOGFILE}
-            else
-                echo "               ${1}"
-            fi
-            shift
-        done
-    else
-        if [ "${DOAPPEND}" = "TRUE" ]; then
-            echo "${TIME_STAMP}  ${1}" >> ${LOGFILE}
-        fi
-        shift
-        while [ "${1}" != "" ]; do
-            if [ "${DOAPPEND}" = "TRUE" ]; then
-                echo "               ${1}" >> ${LOGFILE}
-            fi
-            shift
-        done
-    fi
-}
- 
-# -----------------------------------------------------------------------
-# Purpose....: Clean up before exit
-# -----------------------------------------------------------------------
-function CleanAndQuit() {
-    STATUS="INFO"
-    if [ ${1} -gt 0 ]; then
-      VERBOSE="TRUE"
-      SEND_MAIL="TRUE"
-      STATUS="ERROR"
-    fi
-
-    # log info in case we do send e-mails
-    if [ "${SEND_MAIL}" = "TRUE" ]; then
-        if [ -n "${MAILADDRESS}" ]; then
-            DoMsg "INFO : Send e-Mail to ${MAILADDRESS}"
-        else
-            DoMsg "WARN : SEND_MAIL is TRUE, but can not send e-Mail. No address specified."
-        fi
-    fi
-    case ${1} in
-        0)  DoMsg "END  : of ${SCRIPT_NAME}";;
-        1)  DoMsg "ERR  : Exit Code ${1}. Wrong amount of arguments. See usage for correct one.";;
-        2)  DoMsg "ERR  : Exit Code ${1}. Wrong arguments (${2}). See usage for correct one.";;
-        10) DoMsg "ERR  : Exit Code ${1}. OUD_BASE not set or $OUD_BASE not available.";;
-        11) DoMsg "ERR  : Exit Code ${1}. Could not touch file ${2}";;
-        21) DoMsg "ERR  : Exit Code ${1}. Could not load \${HOME}/.OUD_BASE";;
-        30) DoMsg "ERR  : Exit Code ${1}. Some backups failed";;
-        31) DoMsg "ERR  : Exit Code ${1}. Some exports failed";;
-        43) DoMsg "ERR  : Exit Code ${1}. Missing bind password file";;
-        44) DoMsg "ERR  : Exit Code ${1}. Can not create directory ${2}";;
-        45) DoMsg "ERR  : Exit Code ${1}. Directory ${2} is not writeable";;
-        50) DoMsg "ERR  : Exit Code ${1}. Error while performing exports";;
-        51) DoMsg "ERR  : Exit Code ${1}. Error while performing backups";;
-        60) DoMsg "ERR  : Exit Code ${1}. Force mail enabled but no e-Mail adress specified";;
-        99) DoMsg "INFO : Just wanna say hallo.";;
-        ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
-    esac
- 
-    # if we do have mail addresses we will send some mails...
-    if [ "${SEND_MAIL}" = "TRUE" ] && [ -n "${MAILADDRESS}" ]; then
-        # check how much lines we do have to tail
-        LOG_END=$(wc -l <"${LOGFILE}")
-        LOG_TAIL=$(($LOG_END-$LOG_START))
-        tail -${LOG_TAIL} ${LOGFILE} |mailx -s "$STATUS : OUD Script ${SCRIPT_NAME}" ${MAILADDRESS}
-    fi
-    exit ${1}
 }
 # - EOF Functions -------------------------------------------------------
  
