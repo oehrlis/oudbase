@@ -1,6 +1,0 @@
-2016-10-12_10:44:26  START: Start of oud_status.sh (Version 1.0) with -v
-2016-10-12_10:44:26  INFO : processing commandline parameter
-2016-10-12_10:44:26  INFO : Touch temp file /tmp/oud_status.sh.1824
-2016-10-12_10:44:26  INFO : Run status on OUD Instance oud_pi
-2016-10-12_10:44:26  ERR  : Exit Code 41. Error 127 running status command
-2016-10-12_10:44:26  INFO : Remove temp file /tmp/oud_status.sh.1824
