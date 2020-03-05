@@ -26,3 +26,4 @@ local/oudbase/lib/ldapjclnt19.jar
 /org.python.pydev.PyDevBuilder.launch
 /.externalToolBuilders/
 doc/oudbase.code-workspace
+local/oudbase/log/oud_export.log
