@@ -4,10 +4,10 @@
 1d2eb3b297768626dc15fff63794238692d79817  ./bin/oud_start_stop_all
 a7bc90447516835799df8e0917ce3a994533a5c8  ./bin/oud_export.sh
 bc9a48041a309751d06088a1cf8beeccb3f5127c  ./bin/oud_backup.sh
-3be50f201e16b53f082144544b55d7c497f3a53a  ./bin/oudenv.sh
+074b1c2d74a5dd5d0892989864def96d43208536  ./bin/oudenv.sh
 b93d9fb19451bdaa1314571ffb6bf74cfe4e0c23  ./bin/oud_eusm.sh
 c663fb651540b06c32791da7ac6f2d4297f85e7e  ./etc/oudenv_core.conf
-7bbb03b0b505a58c636fd02a37401a6baf4f291f  ./etc/oudenv.conf
+5c796833d33c9237bee406aa7f088a3bf09c3428  ./etc/oudenv.conf
 2ea0c0069dd86f9aaae99c274f38182c981e2113  ./etc/oudenv_custom.conf
 0918d6399a2471a32a3598beadaf19a129e9d296  ./etc/oudtab
 5db71a75ccbd45f85f4dbbaba286a222d2b2a760  ./etc/oud._DEFAULT_.conf
@@ -15,7 +15,7 @@ b11ba7558dc9f97e5a2545fe672b82fc0a346615  ./templates/etc/wls_oudsm.service
 eae0291c2f607231f369bdbedd2dc7bf0c318d54  ./templates/etc/oudenv_core.conf
 bfd380e3df50a6c00d165f2a41f134d749077116  ./templates/etc/housekeeping.conf
 03fcc0fbc2cd3435e11b8a04767b087ea10dfc73  ./templates/etc/install.rsp
-0dc896bc673a7ecf9d476736e3065abe47d5cbbf  ./templates/etc/oudenv.conf
+5c796833d33c9237bee406aa7f088a3bf09c3428  ./templates/etc/oudenv.conf
 1e2ad1f66cb5309f2172a2f4f2d6d9ee20ed49bd  ./templates/etc/oracle_oud_all
 5e9de046f186d9930f145b5a5158116959104d2d  ./templates/etc/oraInst.loc
 2ea0c0069dd86f9aaae99c274f38182c981e2113  ./templates/etc/oudenv_custom.conf
@@ -24,7 +24,7 @@ bfd380e3df50a6c00d165f2a41f134d749077116  ./templates/etc/housekeeping.conf
 e956a0c953f79f6eefcc31013e10c55434eee9d9  ./templates/etc/oud.crontab
 57f4ba89cb20339fc560dcf75bf4e9971fe32049  ./templates/etc/oud_instance.service
 7d0eea2ac7c7d0fa21ce30b2b71c5e830a7b66b4  ./templates/cron.d/oud
-cabade1edae32e6aac0d8b96c155f00d5db7afe8  ./templates/.bash_profile
+367c2fc153d42d0c84465075dafa9de49f96625c  ./templates/.bash_profile
 b8fda5240323ee307fcff0f813ee9096270ad5aa  ./templates/logrotate.d/oudsm
 4e12fbe845573bbf867b03ec47e6c3aa013dc51d  ./templates/logrotate.d/oud
 902937404653f145aa9815fb7af53b7e2f828570  ./templates/logrotate.d/oudbase
@@ -83,5 +83,5 @@ a9430dc47c10b9221ba5e709fc69088b3ad1aa83  ./templates/create/oud12c_eus_ad_proxy
 3e00a274e99ca0a3e5263252500e6707b3c040b6  ./templates/create/oud12c_eus_ad_proxy/01_create_eus_proxy_instance.sh
 a932ed4eab1c54db8d05024cea39fce289fee682  ./templates/create/oud12c_eus_ad_proxy/03_config_eus_realm.sh
 8624bcdae55baeef00cd11d5dfcfa60f68710a02  ./doc/LICENSE
-f7c2416263857738299ee2c47e97185413b69e09  ./doc/README.md
+3dca8b335210846b8ff3447a6d68e02d22f31272  ./doc/README.md
 8b70f9027426984fd0bfbd2d61868fe21bdbe744  ./doc/.version
