@@ -22,7 +22,7 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in .bash_profile or 
 # in oudenv_core.conf.
-VERSION=v1.7.5
+VERSION=v1.8.1
 
 # define some binaries for later user
 PGREP_BIN=$(command -v pgrep)                                   # get the binary for pgrep
@@ -613,14 +613,14 @@ fi
 # set the log and etc base directory depending on OUD_DATA
 if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
     # set LOG_BASE and ETC_BASE to OUD_BASE
-    export LOG_BASE=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_LOG_NAME}
-    export ETC_BASE=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
+    export LOG_BASE=${LOG_BASE:-${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_LOG_NAME}}
+    export ETC_BASE=${ETC_BASE:-${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}}
     # set the OUDTAB to ETC_CORE since OUD_DATA is ORACLE_BASE
     export OUDTAB=${ETC_CORE}/oudtab
 else
     # set LOG_BASE and ETC_BASE to OUD_DATA
-    export LOG_BASE=${OUD_DATA}/${DEFAULT_OUD_LOCAL_BASE_LOG_NAME}
-    export ETC_BASE=${OUD_DATA}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
+    export LOG_BASE=${LOG_BASE:-${OUD_DATA}/${DEFAULT_OUD_LOCAL_BASE_LOG_NAME}}
+    export ETC_BASE=${ETC_BASE:-${OUD_DATA}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}}
     # set the OUDTAB to ETC_BASE
     export OUDTAB=${ETC_BASE}/oudtab
 fi
