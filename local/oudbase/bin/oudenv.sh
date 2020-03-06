@@ -472,25 +472,28 @@ function oud_help {
         echo "  PORT_SSL            = ${PORT_SSL-n/a}"
     fi
     echo ""
-    echo "--- Default Aliases ---------------------------------------------------"
-    echo "  cda         Change workding directory to \${OUD_INSTANCE_ADMIN}"
-    echo "  cdh         Change workding directory to \${ORACLE_HOME}"
-    echo "  cdih        Change workding directory to \${OUD_INSTANCE_HOME}/OUD/logs"
-    echo "  cdil        Change workding directory to \${OUD_INSTANCE_ADMIN}"
-    echo "  cdob        Change workding directory to \${ORACLE_BASE}"
-    echo "  dsc         Call dsconfig with hostname, port, bind DN and password"
-    echo "  gen_pwd     Generate a password string (gen_password)"
-    echo "  goh         Get oracle home of current oud instance"
-    echo "  gp          Get ports of current oud instance"
-    echo "  oud_help    Display OUD environment help short form h"
-    echo "  oud_status  Display OUD status of current instance"
-    echo "  oudup       List OUD instances and there status short form u"
-    echo "  taa         tail on current OUD access log"
-    echo "  version     Display OUD Base version and changed/added files"
-    echo "  vio         Open vi on \${ETC_BASE}/oudtab"
+    # get default aliases from oudenv.conf
+    if [ -s "${ETC_BASE}/oudenv.conf" ]; then
+        echo "--- Default Aliases from \${ETC_BASE}/oudenv.conf ---------------------"
+        OLDIFS=$IFS                     # save and change IFS
+        IFS=$'\n'
+        for line in $(sed -n '/DEF_ALIASES/,/EOF DEF_ALIASES/p;/EOF DEF_ALIASES/q' ${ETC_BASE}/oudenv.conf); do
+            # If the line starts with alias then echo the line
+            if [[ $line == alias*  ]] ; then
+                ALIAS=$(echo $line|sed -r 's/^.*\s(.*)=('"'"'|").*/\1/' )
+                COMMENT=$(echo $line|sed -r 's/^.*(#(.*)$|(('"'"')|"))$/\2/')
+                COMMENT=${COMMENT:-"n/a"}
+                printf "  %-10s %-s\n" \
+                    ${ALIAS} \
+                    "${COMMENT}"
+                fi
+        done
+        IFS=$OLDIFS                     # restore IFS
+    fi
     echo ""
+    # get custom aliases from oudenv_custom.conf
     if [ -s "${ETC_BASE}/oudenv_custom.conf" ]; then
-        echo "--- Custom Aliases ---------------------------------------------------"
+        echo "--- Custom Aliases from \${ETC_BASE}/oudenv_custom.conf --------------"
         while read -r line; do
         # If the line starts with alias then echo the line
         if [[ $line == alias*  ]] ; then
