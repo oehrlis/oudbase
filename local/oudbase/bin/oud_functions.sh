@@ -28,7 +28,7 @@ VERSION=v1.7.5
 DOAPPEND=${DOAPPEND:-"TRUE"}                    # enable log file append
 VERBOSE=${VERBOSE:-"FALSE"}                     # enable verbose mode
 DEBUG=${DEBUG:-"FALSE"}                         # enable debug mode
-SEND_MAIL=${SEND_MAIL:-"FALSE"} 
+SEND_MAIL=${SEND_MAIL:-"UNDEF"} 
 # - EOF Environment Variables -----------------------------------------------
 
 # - Functions ---------------------------------------------------------------
