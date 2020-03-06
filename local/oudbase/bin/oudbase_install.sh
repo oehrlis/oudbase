@@ -23,7 +23,7 @@ export LOG_BASE=${LOG_BASE-"/tmp"}
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v1.7.5
+VERSION=v1.8.1
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="TRUE"                                  # enable verbose mode
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"     # Basename of the script
@@ -71,7 +71,7 @@ function Usage()
     DoMsg "    -a                          append to  profile eg. .bash_profile or .profile"
     DoMsg "    -b <ORACLE_BASE>            ORACLE_BASE Directory. Mandatory argument. This "
     DoMsg "                                directory is use as OUD_BASE directory"
-    DoMsg "    -o <OUD_BASE>               OUD_BASE Directory. (default \$ORACLE_BASE)."
+    DoMsg "    -o <OUD_BASE>               OUD_BASE Directory. (default \$ORACLE_BASE/$DEFAULT_OUD_LOCAL_BASE_NAME/$DEFAULT_OUD_BASE_NAME)."
     DoMsg "    -d <OUD_DATA>               OUD_DATA Directory. (default /u01 if available otherwise \$ORACLE_BASE). "
     DoMsg "                                This directory has to be specified to distinct persistant data from software "
     DoMsg "                                eg. in a docker containers"
@@ -369,6 +369,14 @@ if [ -d ${ETC_BASE} ]; then
             cp ${ETC_BASE}/$i ${ETC_BASE}/$i.save
         fi
     done
+    # backup core config files
+    if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
+        echo "INFO : Backup existing core config file"
+        if [ -f ${ETC_CORE}/${OUD_CORE_CONFIG} ]; then
+            DoMsg "INFO : Backup ${OUD_CORE_CONFIG} to ${OUD_CORE_CONFIG}"
+            cp ${ETC_CORE}/${OUD_CORE_CONFIG} ${ETC_CORE}/${OUD_CORE_CONFIG}.save
+        fi
+    fi
 fi
 
 # start to process payload
@@ -389,6 +397,18 @@ if [ "${SAVE_CONFIG}" = "TRUE" ]; then
             fi
         fi
     done
+    # restore core config file
+    if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
+        echo "INFO : Restore core config file"
+        if [ -f ${ETC_CORE}/${OUD_CORE_CONFIG}.save ]; then
+            if ! cmp ${ETC_CORE}/${OUD_CORE_CONFIG}.save ${ETC_CORE}/${OUD_CORE_CONFIG} >/dev/null 2>&1 ; then
+                DoMsg "INFO : Restore ${OUD_CORE_CONFIG}.save to ${OUD_CORE_CONFIG}"
+                cp ${ETC_CORE}/${OUD_CORE_CONFIG}.save ${ETC_CORE}/${OUD_CORE_CONFIG}
+            else
+                rm ${ETC_CORE}/${OUD_CORE_CONFIG}.save
+            fi
+        fi
+    fi
 fi
 
 # Store install customization
