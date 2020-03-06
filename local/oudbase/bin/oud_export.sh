@@ -25,6 +25,7 @@ VERSION=v1.7.5
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 MAILADDRESS=""
 SEND_MAIL="FALSE"                               # don't send mails by default
@@ -35,119 +36,34 @@ SUFFIX="ldif"                                   # default suffix
 DATE_STRING=$(date '+%Y%m%d-%H%M%S')            # String used for the export files
 HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)  # Hostname
 # - End of Default Values -----------------------------------------------
- 
+
 # - Functions -----------------------------------------------------------
+# source common functions from oud_functions.sh
+. ${SCRIPT_DIR}/oud_functions.sh
 # -----------------------------------------------------------------------
 # Purpose....: Display Usage
 # -----------------------------------------------------------------------
 function Usage() {
     VERBOSE="TRUE"
-    DoMsg "INFO : Usage, ${SCRIPT_NAME} [-hv -i <OUD_INSTANCES> -m <MAILADDRESSES>]"
-    DoMsg "INFO :   -h                 Usage (this message"
-    DoMsg "INFO :   -v                 enable verbose mode"
-    DoMsg "INFO :   -i <OUD_INSTANCES> List of OUD instances"
-    DoMsg "INFO :   -m <MAILADDRESSES> List of Mail Addresses"
-    DoMsg "INFO :   -o                 force to send mails. Requires -m <MAILADDRESSES>"
-    DoMsg "INFO :   -c                 Compress LDIF file (default no compression)"
-    DoMsg "INFO :   -k <DAYS>          Number of days to keep old exports (default 7)"
-    DoMsg "INFO :   -D <BINDDN>        Bind DN used for the export (default: cn=Directory Manager)"
-    DoMsg "INFO :   -j <PWDFILE>       Password file used for the export (default: \$PWD_FILE)"
-    DoMsg "INFO :   -f <EXPORTPATH>    Directory used to store the exports (default: \$OUD_EXPORT_DIR)"
-    DoMsg "INFO : Logfile : ${LOGFILE}"
+    DoMsg "Usage, ${SCRIPT_NAME} [-hv -i <OUD_INSTANCES> -b <BACKENDS> -m <MAILADDRESSES>]"
+    DoMsg "    -h                 Usage (this message"
+    DoMsg "    -v                 enable verbose mode"
+    DoMsg "    -i <OUD_INSTANCES> List of OUD instances (comma separated)"
+    DoMsg "    -b <BACKENDS>      List of OUD instances default all (semi-comma seperated)"
+    DoMsg "    -m <MAILADDRESSES> List of Mail Addresses (comma separated)"
+    DoMsg "    -o                 force to send mails. Requires -m <MAILADDRESSES>"
+    DoMsg "    -c                 Compress LDIF file (default no compression)"
+    DoMsg "    -k <DAYS>          Number of days to keep old exports (default 7)"
+    DoMsg "    -D <BINDDN>        Bind DN used for the export (default: cn=Directory Manager)"
+    DoMsg "    -j <PWDFILE>       Password file used for the export (default: \$PWD_FILE)"
+    DoMsg "    -f <EXPORTPATH>    Directory used to store the exports (default: \$OUD_EXPORT_DIR)"
+    DoMsg "Logfile : ${LOGFILE}"
     if [ ${1} -gt 0 ]; then
         CleanAndQuit ${1} ${2}
     else
         VERBOSE="FALSE"
         CleanAndQuit 0
     fi
-}
- 
-# -----------------------------------------------------------------------
-# Purpose....: Display Message with time stamp
-# -----------------------------------------------------------------------
-function DoMsg() {
-    INPUT=${1%:*}                         # Take everything behinde
-    case ${INPUT} in                    # Define a nice time stamp for ERR, END
-        "END ")  TIME_STAMP=$(date "+%Y-%m-%d_%H:%M:%S");;
-        "ERR ")  TIME_STAMP=$(date "+%n%Y-%m-%d_%H:%M:%S");;
-        "START") TIME_STAMP=$(date "+%Y-%m-%d_%H:%M:%S");;
-        "OK")    TIME_STAMP="";;
-        "*")     TIME_STAMP="....................";;
-    esac
-    if [ "${VERBOSE}" = "TRUE" ]; then
-        if [ "${DOAPPEND}" = "TRUE" ]; then
-            echo "${TIME_STAMP}  ${1}" |tee -a ${LOGFILE}
-        else
-            echo "${TIME_STAMP}  ${1}"
-        fi
-        shift
-        while [ "${1}" != "" ]; do
-            if [ "${DOAPPEND}" = "TRUE" ]; then
-                echo "               ${1}" |tee -a ${LOGFILE}
-            else
-                echo "               ${1}"
-            fi
-            shift
-        done
-    else
-        if [ "${DOAPPEND}" = "TRUE" ]; then
-            echo "${TIME_STAMP}  ${1}" >> ${LOGFILE}
-        fi
-        shift
-        while [ "${1}" != "" ]; do
-            if [ "${DOAPPEND}" = "TRUE" ]; then
-                echo "               ${1}" >> ${LOGFILE}
-            fi
-            shift
-        done
-    fi
-}
- 
-# -----------------------------------------------------------------------
-# Purpose....: Clean up before exit
-# -----------------------------------------------------------------------
-function CleanAndQuit() {
-    STATUS="INFO"
-    if [ ${1} -gt 0 ]; then
-      VERBOSE="TRUE"
-      SEND_MAIL="TRUE"
-      STATUS="ERROR"
-    fi
-
-    # log info in case we do send e-mails
-    if [ "${SEND_MAIL}" = "TRUE" ]; then
-        if [ -n "${MAILADDRESS}" ]; then
-            DoMsg "INFO : Send e-Mail to ${MAILADDRESS}"
-        else
-            DoMsg "WARN : SEND_MAIL is TRUE, but can not send e-Mail. No address specified."
-        fi
-    fi
-    case ${1} in
-        0)  DoMsg "END  : of ${SCRIPT_NAME}";;
-        1)  DoMsg "ERR  : Exit Code ${1}. Wrong amount of arguments. See usage for correct one.";;
-        2)  DoMsg "ERR  : Exit Code ${1}. Wrong arguments (${2}). See usage for correct one.";;
-        10) DoMsg "ERR  : Exit Code ${1}. OUD_BASE not set or $OUD_BASE not available.";;
-        11) DoMsg "ERR  : Exit Code ${1}. Could not touch file ${2}";;
-        21) DoMsg "ERR  : Exit Code ${1}. Could not load \${HOME}/.OUD_BASE";;
-        30) DoMsg "ERR  : Exit Code ${1}. Some backups failed";;
-        31) DoMsg "ERR  : Exit Code ${1}. Some exports failed";;
-        43) DoMsg "ERR  : Exit Code ${1}. Missing bind password file";;
-        44) DoMsg "ERR  : Exit Code ${1}. Can not create directory ${2}";;
-        45) DoMsg "ERR  : Exit Code ${1}. Directory ${2} is not writeable";;
-        50) DoMsg "ERR  : Exit Code ${1}. Error while performing exports";;
-        51) DoMsg "ERR  : Exit Code ${1}. Error while performing backups";;
-        99) DoMsg "INFO : Just wanna say hallo.";;
-        ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
-    esac
- 
-    # if we do have mail addresses we will send some mails...
-    if [ "${SEND_MAIL}" = "TRUE" ] && [ -n "${MAILADDRESS}" ]; then
-        # check how much lines we do have to tail
-        LOG_END=$(wc -l <"${LOGFILE}")
-        LOG_TAIL=$(($LOG_END-$LOG_START))
-        tail -${LOG_TAIL} ${LOGFILE} |mailx -s "$STATUS : OUD Script ${SCRIPT_NAME}" ${MAILADDRESS}
-    fi
-    exit ${1}
 }
 # - EOF Functions -------------------------------------------------------
  
@@ -183,17 +99,18 @@ fi
  
 # - Main ----------------------------------------------------------------
 DoMsg "${START_HEADER}"
- 
 # get pointer / linenumber from logfile with the latest header line
 LOG_START=$(($(grep -ni "${START_HEADER}" "${LOGFILE}"|cut -d: -f1 |tail -1)-1))
  
 # usage and getopts
 DoMsg "INFO : processing commandline parameter"
-while getopts hvcm:oi:k:E:D:j:f: arg; do
+while getopts hvdcb:m:oi:k:E:D:j:f: arg; do
     case $arg in
         h) Usage 0;;
         v) VERBOSE="TRUE";;
+        d) DEBUG="TRUE";;
         c) COMPRESS="--compress";;
+        b) BACKENDS=${OPTARG};;
         i) MyOUD_INSTANCES="${OPTARG}";;
         k) KEEP="${OPTARG}";;
         m) MAILADDRESS=$(echo "${OPTARG}"|sed s/\,/\ /g);;
@@ -288,28 +205,40 @@ for oud_inst in ${OUD_INST_LIST}; do
         fi
  
         # define a instance export log file and clear it
-        INST_LOG_FILE="${OUD_EXPORT_DIR}/$(basename ${SCRIPT_NAME} .sh)_${oud_inst}.log"
-        >${INST_LOG_FILE}
- 
-        DoMsg "INFO : [$oud_inst] get backends for $oud_inst"
-        # get backends
-        for backend_string in $(list-backends|grep -i userRoot|cut -d: -f1,2|tr -d '[[:blank:]]'); do
-            backend=$(echo ${backend_string}|cut -d: -f1)
-            includeBranch=" --includeBranch $(echo ${backend_string}|cut -d: -f2|sed s'/\",\"/ --includeBranch /'g|sed s'/\"//'g)"
-            DoMsg "INFO : [$oud_inst] start export for $oud_inst backendID ${backend}"
+        INST_LOG_FILE="${OUD_EXPORT_DIR}/$(basename ${SCRIPT_NAME} .sh)_${oud_inst}_${DATE_STRING}.log" >${INST_LOG_FILE}
+
+        OLDIFS=$IFS                     # save and change IFS
+        if [ -n "${BACKENDS}" ]; then
+            IFS=';'
+            DoMsg "INFO : [$oud_inst] using backends ${BACKENDS}"
+            backends=(${BACKENDS})
+        else
+            DoMsg "INFO : [$oud_inst] get backends for $oud_inst"
+            IFS=$'\n'
+            # read all backends into an array
+            EXCLUDED_BACKENDS=" "
+            backends=($(list-backends|egrep -v "[.:]\s*$|${EXCLUDED_BACKENDS}"|tail -n +3|sed 's/"//g'))
+        fi
+        IFS=$OLDIFS                     # restore IFS
+        tLen=${#backends[@]}            # get length of an array
+        # use for loop read all filenames
+        for (( i=0; i<${tLen}; i++ ));do
+            backend_id=$(echo ${backends[$i]}|cut -d: -f1|sed 's/^[ \t]*//;s/[ \t]*$//')
+            backend_basedn=$(echo ${backends[$i]}|cut -d: -f2|sed 's/^[ \t]*//;s/[ \t]*$//'|sed 's/ /\\ /')
+            includeBranch=" --includeBranch $(echo ${backend_basedn}|cut -d: -f2|sed s'/\",\"/ --includeBranch /'g|sed s'/\"//'g)"
+            DoMsg "INFO : [$oud_inst] start export backendID ${backend_id} with base DN ${backend_basedn}"
             DoMsg "INFO : [$oud_inst] export log file ${INST_LOG_FILE}"
- 
-            EXPORT_COMMAND="${OUD_BIN}/export-ldif --hostname ${HOST} --port $PORT_ADMIN ${COMPRESS} --trustAll --bindPasswordFile ${MybindPasswordFile} --backendID ${backend} ${includeBranch} --ldifFile ${OUD_EXPORT_DIR}/export_${oud_inst}_${backend}_${DATE_STRING}.${SUFFIX}"
-            DoMsg "INFO : [$oud_inst] ${EXPORT_COMMAND}"
+
+            EXPORT_COMMAND="${OUD_BIN}/export-ldif --hostname ${HOST} --port $PORT_ADMIN ${COMPRESS} --trustAll --bindPasswordFile ${MybindPasswordFile} --backendID \"${backend_id}\" --ldifFile \"${OUD_EXPORT_DIR}/export_${oud_inst}_${backend_id}_${DATE_STRING}.${SUFFIX}\""
             echo -e "\n${EXPORT_COMMAND}" >>${INST_LOG_FILE}
-            ${EXPORT_COMMAND} >>${INST_LOG_FILE} 2>&1
+            
+            ${OUD_BIN}/export-ldif --hostname ${HOST} --port $PORT_ADMIN ${COMPRESS} --trustAll --bindPasswordFile ${MybindPasswordFile} --backendID "${backend_id}" --ldifFile "${OUD_EXPORT_DIR}/export_${oud_inst}_${backend_id}_${DATE_STRING}.${SUFFIX}">>${INST_LOG_FILE} 2>&1
             OUD_ERROR=$?
-            DoMsg "INFO : [$oud_inst] cat export log ${INST_LOG_FILE}"
-            DoMsg "$(cat ${INST_LOG_FILE})"
+            DoMsg "INFO : [$oud_inst] cat lines from export log ${INST_LOG_FILE}"
+            DoMsg "$(sed -n "/${backend_id}/,\$p" ${INST_LOG_FILE})"
             # handle export errors
-            if [ $OUD_ERROR -lt 0 ]; then
-                DoMsg "WARN : [$oud_inst] Export for $oud_inst backendID ${backend} failed with error ${OUD_ERROR}"
- 
+            if [ $OUD_ERROR -gt 0 ]; then
+                DoMsg "WARN : [$oud_inst] Export for $oud_inst backendID ${backend_id} failed with error ${OUD_ERROR}"
                 # in case we do have an e-mail address we send a mail
                 if [ -n "${MAILADDRESS}" ]; then
                     DoMsg "INFO : [$oud_inst] Send instance logfile ${INST_LOG_FILE} to ${MAILADDRESS}"
@@ -317,7 +246,7 @@ for oud_inst in ${OUD_INST_LIST}; do
                 fi
             ERROR=$((ERROR+1))
             else
-                DoMsg "INFO : [$oud_inst] Export for $oud_inst backendID ${backend} successfully finished"
+                DoMsg "INFO : [$oud_inst] Export for $oud_inst backendID ${backend_id} successfully finished"
             fi
         done
 
@@ -337,8 +266,6 @@ for oud_inst in ${OUD_INST_LIST}; do
     fi
 done
 
-
- 
 if [ "${ERROR}" -gt 0 ]; then
     CleanAndQuit 51
 else
