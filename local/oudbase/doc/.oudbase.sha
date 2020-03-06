@@ -2,7 +2,7 @@
 652f6e6ab4134bfab2e3ba7b3cfbb71b2463c3ee  ./bin/oud_status.sh
 7c506e0bd62ceafd3ef265579e74109e9e8a1729  ./bin/oud_start_stop.sh
 1d2eb3b297768626dc15fff63794238692d79817  ./bin/oud_start_stop_all
-0b6ac4b5f1a584bc649f7182853b218655e17705  ./bin/oud_export.sh
+a7bc90447516835799df8e0917ce3a994533a5c8  ./bin/oud_export.sh
 bc9a48041a309751d06088a1cf8beeccb3f5127c  ./bin/oud_backup.sh
 3be50f201e16b53f082144544b55d7c497f3a53a  ./bin/oudenv.sh
 b93d9fb19451bdaa1314571ffb6bf74cfe4e0c23  ./bin/oud_eusm.sh
