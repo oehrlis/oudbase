@@ -65,8 +65,8 @@ DEFAULT_OUD_LOCAL_BASE_ETC_NAME="etc"
 DEFAULT_OUD_LOCAL_BASE_LOG_NAME="log"
 DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME="templates"
 DEFAULT_PRODUCT_BASE_NAME="product"
-DEFAULT_ORACLE_HOME_NAME="fmw12.2.1.3.0"
-DEFAULT_ORACLE_FMW_HOME_NAME="fmw12.2.1.3.0"
+DEFAULT_ORACLE_HOME_NAME="fmw12.2.1.4.0"
+DEFAULT_ORACLE_FMW_HOME_NAME="fmw12.2.1.4.0"
 OUD_CORE_CONFIG="oudenv_core.conf"
 
 # Default ORACLE_BASE based on script path
@@ -160,6 +160,9 @@ function get_ports {
     DEFAULT_PORT_SSL=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f3)
     DEFAULT_PORT_ADMIN=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f4)
     DEFAULT_PORT_REP=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f5)
+    DEFAULT_PORT_REST_ADMIN=""
+    DEFAULT_PORT_REST_HTTP=""
+    DEFAULT_PORT_REST_HTTPS=""
     # get ports for OUD instance
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         OUD_INSTANCE_REAL_HOME=$(get_instance_real_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} ${Silent})
@@ -170,17 +173,24 @@ function get_ports {
             [ "${Silent}" == "" ] && echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set your PORTS."
             return 1
         fi
+
         # read ports from config file
-        PORT_ADMIN=$(sed -n '/LDAP Administration Connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
-        PORT=$(sed -n '/LDAP Connection Handler/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
-        PORT_SSL=$(sed -n '/LDAPS Connection Handler/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+        PORT_ADMIN=$(sed -n '/ds-cfg-ldap-administration-connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+        PORT_REST_ADMIN=$(sed -n '/ds-cfg-http-administration-connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+        PORT=$(sed -n '/ds-cfg-ldap-connection-handler/,/^$/p' $CONFIG|sed -n '/ds-cfg-use-ssl: true/,/^$/!p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+        PORT_SSL=$(sed -n '/ds-cfg-ldap-connection-handler/,/^$/p' $CONFIG|sed -n '/ds-cfg-use-ssl: true/,/^$/p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
         PORT_REP=$(grep -i ds-cfg-replication-port $CONFIG|cut -d' ' -f2)
+        PORT_REST_HTTP=$(sed -n '/ds-cfg-http-connection-handler/,/^$/p' $CONFIG|sed -n '/ds-cfg-use-ssl: true/,/^$/!p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+        PORT_REST_HTTPS=$(sed -n '/ds-cfg-http-connection-handler/,/^$/p' $CONFIG|sed -n '/ds-cfg-use-ssl: true/,/^$/p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
  
         # export the port variables and set default values with not specified
         export PORT=${PORT:-$DEFAULT_PORT}
         export PORT_SSL=${PORT_SSL:-$DEFAULT_PORT_SSL}
         export PORT_ADMIN=${PORT_ADMIN:-$DEFAULT_PORT_ADMIN}
         export PORT_REP=${PORT_REP:-$DEFAULT_PORT_REP}
+        export PORT_REST_ADMIN=${PORT_REST_ADMIN:-$DEFAULT_PORT_REST_ADMIN}
+        export PORT_REST_HTTP=${PORT_REST_HTTP:-$DEFAULT_PORT_REST_HTTP}
+        export PORT_REST_HTTPS=${PORT_REST_HTTPS:-$DEFAULT_PORT_REST_HTTPS}
     # get ports for OUDSM domain
     elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
         # currently just use the default values for OUDSM 
@@ -193,8 +203,8 @@ function get_ports {
     elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
         # currently just use the default values for ODSEE 
         # export the port variables and set default values with not specified
-        export PORT=$DEFAULT_PORT
-        export PORT_SSL=$DEFAULT_PORT_SSL
+        export PORT=${DEFAULT_PORT:-"7001"}
+        export PORT_SSL=${DEFAULT_PORT_SSL:-"7002"}
         export PORT_ADMIN=""
         export PORT_REP=""
     fi
@@ -207,6 +217,9 @@ function get_ports {
         echo " LDAPS Port      : $PORT_SSL"
         echo " Admin Port      : $PORT_ADMIN"
         echo " Replication Port: $PORT_REP"
+        echo " REST Admin Port : $PORT_REST_ADMIN"
+        echo " REST http Port  : $PORT_REST_HTTP"
+        echo " REST https Port : $PORT_REST_HTTPS"
         echo "--------------------------------------------------------------"
     fi
 }
@@ -218,26 +231,33 @@ function update_oudtab {
     # define the function parameter
     OUD_INSTANCE=${1:-${OUD_INSTANCE}}
     DIRECTORY_TYPE=${2:-${DIRECTORY_TYPE}}
+    START_STOP="N"
     Silent=$3
     # get the ports for the instance
     get_ports ${OUD_INSTANCE} ${DIRECTORY_TYPE} ${Silent}
+    # get the status of the oud instance and set START_STOP if running assume up=Y, down=N, n/a=N
+    START_STOP=$(get_status ${OUD_INSTANCE}|sed 's/up/Y/'|sed 's/down/N/'|sed 's/n\/a/N/')
     if [ -f "${OUDTAB}" ]; then
         # OUDTAB does exists so let's update / add an entry
         if [ $(grep -E $ORATAB_PATTERN "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -eq 1 ]; then
+            # get start/stop flag from existing oudtab assume up=Y, down=N, n/a=N
+            START_STOP=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f7)
+            # if not define set it based on up/down
+            START_STOP=${START_STOP:-"$(get_status ${OUD_INSTANCE}|sed 's/up/Y/'|sed 's/down/N/'|sed 's/n\/a/N/')"}
             # update the OUDTAB entry
-            [ "${Silent}" == "" ] && echo "INFO : update ${OUD_INSTANCE} in ${OUDTAB}"
-            sed -i "/${OUD_INSTANCE}/c\\${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP:$DIRECTORY_TYPE" "${OUDTAB}"
+            [ "${Silent}" == "" ] && echo "INFO : update ${OUD_INSTANCE} in ${OUDTAB} adjust flag Y/N"
+            sed -i "/${OUD_INSTANCE}/c\\${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP:$DIRECTORY_TYPE:$START_STOP" "${OUDTAB}"
         else
             # add a new OUDTAB entry
-            [ "${Silent}" == "" ] && echo "INFO : add ${OUD_INSTANCE} to ${OUDTAB}"
-            echo "${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP:$DIRECTORY_TYPE" >>"${OUDTAB}"
+            [ "${Silent}" == "" ] && echo "INFO : add ${OUD_INSTANCE} to ${OUDTAB} adjust flag Y/N"
+            echo "${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP:$DIRECTORY_TYPE:$START_STOP" >>"${OUDTAB}"
         fi
     else
         # recreate the OUDTAB and add a new entry
         echo "WARN : oudtab (${OUDTAB}) does not exist or is empty. Create a new one.."
         echo "${OUDTAB_COMMENT}" >"${OUDTAB}"
-        [ "${Silent}" == "" ] && echo "INFO : add ${OUD_INSTANCE} to ${OUDTAB}"
-        echo "${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP:$DIRECTORY_TYPE" >>"${OUDTAB}"
+        [ "${Silent}" == "" ] && echo "INFO : add ${OUD_INSTANCE} to ${OUDTAB} adjust flag Y/N"
+        echo "${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP:$DIRECTORY_TYPE:$START_STOP" >>"${OUDTAB}"
     fi
 }
 
@@ -269,6 +289,9 @@ function oud_status {
         echo " LDAPS Port         : ${PORT_SSL-n/a}"
         echo " Admin Port         : ${PORT_ADMIN-n/a}"
         echo " Replication Port   : ${PORT_REP-n/a}"
+        echo " REST Admin Port    : ${PORT_REST_ADMIN-n/a}"
+        echo " REST http Port     : ${PORT_REST_HTTP-n/a}"
+        echo " REST https Port    : ${PORT_REST_HTTPS-n/a}"
     elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
         echo " LDAP Port          : ${PORT-n/a}"
         echo " LDAPS Port         : ${PORT_SSL-n/a}"
