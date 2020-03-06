@@ -435,6 +435,19 @@ for i in    OUD_ADMIN_BASE \
     fi
 done
 
+# change prompt if basenv is installed
+if [ -n "${BE_HOME}" ]; then
+    DoMsg "INFO : \${BE_HOME} is set, assume that oudbase and TVD-BasEnv are used together."
+    if [ -f "$ETC_CORE/oudenv.conf" ]; then
+        DoMsg "INFO : Update the \$PS1 variable in \$ETC_CORE/oudenv.conf"
+        sed -i "s|^export PS1=.*|export PS1=\${BASENV_PS1}|" $ETC_CORE/oudenv.conf
+    fi
+    if [ -f "$ETC_BASE/oudenv.conf" ]; then
+        DoMsg "INFO : Update the \$PS1 variable in \$ETC_BASE/oudenv.conf"
+        sed -i "s|^export PS1=.*|export PS1=\${BASENV_PS1}|" $ETC_BASE/oudenv.conf
+    fi
+fi
+
 # append to the profile....
 if [ "${APPEND_PROFILE}" = "TRUE" ]; then
     if [ -f "${HOME}/.bash_profile" ]; then
@@ -455,7 +468,7 @@ if [ "${APPEND_PROFILE}" = "TRUE" ]; then
     echo "fi"                                                           >>"${PROFILE}"
     echo ""                                                             >>"${PROFILE}"
     echo "# define an oudenv alias"                                     >>"${PROFILE}"
-    echo "alias oud='. \${OUD_BASE}/bin/oudenv.sh'"                     >>"${PROFILE}"
+    echo "alias oudenv='. \${OUD_BASE}/bin/oudenv.sh'"                  >>"${PROFILE}"
     echo ""                                                             >>"${PROFILE}"
     echo "# source oud environment"                                     >>"${PROFILE}"
     echo "if [ -z \"\$PS1\" ]; then"                                    >>"${PROFILE}"
@@ -476,7 +489,7 @@ else
     DoMsg "fi"
     DoMsg ""
     DoMsg "# define an oudenv alias"
-    DoMsg "alias oud='. \${OUD_BASE}/bin/oudenv.sh'"
+    DoMsg "alias oudenv='. \${OUD_BASE}/bin/oudenv.sh'"
     DoMsg ""
     DoMsg "# source oud environment"
     DoMsg "if [ -z \"\$PS1\" ]; then"

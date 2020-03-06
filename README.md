@@ -118,7 +118,7 @@ if [ "${OUD_BASE}" = "" ]; then
 fi
 
 # define an oudenv alias
-alias oud='. ${OUD_BASE}/bin/oudenv.sh'
+alias oudenv='. ${OUD_BASE}/bin/oudenv.sh'
 
 # source oud environment
 if [ -z "" ]; then
@@ -145,7 +145,7 @@ if [ "${OUD_BASE}" = "" ]
 fi
 
 # define an oudenv alias
-alias oud=". $(find $OUD_BASE -name oudenv.sh)"
+alias oudenv=". $(find $OUD_BASE -name oudenv.sh)"
 
 # source oud environment
 . $(find $OUD_BASE -name oudenv.sh)
@@ -185,7 +185,7 @@ echo "  fi"                                                         >>"${PROFILE
 echo "fi"                                                           >>"${PROFILE}"
 echo ""                                                             >>"${PROFILE}"
 echo "# define an oudenv alias"                                     >>"${PROFILE}"
-echo "alias oud='. \${OUD_BASE}/bin/oudenv.sh'"                     >>"${PROFILE}"
+echo "alias oudenv='. \${OUD_BASE}/bin/oudenv.sh'"                  >>"${PROFILE}"
 echo ""                                                             >>"${PROFILE}"
 echo "# source oud environment"                                     >>"${PROFILE}"
 echo ". \${OUD_BASE}/bin/oudenv.sh"                                 >>"${PROFILE}"

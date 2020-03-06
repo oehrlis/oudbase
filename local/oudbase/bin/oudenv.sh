@@ -633,7 +633,13 @@ done
 # Create default config file in ETC_BASE in case they are missing...
 for i in oud._DEFAULT_.conf oudenv_custom.conf oudenv.conf; do
     if [ ! -f "${ETC_BASE}/${i}" ]; then
-        cp ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}/${i} ${ETC_BASE}
+        if [ -f "${ETC_CORE}/${i}" ]; then
+            # take the file from the $ETC_CORE folder
+            mv ${ETC_CORE}/${i} ${ETC_BASE}
+        else
+            # take the file from the templates folder
+            cp ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}/${i} ${ETC_BASE}
+        fi
     fi
 done
  
