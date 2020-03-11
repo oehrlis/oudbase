@@ -35,7 +35,7 @@ BASE64_BIN=$(find /usr/bin -name base64 -print) # executable for base64
 BASE64_BIN=${BASE64_BIN:-"$(command -v -p base64)"} # executable for base64
 TAR_BIN=$(command -v -p tar)                    # executable for tar
 OUD_CORE_CONFIG="oudenv_core.conf"
-CONFIG_FILES="oudtab oud._DEFAULT_.conf oudenv_core.conf"
+CONFIG_FILES="oudtab oud._DEFAULT_.conf oudenv.conf oudenv_custom.conf"
 PAYLOAD_BINARY=0                                # default disable binary payload 
 PAYLOAD_BASE64=1                                # default enable base64 payload 
 
@@ -65,6 +65,7 @@ function Usage()
     DoMsg "Usage, ${SCRIPT_NAME} [-hav] [-b <ORACLE_BASE>] "
     DoMsg "    [-i <OUD_INSTANCE_BASE>] [-B <OUD_BACKUP_BASE>]"
     DoMsg "    [-m <ORACLE_HOME>] [-f <ORACLE_FMW_HOME>] [-j <JAVA_HOME>]"
+    DoMsg "    [-e <ETC_BASE>] [-l <LOG_BASE>]"
     DoMsg ""
     DoMsg "    -h                          Usage (this message)"
     DoMsg "    -v                          enable verbose mode"
@@ -81,6 +82,8 @@ function Usage()
     DoMsg "    -m <ORACLE_HOME>            Oracle home directory for OUD binaries (default \$ORACLE_BASE/products)"
     DoMsg "    -f <ORACLE_FMW_HOME>        Oracle Fusion Middleware home directory. (default \$ORACLE_BASE/products)"
     DoMsg "    -j <JAVA_HOME>              JAVA_HOME directory. (default search for java in \$ORACLE_BASE/products)"
+    DoMsg "    -e <ETC_BASE>               ETC_BASE directory for configuration files. (default \$OUD_BASE/etc respectively \$OUD_DATA/etc)"
+    DoMsg "    -l <LOG_BASE>               LOG_BASE directory for log files. (default \$OUD_BASE/log respectively \$OUD_DATA/log)"
     DoMsg ""
     DoMsg "    Logfile : ${LOGFILE}"
 
@@ -227,7 +230,7 @@ fi
 
 # usage and getopts
 DoMsg "INFO : processing commandline parameter"
-while getopts hvab:o:d:i:m:A:B:E:f:j: arg; do
+while getopts hvab:o:d:i:m:A:B:E:f:j:e:l: arg; do
     case $arg in
       h) Usage 0;;
       v) VERBOSE="TRUE";;
@@ -241,6 +244,8 @@ while getopts hvab:o:d:i:m:A:B:E:f:j: arg; do
       j) INSTALL_JAVA_HOME="${OPTARG}";;
       m) INSTALL_ORACLE_HOME="${OPTARG}";;
       f) INSTALL_ORACLE_FMW_HOME="${OPTARG}";;
+      e) INSTALL_ETC_BASE="${OPTARG}";;
+      l) INSTALL_LOG_BASE="${OPTARG}";;
       E) CleanAndQuit "${OPTARG}";;
       ?) Usage 2 $*;;
     esac
@@ -317,12 +322,12 @@ fi
 export ETC_CORE="${OUD_BASE}/etc" 
 
 # adjust LOG_BASE and ETC_BASE depending on OUD_DATA
-if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
-    export LOG_BASE="${OUD_BASE}/log"
-    export ETC_BASE="${ETC_CORE}"
+if [ "${ORACLE_BASE}" == "${OUD_DATA}" ]; then
+    export LOG_BASE=${INSTALL_LOG_BASE:-"${OUD_BASE}/log"}
+    export ETC_BASE=${INSTALL_LOG_BASE:-"${ETC_CORE}"}
 else
-    export LOG_BASE="${OUD_DATA}/log"
-    export ETC_BASE="${OUD_DATA}/etc"
+    export LOG_BASE=${INSTALL_LOG_BASE:-"${OUD_DATA}/log"}
+    export ETC_BASE=${INSTALL_LOG_BASE:-"${OUD_DATA}/etc"}
 fi
 
 # Print some information on the defined variables
@@ -363,7 +368,7 @@ done
 if [ -d ${ETC_BASE} ]; then
     DoMsg "INFO : Backup existing config files"
     SAVE_CONFIG="TRUE"
-    for i in ${CONFIG_FILES}; do
+    for i in ${CONFIG_FILES} ${OUD_CORE_CONFIG}; do
         if [ -f ${ETC_BASE}/$i ]; then
             DoMsg "INFO : Backup $i to $i.save"
             cp ${ETC_BASE}/$i ${ETC_BASE}/$i.save
@@ -411,6 +416,26 @@ if [ "${SAVE_CONFIG}" = "TRUE" ]; then
     fi
 fi
 
+# move config files
+if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
+    for i in ${CONFIG_FILES}; do
+        if [ ! -f "${ETC_BASE}/${i}" ]; then
+            if [ -f "${ETC_CORE}/${i}" ] && [ ! -L "${ETC_CORE}/${i}" ]; then
+                # take the file from the $ETC_CORE folder
+                echo "INFO : move config file ${i} from \$ETC_CORE"
+                mv ${ETC_CORE}/${i} ${ETC_BASE}
+            elif [ ! -f "${ETC_CORE}/${i}" ]; then
+                echo "INFO : copy config file ${i} from template folder ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}"
+                cp ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}/${i} ${ETC_BASE}
+            fi
+        fi
+        # recreate softlinks for some config files
+        if [ "${i}" == "oudenv.conf" ] || [ "${i}" == "oudtab" ]; then
+            echo "INFO : re-create softlink for ${i} "
+            ln -s -v -f ${ETC_BASE}/${i} ${ETC_CORE}/${i}
+        fi
+    done
+fi
 # Store install customization
 DoMsg "INFO : Store customization in core config file ${ETC_CORE}/${OUD_CORE_CONFIG}"
 for i in    OUD_ADMIN_BASE \
