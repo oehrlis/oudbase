@@ -464,6 +464,8 @@ function oud_help {
         echo "  PORT_ADMIN          = ${PORT_ADMIN-n/a}"
         echo "  PORT_REP            = ${PORT_REP-n/a}"
         echo "  PORT_SSL            = ${PORT_SSL-n/a}"
+        echo "  PORT_REST_HTTP      = ${PORT_REST_HTTP-n/a}"
+        echo "  PORT_REST_HTTP      = ${PORT_REST_HTTP-n/a}"
     elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
         echo "  OUD_INSTANCE        = ${OUD_INSTANCE-n/a}"
         echo "  ORACLE_FMW_HOME     = ${ORACLE_FMW_HOME-'n/a'}"
@@ -611,12 +613,12 @@ else
 fi
  
 # set the log and etc base directory depending on OUD_DATA
-if [ "${ORACLE_BASE}" = "${OUD_DATA}" ]; then
+if [ "${ORACLE_BASE}" == "${OUD_DATA}" ]; then
     # set LOG_BASE and ETC_BASE to OUD_BASE
     export LOG_BASE=${LOG_BASE:-${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_LOG_NAME}}
     export ETC_BASE=${ETC_BASE:-${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}}
     # set the OUDTAB to ETC_CORE since OUD_DATA is ORACLE_BASE
-    export OUDTAB=${ETC_CORE}/oudtab
+    export OUDTAB=${ETC_BASE}/oudtab
 else
     # set LOG_BASE and ETC_BASE to OUD_DATA
     export LOG_BASE=${LOG_BASE:-${OUD_DATA}/${DEFAULT_OUD_LOCAL_BASE_LOG_NAME}}
@@ -629,26 +631,27 @@ fi
 for i in ${OUD_ADMIN_BASE} ${OUD_BACKUP_BASE} ${OUD_INSTANCE_BASE} ${ETC_BASE} ${LOG_BASE}; do
     mkdir -p ${i}
 done
- 
-# Create default config file in ETC_BASE in case they are missing...
-for i in oud._DEFAULT_.conf oudenv_custom.conf oudenv.conf; do
-    if [ ! -f "${ETC_BASE}/${i}" ]; then
-        if [ -f "${ETC_CORE}/${i}" ]; then
-            # take the file from the $ETC_CORE folder
-            mv ${ETC_CORE}/${i} ${ETC_BASE}
-        else
-            # take the file from the templates folder
-            cp ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}/${i} ${ETC_BASE}
+
+# adjust config files in ETC_BASE if different than ETC_CORE
+if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
+    for i in oud._DEFAULT_.conf oudenv_custom.conf oudenv.conf oudtab; do
+        if [ ! -f "${ETC_BASE}/${i}" ]; then
+            if [ -f "${ETC_CORE}/${i}" ] && [ ! -L "${ETC_CORE}/${i}" ]; then
+                # take the file from the $ETC_CORE folder
+                echo "INFO : move config file ${i} from \$ETC_CORE"
+                mv ${ETC_CORE}/${i} ${ETC_BASE}
+            elif [ ! -f "${ETC_CORE}/${i}" ]; then
+                echo "INFO : copy config file ${i} from template folder ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}"
+                cp ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}/${i} ${ETC_BASE}
+            fi
+            # recreate softlinks for some config files
+            if [ "${i}" == "oudenv.conf" ] || [ "${i}" == "oudtab" ]; then
+                echo "INFO : re-create softlink for ${i} "
+                ln -s -v ${ETC_BASE}/${i} ${ETC_CORE}/${i}
+            fi
         fi
-    fi
-done
- 
-# create also some soft links from ETC_CORE to ETC_BASE
-for i in oudenv.conf; do
-    if [ ! -f "${ETC_BASE}/${i}" ]; then
-        ln -sf ${ETC_BASE}/${i} ${ETC_CORE}/${i}
-    fi
-done
+    done
+fi
 
 # check if we have an oudtab file and it does have entries
 if [ -f "${OUDTAB}" ] && [ $(grep -c -E $ORATAB_PATTERN "${OUDTAB}") -gt 0 ]; then
