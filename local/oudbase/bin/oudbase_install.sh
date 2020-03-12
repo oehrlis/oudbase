@@ -44,14 +44,22 @@ DEFAULT_ORACLE_BASE="/u00/app/oracle"
 SYSTEM_JAVA_PATH=$(if [ -d "/usr/java" ]; then echo "/usr/java"; fi)
 DEFAULT_OUD_DATA="/u01"
 DEFAULT_ORACLE_DATA=${DEFAULT_OUD_DATA}
-DEFAULT_OUD_BASE_NAME="oudbase"
+# Default values for file and folder names
+DEFAULT_ORACLE_FMW_HOME_NAME="fmw12.2.1.4.0"
+DEFAULT_ORACLE_HOME_NAME="fmw12.2.1.4.0"
 DEFAULT_OUD_ADMIN_BASE_NAME="admin"
 DEFAULT_OUD_BACKUP_BASE_NAME="backup"
+DEFAULT_OUD_BASE_NAME="oudbase"
 DEFAULT_OUD_INSTANCE_BASE_NAME="instances"
+DEFAULT_OUD_LOCAL_BASE_BIN_NAME="bin"
+DEFAULT_OUD_LOCAL_BASE_ETC_NAME="etc"
+DEFAULT_OUD_LOCAL_BASE_LOG_NAME="log"
 DEFAULT_OUD_LOCAL_BASE_NAME="local"
+DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME="templates"
+DEFAULT_OUDSM_DOMAIN_BASE_NAME="domains"
 DEFAULT_PRODUCT_BASE_NAME="product"
-DEFAULT_ORACLE_HOME_NAME="oud12.2.1.3.0"
-DEFAULT_ORACLE_FMW_HOME_NAME="fmw12.2.1.3.0"
+OUD_CORE_CONFIG="oudenv_core.conf"
+
 # - End of Default Values -----------------------------------------------
 
 # - Functions -----------------------------------------------------------
