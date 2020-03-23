@@ -208,8 +208,13 @@ for oud_inst in ${OUD_INST_LIST}; do
         INST_LOG_FILE="${OUD_BACKUP_DIR}/$(basename ${SCRIPT_NAME} .sh)_${oud_inst}.log"
  
         # create directory for a dedicated backup set
-        mkdir -p ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET} >/dev/null 2>&1 || CleanAndQuit 44 ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}
- 
+        if [ ! -d ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET} ]; then
+            mkdir -p ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET} >/dev/null 2>&1 || CleanAndQuit 44 ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}
+            echo "CREATED:$(date "+%Y.%m.%d-%H%M%S");TYPE:${TYPE^^};STATUS:unknown" >${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/.backup_set.log
+        else 
+            echo "MODIFIED:$(date "+%Y.%m.%d-%H%M%S");TYPE:${TYPE^^};STATUS:unknown" >>${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/.backup_set.log
+        fi  
+
         DoMsg "INFO : [$oud_inst] start backup for $oud_inst for Week ${NEW_WEEKNO}"
         DoMsg "INFO : [$oud_inst] backup log file ${INST_LOG_FILE}"
  
@@ -244,7 +249,8 @@ for oud_inst in ${OUD_INST_LIST}; do
         # handle backup errors
         if [ $OUD_ERROR -lt 0 ]; then
             DoMsg "WARN : [$oud_inst] Backup for $oud_inst failed with error ${OUD_ERROR}"
- 
+            # add NOK to the backup .backup_set.log
+            sed -i "s/unknown/NOK/" ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/.backup_set.log
             # in case we do have an e-mail address we send a mail
             if [ -n "${MAILADDRESS}" ]; then
                 DoMsg "INFO : [$oud_inst] Send instance logfile ${INST_LOG_FILE} to ${MAILADDRESS}"
@@ -258,7 +264,8 @@ for oud_inst in ${OUD_INST_LIST}; do
                 DoMsg "INFO : [$oud_inst] Send instance logfile ${INST_LOG_FILE} to ${MAILADDRESS}"
                 cat ${INST_LOG_FILE}|mailx -s "INFO : Backup OUD Instance ${OUD_INSTANCE} successfully finished" ${MAILADDRESS}
             fi
-
+            # add OK to the backup .backup_set.log
+            sed -i "s/unknown/OK/" ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/.backup_set.log
             # check if we do have a an old backup set defined
             if [ -z "$OLD_BACKUP_SET" ]; then
                 DoMsg "WARN : [$oud_inst] old backup set not defined. Do not purge any backup."
