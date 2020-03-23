@@ -18,7 +18,7 @@
 # -----------------------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v1.8.2
+VERSION=v1.8.3
 SCRIPT_NAME=$(basename $0)
 export OUDBASE_BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 # - End of Default Values -----------------------------------------------
