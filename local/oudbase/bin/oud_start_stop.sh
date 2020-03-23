@@ -27,6 +27,7 @@ VERBOSE="FALSE"                                 # enable verbose mode
 FORCE="FALSE"                                   # enable force restart
 TIMEOUT=60                                      # default timeout in seconds
 WAIT_ITER=60                                    # default wait iternation
+WAIT="FALSE"                                    # default wait mode
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
@@ -248,9 +249,9 @@ for oud_inst in ${OUD_INST_LIST}; do
     elif  [ "$MyActivity" == "STOP" ]; then 
         if [ ${DIRECTORY_TYPE} == "OUD" ]; then
             $OUD_INSTANCE_HOME/OUD/bin/stop-ds >> ${INSTANCE_LOGFILE} 2>&1 
-        elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+        elif [ "${DIRECTORY_TYPE}" == "OUDSM" ]; then
             nohup $OUD_INSTANCE_HOME/bin/stopWebLogic.sh >> ${INSTANCE_LOGFILE} 2>&1 &
-            if [ ${WAIT} == "TRUE" ]; then
+            if [ "${WAIT}" == "TRUE" ]; then
                 DoMsg "INFO : [$oud_inst] Stop OUDSM domain $oud_inst and wait for ${TIMEOUT} seconds."
                 # OUDSM URL to check
                 URL="http://${HOST}:$PORT/oudsm/"
