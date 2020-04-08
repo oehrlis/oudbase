@@ -4,7 +4,7 @@ bb2a2f06ad1dd94f01452ba453b4ede662ef3b4c  ./bin/oud_start_stop.sh
 3ddae63465aea265a53f54ece0cb8e665c2d9b22  ./bin/oud_start_stop_all
 5e36ac53131a7c4623f2cd7fa7eefcbc7bce0c54  ./bin/oud_export.sh
 ce270e3c03f403286658fdae69c5b93bd1a69f4d  ./bin/oud_backup.sh
-67aba1d769051f922e59292e3c24fdc5c86de829  ./bin/oudenv.sh
+2b9ca082f41a7e56bced51bdd2256ab66290eee5  ./bin/oudenv.sh
 6c154aad7913c62033b82479f384261ed3a4110a  ./bin/oud_eusm.sh
 c663fb651540b06c32791da7ac6f2d4297f85e7e  ./etc/oudenv_core.conf
 e931ecdf86bc0b5b2f00f0926366c160281a71f5  ./etc/oudenv.conf
