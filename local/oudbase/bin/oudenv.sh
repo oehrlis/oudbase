@@ -176,7 +176,7 @@ function get_ports {
 
         # read ports from config file
         PORT_ADMIN=$(sed -n '/ds-cfg-ldap-administration-connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
-        PORT_REST_ADMIN=$(sed -n '/ds-cfg-http-administration-connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+        PORT_REST_ADMIN=$(sed -n '/ds-cfg-http-administration-connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2|head -1)
         PORT=$(sed -n '/ds-cfg-ldap-connection-handler/,/^$/p' $CONFIG|sed -n '/ds-cfg-use-ssl: true/,/^$/!p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
         PORT_SSL=$(sed -n '/ds-cfg-ldap-connection-handler/,/^$/p' $CONFIG|sed -n '/ds-cfg-use-ssl: true/,/^$/p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
         PORT_REP=$(grep -i ds-cfg-replication-port $CONFIG|cut -d' ' -f2)
