@@ -398,7 +398,7 @@ UntarPayload
 # restore customized config files
 if [ "${SAVE_CONFIG}" = "TRUE" ]; then
     DoMsg "INFO : Restore cusomized config files"
-    for i in ${CONFIG_FILES}; do
+    for i in ${CONFIG_FILES} ${OUD_CORE_CONFIG}; do
         if [ -f ${ETC_BASE}/$i.save ]; then
             if ! cmp ${ETC_BASE}/$i.save ${ETC_BASE}/$i >/dev/null 2>&1 ; then
                 DoMsg "INFO : Restore $i.save to $i"
