@@ -199,9 +199,9 @@ for oud_inst in ${OUD_INST_LIST}; do
  
         # check and create directory
         if [ ! -d "${OUD_EXPORT_DIR}" ]; then
-            mkdir -p ${OUD_EXPORT_DIR} >/dev/null 2>&1 || CleanAndQuit 44 ${OUD_EXPORT_DIR}
+            mkdir -p ${OUD_EXPORT_DIR} >/dev/null 2>&1 || CleanAndQuit 12 ${OUD_EXPORT_DIR}
         elif [ ! -w "${OUD_EXPORT_DIR}" ]; then
-            CleanAndQuit 45 ${OUD_EXPORT_DIR}
+            CleanAndQuit 13 ${OUD_EXPORT_DIR}
         fi
  
         # define a instance export log file and clear it
@@ -268,7 +268,7 @@ for oud_inst in ${OUD_INST_LIST}; do
 done
 
 if [ "${ERROR}" -gt 0 ]; then
-    CleanAndQuit 51
+    CleanAndQuit 32
 else
     CleanAndQuit 0
 fi
