@@ -299,12 +299,12 @@ for oud_inst in ${OUD_INST_LIST}; do
             DoMsg "WARN : [$oud_inst] Instance $oud_inst is not of type OUD/OUDSM. Skip $MyActivity for this instance."
         fi
    else
-    CleanAndQuit 52 $MyActivity
+    CleanAndQuit 71 $MyActivity
    fi
 done
  
 if [ "${ERROR}" -gt 0 ]; then
-    CleanAndQuit 51
+    CleanAndQuit 70 ${OUD_INST_LIST}
 else
     CleanAndQuit 0
 fi

@@ -199,9 +199,9 @@ for oud_inst in ${OUD_INST_LIST}; do
         OUD_BACKUP_DIR=${MyBackupPath:-"${OUD_BACKUP_DIR}"}
         # check and create directory
         if [ ! -d "${OUD_BACKUP_DIR}" ]; then
-            mkdir -p ${OUD_BACKUP_DIR} >/dev/null 2>&1 || CleanAndQuit 44 ${OUD_BACKUP_DIR}
+            mkdir -p ${OUD_BACKUP_DIR} >/dev/null 2>&1 || CleanAndQuit 12 ${OUD_BACKUP_DIR}
         elif [ ! -w "${OUD_BACKUP_DIR}" ]; then
-            CleanAndQuit 45 ${OUD_BACKUP_DIR}
+            CleanAndQuit 13 ${OUD_BACKUP_DIR}
         fi
  
         # define a instance backup log file
@@ -209,7 +209,7 @@ for oud_inst in ${OUD_INST_LIST}; do
  
         # create directory for a dedicated backup set
         if [ ! -d ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET} ]; then
-            mkdir -p ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET} >/dev/null 2>&1 || CleanAndQuit 44 ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}
+            mkdir -p ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET} >/dev/null 2>&1 || CleanAndQuit 12 ${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}
             echo "CREATED:$(date "+%Y.%m.%d-%H%M%S");TYPE:${TYPE^^};STATUS:unknown" >${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/.backup_set.log
         else 
             echo "MODIFIED:$(date "+%Y.%m.%d-%H%M%S");TYPE:${TYPE^^};STATUS:unknown" >>${OUD_BACKUP_DIR}/${NEW_BACKUP_SET}/.backup_set.log
@@ -289,7 +289,7 @@ for oud_inst in ${OUD_INST_LIST}; do
 done
  
 if [ "${ERROR}" -gt 0 ]; then
-    CleanAndQuit 50
+    CleanAndQuit 33
 else
     CleanAndQuit 0
 fi
