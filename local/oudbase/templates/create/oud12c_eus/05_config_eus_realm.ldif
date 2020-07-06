@@ -1,0 +1,112 @@
+# -----------------------------------------------------------------------
+# Trivadis AG, Business Development & Support (BDS)
+# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# -----------------------------------------------------------------------
+# Name.......: 05_config_eus_realm.ldif
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Editor.....: Stefan Oehrli
+# Date.......: 2020.06.30
+# Revision...: --
+# Purpose....: EUS realm configuration for the user and group search base
+# Notes......: The LDIF file is loaded by the script 03_config_eus_realm.sh 
+#              If necessary it can also be imported manually.
+#
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: Licensed under the Universal Permissive License v 1.0 as 
+#              shown at https://oss.oracle.com/licenses/upl.
+# -----------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
+
+#version: 1
+DN: cn=OracleDBSecurityAdmins,cn=OracleContext
+changetype: modify
+add: uniquemember
+uniquemember: cn=Directory Manager
+uniquemember: ou=role_eus_admins,ou=groups,ou=local,BASEDN
+uniquemember: ou=role_oud_admins,ou=groups,ou=local,BASEDN
+uniquemember: cn=oudadmin,cn=Root DNs,cn=config
+uniquemember: cn=eusadmin,cn=Root DNs,cn=config
+
+dn: cn=OracleDomainAdmins,cn=OracleDefaultDomain,cn=OracleDBSecurity,cn=Products,cn=OracleContext
+changetype: modify
+add: uniquemember
+uniquemember: cn=Directory Manager
+uniquemember: ou=role_eus_admins,ou=groups,ou=local,BASEDN
+uniquemember: ou=role_oud_admins,ou=groups,ou=local,BASEDN
+uniquemember: cn=oudadmin,cn=Root DNs,cn=config
+uniquemember: cn=eusadmin,cn=Root DNs,cn=config
+
+# Update common EUS Configuration
+DN: cn=OracleDBSecurityAdmins,cn=OracleContext,BASEDN
+changetype: modify
+add: uniquemember
+uniquemember: ou=role_oud_admins,ou=groups,ou=local,BASEDN
+uniquemember: ou=role_eus_admins,ou=groups,ou=local,BASEDN
+uniquemember: cn=oudadmin,cn=Root DNs,cn=config
+uniquemember: cn=eusadmin,cn=Root DNs,cn=config
+uniquemember: cn=netadmin,cn=Root DNs,cn=config
+
+DN: cn=OracleNetAdmins,cn=OracleContext,BASEDN
+changetype: modify
+add: uniquemember
+uniquemember:ou=role_oud_admins,ou=groups,ou=local,BASEDN
+uniquemember: ou=role_eus_admins,ou=groups,ou=local,BASEDN
+uniquemember: cn=oudadmin,cn=Root DNs,cn=config
+uniquemember: cn=eusadmin,cn=Root DNs,cn=config
+uniquemember: cn=netadmin,cn=Root DNs,cn=config
+
+dn: cn=OracleContextAdmins,cn=Groups,cn=OracleContext,BASEDN
+changetype: modify
+add: uniquemember
+uniquemember: ou=role_oud_admins,ou=groups,ou=local,BASEDN
+uniquemember: ou=role_eus_admins,ou=groups,ou=local,BASEDN
+uniquemember: cn=eusadmin,cn=Root DNs,cn=config
+
+dn: cn=Common,cn=Products,cn=OracleContext
+changetype: modify
+replace: orclSubscriberSearchBase
+orclSubscriberSearchBase: BASEDN
+
+dn: cn=Common,cn=Products,cn=OracleContext
+changetype: modify
+replace: orclSubscriberNickNameAttribute
+orclSubscriberNickNameAttribute: dc
+
+dn: cn=Common,cn=Products,cn=OracleContext
+changetype: modify
+replace: orclDefaultSubscriber
+orclDefaultSubscriber: BASEDN
+
+dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+changetype: modify
+replace: orclCommonUserSearchBase
+orclCommonUserSearchBase: ou=USER_OU,BASEDN
+
+dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+changetype: modify
+replace: orclCommonUserCreateBase
+orclCommonUserCreateBase: ou=USER_OU,BASEDN
+
+dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+changetype: modify
+replace: orclCommonDefaultUserCreateBase
+orclCommonDefaultUserCreateBase: ou=USER_OU,BASEDN
+
+dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+changetype: modify
+replace: orclCommonGroupCreateBase
+orclCommonGroupCreateBase: ou=GROUP_OU,BASEDN
+
+dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+changetype: modify
+replace: orclCommonDefaultGroupCreateBase
+orclCommonDefaultGroupCreateBase: ou=GROUP_OU,BASEDN
+
+dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+changetype: modify
+replace: orclCommonGroupSearchBase
+orclCommonGroupSearchBase: ou=GROUP_OU,BASEDN
+
+# - EOF -----------------------------------------------------------------

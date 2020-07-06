@@ -1,0 +1,181 @@
+# -----------------------------------------------------------------------
+# Trivadis AG, Business Development & Support (BDS)
+# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# -----------------------------------------------------------------------
+# Name.......: 04_create_root_user.ldif
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Editor.....: Stefan Oehrli
+# Date.......: 2020.06.25
+# Usage......: 04_create_root_user.ldif
+# Purpose....: LDIF file for ldif
+# Notes......:  
+# Reference..: 
+# License....: Licensed under the Universal Permissive License v 1.0 as 
+#              shown at https://oss.oracle.com/licenses/upl.
+# -----------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# - ADD oudadmin
+# Description: Create an additional super user for the OUD instance.
+# This will:    - The user is created
+#               - The resources are expanded
+#               - An unsearch index is possible
+#               - A deletion of Trees is possible
+# ---------------------------------------------------------------------------
+dn: cn=oudadmin,cn=Root DNs,cn=config
+objectClass: inetOrgPerson
+objectClass: person
+objectClass: top
+objectClass: ds-cfg-root-dn-user
+objectClass: organizationalPerson
+cn: oudadmin
+sn: oudadmin
+ds-cfg-alternate-bind-dn: cn=oudadmin
+ds-pwp-password-policy-dn: cn=Root Password Policy,cn=Password Policies,cn=config
+ds-privilege-name: unindexed-search
+ds-rlim-lookthrough-limit: 3000
+ds-rlim-size-limit: 3000
+givenName: OUD Admin
+# - End ADD oudadmin ----------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# - ADD eusadmin
+# Description: Create an additional super user for the OUD instance.
+# This will:    - The user is created
+#               - The resources are expanded
+#               - An unsearch index is possible
+#               - A deletion of Trees is possible
+#               - Revoking permissions from the root user
+# -----------------------------------------------------------------------------
+dn: cn=eusadmin,cn=Root DNs,cn=config
+objectClass: inetOrgPerson
+objectClass: person
+objectClass: top
+objectClass: ds-cfg-root-dn-user
+objectClass: organizationalPerson
+cn: eusadmin
+sn: eusadmin
+ds-cfg-alternate-bind-dn: cn=eusadmin
+ds-pwp-password-policy-dn: cn=Root Password Policy,cn=Password Policies,cn=config
+ds-rlim-size-limit: 3000
+ds-rlim-lookthrough-limit: 3000
+givenName: EUS admin
+ds-privilege-name:  proxied-auth
+ds-privilege-name:  unindexed-search
+ds-privilege-name: -backend-backup
+ds-privilege-name: -backend-restore
+ds-privilege-name: -bypass-acl
+ds-privilege-name: -cancel-request
+ds-privilege-name: -config-read
+ds-privilege-name: -config-write
+ds-privilege-name: -data-sync
+ds-privilege-name: -disconnect-client
+ds-privilege-name: -jmx-notify
+ds-privilege-name: -jmx-read
+ds-privilege-name: -jmx-write
+ds-privilege-name: -ldif-export
+ds-privilege-name: -ldif-import
+ds-privilege-name: -modify-acl
+ds-privilege-name: -password-reset
+ds-privilege-name: -privilege-change
+ds-privilege-name: -proxied-auth
+ds-privilege-name: -server-restart
+ds-privilege-name: -server-shutdown
+ds-privilege-name: -update-schema
+# - End ADD eusadmin ----------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# - ADD netadmin
+# Description: Create an additional super user for the OUD instance.
+# This will:    - The user is created
+#               - The resources are expanded
+#               - An unsearch index is possible
+#               - A deletion of Trees is possible
+#               - Revoking permissions from the root user
+# -----------------------------------------------------------------------------
+dn: cn=netadmin,cn=Root DNs,cn=config
+objectClass: inetOrgPerson
+objectClass: person
+objectClass: top
+objectClass: ds-cfg-root-dn-user
+objectClass: organizationalPerson
+cn: netadmin
+sn: netadmin
+ds-cfg-alternate-bind-dn: cn=netadmin
+ds-pwp-password-policy-dn: cn=Root Password Policy,cn=Password Policies,cn=config
+ds-rlim-size-limit: 3000
+ds-rlim-lookthrough-limit: 3000
+givenName: Net Admin
+ds-privilege-name:  proxied-auth
+ds-privilege-name:  unindexed-search
+ds-privilege-name: -backend-backup
+ds-privilege-name: -backend-restore
+ds-privilege-name: -bypass-acl
+ds-privilege-name: -cancel-request
+ds-privilege-name: -config-read
+ds-privilege-name: -config-write
+ds-privilege-name: -data-sync
+ds-privilege-name: -disconnect-client
+ds-privilege-name: -jmx-notify
+ds-privilege-name: -jmx-read
+ds-privilege-name: -jmx-write
+ds-privilege-name: -ldif-export
+ds-privilege-name: -ldif-import
+ds-privilege-name: -modify-acl
+ds-privilege-name: -password-reset
+ds-privilege-name: -privilege-change
+ds-privilege-name: -proxied-auth
+ds-privilege-name: -server-restart
+ds-privilege-name: -server-shutdown
+ds-privilege-name: -update-schema
+# - End ADD netadmin ----------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# - ADD Useradmin
+# Description: Create an additional super user for the OUD instance.
+# This will:    - The user is created
+#               - The resources are expanded
+#               - An unsearch index is possible
+#               - A deletion of Trees is possible
+#               - Revoking permissions from the root user
+# -----------------------------------------------------------------------------
+dn: cn=useradmin,cn=Root DNs,cn=config
+objectClass: inetOrgPerson
+objectClass: person
+objectClass: top
+objectClass: ds-cfg-root-dn-user
+objectClass: organizationalPerson
+cn: useradmin
+sn: useradmin
+ds-cfg-alternate-bind-dn: cn=useradmin
+ds-pwp-password-policy-dn: cn=Root Password Policy,cn=Password Policies,cn=config
+ds-rlim-size-limit: 3000
+ds-rlim-lookthrough-limit: 3000
+givenName: User Admin
+ds-privilege-name:  unindexed-search
+ds-privilege-name: -backend-backup
+ds-privilege-name: -backend-restore
+ds-privilege-name: -bypass-acl
+ds-privilege-name: -cancel-request
+ds-privilege-name: -config-read
+ds-privilege-name: -config-write
+ds-privilege-name: -data-sync
+ds-privilege-name: -disconnect-client
+ds-privilege-name: -jmx-notify
+ds-privilege-name: -jmx-read
+ds-privilege-name: -jmx-write
+ds-privilege-name: -ldif-export
+ds-privilege-name: -ldif-import
+ds-privilege-name: -modify-acl
+ds-privilege-name: password-reset
+ds-privilege-name: -privilege-change
+ds-privilege-name: -proxied-auth
+ds-privilege-name: -server-restart
+ds-privilege-name: -server-shutdown
+ds-privilege-name: -update-schema
+# - End ADD Useradmin ---------------------------------------------------------
+
+# -----------------------------------------------------------------------------
