@@ -6,7 +6,7 @@
 # Name.......: 02_config_eus_context.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2018.03.18
+# Date.......: 2020.07.09
 # Revision...: --
 # Purpose....: Script to configure the EUS context in the OUD proxy instance.
 # Notes......: The config file 02_config_eus_context.conf is executed using
@@ -27,28 +27,44 @@
 # - load instance environment -------------------------------------------
 . "$(dirname $0)/00_init_environment"
 CONFIGFILE="$(dirname $0)/$(basename $0 .sh).conf"      # config file based on script name
-
+CONFIGFILE_CUSTOM="$(dirname $0)/$(basename $0 .sh)_${BASEDN_STRING}"
 # - configure instance --------------------------------------------------
-echo "Configure OUD instance ${OUD_INSTANCE} using:"
+echo "Configure OUD proxy instance ${OUD_INSTANCE} using:"
 echo "  BASEDN            : ${BASEDN}"
+echo "  BASEDN_STRING     : ${BASEDN_STRING}"
 echo "  CONFIGFILE        : ${CONFIGFILE}"
+echo "  CONFIGFILE_CUSTOM : ${CONFIGFILE_CUSTOM}"
 echo "  AD_PDC_HOST       : ${AD_PDC_HOST}"
 echo "  AD_PDC_PORT       : ${AD_PDC_PORT}"
 echo "  AD_PDC_USER       : ${AD_PDC_USER}"
-echo "  AD_PDC_PASSWORD   : **********"
+echo "  AD_PDC_PASSWORD   : ${AD_PDC_PASSWORD}"
 
-# Update baseDN in config file if required
-if [[ "$BASEDN" != "dc=example,dc=com" ]]; then
-  echo "  Different base DN than default dc=example,dc=com."
-  echo "  Update config and LDIF files to match $BASEDN" 
-  sed -i "s/dc=example,dc=com/$BASEDN/" ${CONFIGFILE}
+LOCAL_AD_PDC_PASSWORD=""
+# check if we do have a password file
+if [ -f "${AD_PDC_PASSWORD_FILE}" ]; then
+  # set the local password variable pased on password file
+  LOCAL_AD_PDC_PASSWORD=$(cat ${AD_PDC_PASSWORD_FILE})
+else
+  # set the local password variable pased on password variable 
+  # or to defalt if variable is empty
+  LOCAL_AD_PDC_PASSWORD=${AD_PDC_PASSWORD:-"default"}
 fi
 
-# Update AD PDC Information in config file
-sed -i "s/AD_PDC_HOST/${AD_PDC_HOST}/" ${CONFIGFILE}
-sed -i "s/AD_PDC_PORT/${AD_PDC_PORT}/" ${CONFIGFILE}
-sed -i "s/AD_PDC_USER/\"${AD_PDC_USER}\"/" ${CONFIGFILE}
-sed -i "s/AD_PDC_PASSWORD/${AD_PDC_PASSWORD}/" ${CONFIGFILE}
+# Update baseDN in LDIF file if required
+if [ -f ${CONFIGFILE} ]; then
+  cp -v ${CONFIGFILE} ${CONFIGFILE_CUSTOM}
+else
+  echo "- skip $(basename $0), missing ${CONFIGFILE}"
+  exit
+fi
+
+echo "- Update batch file to match ${BASEDN} and other variables"
+echo "Update conf files to match AD" 
+sed -i "s/AD_PDC_HOST/${AD_PDC_HOST}/g" ${CONFIGFILE_CUSTOM}
+sed -i "s/AD_PDC_PORT/${AD_PDC_PORT}/g" ${CONFIGFILE_CUSTOM}
+sed -i "s/AD_PDC_USER/${AD_PDC_USER}/g" ${CONFIGFILE_CUSTOM}
+sed -i "s/AD_PDC_PASSWORD/${LOCAL_AD_PDC_PASSWORD}/g" ${CONFIGFILE_CUSTOM}
+sed -i "s/BASEDN/${BASEDN}/g" ${CONFIGFILE_CUSTOM}
 
 echo "  Configure EUS context in OUD Proxy Instance"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \
@@ -60,6 +76,6 @@ ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \
   --verbose \
   --verbose \
   --trustAll \
-  --batchFilePath "${CONFIGFILE}"
+  --batchFilePath "${CONFIGFILE_CUSTOM}"
 
 # - EOF -----------------------------------------------------------------
