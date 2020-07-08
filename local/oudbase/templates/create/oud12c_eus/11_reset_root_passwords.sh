@@ -3,11 +3,11 @@
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # -----------------------------------------------------------------------
-# Name.......: 19_reset_root_passwords.sh
+# Name.......: 11_reset_root_passwords.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2020.06.30
-# Usage......: 19_reset_root_passwords.sh
+# Usage......: 11_reset_root_passwords.sh
 # Purpose....: Script to reset admin user passwords
 # Notes......: 
 # Reference..: 

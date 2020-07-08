@@ -28,25 +28,12 @@
 # - load instance environment -------------------------------------------
 . "$(dirname $0)/00_init_environment"
 CONFIGFILE="$(dirname $0)/$(basename $0 .sh).conf"      # config file based on script name
-CONFIGFILE_CUSTOM="$(dirname $0)/$(basename $0 .sh)_${BASEDN_STRING}"
 # - configure instance --------------------------------------------------
 echo "Configure OUD instance ${OUD_INSTANCE} using:"
 echo "  BASEDN            : ${BASEDN}"
 echo "  BASEDN_STRING     : ${BASEDN_STRING}"
 echo "  CONFIGFILE        : ${CONFIGFILE}"
-echo "  CONFIGFILE_CUSTOM : ${CONFIGFILE_CUSTOM}"
 echo ""
-
-# Update baseDN in LDIF file if required
-if [ -f ${CONFIGFILE} ]; then
-  cp -v ${CONFIGFILE} ${CONFIGFILE_CUSTOM}
-else
-  echo "- skip $(basename $0), missing ${CONFIGFILE}"
-  exit
-fi
-
-echo "- Update batch file to match ${BASEDN} and other variables"
-sed -i "s/BASEDN/${BASEDN}/g" ${CONFIGFILE_CUSTOM}
 
 echo "  Config OUD Proxy Instance"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \
@@ -57,5 +44,5 @@ ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \
   --no-prompt \
   --verbose \
   --trustAll \
-  --batchFilePath "${CONFIGFILE_CUSTOM}"
+  --batchFilePath "${CONFIGFILE}"
 # - EOF -----------------------------------------------------------------

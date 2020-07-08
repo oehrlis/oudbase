@@ -3,7 +3,7 @@ version: 1
 # Trivadis AG, Infrastructure Managed Services
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # ---------------------------------------------------------------------------
-# Name.......: TrivadisLAB.ldif 
+# Name.......: 14_create_demo_users.ldif 
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2020.07.01

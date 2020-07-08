@@ -38,22 +38,28 @@ echo "BASEDN            : ${BASEDN}"
 
 # check if we do have a password file
 if [ ! -f "${PWD_FILE}" ]; then
-    # Auto generate a password
-    echo "- auto generate new password..."
-    while true; do
-        s=$(cat /dev/urandom | tr -dc "A-Za-z0-9" | fold -w 10 | head -n 1)
-        if [[ ${#s} -ge 8 && "$s" == *[A-Z]* && "$s" == *[a-z]* && "$s" == *[0-9]*  ]]; then
-            echo "- passwort does Match the criteria"
-            break
-        else
-            echo "- password does not Match the criteria, re-generating..."
-        fi
-    done
-    echo "- use auto generated password for ${DIRMAN}"
-    echo "- save password for ${DIRMAN} in ${PWD_FILE}"
-    echo $s>${PWD_FILE}
+    # check if we do have a default admin password
+    if [ -z ${DEFAULT_ADMIN_PASSWORD} ]; then
+        # Auto generate a password
+        echo "- auto generate new password..."
+        while true; do
+            s=$(cat /dev/urandom | tr -dc "A-Za-z0-9" | fold -w 10 | head -n 1)
+            if [[ ${#s} -ge 8 && "$s" == *[A-Z]* && "$s" == *[a-z]* && "$s" == *[0-9]*  ]]; then
+                echo "- passwort does Match the criteria"
+                break
+            else
+                echo "- password does not Match the criteria, re-generating..."
+            fi
+        done
+        echo "- use auto generated password for ${DIRMAN}"
+        echo "- save password for ${DIRMAN} in ${PWD_FILE}"
+        echo $s>${PWD_FILE}
+    else
+        echo ${DEFAULT_ADMIN_PASSWORD}>${PWD_FILE}
+        echo "- use predefined admin password for user from variable \${DEFAULT_ADMIN_PASSWORD}"
+    fi
 else
-    echo "- use predefined password for user ${PWD_FILE} from ${PWD_FILE}"
+    echo "- use predefined password for user from file ${PWD_FILE}"
 fi
 
 # check if OUD instance config does not yet exists

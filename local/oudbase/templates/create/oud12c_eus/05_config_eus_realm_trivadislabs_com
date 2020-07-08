@@ -25,21 +25,21 @@ changetype: modify
 add: uniquemember
 uniquemember: cn=Directory Manager
 uniquemember: cn=oudadmin,cn=Root DNs,cn=config
-uniquemember: ou=role_eus_admins,ou=groups,ou=local,BASEDN
-uniquemember: ou=role_oud_admins,ou=groups,ou=local,BASEDN
+uniquemember: ou=role_eus_admins,ou=groups,ou=local,dc=trivadislabs,dc=com
+uniquemember: ou=role_oud_admins,ou=groups,ou=local,dc=trivadislabs,dc=com
 
 # Update common EUS Configuration MOS Note 1996363.1
-dn: cn=OracleContextAdmins,cn=Groups,cn=OracleContext,BASEDN
+dn: cn=OracleContextAdmins,cn=Groups,cn=OracleContext,dc=trivadislabs,dc=com
 changetype: modify
 add: uniquemember
 uniquemember: cn=oudadmin,cn=Root DNs,cn=config
-uniquemember: ou=role_oud_admins,ou=groups,ou=local,BASEDN
-uniquemember: ou=role_eus_admins,ou=groups,ou=local,BASEDN
+uniquemember: ou=role_oud_admins,ou=groups,ou=local,dc=trivadislabs,dc=com
+uniquemember: ou=role_eus_admins,ou=groups,ou=local,dc=trivadislabs,dc=com
 
 dn: cn=Common,cn=Products,cn=OracleContext
 changetype: modify
 replace: orclSubscriberSearchBase
-orclSubscriberSearchBase: BASEDN
+orclSubscriberSearchBase: dc=trivadislabs,dc=com
 
 dn: cn=Common,cn=Products,cn=OracleContext
 changetype: modify
@@ -49,36 +49,36 @@ orclSubscriberNickNameAttribute: dc
 dn: cn=Common,cn=Products,cn=OracleContext
 changetype: modify
 replace: orclDefaultSubscriber
-orclDefaultSubscriber: BASEDN
+orclDefaultSubscriber: dc=trivadislabs,dc=com
 
-dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+dn: cn=Common,cn=Products,cn=OracleContext,dc=trivadislabs,dc=com
 changetype: modify
 replace: orclCommonUserSearchBase
-orclCommonUserSearchBase: ou=USER_OU,BASEDN
+orclCommonUserSearchBase: ou=People,dc=trivadislabs,dc=com
 
-dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+dn: cn=Common,cn=Products,cn=OracleContext,dc=trivadislabs,dc=com
 changetype: modify
 replace: orclCommonUserCreateBase
-orclCommonUserCreateBase: ou=USER_OU,BASEDN
+orclCommonUserCreateBase: ou=People,dc=trivadislabs,dc=com
 
-dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+dn: cn=Common,cn=Products,cn=OracleContext,dc=trivadislabs,dc=com
 changetype: modify
 replace: orclCommonDefaultUserCreateBase
-orclCommonDefaultUserCreateBase: ou=USER_OU,BASEDN
+orclCommonDefaultUserCreateBase: ou=People,dc=trivadislabs,dc=com
 
-dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+dn: cn=Common,cn=Products,cn=OracleContext,dc=trivadislabs,dc=com
 changetype: modify
 replace: orclCommonGroupCreateBase
-orclCommonGroupCreateBase: ou=GROUP_OU,BASEDN
+orclCommonGroupCreateBase: ou=Groups,dc=trivadislabs,dc=com
 
-dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+dn: cn=Common,cn=Products,cn=OracleContext,dc=trivadislabs,dc=com
 changetype: modify
 replace: orclCommonDefaultGroupCreateBase
-orclCommonDefaultGroupCreateBase: ou=GROUP_OU,BASEDN
+orclCommonDefaultGroupCreateBase: ou=Groups,dc=trivadislabs,dc=com
 
-dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+dn: cn=Common,cn=Products,cn=OracleContext,dc=trivadislabs,dc=com
 changetype: modify
 replace: orclCommonGroupSearchBase
-orclCommonGroupSearchBase: ou=GROUP_OU,BASEDN
+orclCommonGroupSearchBase: ou=Groups,dc=trivadislabs,dc=com
 
 # - EOF -----------------------------------------------------------------
