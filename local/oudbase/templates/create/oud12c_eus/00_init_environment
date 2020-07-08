@@ -47,12 +47,13 @@
 # - Instance information
 export DIRMAN="cn=Directory Manager"
 export REPMAN=admin
-export BASEDN="dc=trivadislabs,dc=com"
+export BASEDN=${BASEDN:-"dc=trivadislabs,dc=com"}
 export BASEDN_STRING=$(echo $BASEDN|sed 's/\(dc\|o\|ou\)=//g; s/,/_/g;')
-export DEFAULT_PASSWORD="***REMOVED***"     # default password for ldap users (none admin users)
+export DEFAULT_PASSWORD="***REMOVED***"         # default password for ldap users (none admin users)
+export DEFAULT_ADMIN_PASSWORD="***REMOVED***"   # default password for ldap admin users
 
-export GROUP_OU="Groups"                    # group OU below base DN eg ou=groups,dc=postgasse,dc=org
-export USER_OU="People"                     # user OU below base DN eg ou=people,dc=postgasse,dc=org
+export GROUP_OU="Groups"                        # group OU below base DN eg ou=groups,dc=postgasse,dc=org
+export USER_OU="People"                         # user OU below base DN eg ou=people,dc=postgasse,dc=org
 
 # - Certificates and password
 export KEYSTOREFILE=${OUD_INSTANCE_HOME}/OUD/config/keystore
@@ -62,10 +63,11 @@ export KEYSTOREPIN=${OUD_INSTANCE_HOME}/OUD/config/keystore.pin
 
 # EUS Configuration
 export EUS_USER_NAME="eusadmin"
-export EUS_USER_DN="cn=${EUS_USER_NAME},ou=Users,ou=local,${BASEDN}"
+export EUS_USER_DN="cn=${EUS_USER_NAME},cn=oraclecontext"
 export COMMON_FILES="/u01/common"
-export EUSADMIN_USERS_PWD_FILE=${COMMON_FILES}/etc/${OUD_INSTANCE}_${EUS_USER_NAME}_pwd.txt
-export EUSADMIN_USERS_DN_FILE=${COMMON_FILES}/etc/${OUD_INSTANCE}_${EUS_USER_NAME}_dn.txt
+export EUSADMIN_USERS_PWD_FILE=${COMMON_FILES}/etc/${EUS_USER_NAME}_pwd.txt
+export EUSADMIN_USERS_DN_FILE=${COMMON_FILES}/etc/${EUS_USER_NAME}_dn.txt
+echo ${EUS_USER_DN} >${EUSADMIN_USERS_DN_FILE}
 export TRUSTED_CERT_FILE=${COMMON_FILES}/etc/oud_trusted_cert.txt
 
 # Password files

@@ -82,7 +82,7 @@ cn: role_oud_admins
 description: OUD admin role has password reset, modify acl, bypass acl and unindex search privilege
 ou: role_oud_admins
 uniquemember: cn=Directory Manager
-uniquemember: cn=oudadmin
+uniquemember: cn=oudadmin,cn=Root DNs,cn=config
 
 # add role for EUS Admins
 dn: ou=role_eus_admins,ou=groups,ou=local,BASEDN
@@ -92,7 +92,6 @@ cn: role_eus_admins
 description: EUS admin role has password reset privilege
 ou: role_eus_admins
 uniquemember: cn=Directory Manager
-uniquemember: cn=netadmin
 uniquemember: ou=role_oud_admins,ou=groups,ou=local,BASEDN
 
 # add role for IAM Admins
