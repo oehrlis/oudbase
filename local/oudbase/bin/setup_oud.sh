@@ -356,8 +356,8 @@ else
     rm -rf /tmp/OraInstall*
     # remove all the logs....
     DoMsg "INFO : remove log files in \${ORACLE_INVENTORY} and \${ORACLE_BASE}/product"
-    find ${ORACLE_INVENTORY} -type f -name *.log -exec rm {} \;
-    find ${ORACLE_BASE}/product -type f -name *.log -exec rm {} \;
+    find ${ORACLE_INVENTORY} -type f -name '*.log' -exec rm {} \;
+    find ${ORACLE_BASE}/product -type f -name '*.log' -exec rm {} \;
 fi
 
 if [ "${SLIM^^}" == "TRUE" ] && [ "${PATCH_LATER^^}" == "FALSE" ]; then
