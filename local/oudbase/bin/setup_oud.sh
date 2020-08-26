@@ -36,7 +36,7 @@ SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
-TMP_DIR=$(mktemp -d)                   # create a temp directory
+TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
 
 DOAPPEND="TRUE"                                 # enable log file append
 export VERBOSE=${VERBOSE:-"FALSE"}              # enable debug mode
@@ -60,7 +60,7 @@ DEFAULT_COHERENCE_PATCH_PKG="p30729380_122140_Generic.zip"
 
 # define the software packages default is just the OUD 12.2.1.4 base package
 export OUD_BASE_PKG=${OUD_BASE_PKG:-"p30188352_122140_Generic.zip"} # OUD 12.2.1.4.0
-export FMW_BASE_PKG=${FMW_BASE_PKG:-""}                             
+export FMW_BASE_PKG=${FMW_BASE_PKG:-"fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"}                             
 export OUD_PATCH_PKG=${OUD_PATCH_PKG:-""}
 export FMW_PATCH_PKG=${FMW_PATCH_PKG:-""}
 export OUD_OPATCH_PKG=${OUD_OPATCH_PKG:-""}

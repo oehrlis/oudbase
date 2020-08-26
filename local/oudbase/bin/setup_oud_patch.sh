@@ -27,7 +27,7 @@ SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
-TMP_DIR=$(mktemp -d)                   # create a temp directory
+TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
 
 DOAPPEND="TRUE"                                 # enable log file append
 export VERBOSE=${VERBOSE:-"FALSE"}              # enable debug mode
@@ -65,6 +65,7 @@ export ORACLE_HOME="${ORACLE_HOME:-${ORACLE_BASE}/product/${ORACLE_HOME_NAME}}"
 
 # define generic variables for software, download etc
 export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(find ${ORACLE_BASE} /usr/java -name javac 2>/dev/null|sort -r|head -1) 2>/dev/null) 2>/dev/null)}
+CURRENT_DIR=$(pwd)
 # - EOF Environment Variables -----------------------------------------------
 
 # - Functions -----------------------------------------------------------
@@ -130,6 +131,7 @@ function install_patch {
                 DoMsg "WARN : opatch apply failed with error ${OPATCH_ERR}"
                 return 1
             fi
+            cd -
             # remove binary packages on docker builds
             running_in_docker && rm -rf ${SOFTWARE}/${PATCH_PKG}
             rm -rf ${TMP_DIR}/${PATCH_ID}          # remove the binary packages
@@ -143,7 +145,6 @@ function install_patch {
         DoMsg "INFO : No package specified. Skip patch installation."
     fi
 }
-
 # - EOF Functions -------------------------------------------------------
 # - Initialization ----------------------------------------------------------
 # Make sure root does not run our script
@@ -273,6 +274,7 @@ if [ "${OUD_TYPE}" == "OUDSM12" ]; then
                 DoMsg "WARN : opatch apply failed with error ${OPATCH_ERR}"
                 return 1
             fi
+            cd -
             # remove binary packages on docker builds
             running_in_docker && rm -rf ${SOFTWARE}/${COHERENCE_PATCH_PKG}
             rm -rf ${TMP_DIR}/${COHERENCE_PATCH_ID}          # remove the binary packages
@@ -304,6 +306,7 @@ else
 fi
 
 DoMsg "INFO : List opatch inventory ----------------------------------------------"
+cd ${CURRENT_DIR}
 ${ORACLE_HOME}/OPatch/opatch lsinventory
 
 DoMsg "INFO : CleanUp OUD patch installation -------------------------------------"

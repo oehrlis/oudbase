@@ -1,7 +1,7 @@
 9f033625b1a261971ca56671c5b475e83c552279  ./bin/oud_functions.sh
-0c4cda11250b8f1c3ddcf67d02d021b1a2ce6794  ./bin/setup_oud_patch.sh
+e876c294eff8ac2046e65ba4f0742a8de0ed8871  ./bin/setup_oud_patch.sh
 6d8345a464fe2be06872899f0044181298d46869  ./bin/oud_status.sh
-103aa63e0dee5ed9672c6ddfd7139f59f0f94123  ./bin/setup_oud.sh
+b1a676dcc02f7257727e74272627a6d8b46e7caf  ./bin/setup_oud.sh
 9990736bd1078a61072f30cd582dc7d841083468  ./bin/oud_start_stop.sh
 600f45d0f4eaf04cebcf67aba2704e2fa3fde964  ./bin/oud_start_stop_all
 62c7ca4ff8eb6cf48952d03e6f1a957218be2f55  ./bin/oud_export.sh
