@@ -54,6 +54,8 @@ export DEFAULT_ADMIN_PASSWORD="***REMOVED***"   # default password for ldap admi
 
 export GROUP_OU="Groups"                        # group OU below base DN eg ou=groups,dc=postgasse,dc=org
 export USER_OU="People"                         # user OU below base DN eg ou=people,dc=postgasse,dc=org
+# - INTERNAL Suffix
+export LOCAL_OU="ou=local"
 
 # - Certificates and password
 export KEYSTOREFILE=${OUD_INSTANCE_HOME}/OUD/config/keystore

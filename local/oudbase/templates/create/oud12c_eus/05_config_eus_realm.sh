@@ -22,9 +22,14 @@
 # - load instance environment -------------------------------------------
 . "$(dirname $0)/00_init_environment"
 LDIFFILE="$(dirname $0)/$(basename $0 .sh).ldif"      # LDIF file based on script name
-LDIFFILE_CUSTOM="$(dirname $0)/$(basename $0 .sh)_${BASEDN_STRING}"
+LDIFFILE_CUSTOM="$(dirname $0)/$(basename $0 .sh).ldif_${BASEDN_STRING}"
 # - configure instance --------------------------------------------------
 echo "Configure OUD instance ${OUD_INSTANCE} using:"
+echo "  HOSTNAME          : ${HOST}"
+echo "  PORT              : ${PORT}"
+echo "  PORT_SSL          : ${PORT_SSL}"
+echo "  DIRMAN            : ${DIRMAN}"
+echo "  PWD_FILE          : ${PWD_FILE}"
 echo "  BASEDN            : ${BASEDN}"
 echo "  BASEDN_STRING     : ${BASEDN_STRING}"
 echo "  GROUP_OU          : ${GROUP_OU}"
@@ -46,13 +51,16 @@ echo "- Update LDIF file to match ${BASEDN} and other variables"
 sed -i "s/BASEDN/${BASEDN}/g" ${LDIFFILE_CUSTOM}
 sed -i "s/USER_OU/${USER_OU}/g" ${LDIFFILE_CUSTOM}
 sed -i "s/GROUP_OU/${GROUP_OU}/g" ${LDIFFILE_CUSTOM}
+sed -i "s/LOCAL_OU/${LOCAL_OU}/g" ${LDIFFILE_CUSTOM}
 
 echo "- Update EUS Realm configuration"
 ${OUD_INSTANCE_HOME}/OUD/bin/ldapmodify \
   --hostname ${HOST} \
-  --port ${PORT} \
+  --port ${PORT_SSL} \
   --bindDN "${DIRMAN}" \
   --bindPasswordFile "${PWD_FILE}" \
+  --useSSL \
+  --trustAll \
   --defaultAdd \
   --filename "${LDIFFILE_CUSTOM}"
 # - EOF -----------------------------------------------------------------
