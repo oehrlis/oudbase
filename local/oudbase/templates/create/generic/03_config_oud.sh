@@ -3,19 +3,23 @@
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # -----------------------------------------------------------------------
-# Name.......: 02_configure_instance.sh
+# Name.......: 03_config_oud.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2018.03.18
+# Date.......: 2020.06.30
 # Revision...: --
-# Purpose....: Script für die Ausführung der Instanz Batch 
-#              Konfigurationsdatei
-# Notes......: Das Script laedt das LDIF file 02_configure_instance.ldif 
-#              und fuehrt die dsconfig Kommandos aus 
-#              02_configure_instance.config als Batch aus. Diese lassen 
-#              sich bei Bedarf auch einzel ausführen.
+# Purpose....: Script to configure the OUD proxy instance.
+# Notes......: The config file 03_config_oud_proxy.conf is executed using
+#              dsconfig in batch mode. If required, each command can 
+#              also be executed individually.
+#
+#              dsconfig -h ${HOSTNAME} -p $PORT_ADMIN \
+#                  -D "cn=Directory Manager"-j $PWD_FILE -X -n \
+#                  <COMMAND>
+#
 # Reference..: https://github.com/oehrlis/oudbase
-# License....: GPL-3.0+
+# License....: Licensed under the Universal Permissive License v 1.0 as 
+#              shown at https://oss.oracle.com/licenses/upl.
 # -----------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
@@ -23,30 +27,19 @@
 
 # - load instance environment -------------------------------------------
 . "$(dirname $0)/00_init_environment"
-LDIFFILE="$(basename $0 .sh).ldif"      # LDIF file based on script name
-CONFIGFILE="$(basename $0 .sh).conf"    # config file based on script name
-
+CONFIGFILE="$(dirname $0)/$(basename $0 .sh).conf"      # config file based on script name
 # - configure instance --------------------------------------------------
 echo "Configure OUD instance ${OUD_INSTANCE} using:"
-echo "OUD_INSTANCE_HOME : ${OUD_INSTANCE_HOME}"
-echo "PWD_FILE          : ${PWD_FILE}"
-echo "HOSTNAME          : ${HOST}"
-echo "PORT              : ${PORT}"
-echo "PORT_ADMIN        : ${PORT_ADMIN}"
-echo "DIRMAN            : ${DIRMAN}"
-echo "LDIFFILE          : ${LDIFFILE}"
-echo "CONFIGFILE        : ${CONFIGFILE}"
+echo "  HOSTNAME          : ${HOST}"
+echo "  PORT_ADMIN        : ${PORT_ADMIN}"
+echo "  DIRMAN            : ${DIRMAN}"
+echo "  PWD_FILE          : ${PWD_FILE}"
+echo "  BASEDN            : ${BASEDN}"
+echo "  BASEDN_STRING     : ${BASEDN_STRING}"
+echo "  CONFIGFILE        : ${CONFIGFILE}"
+echo ""
 
-echo "Add Custom LDAP Schema"
-${OUD_INSTANCE_HOME}/OUD/bin/ldapmodify \
-  --hostname ${HOST} \
-  --port ${PORT} \
-  --bindDN "${DIRMAN}" \
-  --bindPasswordFile "${PWD_FILE}" \
-  --defaultAdd \
-  --filename "${LDIFFILE}"
-
-echo "Config OUD Instance"
+echo "  Config OUD Proxy Instance"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \
   --hostname ${HOST} \
   --port ${PORT_ADMIN} \
@@ -56,5 +49,4 @@ ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \
   --verbose \
   --trustAll \
   --batchFilePath "${CONFIGFILE}"
-
 # - EOF -----------------------------------------------------------------
