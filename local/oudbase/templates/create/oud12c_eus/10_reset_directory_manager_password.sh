@@ -24,7 +24,7 @@
 # - configure instance --------------------------------------------------
 echo "- reset admin user password for OUD instance ${OUD_INSTANCE} using:"
 echo "HOSTNAME          : ${HOST}"
-echo "PORT_ADMIN        : ${PORT}"
+echo "PORT_ADMIN        : ${PORT_ADMIN}"
 echo "DIRMAN            : ${DIRMAN}"
 echo "PWD_FILE          : ${PWD_FILE}"
 
