@@ -283,15 +283,9 @@ fi
 if [ -f  ${ETC_CORE}/${OUD_CORE_CONFIG} ]; then
     DoMsg "INFO : oudenv_core.conf does exists, assume upgrade..."
     for i in $(grep -v '^#' ${ETC_CORE}/${OUD_CORE_CONFIG}); do
-        DoMsg "INFO :--------------------------------"
-        DoMsg "INFO :$i"
         variable="UPGRADE_$(echo $i|cut -d= -f1)"
-        DoMsg "INFO :$variable"
-        
         export $variable=$(echo $i|cut -d= -f2)
-        DoMsg "INFO :-- Variable ${variable}=${!variable}"
     done
-    env|grep -i UPGRADE
 fi
 
 DoMsg "INFO : Define default values"
@@ -447,6 +441,11 @@ if [ "${SAVE_CONFIG}" = "TRUE" ]; then
             fi
         fi
     fi
+fi
+
+# remove new / empty core file
+if [ -f "${ETC_CORE}/${OUD_CORE_CONFIG}.new" ] && [ $(grep -v '^#' -c ${ETC_CORE}/${OUD_CORE_CONFIG}.new ) -eq 0 ]; then
+    rm "${ETC_CORE}/${OUD_CORE_CONFIG}.new"
 fi
 
 # move config files
