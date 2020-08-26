@@ -22,18 +22,16 @@ export OPENDS_JAVA_ARGS=-Dcom.sun.jndi.ldap.object.disableEndpointIdentification
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v1.8.5
+VERSION=v1.9.0
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
-TMP_DIRECTORY="/tmp"
-TMP_FILE="${TMP_DIRECTORY}/$(basename $0).$$"
+TMP_FILE=$(mktemp)                              # create a temp file
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 MAILADDRESS=oud@oradba.ch
 ERROR=0
 HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)    # Hostname
-
 # - End of Default Values -----------------------------------------------
 
 # - Functions -----------------------------------------------------------

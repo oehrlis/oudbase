@@ -24,11 +24,13 @@
 
 # - Environment Variables ---------------------------------------------------
 # define default values 
-VERSION=v1.8.5
+VERSION=v1.9.0
 DOAPPEND=${DOAPPEND:-"TRUE"}                    # enable log file append
 VERBOSE=${VERBOSE:-"FALSE"}                     # enable verbose mode
 DEBUG=${DEBUG:-"FALSE"}                         # enable debug mode
 SEND_MAIL=${SEND_MAIL:-"UNDEF"} 
+SOFTWARE=${SOFTWARE:-"${ORACLE_BASE}/software"} # local software stage folder
+SOFTWARE_REPO=${SOFTWARE_REPO:-""}              # URL to software for curl fallback
 # - EOF Environment Variables -----------------------------------------------
 
 # - Functions ---------------------------------------------------------------
@@ -113,11 +115,13 @@ function CleanAndQuit() {
         0)  DoMsg "END  : of ${SCRIPT_NAME}";;
         1)  DoMsg "ERR  : Exit Code ${1}. Wrong amount of arguments. See usage for correct one.";;
         2)  DoMsg "ERR  : Exit Code ${1}. Wrong arguments (${2}). See usage for correct one.";;
+        3)  DoMsg "ERR  : Exit Code ${1}. This script must not be run as root ${2}";;
         5)  DoMsg "ERR  : Exit Code ${1}. OUD Instance ${2} does not exits in ${OUDTAB} or ${ORACLE_INSTANCE_BASE}";;
         10) DoMsg "ERR  : Exit Code ${1}. OUD_BASE not set or $OUD_BASE not available.";;
         11) DoMsg "ERR  : Exit Code ${1}. Could not touch file ${2}";;
         12) DoMsg "ERR  : Exit Code ${1}. Can not create directory ${2}";;
         13) DoMsg "ERR  : Exit Code ${1}. Directory ${2} is not writeable";;
+        14) DoMsg "ERR  : Exit Code ${1}. Directory ${2} already exists";;
         21) DoMsg "ERR  : Exit Code ${1}. Could not load \${HOME}/.OUD_BASE";;
         30) DoMsg "ERR  : Exit Code ${1}. Some backups failed";;
         31) DoMsg "ERR  : Exit Code ${1}. Some exports failed";;
@@ -135,6 +139,7 @@ function CleanAndQuit() {
         60) DoMsg "ERR  : Exit Code ${1}. Force mail enabled but no e-Mail adress specified";;
         70) DoMsg "ERR  : Exit Code ${1}. Error starting instances ${2}";;
         71) DoMsg "ERR  : Exit Code ${1}. Error unknown activity ${2}";;
+        80) DoMsg "ERR  : Exit Code ${1}. No base software package specified. Abort installation.";;
         99) DoMsg "INFO : Just wanna say hallo.";;
         ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
     esac
@@ -148,8 +153,44 @@ function CleanAndQuit() {
     fi
     exit ${1}
 }
-# - EOF Functions -----------------------------------------------------------
 
+function running_in_docker() {
+# ---------------------------------------------------------------------------
+# Purpose....:  Function for checking whether the process is running in a 
+#               container. It return 0 if YES or 1 if NOT.
+# ---------------------------------------------------------------------------
+    if [ -e /proc/self/cgroup ]; then
+        awk -F/ '$2 == "docker"' /proc/self/cgroup | read
+    else
+        return 1
+    fi
+}
+
+function get_software {
+# ---------------------------------------------------------------------------
+# Purpose....: Verify if the software package is available if not try to 
+#              download it from $SOFTWARE_REPO
+# ---------------------------------------------------------------------------
+    PKG=$1
+    if [ ! -s "${SOFTWARE}/${PKG}" ]; then
+        if [ ! -z "${SOFTWARE_REPO}" ]; then
+            echo " - Try to download ${PKG} from ${SOFTWARE_REPO}"
+            curl -f ${SOFTWARE_REPO}/${PKG} -o ${SOFTWARE}/${PKG} 2>&1
+            CURL_ERR=$?
+            if [ ${CURL_ERR} -ne 0 ]; then
+                echo " - WARNING: Unable to access software repository or ${PKG} (curl error ${CURL_ERR})"
+                return 1
+            fi
+        else
+            echo " - WARNING: No software repository specified"
+            return 1
+        fi
+    else
+        echo " - Found package ${PKG} for installation."
+        return 0
+    fi
+}
+# - EOF Functions -----------------------------------------------------------
 # check if script is sourced and return/exit
 if [ "${DEBUG^^}" == "TRUE" ]; then
     if [ "${BASH_SOURCE[0]}" != "${0}" ]; then

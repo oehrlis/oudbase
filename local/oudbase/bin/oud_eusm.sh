@@ -18,7 +18,7 @@
 # -----------------------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v1.8.5
+VERSION=v1.9.0
 JRE_HOME=$JAVA_HOME/jre/
 EUSMLIBDIR=$ORACLE_BASE/local/oudbase/lib
 ORACLEPKI=$ORACLE_HOME/oracle_common/modules/oracle.pki/oraclepki.jar
