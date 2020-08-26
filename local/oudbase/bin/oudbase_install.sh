@@ -448,6 +448,12 @@ if [ -f "${ETC_CORE}/${OUD_CORE_CONFIG}.new" ] && [ $(grep -v '^#' -c ${ETC_CORE
     rm "${ETC_CORE}/${OUD_CORE_CONFIG}.new"
 fi
 
+# remove new / empty oudtab file
+${ETC_BASE}/$i.new
+if [ -f "${ETC_BASE}/oudtab.new" ] && [ $(grep -v '^#' -c ${ETC_BASE}/oudtab.new ) -eq 0 ]; then
+    rm "${ETC_BASE}/oudtab.new"
+fi
+
 # move config files
 if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
     for i in ${CONFIG_FILES}; do
