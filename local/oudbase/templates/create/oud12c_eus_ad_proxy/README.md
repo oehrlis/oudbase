@@ -1,6 +1,6 @@
-# OUD Setup Files
+# OUD EUS AD Proxy Setup Files
 
-This folder contains all files executed after the OUD instance is initially created. Currently only bash scripts (.sh) LDIF files (.ldif) as well dsconfig batch files (.conf) are supported.
+This folder contains all files to setup a EUS OUD AD proxy instance with demo users. Corresponding bash files have to be used to setup / run .LDIF and .CONF files.
 
 - [00_init_environment](00_init_environment) Configuration file for instance specific settings like BaseDN, User OU etc.
 - [01_create_eus_proxy_instance.sh](01_create_eus_proxy_instance.sh) Script for creating the instance. Executes 'oud-setup'.
