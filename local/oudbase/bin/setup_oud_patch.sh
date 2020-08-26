@@ -34,7 +34,9 @@ export CLEANUP=${CLEANUP:-"true"}               # Flag to set yum clean up
 export SLIM=${SLIM:-"false"}                    # flag to enable SLIM setup
 export DEBUG=${DEBUG:-"FALSE"}                  # enable debug mode
 DEFAULT_OUD_TYPE=${OUD_TYPE:-"OUD12"}
-
+# source common functions from oud_functions.sh
+. ${SCRIPT_DIR}/${OUD_FUNCTIONS}
+TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
 # define default software packages
 DEFAULT_FMW_BASE_PKG="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"
 DEFAULT_OUD_BASE_PKG="p30188352_122140_Generic.zip"
@@ -68,9 +70,6 @@ CURRENT_DIR=$(pwd)
 # - EOF Environment Variables -----------------------------------------------
 
 # - Functions -----------------------------------------------------------
-# source common functions from oud_functions.sh
-. ${SCRIPT_DIR}/${OUD_FUNCTIONS}
-TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
 # -----------------------------------------------------------------------
 function Usage() {
 # Purpose....: Display Usage

@@ -43,6 +43,9 @@ export CLEANUP=${CLEANUP:-"true"}               # Flag to set yum clean up
 export SLIM=${SLIM:-"false"}                    # flag to enable SLIM setup
 export DEBUG=${DEBUG:-"FALSE"}                  # enable debug mode
 export PATCH_LATER=${PATCH_LATER:-"FALSE"}      # Flag to postpone patch and clear stuff
+# source common functions from oud_functions.sh
+. ${SCRIPT_DIR}/${OUD_FUNCTIONS}
+TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
 
 DEFAULT_RSP_FILE=${TMP_DIR}/oud_install.rsp     # default response file
 DEFAULT_LOCK_FILE=${TMP_DIR}/oraInst.loc        # default lock file
@@ -83,9 +86,6 @@ export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(find ${ORACLE_BASE} /usr/jav
 # - End of Default Values -----------------------------------------------
 
 # - Functions -----------------------------------------------------------
-# source common functions from oud_functions.sh
-. ${SCRIPT_DIR}/${OUD_FUNCTIONS}
-TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
 # -----------------------------------------------------------------------
 function Usage() {
 # Purpose....: Display Usage
