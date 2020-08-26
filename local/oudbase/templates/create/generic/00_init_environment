@@ -6,23 +6,26 @@
 # Name.......: 00_init_environment
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2018.03.20
+# Date.......: 2020.06.30
 # Revision...: --
-# Purpose....: Datei zum setzten der Instanz spezifischen Umgebung. 
-#              Grundsaetzlich basieren die folgenden Script auf der OUD 
-#              Base Umgebung. Ggf ist diese Datei anzupassen.
-# Notes......:
+# Purpose....: File for setting the instance-specific environment. 
+#              The setup scripts are based on the OUD Base environment. 
+#              If OUD Base is not used, you may have to adapt this file 
+#              and set the specific parameter in section "default 
+#              environment variables"
+# Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
-# License....: GPL-3.0+
+# License....: Licensed under the Universal Permissive License v 1.0 as 
+#              shown at https://oss.oracle.com/licenses/upl.
 # -----------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
 # -----------------------------------------------------------------------
-# - Default Environment Variables ---------------------------------------
-# Diese sollte bereits durch OUD Base korrekt gesetzt sein daher an der 
-# Stelle auskommentiert. Wichtig ist dabei, dass die entsprechende 
-# Umgebung gesetzt ist. Wird OUD Base nicht verwendet, sind die folgenden
-# Variablen explizit zu setzten.
+# - default environment variables ---------------------------------------
+# The default environment variables are already set correctly by OUD Base 
+# and commented out at this point. It is important that the appropriate 
+# environment is set. If OUD Base is not used, the following variables 
+# must be set explicitly.
 # -----------------------------------------------------------------------
 #export ORACLE_BASE="/opt/oracle"
 #export ORACLE_HOME="${ORACLE_BASE}/product/oud12.2.1.3.0"
@@ -34,29 +37,45 @@
 #export PORT=1389
 #export PORT_SSL=1636
 #export PORT_REP=8989
-# - End of Default Environment Variables --------------------------------
+#export PORT_REP=8989
+#export PORT_REST_ADMIN=8444
+#export PORT_REST_HTTP=1080
+#export PORT_REST_HTTPS=1081
+# - End of default environment variables --------------------------------
 
 # - Customization -------------------------------------------------------
-export SOFTWARE=${ORACLE_BASE}/software/v12.2.1.3.0/
-export SOFTWARE_JAVA=${SOFTWARE}/java/
-export SOFTWARE_FMW=${SOFTWARE}/fmw/
-export SOFTWARE_TVD=${SOFTWARE}/tvd/
-
-# - Instance Information
+# - Instance information
 export DIRMAN="cn=Directory Manager"
 export REPMAN=admin
-export BASEDN="BASEDN"
+export BASEDN=${BASEDN:-"dc=trivadislabs,dc=com"}
+export BASEDN_STRING=$(echo $BASEDN|sed 's/\(dc\|o\|ou\)=//g; s/,/_/g;')
+export DEFAULT_PASSWORD="***REMOVED***"         # default password for ldap users (none admin users)
+export DEFAULT_ADMIN_PASSWORD="***REMOVED***"   # default password for ldap admin users
+
+export GROUP_OU="Groups"                        # group OU below base DN eg ou=groups,dc=postgasse,dc=org
+export USER_OU="People"                         # user OU below base DN eg ou=people,dc=postgasse,dc=org
+# - INTERNAL Suffix
+export LOCAL_OU="ou=local"
 
 # - Certificates and password
-export KEYSTOREFILE=${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_jks
-export KEYSTOREPIN=${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}.pin
-export NICKNAME="NICKNAME"
-export PIN="PIN"
+export KEYSTOREFILE=${OUD_INSTANCE_HOME}/OUD/config/keystore
+export KEYSTOREPIN=${OUD_INSTANCE_HOME}/OUD/config/keystore.pin
+#export NICKNAME="NICKNAME"
+#export PIN="PIN"
+
+# EUS Configuration
+export EUS_USER_NAME="eusadmin"
+export EUS_USER_DN="cn=${EUS_USER_NAME},cn=oraclecontext"
+export COMMON_FILES="/u01/common"
+export EUSADMIN_USERS_PWD_FILE=${COMMON_FILES}/etc/${EUS_USER_NAME}_pwd.txt
+export EUSADMIN_USERS_DN_FILE=${COMMON_FILES}/etc/${EUS_USER_NAME}_dn.txt
+echo ${EUS_USER_DN} >${EUSADMIN_USERS_DN_FILE}
+export TRUSTED_CERT_FILE=${COMMON_FILES}/etc/oud_trusted_cert.txt
+
+# Password files
+export DEFAULT_USERS_PWD_FILE=${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_default_user_pwd.txt
 
 # - Hosts
-export HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)    # Hostname
-export HOST1="HOST1"
-export HOST2="HOST2"
-export HOST3="HOST3"
-
-# - End of Customization ------------------------------------------------
+export DEFAULT_HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)   # Hostname
+export HOST=${HOST:-$DEFAULT_HOST}
+# - End of customization ------------------------------------------------
