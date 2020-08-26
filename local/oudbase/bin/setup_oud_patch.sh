@@ -27,7 +27,6 @@ SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
-TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
 
 DOAPPEND="TRUE"                                 # enable log file append
 export VERBOSE=${VERBOSE:-"FALSE"}              # enable debug mode
@@ -71,6 +70,7 @@ CURRENT_DIR=$(pwd)
 # - Functions -----------------------------------------------------------
 # source common functions from oud_functions.sh
 . ${SCRIPT_DIR}/${OUD_FUNCTIONS}
+TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
 # -----------------------------------------------------------------------
 function Usage() {
 # Purpose....: Display Usage
