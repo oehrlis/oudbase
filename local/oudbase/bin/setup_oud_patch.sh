@@ -22,7 +22,7 @@
 # see git revision history for more information on changes/updates
 # ---------------------------------------------------------------------------
 # - Environment Variables ---------------------------------------------------
-VERSION=v1.9.0
+VERSION=v1.9.1
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
