@@ -279,6 +279,21 @@ if [ ! "${INSTALL_OUD_DATA}" = "" ] && [ ! -d "${INSTALL_OUD_DATA}" ]; then
     CleanAndQuit 44 ${INSTALL_OUD_DATA}
 fi
 
+# check if we do have an existing 
+if [ -f  ${ETC_CORE}/${OUD_CORE_CONFIG} ]; then
+    DoMsg "INFO : oudenv_core.conf does exists, assume upgrade..."
+    for i in $(grep -v '^#' ${ETC_CORE}/${OUD_CORE_CONFIG}); do
+        DoMsg "INFO :--------------------------------"
+        DoMsg "INFO :$i"
+        variable="UPGRADE_$(echo $i|cut -d= -f1)"
+        DoMsg "INFO :$variable"
+        
+        export $variable=$(echo $i|cut -d= -f2)
+        DoMsg "INFO :-- Variable ${variable}=${!variable}"
+    done
+    env|grep -i UPGRADE
+fi
+
 DoMsg "INFO : Define default values"
 # define default values for a couple of directories and set the real 
 # directories based on the cli or default values
@@ -288,37 +303,45 @@ export ORACLE_BASE=${INSTALL_ORACLE_BASE:-"${DEFAULT_ORACLE_BASE}"}
 
 # define OUD_BASE
 DEFAULT_OUD_BASE="${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/${DEFAULT_OUD_BASE_NAME}"
+INSTALL_OUD_BASE=${INSTALL_OUD_BASE:-${UPGRADE_OUD_BASE}}
 export OUD_BASE=${INSTALL_OUD_BASE:-"${DEFAULT_OUD_BASE}"}
 
 # define OUD_DATA
 DEFAULT_OUD_DATA=$(if [ -d "${DEFAULT_OUD_DATA}" ]; then echo ${DEFAULT_OUD_DATA}; else echo "${ORACLE_BASE}"; fi)
+INSTALL_OUD_DATA=${INSTALL_OUD_DATA:-${UPGRADE_OUD_DATA}}
 export OUD_DATA=${INSTALL_OUD_DATA:-"${DEFAULT_OUD_DATA}"}
 export ORACLE_DATA=${ORACLE_DATA:-"${OUD_DATA}"}
 
 # define OUD_INSTANCE_BASE
 DEFAULT_OUD_INSTANCE_BASE="${OUD_DATA}/${DEFAULT_OUD_INSTANCE_BASE_NAME}"
+INSTALL_OUD_INSTANCE_BASE=${INSTALL_OUD_INSTANCE_BASE:-${UPGRADE_OUD_INSTANCE_BASE}}
 export OUD_INSTANCE_BASE=${INSTALL_OUD_INSTANCE_BASE:-"${DEFAULT_OUD_INSTANCE_BASE}"}
 
 # define OUD_BACKUP_BASE
 DEFAULT_OUD_BACKUP_BASE="${OUD_DATA}/${DEFAULT_OUD_BACKUP_BASE_NAME}"
+INSTALL_OUD_BACKUP_BASE=${INSTALL_OUD_BACKUP_BASE:-${UPGRADE_OUD_BACKUP_BASE}}
 export OUD_BACKUP_BASE=${INSTALL_OUD_BACKUP_BASE:-"${DEFAULT_OUD_BACKUP_BASE}"}
 
 # define ORACLE_HOME
 DEFAULT_ORACLE_HOME=$(find ${ORACLE_BASE} ! -readable -prune -o -name oud-setup -print |sed 's/\/oud\/oud-setup$//'|head -n 1)
 DEFAULT_ORACLE_HOME=${DEFAULT_ORACLE_HOME:-"${ORACLE_BASE}/${DEFAULT_PRODUCT_BASE_NAME}/${DEFAULT_ORACLE_HOME_NAME}"}
+INSTALL_ORACLE_HOME=${INSTALL_ORACLE_HOME:-${UPGRADE_ORACLE_HOME}}
 export ORACLE_HOME=${INSTALL_ORACLE_HOME:-"${DEFAULT_ORACLE_HOME}"}
 
 # define ORACLE_FMW_HOME
 DEFAULT_ORACLE_FMW_HOME=$(find ${ORACLE_BASE} ! -readable -prune -o -name oudsm-wlst.jar -print|sed -r 's/(\/[^\/]+){3}\/oudsm-wlst.jar//g'|head -n 1)
 DEFAULT_ORACLE_FMW_HOME=${DEFAULT_ORACLE_FMW_HOME:-"${ORACLE_BASE}/${DEFAULT_PRODUCT_BASE_NAME}/${DEFAULT_ORACLE_FMW_HOME_NAME}"}
+INSTALL_ORACLE_FMW_HOME=${INSTALL_ORACLE_FMW_HOME:-${UPGRADE_ORACLE_FMW_HOME}}
 export ORACLE_FMW_HOME=${INSTALL_ORACLE_FMW_HOME:-"${DEFAULT_ORACLE_FMW_HOME}"}
 
 # define JAVA_HOME
 DEFAULT_JAVA_HOME=$(readlink -f $(find ${ORACLE_BASE} ${SYSTEM_JAVA_PATH} ! -readable -prune -o -type f -name java -print |head -1) 2>/dev/null| sed "s:/bin/java::")
+INSTALL_JAVA_HOME=${INSTALL_JAVA_HOME:-${UPGRADE_JAVA_HOME}}
 export JAVA_HOME=${INSTALL_JAVA_HOME:-"${DEFAULT_JAVA_HOME}"}
 
 # define OUD_BACKUP_BASE
 DEFAULT_OUD_ADMIN_BASE="${OUD_DATA}/${DEFAULT_OUD_ADMIN_BASE_NAME}"
+INSTALL_OUD_ADMIN_BASE=${INSTALL_OUD_ADMIN_BASE:-${UPGRADE_OUD_ADMIN_BASE}}
 export OUD_ADMIN_BASE=${INSTALL_OUD_ADMIN_BASE:-"${DEFAULT_OUD_ADMIN_BASE}"}
 
 # define ORACLE_PRODUCT
@@ -330,12 +353,14 @@ fi
 export ETC_CORE="${OUD_BASE}/etc" 
 
 # adjust LOG_BASE and ETC_BASE depending on OUD_DATA
+INSTALL_LOG_BASE=${INSTALL_LOG_BASE:-${UPGRADE_LOG_BASE}}
+INSTALL_ETC_BASE=${INSTALL_ETC_BASE:-${UPGRADE_ETC_BASE}}
 if [ "${ORACLE_BASE}" == "${OUD_DATA}" ]; then
     export LOG_BASE=${INSTALL_LOG_BASE:-"${OUD_BASE}/log"}
-    export ETC_BASE=${INSTALL_LOG_BASE:-"${ETC_CORE}"}
+    export ETC_BASE=${INSTALL_ETC_BASE:-"${ETC_CORE}"}
 else
     export LOG_BASE=${INSTALL_LOG_BASE:-"${OUD_DATA}/log"}
-    export ETC_BASE=${INSTALL_LOG_BASE:-"${OUD_DATA}/etc"}
+    export ETC_BASE=${INSTALL_ETC_BASE:-"${OUD_DATA}/etc"}
 fi
 
 # Print some information on the defined variables
@@ -430,7 +455,7 @@ if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
         if [ ! -f "${ETC_BASE}/${i}" ]; then
             if [ -f "${ETC_CORE}/${i}" ] && [ ! -L "${ETC_CORE}/${i}" ]; then
                 # take the file from the $ETC_CORE folder
-                echo "INFO : move config file ${i} from \$ETC_CORE"
+                echo "INFO : move config file ${i} from \$ETC_CORE=${ETC_CORE} to \${ETC_BASE}=${ETC_BASE}"
                 mv ${ETC_CORE}/${i} ${ETC_BASE}
             elif [ ! -f "${ETC_CORE}/${i}" ]; then
                 echo "INFO : copy config file ${i} from template folder ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}"
@@ -455,6 +480,8 @@ for i in    OUD_ADMIN_BASE \
             ORACLE_BASE \
             ORACLE_HOME \
             ORACLE_FMW_HOME \
+            LOG_BASE \
+            ETC_BASE \
             JAVA_HOME; do
     variable="INSTALL_${i}"
     if [ ! "${!variable}" == "" ]; then
