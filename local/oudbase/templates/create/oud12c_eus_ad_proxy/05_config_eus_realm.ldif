@@ -25,16 +25,16 @@ changetype: modify
 add: uniquemember
 uniquemember: cn=Directory Manager
 uniquemember: cn=oudadmin,cn=Root DNs,cn=config
-uniquemember: ou=role_eus_admins,ou=groups,ou=local,BASEDN
-uniquemember: ou=role_oud_admins,ou=groups,ou=local,BASEDN
+uniquemember: ou=role_eus_admins,ou=groups,LOCAL_OU,BASEDN
+uniquemember: ou=role_oud_admins,ou=groups,LOCAL_OU,BASEDN
 
 # Update common EUS Configuration MOS Note 1996363.1
 dn: cn=OracleContextAdmins,cn=Groups,cn=OracleContext,BASEDN
 changetype: modify
 add: uniquemember
 uniquemember: cn=oudadmin,cn=Root DNs,cn=config
-uniquemember: ou=role_oud_admins,ou=groups,ou=local,BASEDN
-uniquemember: ou=role_eus_admins,ou=groups,ou=local,BASEDN
+uniquemember: ou=role_eus_admins,ou=groups,LOCAL_OU,BASEDN
+uniquemember: ou=role_oud_admins,ou=groups,LOCAL_OU,BASEDN
 
 dn: cn=Common,cn=Products,cn=OracleContext
 changetype: modify

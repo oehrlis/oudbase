@@ -3,11 +3,11 @@
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # -----------------------------------------------------------------------
-# Name.......: 12_reset_eusadmin_password.sh
+# Name.......: 18_reset_eusadmin_password.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2020.06.30
-# Usage......: 12_reset_eusadmin_password.sh
+# Usage......: 18_reset_eusadmin_password.sh
 # Purpose....: Script to reset eusadmin user password
 # Notes......: 
 # Reference..: 
