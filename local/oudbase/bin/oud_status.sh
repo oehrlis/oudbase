@@ -19,6 +19,7 @@
 # - Customization -------------------------------------------------------
 export OUD_ROOT_DN=${OUD_ROOT_DN:-"postgasse.org"}
 export OPENDS_JAVA_ARGS=-Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true
+export OUD_CON_HANDLER=${OUD_CON_HANDLER:-"LDAP LDAPS"}
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
@@ -42,14 +43,16 @@ function Usage() {
 # Purpose....: Display Usage
 # -----------------------------------------------------------------------
     VERBOSE="TRUE"
-    DoMsg "Usage, ${SCRIPT_NAME} [-hvr -i <OUD_INSTANCE> -D <bindDN> -j <bindPasswordFile> ]"
-    DoMsg "    -h                    Usage this message"
-    DoMsg "    -v                    enable verbose mode"
-    DoMsg "    -l                    enable instance log file in \$OUD_ADMIN_BASE/\$OUD_INSTANCE/"
-    DoMsg "    -r                    check for replication"
-    DoMsg "    -D <bindDN>           Default value: cn=Directory Manager"
-    DoMsg "    -j <bindPasswordFile> Bind password file"
-    DoMsg "    -i <OUD_INSTANCE>     OUD Instance"
+    DoMsg "Usage, ${SCRIPT_NAME} [-hvr] [-i <OUD_INSTANCE>][-D <bindDN>]"
+    DoMsg "              [-j <bindPasswordFile>] [-c <CONNECTION HANDLER>]"
+    DoMsg "    -h                       Usage this message"
+    DoMsg "    -v                       enable verbose mode"
+    DoMsg "    -l                       enable instance log file in \$OUD_ADMIN_BASE/\$OUD_INSTANCE/"
+    DoMsg "    -r                       check for replication"
+    DoMsg "    -D <bindDN>              Default value: cn=Directory Manager"
+    DoMsg "    -j <bindPasswordFile>    Bind password file"
+    DoMsg "    -c <CONNECTION HANDLER>  List of connection handler to check (default LDAP,LDAPS)"
+    DoMsg "    -i <OUD_INSTANCE>        OUD Instance"
     DoMsg "    Logfile : ${LOGFILE}"
     if [ ${1} -gt 0 ]; then
         CleanAndQuit ${1} ${2}
@@ -99,7 +102,7 @@ if [ $# -lt 1 ]; then
 fi
 
 # usage and getopts
-while getopts hvli:D:j:E:r arg; do
+while getopts hvli:D:j:c:E:r arg; do
     case $arg in
         h) Usage 0;;
         v) VERBOSE="TRUE";;
@@ -107,12 +110,15 @@ while getopts hvli:D:j:E:r arg; do
         i) MyOUD_INSTANCE="${OPTARG}";;
         D) MybindDN="${OPTARG}";;
         j) MybindPasswordFile="${OPTARG}";;
+        c) MY_OUD_CON_HANDLER=$(echo "${OPTARG}"|sed s/\,/\ /g);;
         r) REPLICATION="TRUE";;
         E) CleanAndQuit "${OPTARG}";;
         ?) Usage 2 $*;;
     esac
 done
 
+# set the connection handler
+OUD_CON_HANDLER=${MY_OUD_CON_HANDLER:-$OUD_CON_HANDLER}
 # fallback to current instance if ${MyOUD_INSTANCE} is undefined
 if [ "${MyOUD_INSTANCE}" == "" ]; then
     DoMsg "INFO : Use current OUD instance"
@@ -184,7 +190,7 @@ if [ ${DIRECTORY_TYPE} == "OUD" ]; then
     fi
 
     # check if connection handler are enabled
-    for i in LDAP LDAPS; do
+    for i in ${OUD_CON_HANDLER}; do
         DoMsg "INFO : Check connection handler ${i}"
         AWK_OUT=$(awk 'BEGIN{RS="\n-\n";FS="\n";IGNORECASE=1; Error=51} $1 ~ /^Address/ && $2 ~ /\<'${i}'\>/ {if ($3 ~ /\<Enabled\>/) Error=0; } END{exit Error}' ${TMP_FILE} )
         OUD_ERROR=$?
