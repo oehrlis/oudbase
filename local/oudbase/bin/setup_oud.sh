@@ -36,7 +36,7 @@ SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
-TMP_DIR=$(mktemp --directory)                   # create a temp directory
+TMP_DIR=$(mktemp -d)                   # create a temp directory
 
 DOAPPEND="TRUE"                                 # enable log file append
 export VERBOSE=${VERBOSE:-"FALSE"}              # enable debug mode
