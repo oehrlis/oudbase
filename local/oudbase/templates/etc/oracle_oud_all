@@ -24,7 +24,7 @@ export OUD_USER="oracle"
  
 # - Default Values ------------------------------------------------------
 # Set the path to the Oracle Unified Directory instance to manage
-. /home/${OUD_USER}/.OUD_BASE
+. $(eval echo ~${OUD_USER}/.OUD_BASE)
 # - End of Default Values -----------------------------------------------
  
 # Determine what action should be performed on the server
