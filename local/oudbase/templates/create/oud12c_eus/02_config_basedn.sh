@@ -79,6 +79,7 @@ fi
 
 echo "- Update batch file to match ${BASEDN} and other variables"
 sed -i "s/BASEDN/${BASEDN}/g" ${CONFIGFILE_CUSTOM}
+sed -i "s/LOCAL_OU/${LOCAL_OU}/g" ${CONFIGFILE_CUSTOM}
 
 echo "  Config OUD Proxy Instance"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \
