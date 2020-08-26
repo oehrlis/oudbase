@@ -3,13 +3,13 @@
 # Trivadis AG, Business Development & Support (BDS)
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # -----------------------------------------------------------------------
-# Name.......: 05_config_eus_realm.sh
+# Name.......: 02_config_basedn.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2020.06.30
 # Revision...: --
-# Purpose....: Script to configure EUS realm to the OUD proxy instance.
-# Notes......: BaseDN in 05_config_eus_realm.ldif will be updated before
+# Purpose....: Script to configure base DN and add ou's for users and groups.
+# Notes......: BaseDN in 02_config_basedn.ldif will be updated before
 #              it is loaded using ldapmodify.
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: Licensed under the Universal Permissive License v 1.0 as 
@@ -23,11 +23,14 @@
 . "$(dirname $0)/00_init_environment"
 LDIFFILE="$(dirname $0)/$(basename $0 .sh).ldif"      # LDIF file based on script name
 LDIFFILE_CUSTOM="$(dirname $0)/$(basename $0 .sh).ldif_${BASEDN_STRING}"
+CONFIGFILE="$(dirname $0)/$(basename $0 .sh).conf"      # config file based on script name
+CONFIGFILE_CUSTOM="$(dirname $0)/$(basename $0 .sh).conf_${BASEDN_STRING}"
 # - configure instance --------------------------------------------------
 echo "Configure OUD instance ${OUD_INSTANCE} using:"
 echo "  HOSTNAME          : ${HOST}"
 echo "  PORT              : ${PORT}"
 echo "  PORT_SSL          : ${PORT_SSL}"
+echo "  PORT_ADMIN        : ${PORT_ADMIN}"
 echo "  DIRMAN            : ${DIRMAN}"
 echo "  PWD_FILE          : ${PWD_FILE}"
 echo "  BASEDN            : ${BASEDN}"
@@ -36,6 +39,8 @@ echo "  GROUP_OU          : ${GROUP_OU}"
 echo "  USER_OU           : ${USER_OU}"
 echo "  LDIFFILE          : ${LDIFFILE}"
 echo "  LDIFFILE_CUSTOM   : ${LDIFFILE_CUSTOM}"
+echo "  CONFIGFILE        : ${CONFIGFILE}"
+echo "  CONFIGFILE_CUSTOM : ${CONFIGFILE_CUSTOM}"
 echo ""
 
 # - configure instance --------------------------------------------------
@@ -51,8 +56,9 @@ echo "- Update LDIF file to match ${BASEDN} and other variables"
 sed -i "s/BASEDN/${BASEDN}/g" ${LDIFFILE_CUSTOM}
 sed -i "s/USER_OU/${USER_OU}/g" ${LDIFFILE_CUSTOM}
 sed -i "s/GROUP_OU/${GROUP_OU}/g" ${LDIFFILE_CUSTOM}
+sed -i "s/LOCAL_OU/${LOCAL_OU}/g" ${LDIFFILE_CUSTOM}
 
-echo "- Update EUS Realm configuration"
+echo "- Configure base DN for groups, people and entries"
 ${OUD_INSTANCE_HOME}/OUD/bin/ldapmodify \
   --hostname ${HOST} \
   --port ${PORT_SSL} \
@@ -62,4 +68,27 @@ ${OUD_INSTANCE_HOME}/OUD/bin/ldapmodify \
   --trustAll \
   --defaultAdd \
   --filename "${LDIFFILE_CUSTOM}"
+
+# Update baseDN in LDIF file if required
+if [ -f ${CONFIGFILE} ]; then
+  cp -v ${CONFIGFILE} ${CONFIGFILE_CUSTOM}
+else
+  echo "- skip $(basename $0), missing ${CONFIGFILE}"
+  exit
+fi
+
+echo "- Update batch file to match ${BASEDN} and other variables"
+sed -i "s/BASEDN/${BASEDN}/g" ${CONFIGFILE_CUSTOM}
+sed -i "s/LOCAL_OU/${LOCAL_OU}/g" ${CONFIGFILE_CUSTOM}
+
+echo "  Config OUD Proxy Instance"
+${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \
+  --hostname ${HOST} \
+  --port ${PORT_ADMIN} \
+  --bindDN "${DIRMAN}" \
+  --bindPasswordFile "${PWD_FILE}" \
+  --no-prompt \
+  --verbose \
+  --trustAll \
+  --batchFilePath "${CONFIGFILE_CUSTOM}"
 # - EOF -----------------------------------------------------------------

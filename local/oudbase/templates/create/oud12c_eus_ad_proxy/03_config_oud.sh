@@ -30,6 +30,10 @@
 CONFIGFILE="$(dirname $0)/$(basename $0 .sh).conf"      # config file based on script name
 # - configure instance --------------------------------------------------
 echo "Configure OUD instance ${OUD_INSTANCE} using:"
+echo "  HOSTNAME          : ${HOST}"
+echo "  PORT_ADMIN        : ${PORT_ADMIN}"
+echo "  DIRMAN            : ${DIRMAN}"
+echo "  PWD_FILE          : ${PWD_FILE}"
 echo "  BASEDN            : ${BASEDN}"
 echo "  BASEDN_STRING     : ${BASEDN_STRING}"
 echo "  CONFIGFILE        : ${CONFIGFILE}"
