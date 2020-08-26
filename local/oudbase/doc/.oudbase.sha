@@ -6,7 +6,7 @@ dbe876670febdbb75b628e68e7acf843e92e1dd3  ./bin/setup_oud_patch.sh
 600f45d0f4eaf04cebcf67aba2704e2fa3fde964  ./bin/oud_start_stop_all
 62c7ca4ff8eb6cf48952d03e6f1a957218be2f55  ./bin/oud_export.sh
 a6f4883f80a72ad18ce4b7aa35a8ebe01bd7f1f6  ./bin/oud_backup.sh
-1087a0699f9a573a0b1a6fd0ed6cc3f0bf5a4634  ./bin/oudenv.sh
+2877d826ca911dc270dfa96f19b24babf6976975  ./bin/oudenv.sh
 106725e6138a7b699dc79edaf01c709c2420c52a  ./bin/oud_eusm.sh
 c663fb651540b06c32791da7ac6f2d4297f85e7e  ./etc/oudenv_core.conf
 e931ecdf86bc0b5b2f00f0926366c160281a71f5  ./etc/oudenv.conf
