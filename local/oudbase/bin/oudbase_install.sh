@@ -444,7 +444,7 @@ if [ "${SAVE_CONFIG}" = "TRUE" ]; then
 fi
 
 # remove new / empty core file
-if [ -f "${ETC_CORE}/${OUD_CORE_CONFIG}.new" ];
+if [ -f "${ETC_CORE}/${OUD_CORE_CONFIG}.new" ]; then
     if [ $(grep -v '^#' -c ${ETC_CORE}/${OUD_CORE_CONFIG}.new ) -eq 0 ]; then
         rm "${ETC_CORE}/${OUD_CORE_CONFIG}.new"
     fi
