@@ -38,9 +38,9 @@
 #export PORT_SSL=1636
 #export PORT_REP=8989
 #export PORT_REP=8989
-#export PORT_REST_ADMIN=8444
-#export PORT_REST_HTTP=1080
-#export PORT_REST_HTTPS=1081
+export PORT_REST_ADMIN=8444
+export PORT_REST_HTTP=1080
+export PORT_REST_HTTPS=1081
 # - End of default environment variables --------------------------------
 
 # - Customization -------------------------------------------------------
@@ -74,7 +74,7 @@ export AD_PDC_PASSWORD_FILE="${OUD_INSTANCE_ADMIN}/etc/ad_pwd_file.txt"         
 # EUS Configuration
 export EUS_USER_NAME="eusadmin"
 export EUS_USER_DN="cn=${EUS_USER_NAME},cn=oraclecontext"
-export COMMON_FILES="/u01/common"
+export COMMON_FILES="${OUD_INSTANCE_ADMIN}"
 export EUSADMIN_USERS_PWD_FILE=${COMMON_FILES}/etc/${EUS_USER_NAME}_pwd.txt
 export EUSADMIN_USERS_DN_FILE=${COMMON_FILES}/etc/${EUS_USER_NAME}_dn.txt
 echo ${EUS_USER_DN} >${EUSADMIN_USERS_DN_FILE}
@@ -86,4 +86,7 @@ export DEFAULT_USERS_PWD_FILE=${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_default_
 # - Hosts
 export DEFAULT_HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)   # Hostname
 export HOST=${HOST:-$DEFAULT_HOST}
+export HOST1=""
+export HOST2=""
+export HOST3=""
 # - End of customization ------------------------------------------------
