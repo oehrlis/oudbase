@@ -1,6 +1,6 @@
 7169d8412315b8f10e09603490d7146febef9791  ./bin/oud_functions.sh
 24dacae355dedeb6a7b5850bfca50dbe5d6a39ef  ./bin/setup_oud_patch.sh
-0ecd4270e38a0455f96515ac35ba46b84b37e162  ./bin/oud_status.sh
+a04d622703da1fc8567158347d0094c25588c8eb  ./bin/oud_status.sh
 8a3f68e60ae3fea1f0c3a5a4b7f634c32ef6aeb3  ./bin/setup_oud.sh
 c37d2b86c37f242726a035b7ab91ad2e7548dc5c  ./bin/oud_start_stop.sh
 3025cbbe0853dae8922f95a3aeaaa1daafaac5f7  ./bin/oud_start_stop_all
@@ -38,7 +38,7 @@ d7bd955f1e813aed95edb32bbcc761444b6dd114  ./templates/create/oud12c_eus/01_creat
 199d2f88fd25c7b1fb67f68ef66f0f9563512fbf  ./templates/create/oud12c_eus/10_reset_directory_manager_password.sh
 bb470a2c69ef7801ead08d8f524ab50e1cf248c8  ./templates/create/oud12c_eus/05_config_eus_realm.ldif
 b872de790c83ac5faac3ec304e7101e0fd098c35  ./templates/create/oud12c_eus/12_reset_eusadmin_password.sh
-2eb14d706440426accd94dd8439e05e1dc1009ad  ./templates/create/oud12c_eus/README.md
+21b10855afab2c8b2f8e78f5f2a6e101e833db5c  ./templates/create/oud12c_eus/README.md
 38a03a57a7fe00a45bcca7a8f77078083553d067  ./templates/create/oud12c_eus/02_config_basedn.sh
 371aeced77d7223b48e160ba44073d1e936bd0aa  ./templates/create/oud12c_eus/07_create_eusadmin_users.sh
 8f646d0d3cc512eef1def9834d75614874dc0a1c  ./templates/create/oud12c_eus/03_config_oud.conf
@@ -70,6 +70,16 @@ c1e821551138ed2e2a58ada70844a9cca4956565  ./templates/create/generic/18_migrate_
 cec411e54af5f89728f72c8600b764c336090c19  ./templates/create/generic/02_config_basedn.conf
 acf1b8d4ba079367d312f255efbca196034be64f  ./templates/create/generic/14_create_demo_users.ldif
 0cf12af40e7d6167355532f116ee7b2e87cc0929  ./templates/create/generic/19_export_trustcert_keystore.sh
+38c33240c3954837515361b32ab6b6cad49fb289  ./templates/create/replication/40_status_replication.sh
+88d07147014a401f97bc0f3a9efd558bd52024cf  ./templates/create/replication/31_initialize_host1.sh
+c5007e44a116d4a49527f1af2086e975ec63dc2b  ./templates/create/replication/README.md
+9d453f926074990bfaf6afa97002ac2c23ab1f29  ./templates/create/replication/22_replication_add_host1.sh
+d2c64b305d08aa9ecfec95468eb06d41170cfe06  ./templates/create/replication/31_initialize_host2.sh
+5f66c443f8d6c0c437f387969e938ec14db2c3de  ./templates/create/replication/21_replication_add_host2.sh
+98384527df0770539e2a04a5fa9f635d7682eb6b  ./templates/create/replication/22_enable_replication_host2.sh
+c668992c61d80d2c794a2065e9bd29fc9a8f8667  ./templates/create/replication/21_enable_replication_host1.sh
+7bddca7037836b1460bdac6b24f4313d6e2e1411  ./templates/create/replication/31_initialize_host3.sh
+b2f86f568eb6c16d802b3c48c805d4872576624b  ./templates/create/replication/21_replication_add_host3.sh
 cd0ac218d7e1c4f70675ceb357c12e372af255c5  ./templates/create/oud12c_eus_ad_proxy/setup_oud_instance
 85258698779fbc00895e814debfe93092a9b9723  ./templates/create/oud12c_eus_ad_proxy/04_create_root_user.ldif
 d512e4f9d6444581687fe536397e796f163c5500  ./templates/create/oud12c_eus_ad_proxy/02_config_basedn.ldif
