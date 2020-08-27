@@ -34,6 +34,9 @@ export CLEANUP=${CLEANUP:-"true"}               # Flag to set yum clean up
 export SLIM=${SLIM:-"false"}                    # flag to enable SLIM setup
 export DEBUG=${DEBUG:-"FALSE"}                  # enable debug mode
 DEFAULT_OUD_TYPE=${OUD_TYPE:-"OUD12"}
+# define oradba specific variables
+export SETUP_OUD_PATCH="setup_oud_patch.sh"     # OUD patch script
+export OUD_FUNCTIONS="oud_functions.sh"         # OUD oud_functions script
 # source common functions from oud_functions.sh
 . ${SCRIPT_DIR}/${OUD_FUNCTIONS}
 TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
