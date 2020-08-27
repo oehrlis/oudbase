@@ -43,6 +43,9 @@ export CLEANUP=${CLEANUP:-"true"}               # Flag to set yum clean up
 export SLIM=${SLIM:-"false"}                    # flag to enable SLIM setup
 export DEBUG=${DEBUG:-"FALSE"}                  # enable debug mode
 export PATCH_LATER=${PATCH_LATER:-"FALSE"}      # Flag to postpone patch and clear stuff
+# define oradba specific variables
+export SETUP_OUD_PATCH="setup_oud_patch.sh"     # OUD patch script
+export OUD_FUNCTIONS="oud_functions.sh"         # OUD oud_functions script
 # source common functions from oud_functions.sh
 . ${SCRIPT_DIR}/${OUD_FUNCTIONS}
 TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
@@ -71,9 +74,6 @@ export COHERENCE_PATCH_PKG=${COHERENCE_PATCH_PKG:-""}
 export OUD_ONEOFF_PKGS=${OUD_ONEOFF_PKGS:-""}
 export OUD_INSTALL_TYPE=${OUD_INSTALL_TYPE:-'Standalone Oracle Unified Directory Server (Managed independently of WebLogic server)'}
 
-# define oradba specific variables
-export SETUP_OUD_PATCH="setup_oud_patch.sh"     # OUD patch script
-export OUD_FUNCTIONS="oud_functions.sh"         # OUD oud_functions script
 # define Oracle specific variables
 export ORACLE_ROOT=${ORACLE_ROOT:-"/u00"}
 export ORACLE_BASE=${ORACLE_BASE:-"${ORACLE_ROOT}/app/oracle"}
