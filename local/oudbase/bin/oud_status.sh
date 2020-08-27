@@ -52,6 +52,7 @@ function Usage() {
     DoMsg "    -D <bindDN>              Default value: cn=Directory Manager"
     DoMsg "    -j <bindPasswordFile>    Bind password file"
     DoMsg "    -c <CONNECTION HANDLER>  List of connection handler to check (default LDAP,LDAPS)"
+    DoMsg "                             Can be controlled with the environment variable \$OUD_CON_HANDLER"
     DoMsg "    -i <OUD_INSTANCE>        OUD Instance"
     DoMsg "    Logfile : ${LOGFILE}"
     if [ ${1} -gt 0 ]; then
