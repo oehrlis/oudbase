@@ -240,7 +240,7 @@ else
 fi
 
 # create product directory 
-mkdir -v -p $(dirname ${ORACLE_HOME})
+mkdir -p $(dirname ${ORACLE_HOME})
 # check if oracle home does exists
 if [ -d "${ORACLE_HOME}" ]; then
     CleanAndQuit 14 ${ORACLE_HOME}

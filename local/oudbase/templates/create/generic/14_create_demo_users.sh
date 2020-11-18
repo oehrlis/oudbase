@@ -41,7 +41,7 @@ echo ""
 # - configure instance --------------------------------------------------
 # Update baseDN in LDIF file if required
 if [ -f ${LDIFFILE} ]; then
-  cp -v ${LDIFFILE} ${LDIFFILE_CUSTOM}
+  cp ${LDIFFILE} ${LDIFFILE_CUSTOM}
 else
   echo "- skip $(basename $0), missing ${LDIFFILE}"
   exit
