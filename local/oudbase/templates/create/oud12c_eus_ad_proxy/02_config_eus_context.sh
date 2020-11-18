@@ -52,7 +52,7 @@ fi
 
 # Update baseDN in LDIF file if required
 if [ -f ${CONFIGFILE} ]; then
-  cp -v ${CONFIGFILE} ${CONFIGFILE_CUSTOM}
+  cp ${CONFIGFILE} ${CONFIGFILE_CUSTOM}
 else
   echo "- skip $(basename $0), missing ${CONFIGFILE}"
   exit
