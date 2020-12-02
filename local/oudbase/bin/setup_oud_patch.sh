@@ -43,11 +43,12 @@ TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
 # define default software packages
 DEFAULT_FMW_BASE_PKG="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"
 DEFAULT_OUD_BASE_PKG="p30188352_122140_Generic.zip"
-DEFAULT_OUD_PATCH_PKG="p31400392_122140_Generic.zip"
-DEFAULT_FMW_PATCH_PKG="p31537019_122140_Generic.zip"
+DEFAULT_OUD_PATCH_PKG="p31809303_122140_Generic.zip"
+DEFAULT_FMW_PATCH_PKG="p31960985_122140_Generic.zip"
 DEFAULT_OUD_OPATCH_PKG="p28186730_139424_Generic.zip"
 DEFAULT_OUI_PATCH_PKG=""
 DEFAULT_COHERENCE_PATCH_PKG="p30729380_122140_Generic.zip"
+DEFAULT_OUD_ONEOFF_PKGS="p32097167_12214201001_Generic.zip"
 
 # define the software packages
 export OUD_PATCH_PKG=${OUD_PATCH_PKG:-""}
@@ -200,6 +201,7 @@ if [ "${LATEST^^}" == "TRUE" ]; then
     export COHERENCE_PATCH_PKG=${DEFAULT_COHERENCE_PATCH_PKG}
     export OUI_PATCH_PKG=${DEFAULT_OUI_PATCH_PKG}
     export OUD_OPATCH_PKG=${DEFAULT_OUD_OPATCH_PKG}
+    export OUD_ONEOFF_PKGS=${DEFAULT_OUD_ONEOFF_PKGS}
 fi
 
 if [ -n "${ORACLE_HOME_NAME}" ]; then 

@@ -34,6 +34,7 @@ ERROR=0
 BASE64_BIN=$(find /usr/bin -name base64 -print) # executable for base64
 BASE64_BIN=${BASE64_BIN:-"$(command -v -p base64)"} # executable for base64
 TAR_BIN=$(command -v -p tar)                    # executable for tar
+GZIP_BIN=$(command -v -p gzip)                    # executable for tar
 OUD_CORE_CONFIG="oudenv_core.conf"
 CONFIG_FILES="oudtab oud._DEFAULT_.conf oudenv.conf oudenv_custom.conf"
 PAYLOAD_BINARY=0                                # default disable binary payload 
@@ -162,6 +163,7 @@ function CleanAndQuit()
         3)  DoMsg "ERR  : Exit Code ${1}. Missing mandatory argument ${2}. See usage for correct one.";;
         10) DoMsg "ERR  : Exit Code ${1}. OUD_BASE not set or $OUD_BASE not available.";;
         20) DoMsg "ERR  : Exit Code ${1}. Can not append to profile.";;
+        30) DoMsg "ERR  : Exit Code ${1}. Missing ${2} can not proceed";;
         40) DoMsg "ERR  : Exit Code ${1}. This is not an Install package. Missing TAR payload or TAR file.";;
         41) DoMsg "ERR  : Exit Code ${1}. Error creating directory ${2}.";;
         42) DoMsg "ERR  : Exit Code ${1}. ORACEL_BASE directory not available ${2}";;
@@ -185,8 +187,16 @@ function UntarPayload()
     
     
     DoMsg "INFO : Start processing the payload"
-    MATCH=$(grep --text --line-number '^__TAR_PAYLOAD__$' $0 | cut -d ':' -f 1)
+    MATCH=$(grep -n '^__TAR_PAYLOAD__$' $0 | cut -d ':' -f 1)
     PAYLOAD_START=$((MATCH + 1))
+
+    # adjust os specific tar commands
+    case "$OSTYPE" in
+        aix*)       LOCAL_TAR="${GZIP_BIN} -c - | ${TAR_BIN} -xf -" ;;
+        linux*)     LOCAL_TAR="${TAR_BIN} -xzv --exclude=\"._*\"" ;;
+        *)          LOCAL_TAR="${TAR_BIN} -xzv --exclude=\"._*\"" ;;
+    esac
+    echo "LOCAL_TAR =>$LOCAL_TAR"
     # check if we do have a payload
     if [[ ${PAYLOAD_START} -gt 1 ]]; then
         DoMsg "INFO : Payload is available as of line ${PAYLOAD_START}."
@@ -204,7 +214,7 @@ function UntarPayload()
         TARFILE="$(dirname ${SCRIPT_FQN})/$(basename ${SCRIPT_FQN} .sh).tgz"      # LDIF file based on script name
         if [[ -f ${TARFILE} ]]; then
             DoMsg "INFO : Extracting local tar into ${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}"
-            ${TAR_BIN} -xzvf ${TARFILE} --exclude="._*" -C ${OUD_BASE}
+            ${TAR_BIN} -xzv --exclude="._*" -f ${TARFILE} -C ${OUD_BASE}
         else
             CleanAndQuit 40
         fi
@@ -286,6 +296,22 @@ if [ -f  ${ETC_CORE}/${OUD_CORE_CONFIG} ]; then
         variable="UPGRADE_$(echo $i|cut -d= -f1)"
         export $variable=$(echo $i|cut -d= -f2)
     done
+fi
+
+# check if we do have a base64 tool
+if [ -z "${BASE64_BIN}" ] && [ ${PAYLOAD_BASE64} -eq 1 ]; then 
+    CleanAndQuit 30 "base64"
+fi
+
+# get the right TAR file
+case "$OSTYPE" in
+    aix*)     TAR_BIN=$(command -v gtar) ;; 
+    linux*)   TAR_BIN=$(command -v -p tar);;
+    *)        TAR_BIN=$(command -v -p tar);;
+esac
+# check if we do have a base64 tool
+if [ -z "${TAR_BIN}" ]; then 
+    CleanAndQuit 30 "tar"
 fi
 
 DoMsg "INFO : Define default values"
@@ -387,7 +413,7 @@ for i in    ${LOG_BASE} \
             ${OUD_INSTANCE_BASE} \
             ${ORACLE_PRODUCT} \
             ${OUD_BASE}; do
-    mkdir -pv ${i} >/dev/null 2>&1 && DoMsg "INFO : Create Directory ${i}" || CleanAndQuit 41 ${i}
+    mkdir -p ${i} >/dev/null 2>&1 && DoMsg "INFO : Create Directory ${i}" || CleanAndQuit 41 ${i}
 done
 
 # backup config files if the exits. Just check if ${OUD_BASE}/local/etc
@@ -473,7 +499,7 @@ if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
         # recreate softlinks for some config files
         if [ "${i}" == "oudenv.conf" ] || [ "${i}" == "oudtab" ]; then
             echo "INFO : re-create softlink for ${i} "
-            ln -s -v -f ${ETC_BASE}/${i} ${ETC_CORE}/${i}
+            ln -s -f ${ETC_BASE}/${i} ${ETC_CORE}/${i}
         fi
     done
 fi
