@@ -1,13 +1,13 @@
-domain_name = "###DOMAIN_NAME###"
-domain_home = "###DOMAIN_HOME###"
-wls_home = "###WLS_HOME###"
-jdk_home = "###JDK_HOME###"
-wls_admin = "###WLS_ADMIN###"
-wls_pwd = "###WLS_PASSWORD###"
+domain_name     = "###DOMAIN_NAME###"
+domain_home     = "###DOMAIN_HOME###"
+wls_home        = "###WLS_HOME###"
+jdk_home        = "###JAVA_HOME###"
+wls_admin       = "###WLS_ADMIN###"
+wls_pwd         = "###WLS_PASSWORD###"
 production_mode = "dev"
-nm_port = ###NM_PORT###
-machine_name = "###MACHINE_NAME###"
-listen_port = ###LISTEN_PORT###
+nm_port         = ###NM_PORT###
+machine_name    = "###MACHINE_NAME###"
+listen_port     = ###LISTEN_PORT###
 
 #=====================================================================
 # Read right templates, you can add more elif clauses
