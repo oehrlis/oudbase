@@ -1,0 +1,63 @@
+domain_name     = "###DOMAIN_NAME###"
+domain_home     = "###DOMAIN_HOME###"
+wls_home        = "###WLS_HOME###"
+jdk_home        = "###JAVA_HOME###"
+wls_admin       = "###WLS_ADMIN###"
+wls_pwd         = "###WLS_PASSWORD###"
+production_mode = "dev"
+nm_port         = ###NM_PORT###
+machine_name    = "###MACHINE_NAME###"
+listen_port     = ###LISTEN_PORT###
+
+#=====================================================================
+# Read right templates, you can add more elif clauses
+#=====================================================================
+selectTemplate('Basic WebLogic Server Domain')
+loadTemplates()
+
+#=====================================================================
+# Set Domain Parameters which are generic
+#=====================================================================
+set('Name', domain_name)
+setOption('DomainName', domain_name)
+setOption('ServerStartMode', production_mode)
+setOption('JavaHome', jdk_home)
+
+#=====================================================================
+# Configure Admin Server 
+#=====================================================================
+cd('/Server/AdminServer')
+set('Name','AdminServer')
+set('ListenPort', listen_port)
+
+#=====================================================================
+# Configure Security
+#=====================================================================
+cd('/Security/%s/User/weblogic' % domain_name)
+cmo.setName(wls_admin)
+cmo.setPassword(wls_pwd)
+
+#=====================================================================
+# Configure Machine
+#=====================================================================
+cd('/')
+machine = create(machine_name, 'Machine')
+machine.setName(machine_name)
+
+#=====================================================================
+# Configure Nodemanager 
+#=====================================================================
+cd('/NMProperties')
+set('ListenAddress', 'localhost')
+set('ListenPort', nm_port)
+cd('/SecurityConfiguration/base_domain')
+set('Name', domain_name)
+cd('/SecurityConfiguration/%s' % domain_name)
+set('NodeManagerUsername', wls_admin)
+set('NodeManagerPasswordEncrypted', wls_pwd)
+
+#=====================================================================
+# Save the domain to ###DOMAIN_HOME###
+#=====================================================================
+writeDomain(domain_home)
+closeTemplate()
