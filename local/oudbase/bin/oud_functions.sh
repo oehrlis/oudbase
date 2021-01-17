@@ -24,7 +24,7 @@
 
 # - Environment Variables ---------------------------------------------------
 # define default values 
-VERSION=v1.9.1
+VERSION=v1.9.4
 DOAPPEND=${DOAPPEND:-"TRUE"}                    # enable log file append
 VERBOSE=${VERBOSE:-"FALSE"}                     # enable verbose mode
 DEBUG=${DEBUG:-"FALSE"}                         # enable debug mode
