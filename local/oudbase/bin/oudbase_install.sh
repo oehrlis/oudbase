@@ -230,7 +230,7 @@ pTTY=$?
 # Define Logfile but first reset LOG_BASE if directory does not exists
 if [ ! -d ${LOG_BASE} ]; then
     export LOG_BASE="/tmp"
-if [ -w ${LOG_BASE} ]; then
+elif [ -w ${LOG_BASE} ]; then
     export LOG_BASE="/tmp"
 fi
 
