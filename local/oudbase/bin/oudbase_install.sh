@@ -228,9 +228,7 @@ tty >/dev/null 2>&1
 pTTY=$?
 
 # Define Logfile but first reset LOG_BASE if directory does not exists
-if [ ! -d ${LOG_BASE} ]; then
-    export LOG_BASE="/tmp"
-elif [ -w ${LOG_BASE} ]; then
+if [ ! -d ${LOG_BASE} ] && [ -w ${LOG_BASE} ] ; then
     export LOG_BASE="/tmp"
 fi
 
