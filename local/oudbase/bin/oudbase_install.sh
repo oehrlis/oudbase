@@ -545,10 +545,10 @@ fi
 
 # append to the profile....
 if [ "${APPEND_PROFILE}" = "TRUE" ]; then
-    if [ -f "~/.bash_profile" ]; then
-        PROFILE="~/.bash_profile"
-    elif [ -f "~/.profile" ]; then
-        PROFILE="~/.profile"
+    if [ -f "$HOME/.bash_profile" ]; then
+        PROFILE="$HOME/.bash_profile"
+    elif [ -f "$HOME/.profile" ]; then
+        PROFILE="$HOME/.profile"
     else
         CleanAndQuit 20 
     fi
