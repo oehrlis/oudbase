@@ -10,19 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- add markdownlint configuration file [.markdownlint.json](.markdownlint.json)
-
 ### Changed
-
-- adapt pipeline with a new job for the markdownlint.
-- Add information about [.markdownlint.json](.markdownlint.json) to
-  [AUTHOR_GUIDE](AUTHOR_GUIDE.md)
 
 ### Fixed
 
 ### Removed
 
-## [1.9.5] - 2021-03-03
+## [1.9.5] - 2021-05-28
 
 ### Added
 
@@ -40,8 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - fix [oud_backup.sh](local/oudbase/bin/oud_backup.sh) and uncomment remove of
   old backups
-
-### Removed
 
 [unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.2.1...HEAD
 [1.9.5]: https://github.com/oehrlis/oudbase/releases/tag/v1.9.4
