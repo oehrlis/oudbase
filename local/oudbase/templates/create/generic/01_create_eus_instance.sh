@@ -80,7 +80,7 @@ if [ ! -f "${OUD_INSTANCE_HOME}/OUD/config/config.ldif" ]; then
         --generateSelfSignedCertificate \
         --enableStartTLS \
         --baseDN "${BASEDN}" \
-        --integration EUS \
+        --integration generic \
         --serverTuning jvm-default \
         --offlineToolsTuning autotune \
         --no-prompt

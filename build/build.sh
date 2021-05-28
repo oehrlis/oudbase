@@ -20,6 +20,7 @@
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"                  # Basename of the script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of script
 SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"                    # Full qualified script name
+PACKAG_BASE=$(dirname ${SCRIPT_DIR})                         # basename of package
 export COPYFILE_DISABLE=true
 echo "SCRIPT_FQN=$SCRIPT_FQN"
 echo "SCRIPT_DIR=$SCRIPT_DIR"
@@ -48,7 +49,7 @@ cp ${SCRIPT_DIR}/../README.md ${SCRIPT_DIR}/../local/oudbase/doc
 cp ${SCRIPT_DIR}/../LICENSE ${SCRIPT_DIR}/../local/oudbase/doc
 
 # update version in *.sh files
-VERSION=$(grep -i "OUD Base Release" ./doc/.version |sed -E 's/.*(v[0-9]+.[0-9]+.[0-9]+).*/\1/')
+VERSION=$(head -1 ${PACKAG_BASE}/VERSION |sed -E 's/.*(v[0-9]+.[0-9]+.[0-9]+).*/\1/')
 
 for i in ./bin/*; do
     echo "update version to ${VERSION} in file $i"
