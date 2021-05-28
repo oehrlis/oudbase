@@ -21,7 +21,7 @@ export OPENDS_JAVA_ARGS=-Dcom.sun.jndi.ldap.object.disableEndpointIdentification
 # - End of Customization ------------------------------------------------
  
 # - Default Values ------------------------------------------------------
-VERSION=v1.9.4
+VERSION=v1.9.5
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
@@ -273,7 +273,7 @@ for oud_inst in ${OUD_INST_LIST}; do
                 # Automaticaly purge backup's older than KEEP weeks
                 if [ -d ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET} ]; then
                     DoMsg "INFO : [$oud_inst] Remove old backup set ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET} of week ${OLD_WEEKNO}"
-                    #rm -rf ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET}
+                    rm -rf ${OUD_BACKUP_DIR}/${OLD_BACKUP_SET}
                 else
                     DoMsg "INFO : [$oud_inst] No old backup found (eg. ${OLD_BACKUP_SET} week ${OLD_WEEKNO})"
                 fi

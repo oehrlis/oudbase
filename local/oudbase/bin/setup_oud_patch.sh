@@ -22,7 +22,7 @@
 # see git revision history for more information on changes/updates
 # ---------------------------------------------------------------------------
 # - Environment Variables ---------------------------------------------------
-VERSION=v1.9.4
+VERSION=v1.9.5
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
@@ -43,12 +43,12 @@ TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
 # define default software packages
 DEFAULT_FMW_BASE_PKG="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"
 DEFAULT_OUD_BASE_PKG="p30188352_122140_Generic.zip"
-DEFAULT_OUD_PATCH_PKG="p31809303_122140_Generic.zip"
-DEFAULT_FMW_PATCH_PKG="p31960985_122140_Generic.zip"
-DEFAULT_OUD_OPATCH_PKG="p28186730_139424_Generic.zip"
+DEFAULT_OUD_PATCH_PKG="p32730494_122140_Generic.zip"
+DEFAULT_FMW_PATCH_PKG="p32698246_122140_Generic.zip"
+DEFAULT_OUD_OPATCH_PKG="p28186730_139425_Generic.zip"
 DEFAULT_OUI_PATCH_PKG=""
-DEFAULT_COHERENCE_PATCH_PKG="p30729380_122140_Generic.zip"
-DEFAULT_OUD_ONEOFF_PKGS="p32097167_12214201001_Generic.zip"
+DEFAULT_COHERENCE_PATCH_PKG="p32581859_122140_Generic.zip"
+DEFAULT_OUD_ONEOFF_PKGS=""
 
 # define the software packages
 export OUD_PATCH_PKG=${OUD_PATCH_PKG:-""}
