@@ -1,6 +1,6 @@
 #!/bin/bash
 # -----------------------------------------------------------------------
-# Trivadis AG, Infrastructure Managed Services
+# Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # -----------------------------------------------------------------------
 # Name.......: oudbase_install.sh
@@ -12,7 +12,8 @@
 #              Environment
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
-# License....: GPL-3.0+
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
 # -----------------------------------------------------------------------
 # Modified...::175
 # see git revision history with git log for more information on changes
