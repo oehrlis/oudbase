@@ -10,6 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- add initial version of scripts for Oracle Net Service Names administration
+  based on OpenLDAP client tools.
+  - [tns_add.sh](local/oudbase/bin/tns_add.sh) script to add TNS Names entries
+  - [tns_delete.sh](local/oudbase/bin/tns_delete.sh) script to delete TNS Names entries
+  - [tns_dump.sh](local/oudbase/bin/tns_dump.sh) script to dump TNS Names entries into a *tnsname.ora* file.
+  - [tns_functions.sh](local/oudbase/bin/tns_functions.sh) common functions.
+  - [tns_load.sh](local/oudbase/bin/tns_load.sh) script to do bulk loads of TNS Names entries.
+  - [tns_modify.sh](local/oudbase/bin/tns_modify.sh) script to modify TNS Names entries.
+  - [tns_search.sh](local/oudbase/bin/tns_search.sh) script to search TNS Names entries.
+  - [tns_test.sh](local/oudbase/bin/tns_test.sh) Test LDAP entries using tnsping.
+
 ### Changed
 
 - update latest patch information in [setup_oud.sh](local/oudbase/bin/setup_oud.sh)
