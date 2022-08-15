@@ -29,7 +29,7 @@ set -o pipefail         # pipefail exit after 1st piped commands failed
 
 # - Environment Variables ---------------------------------------------------
 # define generic environment variables
-VERSION=v0.3.1
+VERSION=v1.9.6
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode
