@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - 2022-02-15
+## [Unreleased] -
 
 ### Added
 
@@ -23,12 +23,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- update latest patch information in [setup_oud.sh](local/oudbase/bin/setup_oud.sh)
-- update latest patch information in [setup_oud_patch.sh](local/oudbase/bin/setup_oud_patch.sh)
-
 ### Fixed
 
 ### Removed
+
+## [1.9.6] - 2022-08-15
+
+### Changed
+
+- update latest patch information in [setup_oud.sh](local/oudbase/bin/setup_oud.sh)
+- update latest patch information in [setup_oud_patch.sh](local/oudbase/bin/setup_oud_patch.sh)
 
 ## [1.9.5] - 2021-05-28
 
@@ -49,5 +53,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix [oud_backup.sh](local/oudbase/bin/oud_backup.sh) and uncomment remove of
   old backups
 
-[unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.2.1...HEAD
-[1.9.5]: https://github.com/oehrlis/oudbase/releases/tag/v1.9.4
+[unreleased]: https://github.com/oehrlis/oudbase
+[1.9.5]: https://github.com/oehrlis/oudbase/releases/tag/v1.9.5
+[1.9.6]: https://github.com/oehrlis/oudbase/releases/tag/v1.9.6
