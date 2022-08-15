@@ -31,7 +31,7 @@
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v1.9.5
+VERSION=v1.9.6
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
@@ -57,11 +57,11 @@ DEFAULT_OUD_TYPE=${OUD_TYPE:-"OUD12"}
 # define default software packages
 DEFAULT_FMW_BASE_PKG="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"
 DEFAULT_OUD_BASE_PKG="p30188352_122140_Generic.zip"
-DEFAULT_OUD_PATCH_PKG="p33448950_122140_Generic.zip"
-DEFAULT_FMW_PATCH_PKG="p33727616_122140_Generic.zip"
-DEFAULT_OUD_OPATCH_PKG="p28186730_139428_Generic.zip"
+DEFAULT_OUD_PATCH_PKG="p34039288_122140_Generic.zip"
+DEFAULT_FMW_PATCH_PKG="p34236279_122140_Generic.zip"
+DEFAULT_OUD_OPATCH_PKG="p28186730_1394210_Generic.zip"
 DEFAULT_OUI_PATCH_PKG=""
-DEFAULT_COHERENCE_PATCH_PKG="p33591019_122140_Generic.zip"
+DEFAULT_COHERENCE_PATCH_PKG="p34248976_122140_Generic.zip"
 DEFAULT_OUD_ONEOFF_PKGS=""
 
 # define the software packages default is just the OUD 12.2.1.4 base package

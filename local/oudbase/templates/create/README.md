@@ -17,10 +17,12 @@ A collection of OUD create scripts and templates for different use cases. The sc
 | replication                | planned   | Setup and initialize replication                                                                   |
 
 ## Issues
+
 Please file your bug reports, enhancement requests, questions and other support requests within [Github's issue tracker](https://help.github.com/articles/about-issues/):
 
 * [Existing issues](https://github.com/oehrlis/oudbase/issues)
 * [submit new issue](https://github.com/oehrlis/oudbase/issues/new)
 
 ## License
+
 oehrlis/docker is licensed under the GNU General Public License v3.0. You may obtain a copy of the License at <https://www.gnu.org/licenses/gpl.html>.
