@@ -24,7 +24,7 @@ export OUD_CON_HANDLER=${OUD_CON_HANDLER:-"LDAP LDAPS"}
 # - End of Customization ------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v1.9.6
+VERSION=v2.0.0
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
