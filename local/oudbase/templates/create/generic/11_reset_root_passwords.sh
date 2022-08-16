@@ -48,15 +48,19 @@ for user in "${ROOT_USERS[@]}"; do
   if [ -z ${ADMIN_PASSWORD} ]; then
     # Auto generate a password
     echo "- auto generate new password..."
-    while true; do
-        s=$(cat /dev/urandom | tr -dc "A-Za-z0-9" | fold -w 10 | head -n 1)
-        if [[ ${#s} -ge 8 && "$s" == *[A-Z]* && "$s" == *[a-z]* && "$s" == *[0-9]*  ]]; then
-            echo "- passwort does Match the criteria"
-            break
-        else
-            echo "- password does not Match the criteria, re-generating..."
-        fi
-    done
+    if [ $(command -v pwgen) ]; then 
+        s=$(pwgen -s -1 10)
+    else 
+        while true; do
+            # use urandom to generate a random string
+            s=$(cat /dev/urandom | tr -dc "A-Za-z0-9" | fold -w 10 | head -n 1)
+            # check if the password meet the requirements
+            if [[ ${#s} -ge 10 && "$s" == *[A-Z]* && "$s" == *[a-z]* && "$s" == *[0-9]*  ]]; then
+                echo "$s"
+                break
+            fi
+        done
+    fi
     echo "- use auto generated password for user ${user}"
     ADMIN_PASSWORD=$s
     echo "- save password for ${user} in ${ROOT_USERS_PWD_FILE}"
