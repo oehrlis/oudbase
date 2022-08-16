@@ -38,9 +38,9 @@
 #export PORT_SSL=1636
 #export PORT_REP=8989
 #export PORT_REP=8989
-#export PORT_REST_ADMIN=8444
-#export PORT_REST_HTTP=1080
-#export PORT_REST_HTTPS=1081
+export PORT_REST_ADMIN=${PORT_REST_ADMIN:-"8444"}
+export PORT_REST_HTTP=${PORT_REST_HTTP:-"1080"}
+export PORT_REST_HTTPS=${PORT_REST_HTTPS:-"1081"}
 # - End of default environment variables --------------------------------
 
 # - Customization -------------------------------------------------------
@@ -49,13 +49,23 @@ export DIRMAN="cn=Directory Manager"
 export REPMAN=admin
 export BASEDN=${BASEDN:-"dc=trivadislabs,dc=com"}
 export BASEDN_STRING=$(echo $BASEDN|sed 's/\(dc\|o\|ou\)=//g; s/,/_/g;')
-export DEFAULT_PASSWORD="***REMOVED***"         # default password for ldap users (none admin users)
-export DEFAULT_ADMIN_PASSWORD="***REMOVED***"   # default password for ldap admin users
+export DEFAULT_PASSWORD=$ADMIN_PASSWORD         # default password for ldap users (none admin users)
+export DEFAULT_ADMIN_PASSWORD=$ADMIN_PASSWORD   # default password for ldap admin users
 
 export GROUP_OU="Groups"                        # group OU below base DN eg ou=groups,dc=postgasse,dc=org
 export USER_OU="People"                         # user OU below base DN eg ou=people,dc=postgasse,dc=org
 # - INTERNAL Suffix
 export LOCAL_OU="ou=local"
+
+# Create a list of all suffix based on variables with _SUFFIX
+ALL_SUFFIX=""                        # initial values of ALL_SUFFIX
+for i in $(env|cut -d= -f1|grep '_SUFFIX$'); do
+    # check if environment variable is not empty and value not yet part of ALL_SUFFIX
+    if [ -n "${!i}" ] && [[ $ALL_SUFFIX != *"${!i}"* ]]; then
+        ALL_SUFFIX+="${!i};"
+    fi
+done
+export ALL_SUFFIX=$(echo $ALL_SUFFIX|sed 's/.$//')
 
 # - Certificates and password
 export KEYSTOREFILE=${OUD_INSTANCE_HOME}/OUD/config/keystore
@@ -66,7 +76,7 @@ export KEYSTOREPIN=${OUD_INSTANCE_HOME}/OUD/config/keystore.pin
 # EUS Configuration
 export EUS_USER_NAME="eusadmin"
 export EUS_USER_DN="cn=${EUS_USER_NAME},cn=oraclecontext"
-export COMMON_FILES="/u01/common"
+export COMMON_FILES=${OUD_INSTANCE_ADMIN}
 export EUSADMIN_USERS_PWD_FILE=${COMMON_FILES}/etc/${EUS_USER_NAME}_pwd.txt
 export EUSADMIN_USERS_DN_FILE=${COMMON_FILES}/etc/${EUS_USER_NAME}_dn.txt
 echo ${EUS_USER_DN} >${EUSADMIN_USERS_DN_FILE}
