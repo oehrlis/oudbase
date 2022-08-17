@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.1.1] - 2022-08-17
+
+### Fixed
+
+- Fix the check for OUD_BASE creation. Does only exit if OUD_BASE can not be created.
+
 ## [2.1.0] - 2022-08-17
 
 ### Added
