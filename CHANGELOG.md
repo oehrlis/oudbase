@@ -9,11 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] -
 
 ### Added
+
 ### Changed
 
 ### Fixed
 
 ### Removed
+
+## [2.1.0] - 2022-08-17
+
+### Added
+
+- add Status info to [tns_load.sh](./local/oudbase/bin/tns_load.sh)
+
+### Changed
+
+- Update File header to latest Date, Version etc Information
+- Change license in all files to Apache
 
 ## [2.0.0] - 2022-08-16
 
