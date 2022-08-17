@@ -59,7 +59,7 @@ for i in ./bin/* ./etc/* $(find ./templates -type f); do
 done
 
 #update version file
-sed -i "s/v[0-9]\+\.[0-9]\+\.[0-9]\+/v${VERSION}/" $(find . -name .version)
+sed -i "s/v[0-9]\+\.[0-9]\+\.[0-9]\+/${VERSION}/" $(find . -name .version)
 
 # create sha hash's
 echo "Create sha hashs for all files"
