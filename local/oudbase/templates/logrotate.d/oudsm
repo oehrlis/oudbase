@@ -1,21 +1,21 @@
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
-# Name.......: oud
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# ------------------------------------------------------------------------------
+# Name.......: oudsm
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2018.03.18
+# Date.......: 2022.08.17
 # Revision...: --
-# Purpose....: Logrotate configuration file for OUD Environment
+# Purpose....: Logrotate configuration file for OUDSM domain
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 OUDSM_DOMAIN_HOME/servers/AdminServer/logs/access.log
 OUDSM_DOMAIN_HOME/servers/AdminServer/logs/AdminServer-diagnostic.log
 OUDSM_DOMAIN_HOME/servers/AdminServer/logs/AdminServer.log

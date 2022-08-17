@@ -1,12 +1,12 @@
 #!/bin/sh
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: oracle_oud_all
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.02.25
+# Date.......: 2022.08.17
 # chkconfig:   345 90 30
 # description: Init.d script to start / stop all OUD instances using oud_start_stop.sh 
 # Notes......: copy this script to /etc/init.d/oracle_oud_all
@@ -14,19 +14,19 @@
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
-# - Customization -------------------------------------------------------
+# ------------------------------------------------------------------------------
+# - Customization --------------------------------------------------------------
 export OPENDS_JAVA_ARGS=-Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true
 export OUD_USER="oracle"
-# - End of Customization ------------------------------------------------
+# - End of Customization -------------------------------------------------------
  
-# - Default Values ------------------------------------------------------
+# - Default Values -------------------------------------------------------------
 # Set the path to the Oracle Unified Directory instance to manage
 . $(eval echo ~${OUD_USER}/.OUD_BASE)
-# - End of Default Values -----------------------------------------------
+# - End of Default Values ------------------------------------------------------
  
 # Determine what action should be performed on the server
 case "${1}" in
@@ -49,4 +49,4 @@ restart)
     ;;
 esac
 
-# - EOF -----------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------
