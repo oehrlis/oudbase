@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Version....: v2.1.1
+# Version....: v2.1.2
 # Purpose....: Script to patch Oracle Unified Directory binaries
 # Notes......: - Script would like to be executed as oracle :-)
 #              - If the required software is not in /opt/stage, an attempt is
@@ -22,7 +22,7 @@
 # see git revision history for more information on changes/updates
 # ---------------------------------------------------------------------------
 # - Environment Variables ---------------------------------------------------
-VERSION=v2.1.1
+VERSION=v2.1.2
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
@@ -39,6 +39,7 @@ export SETUP_OUD_PATCH="setup_oud_patch.sh"     # OUD patch script
 export OUD_FUNCTIONS="oud_functions.sh"         # OUD oud_functions script
 # source common functions from oud_functions.sh
 . ${SCRIPT_DIR}/${OUD_FUNCTIONS}
+DEFAULT_TMP_DIR=$(mktemp -d)          
 # define default software packages
 DEFAULT_FMW_BASE_PKG="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"
 DEFAULT_OUD_BASE_PKG="p30188352_122140_Generic.zip"
@@ -206,26 +207,6 @@ if [ -n "${ORACLE_HOME_NAME}" ]; then
     export ORACLE_HOME="${ORACLE_BASE}/product/${ORACLE_HOME_NAME}"
 fi
 
-# show what we will create later on...
-DoMsg "INFO : Prepare Oracle OUD patch installation ---------------------------"
-DoMsg "INFO : ORACLE_ROOT           = ${ORACLE_ROOT:-n/a}"
-DoMsg "INFO : ORACLE_DATA           = ${ORACLE_DATA:-n/a}"
-DoMsg "INFO : ORACLE_BASE           = ${ORACLE_BASE:-n/a}"
-DoMsg "INFO : ORACLE_HOME           = ${ORACLE_HOME:-n/a}"
-DoMsg "INFO : ORACLE_INVENTORY      = ${ORACLE_INVENTORY:-n/a}"
-DoMsg "INFO : OUD_TYPE              = ${OUD_TYPE:-n/a}"
-DoMsg "INFO : SOFTWARE              = ${SOFTWARE:-n/a}"
-DoMsg "INFO : SOFTWARE_REPO         = ${SOFTWARE_REPO:-n/a}"
-DoMsg "INFO : TMP_DIR               = ${TMP_DIR:-n/a}"
-DoMsg "INFO : OUD_BASE_PKG          = ${OUD_BASE_PKG:-n/a}"
-DoMsg "INFO : FMW_BASE_PKG          = ${FMW_BASE_PKG:-n/a}"
-DoMsg "INFO : OUD_PATCH_PKG         = ${OUD_PATCH_PKG:-n/a}"
-DoMsg "INFO : FMW_PATCH_PKG         = ${FMW_PATCH_PKG:-n/a}"
-DoMsg "INFO : OUD_OPATCH_PKG        = ${OUD_OPATCH_PKG:-n/a}"
-DoMsg "INFO : OUI_PATCH_PKG         = ${OUI_PATCH_PKG:-n/a}"
-DoMsg "INFO : COHERENCE_PATCH_PKG   = ${COHERENCE_PATCH_PKG:-n/a}"
-DoMsg "INFO : OUD_ONEOFF_PKGS       = ${OUD_ONEOFF_PKGS:-n/a}"
-
 # Create a list of software based on environment variables ending with _PKG or _PKGS
 SOFTWARE_LIST=""                        # initial values of SOFTWARE_LIST
 for i in $(env|cut -d= -f1|grep '_PKG$\|_PKGS$'); do
@@ -247,6 +228,25 @@ if [ -d "${SOFTWARE}" ] || [ -w "${SOFTWARE}" ]; then
 else
     DoMsg "INFO : Sofware repository is ready"
 fi
+# show what we will create later on...
+DoMsg "INFO : Prepare Oracle OUD patch installation ---------------------------"
+DoMsg "INFO : ORACLE_ROOT           = ${ORACLE_ROOT:-n/a}"
+DoMsg "INFO : ORACLE_DATA           = ${ORACLE_DATA:-n/a}"
+DoMsg "INFO : ORACLE_BASE           = ${ORACLE_BASE:-n/a}"
+DoMsg "INFO : ORACLE_HOME           = ${ORACLE_HOME:-n/a}"
+DoMsg "INFO : ORACLE_INVENTORY      = ${ORACLE_INVENTORY:-n/a}"
+DoMsg "INFO : OUD_TYPE              = ${OUD_TYPE:-n/a}"
+DoMsg "INFO : SOFTWARE              = ${SOFTWARE:-n/a}"
+DoMsg "INFO : SOFTWARE_REPO         = ${SOFTWARE_REPO:-n/a}"
+DoMsg "INFO : TMP_DIR               = ${TMP_DIR:-n/a}"
+DoMsg "INFO : OUD_BASE_PKG          = ${OUD_BASE_PKG:-n/a}"
+DoMsg "INFO : FMW_BASE_PKG          = ${FMW_BASE_PKG:-n/a}"
+DoMsg "INFO : OUD_PATCH_PKG         = ${OUD_PATCH_PKG:-n/a}"
+DoMsg "INFO : FMW_PATCH_PKG         = ${FMW_PATCH_PKG:-n/a}"
+DoMsg "INFO : OUD_OPATCH_PKG        = ${OUD_OPATCH_PKG:-n/a}"
+DoMsg "INFO : OUI_PATCH_PKG         = ${OUI_PATCH_PKG:-n/a}"
+DoMsg "INFO : COHERENCE_PATCH_PKG   = ${COHERENCE_PATCH_PKG:-n/a}"
+DoMsg "INFO : OUD_ONEOFF_PKGS       = ${OUD_ONEOFF_PKGS:-n/a}"
 
 # - EOF Initialization ---------------------------------------------------------
 
