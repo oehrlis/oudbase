@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Revision...: --
+# Version....: 2.0.0
 # Purpose....: Script to create the OUD instance with EUS context 
 #              using oud-proxy-setup.
 # Notes......: Will skip oud-proxy-setup if config.ldif already exists
