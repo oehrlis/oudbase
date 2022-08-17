@@ -39,7 +39,6 @@ export SETUP_OUD_PATCH="setup_oud_patch.sh"     # OUD patch script
 export OUD_FUNCTIONS="oud_functions.sh"         # OUD oud_functions script
 # source common functions from oud_functions.sh
 . ${SCRIPT_DIR}/${OUD_FUNCTIONS}
-TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
 # define default software packages
 DEFAULT_FMW_BASE_PKG="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"
 DEFAULT_OUD_BASE_PKG="p30188352_122140_Generic.zip"
@@ -58,12 +57,10 @@ export OUI_PATCH_PKG=${OUI_PATCH_PKG:-""}
 export COHERENCE_PATCH_PKG=${COHERENCE_PATCH_PKG:-""}
 export OPATCH_NO_FUSER=true
 
-# define oradba specific variables
-export SETUP_OUD_PATCH="setup_oud_patch.sh"     # OUD patch script
-export OUD_FUNCTIONS="oud_functions.sh"         # OUD oud_functions script
 # define Oracle specific variables
 export ORACLE_ROOT=${ORACLE_ROOT:-"/u00"}
 export ORACLE_BASE=${ORACLE_BASE:-"${ORACLE_ROOT}/app/oracle"}
+export SOFTWARE=${SOFTWARE:-"${ORACLE_BASE}/software"}
 export ORACLE_INVENTORY=${ORACLE_INVENTORY:-"${ORACLE_ROOT}/app/oraInventory"}
 export ORACLE_HOME_NAME=${ORACLE_HOME_NAME:-"oud12.2.1.4.0"}
 export ORACLE_HOME="${ORACLE_HOME:-${ORACLE_BASE}/product/${ORACLE_HOME_NAME}}"
@@ -79,7 +76,7 @@ function Usage() {
 # Purpose....: Display Usage
 # ------------------------------------------------------------------------------
     VERBOSE="TRUE"
-    DoMsg "Usage, ${SCRIPT_NAME} [-hvAL] [-b <ORACLE_BASE>] -i <ORACLE_INVENTORY>"
+    DoMsg "Usage, ${SCRIPT_NAME} [-hvAL] [-b <ORACLE_BASE>] [-i <ORACLE_INVENTORY>]"
     DoMsg "    [-j <JAVA_HOME>] [-l <LOCK FILE>] [-m <ORACLE_HOME>]"
     DoMsg "    [-n <ORACLE_HOME_NAME>] [-r <RESPONSE FILE>] [-t <INSTALL TYPE>]"
     DoMsg "    [-C <COHERENCE_PATCH_PKG>] [-O <OUD_BASE_PKG FILE>] [-P <OUD_ONEOFF_PKGS>]"
@@ -88,6 +85,7 @@ function Usage() {
     DoMsg ""
     DoMsg "    -b <ORACLE_BASE>         ORACLE_BASE Directory. (default \$ORACLE_BASE=${ORACLE_BASE})"
     DoMsg "    -i <ORACLE_INVENTORY>    ORACLE_INVENTORY Directory. (default \$ORACLE_INVENTORY=${ORACLE_INVENTORY})"
+    DoMsg "    -S <SOFTWARE>            Directory containing the installation packages and software. (default \$SOFTWARE=${ORACLE_BASE}/software)"
     DoMsg "    -h                       Usage this message"
     DoMsg "    -j <JAVA_HOME>           JAVA_HOME directory. If not set we will search for java in \$ORACLE_BASE/products)"
     DoMsg "    -l <LOCK FILE>           Specify a dedicated lock file (default ${DEFAULT_LOCK_FILE})"
@@ -166,11 +164,12 @@ fi
 running_in_docker && export OPATCH_NO_FUSER=true
 
 # usage and getopts
-while getopts b:i:hj:m:n:t:vAC:O:P:T:U:V:W:I:E: arg; do
+while getopts b:i:S:hj:m:n:t:vAC:O:P:T:U:V:W:I:E: arg; do
     case $arg in
         h) Usage 0;;
         b) export ORACLE_BASE="${OPTARG}";;
         i) export ORACLE_INVENTORY="${OPTARG}";;
+        S) export SOFTWARE="${OPTARG}";;
         j) export JAVA_HOME="${OPTARG}";;
         m) export ORACLE_HOME="${OPTARG}";;
         n) export ORACLE_HOME_NAME="${OPTARG}";;
@@ -226,6 +225,29 @@ DoMsg "INFO : OUD_OPATCH_PKG        = ${OUD_OPATCH_PKG:-n/a}"
 DoMsg "INFO : OUI_PATCH_PKG         = ${OUI_PATCH_PKG:-n/a}"
 DoMsg "INFO : COHERENCE_PATCH_PKG   = ${COHERENCE_PATCH_PKG:-n/a}"
 DoMsg "INFO : OUD_ONEOFF_PKGS       = ${OUD_ONEOFF_PKGS:-n/a}"
+
+# Create a list of software based on environment variables ending with _PKG or _PKGS
+SOFTWARE_LIST=""                        # initial values of SOFTWARE_LIST
+for i in $(env|cut -d= -f1|grep '_PKG$\|_PKGS$'); do
+    # check if environment variable is not empty and value not yet part of SOFTWARE_LIST
+    if [ -n "${!i}" ] && [[ $SOFTWARE_LIST != *"${!i}"* ]]; then
+        SOFTWARE_LIST+="${!i};"
+    fi
+done
+export SOFTWARE_LIST=$(echo $SOFTWARE_LIST|sed 's/.$//')
+
+# check Software folder
+if [ -d "${SOFTWARE}" ] || [ -w "${SOFTWARE}" ];; then
+    TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
+    for i in ${SOFTWARE_LIST//;/ }; do
+        if [ ! -f ${SOFTWARE}/$i ]; then
+            CleanAndQuit 15 ${i}             # Define a clean exit
+        fi
+    done
+else
+    DoMsg "INFO : Sofware repository is ready"
+fi
+
 # - EOF Initialization ---------------------------------------------------------
 
 # - Main -----------------------------------------------------------------------
@@ -327,6 +349,15 @@ else
     # Temp locations
     DoMsg "INFO : remove temp files"
     rm -rf ${TMP_DIR}
+fi
+
+if [ "${SLIM^^}" == "TRUE" ] && [ "${PATCH_LATER^^}" == "FALSE" ]; then
+    DoMsg "INFO : \$SLIM set to TRUE, remove other stuff..."
+    rm -rf ${ORACLE_HOME}/inventory                 # remove inventory
+    rm -rf ${ORACLE_HOME}/oui                       # remove oui
+    rm -rf ${ORACLE_HOME}/OPatch                    # remove OPatch
+    rm -rf ${TMP_DIR}
+    rm -rf ${ORACLE_HOME}/.patch_storage            # remove patch storage
     rm -rf /tmp/InstallActions*
     rm -rf /tmp/CVU*oracle
     rm -rf /tmp/OraInstall*
@@ -334,15 +365,5 @@ else
     DoMsg "INFO : remove log files in \${ORACLE_INVENTORY} and \${ORACLE_BASE}/product"
     find ${ORACLE_INVENTORY} -type f -name '*.log' -exec rm {} \;
     find ${ORACLE_BASE}/product -type f -name '*.log' -exec rm {} \;
-fi
-
-if [ "${SLIM^^}" == "TRUE" ]; then
-    DoMsg "INFO : \$SLIM set to TRUE, remove other stuff..."
-    rm -rf ${ORACLE_HOME}/inventory                 # remove inventory
-    rm -rf ${ORACLE_HOME}/oui                       # remove oui
-    rm -rf ${ORACLE_HOME}/OPatch                    # remove OPatch
-    rm -rf ${TMP_DIR}
-    rm -rf /tmp/OraInstall*
-    rm -rf ${ORACLE_HOME}/.patch_storage            # remove patch storage
 fi
 # --- EOF ----------------------------------------------------------------------
