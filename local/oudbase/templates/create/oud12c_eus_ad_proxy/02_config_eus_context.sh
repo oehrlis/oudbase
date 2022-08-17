@@ -1,10 +1,10 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 02_config_eus_context.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2020.07.09
 # Revision...: --
@@ -20,16 +20,16 @@
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - load instance environment -------------------------------------------
+# - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
 CONFIGFILE="$(dirname $0)/$(basename $0 .sh).conf"      # config file based on script name
 CONFIGFILE_CUSTOM="$(dirname $0)/$(basename $0 .sh)_${BASEDN_STRING}"
-# - configure instance --------------------------------------------------
+# - configure instance ---------------------------------------------------------
 echo "Configure OUD proxy instance ${OUD_INSTANCE} using:"
 echo "  BASEDN            : ${BASEDN}"
 echo "  BASEDN_STRING     : ${BASEDN_STRING}"
@@ -79,4 +79,4 @@ ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \
   --trustAll \
   --batchFilePath "${CONFIGFILE_CUSTOM}"
 
-# - EOF -----------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------

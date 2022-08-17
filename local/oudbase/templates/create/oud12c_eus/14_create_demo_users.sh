@@ -1,29 +1,29 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 14_create_demo_users.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.07.01
+# Date.......: 2022.08.17
 # Revision...: --
 # Purpose....: Script to create a couple of users and groups.
 # Notes......: BaseDN in 02_config_basedn.ldif will be updated before
 #              it is loaded using ldapmodify.
 # Reference..: https://github.com/oehrlis/oudbase
-# License....: Licensed under the Universal Permissive License v 1.0 as 
-#              shown at https://oss.oracle.com/licenses/upl.
-# -----------------------------------------------------------------------
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - load instance environment -------------------------------------------
+# - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
 LDIFFILE="$(dirname $0)/$(basename $0 .sh).ldif"      # LDIF file based on script name
 LDIFFILE_CUSTOM="$(dirname $0)/$(basename $0 .sh).ldif_${BASEDN_STRING}"
-# - configure instance --------------------------------------------------
+# - configure instance ---------------------------------------------------------
 echo "Configure OUD instance ${OUD_INSTANCE} using:"
 echo "  HOSTNAME          : ${HOST}"
 echo "  PORT              : ${PORT}"
@@ -38,7 +38,7 @@ echo "  LDIFFILE          : ${LDIFFILE}"
 echo "  LDIFFILE_CUSTOM   : ${LDIFFILE_CUSTOM}"
 echo ""
 
-# - configure instance --------------------------------------------------
+# - configure instance ---------------------------------------------------------
 # Update baseDN in LDIF file if required
 if [ -f ${LDIFFILE} ]; then
   cp ${LDIFFILE} ${LDIFFILE_CUSTOM}
@@ -62,4 +62,4 @@ ${OUD_INSTANCE_HOME}/OUD/bin/ldapmodify \
   --trustAll \
   --defaultAdd \
   --filename "${LDIFFILE_CUSTOM}"
-# - EOF -----------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------

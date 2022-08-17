@@ -1,29 +1,29 @@
 
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 02_config_basedn.ldif
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.06.30
+# Date.......: 2022.08.17
 # Revision...: --
 # Purpose....: Configure base DN and add ou's for users and groups
 # Notes......: The LDIF file is loaded by the script 02_config_basedn.sh 
 #              If necessary it can also be imported manually.
 #
 # Reference..: https://github.com/oehrlis/oudbase
-# License....: Licensed under the Universal Permissive License v 1.0 as 
-#              shown at https://oss.oracle.com/licenses/upl.
-# -----------------------------------------------------------------------
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 #version: 1
-# - Update Structure ----------------------------------------------------
+# - Update Structure -----------------------------------------------------------
 # Description: Add different containers and OUs.
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # local container for user and groups
 dn: LOCAL_OU,BASEDN
 changetype: add
@@ -51,9 +51,9 @@ ObjectClass: organizationalUnit
 Description: local groups maintained by OUD
 ou: groups
 
-# - Add groups and roles ------------------------------------------------
+# - Add groups and roles -------------------------------------------------------
 # Description: Add different groups and roles
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # add role for OUD Admins
 dn: ou=role_oud_admins,ou=groups,LOCAL_OU,BASEDN
 objectClass: groupOfUniquenames
@@ -170,9 +170,9 @@ description: Group group_all_ro has all read privilges on BASEDN
 ou: group_all_ro
 uniqueMember: ou=role_oud_admins,ou=groups,LOCAL_OU,BASEDN
 
-# - Add ACIs ------------------------------------------------------------
+# - Add ACIs -------------------------------------------------------------------
 # Description: Add different ACIs
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 dn: BASEDN
 changetype: modify
 add: aci
@@ -181,4 +181,4 @@ aci: (target = "ldap:///BASEDN")(targetattr = "* || +")(targetscope = "base") (v
 aci: (target = "ldap:///BASEDN")(targetattr = "* || +")(targetscope = "subtree") (version 3.0; acl "All full write access"; allow (compare,read,add,write,delete,search) groupdn = "ldap:///ou=group_all_rw,ou=groups,LOCAL_OU,BASEDN";)
 aci: (target = "ldap:///BASEDN")(targetattr = "* || +")(targetscope = "subtree") (version 3.0; acl "All full read access"; allow (search,read) groupdn = "ldap:///ou=group_all_ro,ou=groups,LOCAL_OU,BASEDN";)
 
-# - EOF -----------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------

@@ -1,23 +1,23 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 99_completion_status.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.11.19
+# Date.......: 2022.08.17
 # Usage......: 99_completion_status.sh
 # Purpose....: simple touch completion status
 # Notes......:  
 # Reference..: 
-# License...: Licensed under the Universal Permissive License v 1.0 as 
-#             shown at http://oss.oracle.com/licenses/upl.
-# -----------------------------------------------------------------------
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
-# - load instance environment -----------------------------------------------
+# ------------------------------------------------------------------------------
+# - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
 
 SCRIPTFILE="$(dirname $0)/$(basename $0)"
@@ -27,7 +27,7 @@ INSTANCE_INIT=${INSTANCE_INIT:-$(dirname $SCRIPT_BASE)}
 COMMON_DIR="$(dirname ${INSTANCE_INIT})/common"
 STATUS_FILE="${OUD_INSTANCE}_${HOST}"
 
-# - configure instance ------------------------------------------------------
+# - configure instance ---------------------------------------------------------
 echo "Completion Status for ${OUD_INSTANCE} on ${HOST}:"
 echo "COMMON_DIR        : ${COMMON_DIR}"
 echo "STATUS_FILE       : ${STATUS_FILE}"
@@ -38,6 +38,6 @@ if [ -d "${COMMON_DIR}" ]; then
     echo "INFO: create status file ${COMMON_DIR}/${STATUS_FILE}"
     touch ${COMMON_DIR}/${STATUS_FILE}
 fi
-# - touch file when setup finished ------------------------------------------
+# - touch file when setup finished ---------------------------------------------
 
-# - EOF ---------------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------

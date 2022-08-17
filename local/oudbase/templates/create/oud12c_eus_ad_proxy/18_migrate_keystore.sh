@@ -1,31 +1,31 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 18_migrate_keystore.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.07.01
+# Date.......: 2022.08.17
 # Revision...: --
 # Purpose....: Script to migrate the java keystore to PKCS12
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
-# License....: Licensed under the Universal Permissive License v 1.0 as 
-#              shown at https://oss.oracle.com/licenses/upl.
-# -----------------------------------------------------------------------
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - load instance environment -------------------------------------------
+# - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
 
 # set default values for keystore if not specified
 export KEYSTOREFILE=${KEYSTOREFILE:-"${OUD_INSTANCE_HOME}/OUD/config/keystore"} 
 export KEYSTOREPIN=${KEYSTOREPIN:-"${OUD_INSTANCE_HOME}/OUD/config/keystore.pin"}
 
-# - configure instance --------------------------------------------------
+# - configure instance ---------------------------------------------------------
 echo "Migrate java keystore for OUD instance ${OUD_INSTANCE} using:"
 echo "  KEYSTOREFILE      : ${KEYSTOREFILE}"
 echo "  KEYSTOREPIN       : ${KEYSTOREPIN}"
@@ -38,4 +38,4 @@ $JAVA_HOME/bin/keytool -importkeystore \
     -deststorepass $(cat ${KEYSTOREPIN}) \
     -deststoretype pkcs12
 
-# - EOF -----------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------

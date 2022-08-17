@@ -1,30 +1,30 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 04_create_root_user.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.06.25
+# Date.......: 2022.08.17
 # Usage......: 04_create_root_user.sh
 # Purpose....: Script für das erstellen der root User
 # Notes......: Das Script für die dsconfig Kommandos aus 04_create_root_user.conf
 #              als Batch aus sowie die LDIF aus 04_create_root_user.ldif. 
 # Reference..: 
-# License....: Licensed under the Universal Permissive License v 1.0 as 
-#              shown at https://oss.oracle.com/licenses/upl.
-# -----------------------------------------------------------------------
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - load instance environment -----------------------------------------------
+# - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
 LDIFFILE="$(dirname $0)/$(basename $0 .sh).ldif"      # LDIF file based on script name
 CONFIGFILE="$(dirname $0)/$(basename $0 .sh).conf"    # config file based on script name
 
-# - configure instance ------------------------------------------------------
+# - configure instance ---------------------------------------------------------
 echo "Configure OUD instance ${OUD_INSTANCE} using:"
 echo "  HOSTNAME          : ${HOST}"
 echo "  PORT_ADMIN        : ${PORT_ADMIN}"
@@ -34,7 +34,7 @@ echo "  KEYSTOREPIN       : ${KEYSTOREPIN}"
 echo "  CONFIGFILE        : ${CONFIGFILE}"
 echo "  LDIFFILE          : ${LDIFFILE}"
 
-# - configure instance ------------------------------------------------------
+# - configure instance ---------------------------------------------------------
 echo "- Add root user to OUD instance ${OUD_INSTANCE}"
 ${OUD_INSTANCE_HOME}/OUD/bin/ldapmodify \
   --hostname "${HOST}" \
@@ -56,4 +56,4 @@ ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \
   --verbose \
   --trustAll \
   --batchFilePath "${CONFIGFILE}"
-# - EOF ---------------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------
