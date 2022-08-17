@@ -1,27 +1,27 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: oud_export.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2018.03.18
+# Date.......: 2022.08.17
 # Revision...: --
 # Purpose....: Bash Script to export all running OUD Instances
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
-# - Customization -------------------------------------------------------
+# ------------------------------------------------------------------------------
+# - Customization --------------------------------------------------------------
 export OPENDS_JAVA_ARGS=-Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true
-# - End of Customization ------------------------------------------------
+# - End of Customization -------------------------------------------------------
  
-# - Default Values ------------------------------------------------------
+# - Default Values -------------------------------------------------------------
 VERSION=v1.9.6
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
@@ -36,14 +36,14 @@ COMPRESS=""                                     # set default value for compress
 SUFFIX="ldif"                                   # default suffix
 DATE_STRING=$(date '+%Y%m%d-%H%M%S')            # String used for the export files
 HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)  # Hostname
-# - End of Default Values -----------------------------------------------
+# - End of Default Values ------------------------------------------------------
 
-# - Functions -----------------------------------------------------------
+# - Functions ------------------------------------------------------------------
 # source common functions from oud_functions.sh
 . ${SCRIPT_DIR}/oud_functions.sh
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Purpose....: Display Usage
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function Usage() {
     VERBOSE="TRUE"
     DoMsg "Usage, ${SCRIPT_NAME} [-hv -i <OUD_INSTANCES> -b <BACKENDS> -m <MAILADDRESSES>]"
@@ -66,9 +66,9 @@ function Usage() {
         CleanAndQuit 0
     fi
 }
-# - EOF Functions -------------------------------------------------------
+# - EOF Functions --------------------------------------------------------------
  
-# - Initialization ------------------------------------------------------
+# - Initialization -------------------------------------------------------------
 # Check OUD_BASE and load if necessary
 if [ "${OUD_BASE}" = "" ]; then
     if [ -f "${HOME}/.OUD_BASE" ]; then
@@ -96,9 +96,9 @@ else
     CleanAndQuit 11 ${LOGFILE} # Define a clean exit
 fi
  
-# - EOF Initialization --------------------------------------------------
+# - EOF Initialization ---------------------------------------------------------
  
-# - Main ----------------------------------------------------------------
+# - Main -----------------------------------------------------------------------
 DoMsg "${START_HEADER}"
 # get pointer / linenumber from logfile with the latest header line
 LOG_START=$(($(grep -ni "${START_HEADER}" "${LOGFILE}"|cut -d: -f1 |tail -1)-1))
@@ -273,4 +273,4 @@ if [ "${ERROR}" -gt 0 ]; then
 else
     CleanAndQuit 0
 fi
-# - EOF -----------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------

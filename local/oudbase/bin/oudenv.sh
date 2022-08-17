@@ -1,24 +1,24 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: oudenv.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2018.03.18
+# Date.......: 2022.08.17
 # Revision...: --
 # Purpose....: Bash Source File to set the environment for OUD Instances
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - Environment Variables -----------------------------------------------
+# - Environment Variables ------------------------------------------------------
 # Definition of default values for environment variables, if not defined 
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in .bash_profile or 
@@ -50,7 +50,7 @@ OUDTAB_COMMENT=$(cat <<COMMENT
 #  5: OUD Replication Port
 #  6: Directory type eg. OUD, OID, ODSEE or OUDSM
 #  7: Flag for start/stop eg. (N)o, (Y)es or (D)ummy
-# --------------------------------------------------
+# ------------------------------------------------------------------------------
 COMMENT
 )
  
@@ -109,14 +109,14 @@ export JAVA_HOME=${JAVA_HOME:-"${ORACLE_BASE}/${DEFAULT_PRODUCT_BASE_NAME}/java"
 # set directory type
 DEFAULT_DIRECTORY_TYPE="OUD"
 export DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
-# - EOF Environment Variables -------------------------------------------
+# - EOF Environment Variables --------------------------------------------------
 
-# - Functions -----------------------------------------------------------
+# - Functions ------------------------------------------------------------------
 
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function get_instance_real_home {
 # Purpose....: get the corresponding PORTS from OUD Instance
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
  # define the function parameter
     OUD_INSTANCE=${1:-${OUD_INSTANCE}}
     DIRECTORY_TYPE=${2:-${DIRECTORY_TYPE}}
@@ -153,10 +153,10 @@ function get_instance_real_home {
     fi
     echo "${OUD_INSTANCE_REAL_HOME}"
 }
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function get_ports {
 # Purpose....: get the corresponding PORTS from OUD Instance
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     # define the function parameter
     OUD_INSTANCE=${1:-${OUD_INSTANCE}}
     DIRECTORY_TYPE=${2:-${DIRECTORY_TYPE}}
@@ -234,10 +234,10 @@ function get_ports {
     fi
 }
 
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function update_oudtab {
 # Purpose....: update OUD tab
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     # define the function parameter
     OUD_INSTANCE=${1:-${OUD_INSTANCE}}
     DIRECTORY_TYPE=${2:-${DIRECTORY_TYPE}}
@@ -271,10 +271,10 @@ function update_oudtab {
     fi
 }
 
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function oud_status {
 # Purpose....: just display the current OUD settings
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     STATUS=$(get_status)
     DIR_STATUS="??"
     OUD_INSTANCE_REAL_HOME=$(get_instance_real_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} ${Silent})
@@ -313,10 +313,10 @@ function oud_status {
     echo "--------------------------------------------------------------"
 }
  
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function oud_up {
 # Purpose....: display the status of the OUD instances
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     echo "TYPE  INSTANCE     STATUS PORTS          INSTANCE HOME"
     echo "----- ------------ ------ -------------- ----------------------------------"
     # loop through OUD instance list
@@ -340,10 +340,10 @@ function oud_up {
     echo ""
 }
 
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function proc_grep {
 # Purpose....: simulate pgrep to get the OUD / OUDSM process status
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     GrepString=${1}
     if [ -n "$GrepString" ]; then
         GrepString=$(echo ${GrepString}|sed 's/\(.\)/[\1]/1')
@@ -353,10 +353,10 @@ function proc_grep {
     fi
 }
 
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function oud_pgrep {
 # Purpose....: simulate pgrep to get the OUD / OUDSM process status
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     GrepString=${1}
     if [ -n "$GrepString" ]; then
         GrepString=$(echo ${GrepString}|sed 's/\(.\)/[\1]/1')
@@ -426,10 +426,10 @@ function get_oracle_home {
     fi
 }
  
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function gen_password {
 # Purpose....: generate a password string
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     Length=${1:-10}
 
     # make sure, that the password length is not shorter than 4 characters
@@ -449,10 +449,10 @@ function gen_password {
     done
 }
 
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function oud_help {
 # Purpose....: just display help for OUD environment
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     echo "--- OUD Instances -----------------------------------------------------"
     echo ""
     echo "--- ENV Variables -----------------------------------------------------"
@@ -522,17 +522,17 @@ function oud_help {
     fi
 }
  
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function join_by {
 # Purpose....: Join array elements
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     local IFS="$1"; shift; echo "$*";
 }
  
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function relpath {
 # Purpose....: get the relative path of DIR1 from DIR2
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     # define the function parameter
     BaseDirectory=$1
     TargetDirectory=$2
@@ -582,9 +582,9 @@ function relpath {
     fi
     echo "$Result"
 }
-# - EOF Functions -------------------------------------------------------
+# - EOF Functions --------------------------------------------------------------
 
-# - Initialization ------------------------------------------------------
+# - Initialization -------------------------------------------------------------
 tty >/dev/null 2>&1
 pTTY=$?
 export SILENT=${2}
@@ -739,9 +739,9 @@ elif [ "${1}" == "SILENT" ]; then
 else
     export OUD_INSTANCE=${1}
 fi
-# - EOF Initialization --------------------------------------------------
+# - EOF Initialization ---------------------------------------------------------
 
-# - Main ----------------------------------------------------------------
+# - Main -----------------------------------------------------------------------
  
 # Load OUD config from oudtab
 if [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -eq 1 ]; then
@@ -878,4 +878,4 @@ if [ ${pTTY} -eq 0 ] && [ "${SILENT}" = "" ] && [ ! "${OUD_INSTANCE}" == 'n/a' ]
     echo "Source environment for ${DIRECTORY_TYPE} Instance ${OUD_INSTANCE}"
     oud_status
 fi
-# - EOF -----------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------
