@@ -52,9 +52,10 @@ cp ${SCRIPT_DIR}/../LICENSE ${SCRIPT_DIR}/../local/oudbase/doc
 # update version in *.sh files
 VERSION=$(head -1 ${PACKAG_BASE}/VERSION |sed -E 's/.*(v[0-9]+.[0-9]+.[0-9]+).*/\1/')
 
-for i in ./bin/*; do
+for i in ./bin/* ./etc/* $(find ./templates -type f); do
     echo "update version to ${VERSION} in file $i"
     sed -i -E "s/^VERSION=.*/VERSION=${VERSION}/" $i 
+    sed -i -E "s/^# Version\.\.\.\.:.*/# Version....: ${VERSION}/" $i  
 done
 # create sha hash's
 echo "Create sha hashs for all files"
