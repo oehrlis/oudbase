@@ -1,23 +1,23 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: build.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
-# Editor.....: $LastChangedBy: $
-# Date.......: $LastChangedDate: $
-# Revision...: $LastChangedRevision: $
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
+# Editor.....: Stefan Oehrli
+# Date.......: 2022.08.17
+# Revision...: --
 # Purpose....: Simple build script for the OUD Base Package
 # Notes......: This script is used as base install script for the OUD 
 #              Environment
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"                  # Basename of the script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)" # Absolute path of script
 SCRIPT_FQN="${SCRIPT_DIR}/${SCRIPT_NAME}"                    # Full qualified script name
@@ -63,12 +63,12 @@ find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" ! -iname "*.log" 
 
 # Tar all together
 echo "Put all together in a tar"
-tar -zcvf ${SCRIPT_DIR}/oudbase_install.tgz \
+tar --verbose -zcvf ${SCRIPT_DIR}/oudbase_install.tgz \
     --exclude=bin/oudbase_install.sh \
     --exclude=log/*.log \
     --exclude='.DS_Store' \
     --exclude='._*'  \
-    bin/ doc/ etc/ log/ lib/ templates/
+    bin/ doc/ etc/ templates/
 
 # build this nice executable shell script with a TAR payload
 echo "Create this fancy shell with a tar payload"
@@ -103,4 +103,4 @@ echo "Clean up...."
 rm ${SCRIPT_DIR}/../local/oudbase/doc/README.md
 rm ${SCRIPT_DIR}/../local/oudbase/doc/LICENSE
 chmod 755 ${SCRIPT_DIR}/oudbase_install.sh
-# - EOF ---------------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------
