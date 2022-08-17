@@ -1,28 +1,28 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 01_create_eus_proxy_instance.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.06.30
+# Date.......: 2022.08.17
 # Revision...: --
 # Purpose....: Script to create the OUD instance with EUS context 
 #              using oud-proxy-setup.
 # Notes......: Will skip oud-proxy-setup if config.ldif already exists
 # Reference..: https://github.com/oehrlis/oudbase
-# License....: Licensed under the Universal Permissive License v 1.0 as 
-#              shown at https://oss.oracle.com/licenses/upl.
-# -----------------------------------------------------------------------
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - load instance environment -------------------------------------------
+# - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
 
-# - create instance -----------------------------------------------------
+# - create instance ------------------------------------------------------------
 echo "Create OUD instance ${OUD_INSTANCE} using:"
 echo "OUD_INSTANCE_HOME : ${OUD_INSTANCE_HOME}"
 echo "PWD_FILE          : ${PWD_FILE}"
@@ -88,4 +88,4 @@ else
     echo "      skip create instance ${OUD_INSTANCE}"
 fi
 
-# - EOF -----------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------

@@ -1,32 +1,32 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 15_reset_user_passwords.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.06.30
+# Date.......: 2022.08.17
 # Usage......: 15_reset_user_passwords.sh
 # Purpose....: Script to reset admin user passwords
 # Notes......: 
 # Reference..: 
-# License...: Licensed under the Universal Permissive License v 1.0 as 
-#             shown at http://oss.oracle.com/licenses/upl.
-# -----------------------------------------------------------------------
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - load instance environment -----------------------------------------------
+# - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
 
 # Get the root users
-echo "- get user from directory -----------------------------------------------"
+echo "- get user from directory ------------------------------------------------------"
 mapfile -t COMMON_USERS < <(${OUD_INSTANCE_HOME}/OUD/bin/ldapsearch --hostname ${HOST} --port $PORT_SSL --trustAll --useSSL -D "${DIRMAN}"  -j ${PWD_FILE} -b "${BASEDN}" "(objectClass=person)" dn|sed 's/^dn: //'|grep -i 'cn')
 DEFAULT_USERS_PWD_FILE=${DEFAULT_USERS_PWD_FILE:-"${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_default_user_pwd.txt"}
 
-# - configure instance ------------------------------------------------------
+# - configure instance ---------------------------------------------------------
 echo "- reset admin user password for OUD instance ${OUD_INSTANCE} using:"
 echo "HOSTNAME          : ${HOST}"
 echo "PORT_ADMIN        : ${PORT_ADMIN}"
@@ -74,4 +74,4 @@ for user in "${COMMON_USERS[@]}"; do
     echo "NOK"
   fi
 done
-# - EOF ---------------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------
