@@ -1,23 +1,23 @@
 #!/bin/bash
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: setup_oud.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.08.26
+# Date.......: 2022.07.17
 # Revision...: 
 # Purpose....: generic script to install Oracle Unified Directory binaries.
 # Notes......: Script would like to be executed as oracle :-).
 # Reference..: --
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history for more information on changes/updates
-# ---------------------------------------------------------------------------
-# - Customization -----------------------------------------------------------
+# ------------------------------------------------------------------------------
+# - Customization --------------------------------------------------------------
 # OUD_BASE_PKG="p30188352_122140_Generic.zip"         # OUD 12.2.1.4.0
 # FMW_BASE_PKG="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"         # ORACLE FUSION MIDDLEWARE 12C (12.2.1.4.0) INFRASTRUCTURE (Patchset)
 # OUD_PATCH_PKG="p31400392_122140_Generic.zip"        # OUD BUNDLE PATCH 12.2.1.4.200204 (Patch) 
@@ -28,9 +28,9 @@
 # ORACLE_HOME_NAME="oud12.2.1.4.0"                    # Name of the Oracle Home directory
 # ORACLE_HOME="${ORACLE_BASE}/product/${ORACLE_HOME_NAME}"
 
-# - End of Customization ------------------------------------------------
+# - End of Customization -------------------------------------------------------
 
-# - Default Values ------------------------------------------------------
+# - Default Values -------------------------------------------------------------
 VERSION=v1.9.6
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
@@ -84,15 +84,15 @@ export ORACLE_HOME="${ORACLE_HOME:-${ORACLE_BASE}/product/${ORACLE_HOME_NAME}}"
 
 # define generic variables for software, download etc
 export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(find ${ORACLE_BASE} /usr/java -name javac 2>/dev/null|sort -r|head -1) 2>/dev/null) 2>/dev/null)}
-# - End of Default Values -----------------------------------------------
+# - End of Default Values ------------------------------------------------------
 
-# - Functions -----------------------------------------------------------
-# -----------------------------------------------------------------------
+# - Functions ------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function Usage() {
 # Purpose....: Display Usage
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     VERBOSE="TRUE"
-    DoMsg "Usage, ${SCRIPT_NAME} [-hvAL] [-b <ORACLE_BASE>] "
+    DoMsg "Usage, ${SCRIPT_NAME} [-hvAL] [-b <ORACLE_BASE>] -i <ORACLE_INVENTORY>"
     DoMsg "    [-j <JAVA_HOME>] [-l <LOCK FILE>] [-m <ORACLE_HOME>]"
     DoMsg "    [-n <ORACLE_HOME_NAME>] [-r <RESPONSE FILE>] [-t <INSTALL TYPE>]"
     DoMsg "    [-C <COHERENCE_PATCH_PKG>] [-O <OUD_BASE_PKG FILE>] [-P <OUD_ONEOFF_PKGS>]"
@@ -100,6 +100,7 @@ function Usage() {
     DoMsg "    [-W <FMW_BASE_PKG>] [-I <OUI_PATCH_PKG>]"
     DoMsg ""
     DoMsg "    -b <ORACLE_BASE>         ORACLE_BASE Directory. (default \$ORACLE_BASE=${ORACLE_BASE})"
+    DoMsg "    -i <ORACLE_INVENTORY>    ORACLE_INVENTORY Directory. (default \$ORACLE_INVENTORY=${ORACLE_INVENTORY})"
     DoMsg "    -h                       Usage this message"
     DoMsg "    -j <JAVA_HOME>           JAVA_HOME directory. If not set we will search for java in \$ORACLE_BASE/products)"
     DoMsg "    -l <LOCK FILE>           Specify a dedicated lock file (default ${DEFAULT_LOCK_FILE})"
@@ -131,8 +132,8 @@ function Usage() {
         CleanAndQuit 0 
     fi
 }
-# - EOF Functions -------------------------------------------------------
-# - Initialization ----------------------------------------------------------
+# - EOF Functions --------------------------------------------------------------
+# - Initialization -------------------------------------------------------------
 # Make sure root does not run our script
 if [ ! $EUID -ne 0 ]; then
    CleanAndQuit 3 "root"
@@ -148,13 +149,14 @@ else
 fi
 
 # usage and getopts
-while getopts b:hj:l:m:n:r:t:vALC:O:P:T:U:V:W:I:E: arg; do
+while getopts b:i:hj:l:m:n:r:t:vALC:O:P:T:U:V:W:I:E: arg; do
     case $arg in
         h) Usage 0;;
         l) LOCK_FILE="${OPTARG}";;
         r) RSP_FILE="${OPTARG}";;
         L) PATCH_LATER="TRUE";;     
         b) export ORACLE_BASE="${OPTARG}";;
+        i) export ORACLE_INVENTORY="${OPTARG}";;
         j) export JAVA_HOME="${OPTARG}";;
         m) export ORACLE_HOME="${OPTARG}";;
         n) export ORACLE_HOME_NAME="${OPTARG}";;
@@ -246,11 +248,11 @@ mkdir -p $(dirname ${ORACLE_HOME})
 if [ -d "${ORACLE_HOME}" ]; then
     CleanAndQuit 14 ${ORACLE_HOME}
 fi
-# - EOF Initialization ------------------------------------------------------
+# - EOF Initialization ---------------------------------------------------------
 
-# - Main --------------------------------------------------------------------
+# - Main -----------------------------------------------------------------------
 
-# - Install FWM Binaries ----------------------------------------------------
+# - Install FWM Binaries -------------------------------------------------------
 # - just required if you setup OUDSM
 if [ "${OUD_TYPE}" == "OUDSM12" ]; then
     DoMsg "INFO : Install Oracle FMW binaries ----------------------------------------"
@@ -282,7 +284,7 @@ if [ "${OUD_TYPE}" == "OUDSM12" ]; then
     fi
 fi
 
-# - Install OUD binaries ----------------------------------------------------
+# - Install OUD binaries -------------------------------------------------------
 DoMsg "INFO : Install Oracle OUD binaries ----------------------------------------"
 if [ -n "${OUD_BASE_PKG}" ]; then
     if get_software "${OUD_BASE_PKG}"; then          # Check and get binaries
@@ -370,4 +372,4 @@ if [ "${SLIM^^}" == "TRUE" ] && [ "${PATCH_LATER^^}" == "FALSE" ]; then
     rm -rf /tmp/OraInstall*
     rm -rf ${ORACLE_HOME}/.patch_storage            # remove patch storage
 fi
-# --- EOF --------------------------------------------------------------------
+# --- EOF ----------------------------------------------------------------------

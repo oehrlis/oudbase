@@ -79,7 +79,7 @@ function Usage() {
 # Purpose....: Display Usage
 # ------------------------------------------------------------------------------
     VERBOSE="TRUE"
-    DoMsg "Usage, ${SCRIPT_NAME} [-hvA] [-b <ORACLE_BASE>] "
+    DoMsg "Usage, ${SCRIPT_NAME} [-hvAL] [-b <ORACLE_BASE>] -i <ORACLE_INVENTORY>"
     DoMsg "    [-j <JAVA_HOME>] [-l <LOCK FILE>] [-m <ORACLE_HOME>]"
     DoMsg "    [-n <ORACLE_HOME_NAME>] [-r <RESPONSE FILE>] [-t <INSTALL TYPE>]"
     DoMsg "    [-C <COHERENCE_PATCH_PKG>] [-O <OUD_BASE_PKG FILE>] [-P <OUD_ONEOFF_PKGS>]"
@@ -87,12 +87,10 @@ function Usage() {
     DoMsg "    [-W <FMW_BASE_PKG>] [-I <OUI_PATCH_PKG>]"
     DoMsg ""
     DoMsg "    -b <ORACLE_BASE>         ORACLE_BASE Directory. (default \$ORACLE_BASE=${ORACLE_BASE})"
+    DoMsg "    -i <ORACLE_INVENTORY>    ORACLE_INVENTORY Directory. (default \$ORACLE_INVENTORY=${ORACLE_INVENTORY})"
     DoMsg "    -h                       Usage this message"
     DoMsg "    -j <JAVA_HOME>           JAVA_HOME directory. If not set we will search for java in \$ORACLE_BASE/products)"
-    DoMsg "    -m <ORACLE_HOME>         Oracle home directory for OUD binaries "
-    DoMsg "                             (default \$ORACLE_HOME=$ORACLE_BASE/products/$ORACLE_HOME_NAME)"
-    DoMsg "    -n <ORACLE_HOME_NAME>    Name for the Oracle home folder. Can be used to overwrite \$ORACLE_HOME"
-    DoMsg "                             (default \$ORACLE_HOME_NAME=${ORACLE_HOME_NAME})"
+    DoMsg "    -l <LOCK FILE>           Specify a dedicated lock file (default ${DEFAULT_LOCK_FILE})"
     DoMsg "    -t <INSTALL TYPE>        OUD install type OUD12,OUDSM12 or OUD11 (default ${DEFAULT_OUD_TYPE})"
     DoMsg "    -v                       enable verbose mode"
     DoMsg "    -A                       Install latest default patches"
@@ -168,10 +166,11 @@ fi
 running_in_docker && export OPATCH_NO_FUSER=true
 
 # usage and getopts
-while getopts b:hj:m:n:t:vAC:O:P:T:U:V:W:I:E: arg; do
+while getopts b:i:hj:m:n:t:vAC:O:P:T:U:V:W:I:E: arg; do
     case $arg in
         h) Usage 0;;
         b) export ORACLE_BASE="${OPTARG}";;
+        i) export ORACLE_INVENTORY="${OPTARG}";;
         j) export JAVA_HOME="${OPTARG}";;
         m) export ORACLE_HOME="${OPTARG}";;
         n) export ORACLE_HOME_NAME="${OPTARG}";;
