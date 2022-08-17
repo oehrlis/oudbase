@@ -22,6 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - add Status info to [tns_load.sh](./local/oudbase/bin/tns_load.sh)
 - add new exit code 15 for missing software package
+- add parameter to specify software Repository
+- add check to verify software repository and software packages
 
 ### Changed
 
