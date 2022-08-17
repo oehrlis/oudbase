@@ -1,23 +1,23 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 22_enable_replication_host2.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2019.09.04
+# Date.......: 2022.08.17
 # Usage......: 22_enable_replication_host2.sh
 # Purpose....: simple script to enable and initialize replication
 # Notes......:  
 # Reference..: 
-# License...: Licensed under the Universal Permissive License v 1.0 as 
-#             shown at http://oss.oracle.com/licenses/upl.
-# -----------------------------------------------------------------------
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
-# - load instance environment -----------------------------------------------
+# ------------------------------------------------------------------------------
+# - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
 
 # limit Script to run on HOST2
@@ -36,7 +36,7 @@ else
     exit
 fi
 
-# - configure instance ------------------------------------------------------
+# - configure instance ---------------------------------------------------------
 echo "Enable replication ${OUD_INSTANCE} using:"
 echo "HOSTNAME          : ${HOST}"
 echo "HOST1             : ${HOST1}"
@@ -50,8 +50,8 @@ echo "REPMAN            : ${REPMAN}"
 echo "PWD_FILE          : ${PWD_FILE}"
 echo "BASEDN            : ${BASEDN}"
 
-# - loop through list of suffix ---------------------------------------------
-# - add suffix --------------------------------------------------------------
+# - loop through list of suffix ------------------------------------------------
+# - add suffix -----------------------------------------------------------------
 echo "enable replication for suffix (${BASEDN}) from $HOST2 to $HOST3"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication enable \
 --HOST2 "${HOST2}" --port1 "${PORT_ADMIN}" --bindDN1 "${DIRMAN}" --bindPasswordFile1 "${PWD_FILE}" \
@@ -60,15 +60,15 @@ ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication enable \
 --replicationPort2 "${PORT_REP}" --secureReplication2 \
 --baseDN "${BASEDN}" --adminUID "${REPMAN}" \
 --adminPasswordFile "${PWD_FILE}" --trustAll --no-prompt --noPropertiesFile
-# - initialize replication --------------------------------------------------
+# - initialize replication -----------------------------------------------------
 echo "initialize replication for suffix ${BASEDN} on all hosts"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication initialize-all \
 -h "${HOST2}" -p "${PORT_ADMIN}" --baseDN "${BASEDN}" \
 --adminUID "${REPMAN}" --adminPasswordFile "${PWD_FILE}" \
 --trustAll --no-prompt --noPropertiesFile
 
-# - check status of replication ---------------------------------------------
+# - check status of replication ------------------------------------------------
 ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication status -h "${HOST2}" -p "${PORT_ADMIN}" \
 --adminUID "${REPMAN}" --adminPasswordFile "${PWD_FILE}" \
 --trustAll --no-prompt --noPropertiesFile
-# - EOF ---------------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------

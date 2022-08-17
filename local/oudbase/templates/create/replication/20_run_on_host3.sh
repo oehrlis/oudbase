@@ -1,24 +1,24 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 20_wait_for_host2.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2019.09.26
+# Date.......: 2022.08.17
 # Usage......: 20_wait_for_host2.sh
 # Purpose....: Script to wait for other host to be ready
 # Notes......:  
 # Reference..: 
-# License...: Licensed under the Universal Permissive License v 1.0 as 
-#             shown at http://oss.oracle.com/licenses/upl.
-# -----------------------------------------------------------------------
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - load instance environment -----------------------------------------------
+# - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
 
 SCRIPTFILE="$(dirname $0)/$(basename $0)"
@@ -37,4 +37,4 @@ else
     echo "Skip script $(basename $SCRIPTFILE) on host ${HOST}"
 fi
 
-# - EOF ---------------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------
