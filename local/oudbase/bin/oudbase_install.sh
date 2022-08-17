@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Version....: v2.1.0
+# Version....: v2.1.1
 # Purpose....: This script is used as base install script for the OUD 
 #              Environment
 # Notes......: --
@@ -24,7 +24,7 @@ export LOG_BASE=${LOG_BASE-"/tmp"}
 # - End of Customization -------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v2.1.0
+VERSION=v2.1.1
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="TRUE"                                  # enable verbose mode
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"     # Basename of the script
@@ -283,7 +283,12 @@ fi
 
 # Check if INSTALL_ORACLE_BASE exits
 if [ ! "${INSTALL_OUD_BASE}" = "" ] && [ ! -d "${INSTALL_OUD_BASE}" ]; then
-    CleanAndQuit 43 ${INSTALL_OUD_BASE}
+     if [ -w $(dirname "${INSTALL_OUD_BASE}") ]; then
+        DoMsg "INFO : ${INSTALL_OUD_BASE} does not exists but can be created later..."
+    else
+        DoMsg "WARN : ${INSTALL_OUD_BASE} does not exists and can not be created later..."
+        CleanAndQuit 13 $(dirname "${INSTALL_OUD_BASE}")
+    fi
 fi
 
 # Check if INSTALL_ORACLE_BASE exits
