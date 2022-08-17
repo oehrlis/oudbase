@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Version....: v2.1.1
+# Version....: v2.1.2
 # Purpose....: Search a tns entry
 # Notes......: --
 # Reference..: --
@@ -28,7 +28,7 @@ set -o pipefail                     # pipefail exit after 1st piped commands fai
 
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v2.1.1
+VERSION=v2.1.2
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode

@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.07.17
-# Version....: v2.1.1
+# Version....: v2.1.2
 # Purpose....: generic script to install Oracle Unified Directory binaries.
 # Notes......: Script would like to be executed as oracle :-).
 # Reference..: --
@@ -31,7 +31,7 @@
 # - End of Customization -------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v2.1.1
+VERSION=v2.1.2
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
@@ -48,9 +48,9 @@ export SETUP_OUD_PATCH="setup_oud_patch.sh"     # OUD patch script
 export OUD_FUNCTIONS="oud_functions.sh"         # OUD oud_functions script
 # source common functions from oud_functions.sh
 . ${SCRIPT_DIR}/${OUD_FUNCTIONS}
-
-DEFAULT_RSP_FILE=${TMP_DIR}/oud_install.rsp     # default response file
-DEFAULT_LOCK_FILE=${TMP_DIR}/oraInst.loc        # default lock file
+DEFAULT_TMP_DIR=$(mktemp -d)                            # create a temp directory
+DEFAULT_RSP_FILE=${DEFAULT_TMP_DIR}/oud_install.rsp     # default response file
+DEFAULT_LOCK_FILE=${DEFAULT_TMP_DIR}/oraInst.loc        # default lock file
 DEFAULT_OUD_TYPE=${OUD_TYPE:-"OUD12"}
 
 # define default software packages
@@ -197,28 +197,6 @@ if [ "${LATEST^^}" == "TRUE" ]; then
     export OUD_ONEOFF_PKGS=${DEFAULT_OUD_ONEOFF_PKGS}
 fi
 
-# show what we will create later on...
-DoMsg "INFO : Prepare Oracle OUD binaries installation ---------------------------"
-DoMsg "INFO : ORACLE_ROOT           = ${ORACLE_ROOT:-n/a}"
-DoMsg "INFO : ORACLE_DATA           = ${ORACLE_DATA:-n/a}"
-DoMsg "INFO : ORACLE_BASE           = ${ORACLE_BASE:-n/a}"
-DoMsg "INFO : ORACLE_HOME           = ${ORACLE_HOME:-n/a}"
-DoMsg "INFO : ORACLE_INVENTORY      = ${ORACLE_INVENTORY:-n/a}"
-DoMsg "INFO : OUD_TYPE              = ${OUD_TYPE:-n/a}"
-DoMsg "INFO : SOFTWARE              = ${SOFTWARE:-n/a}"
-DoMsg "INFO : SOFTWARE_REPO         = ${SOFTWARE_REPO:-n/a}"
-DoMsg "INFO : TMP_DIR               = ${TMP_DIR:-n/a}"
-DoMsg "INFO : RSP_FILE              = ${RSP_FILE:-n/a}"
-DoMsg "INFO : LOCK_FILE             = ${LOCK_FILE:-n/a}"
-DoMsg "INFO : OUD_BASE_PKG          = ${OUD_BASE_PKG:-n/a}"
-DoMsg "INFO : FMW_BASE_PKG          = ${FMW_BASE_PKG:-n/a}"
-DoMsg "INFO : OUD_PATCH_PKG         = ${OUD_PATCH_PKG:-n/a}"
-DoMsg "INFO : FMW_PATCH_PKG         = ${FMW_PATCH_PKG:-n/a}"
-DoMsg "INFO : OUD_OPATCH_PKG        = ${OUD_OPATCH_PKG:-n/a}"
-DoMsg "INFO : OUI_PATCH_PKG         = ${OUI_PATCH_PKG:-n/a}"
-DoMsg "INFO : COHERENCE_PATCH_PKG   = ${COHERENCE_PATCH_PKG:-n/a}"
-DoMsg "INFO : OUD_ONEOFF_PKGS       = ${OUD_ONEOFF_PKGS:-n/a}"
-
 # Create a list of software based on environment variables ending with _PKG or _PKGS
 SOFTWARE_LIST=""                        # initial values of SOFTWARE_LIST
 for i in $(env|cut -d= -f1|grep '_PKG$\|_PKGS$'); do
@@ -244,6 +222,29 @@ fi
 if [ -n "${ORACLE_HOME_NAME}" ]; then 
     export ORACLE_HOME="${ORACLE_BASE}/product/${ORACLE_HOME_NAME}"
 fi
+
+# show what we will create later on...
+DoMsg "INFO : Prepare Oracle OUD binaries installation ---------------------------"
+DoMsg "INFO : ORACLE_ROOT           = ${ORACLE_ROOT:-n/a}"
+DoMsg "INFO : ORACLE_DATA           = ${ORACLE_DATA:-n/a}"
+DoMsg "INFO : ORACLE_BASE           = ${ORACLE_BASE:-n/a}"
+DoMsg "INFO : ORACLE_HOME           = ${ORACLE_HOME:-n/a}"
+DoMsg "INFO : ORACLE_INVENTORY      = ${ORACLE_INVENTORY:-n/a}"
+DoMsg "INFO : OUD_TYPE              = ${OUD_TYPE:-n/a}"
+DoMsg "INFO : SOFTWARE              = ${SOFTWARE:-n/a}"
+DoMsg "INFO : SOFTWARE_REPO         = ${SOFTWARE_REPO:-n/a}"
+DoMsg "INFO : DEFAULT_TMP_DIR       = ${DEFAULT_TMP_DIR:-n/a}"
+DoMsg "INFO : TMP_DIR               = ${TMP_DIR:-n/a}"
+DoMsg "INFO : RSP_FILE              = ${RSP_FILE:-n/a}"
+DoMsg "INFO : LOCK_FILE             = ${LOCK_FILE:-n/a}"
+DoMsg "INFO : OUD_BASE_PKG          = ${OUD_BASE_PKG:-n/a}"
+DoMsg "INFO : FMW_BASE_PKG          = ${FMW_BASE_PKG:-n/a}"
+DoMsg "INFO : OUD_PATCH_PKG         = ${OUD_PATCH_PKG:-n/a}"
+DoMsg "INFO : FMW_PATCH_PKG         = ${FMW_PATCH_PKG:-n/a}"
+DoMsg "INFO : OUD_OPATCH_PKG        = ${OUD_OPATCH_PKG:-n/a}"
+DoMsg "INFO : OUI_PATCH_PKG         = ${OUI_PATCH_PKG:-n/a}"
+DoMsg "INFO : COHERENCE_PATCH_PKG   = ${COHERENCE_PATCH_PKG:-n/a}"
+DoMsg "INFO : OUD_ONEOFF_PKGS       = ${OUD_ONEOFF_PKGS:-n/a}"
 
 # Replace place holders in responce file
 DoMsg "INFO : Prepare response files ---------------------------------------------"

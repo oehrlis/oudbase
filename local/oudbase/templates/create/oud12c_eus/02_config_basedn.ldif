@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Version....: v2.1.1
+# Version....: v2.1.2
 # Purpose....: Configure base DN and add ou's for users and groups
 # Notes......: The LDIF file is loaded by the script 02_config_basedn.sh 
 #              If necessary it can also be imported manually.
