@@ -57,6 +57,10 @@ for i in ./bin/* ./etc/* $(find ./templates -type f); do
     sed -i -E "s/^VERSION=.*/VERSION=${VERSION}/" $i 
     sed -i -E "s/^# Version\.\.\.\.:.*/# Version....: ${VERSION}/" $i  
 done
+
+#update version file
+sed -i "s/v[0-9]\+\.[0-9]\+\.[0-9]\+/v${VERSION}/" $(find . -name .version)
+
 # create sha hash's
 echo "Create sha hashs for all files"
 find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" ! -iname "*.log" ! -iname "oudbase_install.sh" \) \
