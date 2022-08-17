@@ -1,45 +1,54 @@
 #!/bin/bash
-# ----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# ----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: tns_functions.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2021.12.14
+# Date.......: 2022.08.17
 # Revision...: 
 # Purpose....: Common functions used by the TNS bash scripts.
 # Notes......: --
 # Reference..: --
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# ----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - Customization ------------------------------------------------------------
+# - Customization --------------------------------------------------------------
 # - just add/update any kind of customized environment variable here
 TVDLDAP_DEFAULT_LDAPHOST="localhost"
 TVDLDAP_DEFAULT_LDAPPORT=389
 TVDLDAP_DEFAULT_KEEP_LOG_DAYS=5
+TVDLDAP_DEFAULT_BASEDN=""
 TVDLDAP_DEFAULT_BINDDN=""
 TVDLDAP_DEFAULT_BINDDN_PWDASK="FALSE"
 TVDLDAP_DEFAULT_BINDDN_PWD=""
 TVDLDAP_DEFAULT_BINDDN_PWDFILE=""
-# - End of Customization ----------------------------------------------------
+TVDLDAP_DEFAULT_TIMEMOUT=0 
+TVDLDAP_DEFAULT_SQL_USER=""
+TVDLDAP_DEFAULT_SQL_PWD=""
+TVDLDAP_DEFAULT_SQL_PWDASK="FALSE"
+TVDLDAP_DEFAULT_SQL_PWDFILE=""
+TVDLDAP_DEFAULT_LDAPTOOLS=""
+# - End of Customization -------------------------------------------------------
 
 # Define a bunch of bash option see 
 # https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
 # https://www.davidpashley.com/articles/writing-robust-shell-scripts/
-set -o nounset          # exit if script try to use an uninitialised variable
-set -o errexit          # exit script if any statement returns a non-true return value
-set -o pipefail         # pipefail exit after 1st piped commands failed
+set -o nounset                      # exit if script try to use an uninitialised variable
+set -o errexit                      # exit script if any statement returns a non-true return value
+set -o pipefail                     # pipefail exit after 1st piped commands failed
 
-# - Environment Variables ---------------------------------------------------
+# - Environment Variables ------------------------------------------------------
 # define generic environment variables
 VERSION=v1.9.6
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode
-DEFAULT_TOOLS=${DEFAULT_TOOLS:-"ldapsearch ldapadd ldapmodify ldapdelete"} # List of default tools
+DEFAULT_TOOLS=${DEFAULT_TOOLS:-"ldapsearch ldapmodify ldapdelete"} # List of default tools
+TEMPFILE=${TEMPFILE:-""}
+TNSPING_TEMPFILE=${TNSPING_TEMPFILE:-""}
 LOCAL_SCRIPT_NAME=$(basename ${BASH_SOURCE[0]})
 export TVDLDAP_BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 export TVDLDAP_LOG_DIR="$(dirname ${TVDLDAP_BIN_DIR})/log"
@@ -48,24 +57,36 @@ export TVDLDAP_BASE=$(dirname ${TVDLDAP_BIN_DIR})
 export TOOL_BASE_NAME=$(basename ${TVDLDAP_BASE})
 export TVDLDAP_CONFIG_FILES=""
 export TVDLDAP_KEEP_LOG_DAYS=${TVDLDAP_KEEP_LOG_DAYS:-$TVDLDAP_DEFAULT_KEEP_LOG_DAYS}
+padding='............................'
 
 # define bind DN environment variables
+export TVDLDAP_LDAPTOOLS=${TVDLDAP_LDAPTOOLS:-$TVDLDAP_DEFAULT_LDAPTOOLS}
+export TVDLDAP_BASEDN=${TVDLDAP_BASEDN:-$TVDLDAP_DEFAULT_BASEDN}
 export TVDLDAP_BINDDN=${TVDLDAP_BINDDN:-$TVDLDAP_DEFAULT_BINDDN}
 export TVDLDAP_BINDDN_PWDASK=${TVDLDAP_BINDDN_PWDASK:-$TVDLDAP_DEFAULT_BINDDN_PWDASK}
 export TVDLDAP_BINDDN_PWD=${TVDLDAP_BINDDN_PWD:-$TVDLDAP_DEFAULT_BINDDN_PWD}
 export TVDLDAP_BINDDN_PWDFILE=${TVDLDAP_BINDDN_PWDFILE:-$TVDLDAP_DEFAULT_BINDDN_PWDFILE}
 
+# define SQLPlus test credential environment variables
+export TVDLDAP_SQL_USER=${TVDLDAP_SQL_USER:-$TVDLDAP_DEFAULT_SQL_USER}
+export TVDLDAP_SQL_PWDASK=${TVDLDAP_SQL_PWDASK:-$TVDLDAP_DEFAULT_SQL_PWDASK}
+export TVDLDAP_SQL_PWD=${TVDLDAP_SQL_PWD:-$TVDLDAP_DEFAULT_SQL_PWD}
+export TVDLDAP_SQL_PWDFILE=${TVDLDAP_SQL_PWDFILE:-$TVDLDAP_DEFAULT_SQL_PWDFILE}
+
+# define default timeout
+export TVDLDAP_TIMEMOUT=${TVDLDAP_TIMEMOUT:-$TVDLDAP_DEFAULT_TIMEMOUT}
+
 # initialize common variables
-export TVDLDAP_BASEDN=${TVDLDAP_BASEDN:-""}
 export TVDLDAP_DRYRUN=${TVDLDAP_DRYRUN:-"FALSE"}
 export TVDLDAP_FORCE=${TVDLDAP_FORCE:-"FALSE"}
-# - EOF Environment Variables -----------------------------------------------
+export TVDLDAP_NETALIAS=${TVDLDAP_NETALIAS:-"FALSE"}
+# - EOF Environment Variables --------------------------------------------------
 
-# - Functions ---------------------------------------------------------------
-# ---------------------------------------------------------------------------
+# - Functions ------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: force_enabled
 # Purpose....: Check if FORCE mode is enabled
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function force_enabled () {
     if [ "${TVDLDAP_FORCE^^}" == "TRUE" ]; then
         return 0
@@ -74,10 +95,22 @@ function force_enabled () {
     fi
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Function...: alias_enabled
+# Purpose....: Check if FORCE mode is enabled
+# ------------------------------------------------------------------------------
+function alias_enabled () {
+    if [ "${TVDLDAP_NETALIAS^^}" == "TRUE" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# ------------------------------------------------------------------------------
 # Function...: dryrun_enabled
 # Purpose....: Check if DRYRUN mode is enabled
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function dryrun_enabled () {
     if [ "${TVDLDAP_DRYRUN^^}" == "TRUE" ]; then
         return 0
@@ -86,18 +119,18 @@ function dryrun_enabled () {
     fi
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: command_exists
 # Purpose....: Check if a command does exists
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function command_exists () {
     command -v $1 >/dev/null 2>&1;
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: check_tools
 # Purpose....: Check if the required tools are installed
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function check_tools() {
     TOOLS="$DEFAULT_TOOLS ${1:-""}"
     echo_debug "DEBUG: List of tools to check: ${TOOLS}"
@@ -107,15 +140,29 @@ function check_tools() {
             exit 1
         fi
     done
-    if [ $(ldapsearch -VV 2>&1 |grep -c OpenLDAP) -eq 0]; then
-        clean_quit 11 ${i} 
+}
+
+# ------------------------------------------------------------------------------
+# Function...: check_ldap_tools
+# Purpose....: Check which LDAP tools are available
+# ------------------------------------------------------------------------------
+function check_ldap_tools() {
+    if [ $(ldapsearch -VV 2>&1 |grep -c "OpenLDAP" ) -ne 0 ]; then
+        export TVDLDAP_LDAPTOOLS="OPENLDAP"
+        echo_debug "DEBUG: Identified OpenLDAP Utilities. Set TVDLDAP_LDAPTOOLS=$TVDLDAP_LDAPTOOLS"
+    elif [ $(ldapsearch --version 2>&1 | grep -c "Oracle Unified") -ne 0 ]; then
+        export TVDLDAP_LDAPTOOLS="OUD"
+        echo_debug "DEBUG: Identified Oracle Unified Directory Utilities. Set TVDLDAP_LDAPTOOLS=$TVDLDAP_LDAPTOOLS"
+    else
+        export TVDLDAP_LDAPTOOLS="DB"
+        echo_debug "DEBUG: Assume Oracle Database LDAP Utilities. Set TVDLDAP_LDAPTOOLS=$TVDLDAP_LDAPTOOLS"
     fi
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: check_openldap_tools
 # Purpose....: Check if the required tools are OpenLDAP
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function check_openldap_tools() {
     TOOLS="ldapsearch ldapmodify ldapadd ldapdelete"
     echo_debug "DEBUG: List of tools to check: ${TOOLS}"
@@ -128,20 +175,87 @@ function check_openldap_tools() {
     done
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Function...: ldapsearch_options
+# Purpose....: Wrapper function to get ldapsearch options for the
+#              different ldapsearch implementations
+# ------------------------------------------------------------------------------
+function ldapsearch_options () {
+    if [ "${TVDLDAP_LDAPTOOLS^^}" == "OPENLDAP" ]; then
+        echo "-x -o ldif-wrap=no -LLL"
+    elif [ "${TVDLDAP_LDAPTOOLS^^}" == "OUD" ]; then
+        echo "-o 'ldif-wrap=no'"
+    elif [ "${TVDLDAP_LDAPTOOLS^^}" == "DB" ]; then
+        echo "-L"
+    else
+        echo ""
+    fi
+}
+
+# ------------------------------------------------------------------------------
+# Function...: ldapmodify_options
+# Purpose....: Wrapper function to get ldapmodify options for the
+#              different ldapmodify implementations
+# ------------------------------------------------------------------------------
+function ldapmodify_options () {
+    if [ "${TVDLDAP_LDAPTOOLS^^}" == "OPENLDAP" ]; then
+        echo ""
+    elif [ "${TVDLDAP_LDAPTOOLS^^}" == "OUD" ]; then
+        echo "-a"
+    elif [ "${TVDLDAP_LDAPTOOLS^^}" == "DB" ]; then
+        echo ""
+    else
+        echo ""
+    fi
+}
+
+# ------------------------------------------------------------------------------
+# Function...: ldapadd_options
+# Purpose....: Wrapper function to get ldapadd options for the
+#              different ldapadd implementations
+# ------------------------------------------------------------------------------
+function ldapadd_options () {
+    if [ "${TVDLDAP_LDAPTOOLS^^}" == "OPENLDAP" ]; then
+        echo ""
+    elif [ "${TVDLDAP_LDAPTOOLS^^}" == "OUD" ]; then
+        echo "-a"
+    elif [ "${TVDLDAP_LDAPTOOLS^^}" == "DB" ]; then
+        echo ""
+    else
+        echo ""
+    fi
+}
+
+# ------------------------------------------------------------------------------
+# Function...: ldapadd_command
+# Purpose....: Wrapper function to get ldapadd command or map it to ldapmodify
+# ------------------------------------------------------------------------------
+function ldapadd_command () {
+    if ! command_exists ldapadd; then
+        echo "ldapmodify"
+    else
+        if [ "${TVDLDAP_LDAPTOOLS^^}" == "OUD" ]; then
+            echo "ldapmodify"
+        else
+            echo "ldapadd"
+        fi
+    fi
+}
+
+# ------------------------------------------------------------------------------
 # Function...: echo_debug
 # Purpose....: Echo only if TVDLDAP_DEBUG variable is true
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function echo_debug () {
     if [ "${TVDLDAP_DEBUG^^}" == "TRUE" ]; then
         echo $1
     fi
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: clean_quit
 # Purpose....: Clean exit for all scripts
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function clean_quit() {
 
     # define default values for function arguments
@@ -164,18 +278,25 @@ function clean_quit() {
         23) echo "ERROR: Exit Code ${error}. Can not write file ${error_value} ..." >&2;;
         24) echo "ERROR: Exit Code ${error}. Can not create skip/reject files in ${error_value} ..." >&2;;
         25) echo "ERROR: Exit Code ${error}. Can not read file password file ${error_value} ..." >&2;;
+        26) echo "ERROR: Exit Code ${error}. Can not write tempfile file ${error_value} ..." >&2;;
         30) echo "ERROR: Exit Code ${error}. Bind DN ${error_value} defined but no password parameter provided..." >&2;;
         31) echo "ERROR: Exit Code ${error}. Base DN ${error_value} does not exists..." >&2;;
         32) echo "ERROR: Exit Code ${error}. Base DN ALL not supported for ${error_value} ..." >&2;;
+        33) echo "ERROR: Exit Code ${error}. Error running ${error_value} ..." >&2;;
         *)  echo "ERROR: Exit Code ${error}. But do not no realy why..." >&2;;
     esac
+
+    # remove tempfiles
+    if [ -f "$TEMPFILE" ]; then rm $TEMPFILE; fi
+    if [ -f "$TNSPING_TEMPFILE" ]; then rm $TNSPING_TEMPFILE; fi
+    
     exit ${error}
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: load_config
 # Purpose....: Load package specific configuration files
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function load_config() {
     echo_debug "DEBUG: Start to source configuration files"
     for config in   ${TVDLDAP_ETC_DIR}/${TOOL_BASE_NAME}.conf \
@@ -190,21 +311,26 @@ function load_config() {
     done
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: dump_runtime_config
 # Purpose....: Dump / display runtime configuration and variables
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function dump_runtime_config() {
     echo_debug "DEBUG: Dump current ${TOOL_BASE_NAME} specific environment variables"
-    if [ "${TVDLDAP_DEBUG^^}" == "TRUE" ]; then 
-        env|grep -i "${TOOL_BASE_NAME}_"|sort
+    if [ "${TVDLDAP_DEBUG^^}" == "TRUE" ]; then
+        for i in $(env|grep -i "${TOOL_BASE_NAME}_"|sort); do
+        variable=$(echo "$i"|cut -d= -f1)
+        value=$(echo "$i"|cut -d= -f2)
+        value=${value:-"undef"}
+        printf "DEBUG: %s%s %s\n" "${variable}" "${padding:${#variable}}" "${value}" 
+        done
     fi
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: rotate_logfiles
 # Purpose....: Rotate and purge log files
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function rotate_logfiles() {
     TVDLDAP_KEEP_LOG_DAYS=${1:-$TVDLDAP_KEEP_LOG_DAYS}
     echo_debug "DEBUG: purge files older for ${TVDLDAP_SCRIPT_NAME} than $TVDLDAP_KEEP_LOG_DAYS"
@@ -212,34 +338,39 @@ function rotate_logfiles() {
         -mtime +${TVDLDAP_KEEP_LOG_DAYS} -exec rm {} \; 
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: get_all_basedn
 # Purpose....: get base dn from LDAP server namingContexts
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function get_all_basedn() {
     TVDLDAP_LDAPHOST=${1:-$(get_ldaphost)}
     TVDLDAP_LDAPPORT=${2:-$(get_ldapport)}
-    /usr/bin/ldapsearch -p ${TVDLDAP_LDAPPORT} -h ${TVDLDAP_LDAPHOST} -x -b "" -LLL \
-        -s base "(objectClass=*)" namingContexts|grep -i namingContexts|cut -d: -f2| xargs
-}
-
-# ---------------------------------------------------------------------------
-# Function...: get_local_basedn
-# Purpose....: get base dn from ldap.ora DEFAULT_ADMIN_CONTEXT
-# ---------------------------------------------------------------------------
-function get_local_basedn() {
-    if [ -f "$TNS_ADMIN/ldap.ora" ]; then
-        grep -i DEFAULT_ADMIN_CONTEXT $TNS_ADMIN/ldap.ora|sed 's/.*"\(.*\)".*/\1/'
-    else
-        echo $TVDLDAP_DEFAULT_BASEDN
+    ldapsearch_options=$(ldapsearch_options)
+    ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} -b "" \
+        ${ldapsearch_options} -s base "(objectClass=*)" \
+        namingContexts| grep -i namingContexts| sed 's/namingContexts=//g' | cut -d: -f2| xargs
+    if [ $? -ne 0 ]; then
+        clean_quit 33 "ldapsearch"
     fi
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Function...: get_local_basedn
+# Purpose....: get base dn from ldap.ora DEFAULT_ADMIN_CONTEXT
+# ------------------------------------------------------------------------------
+function get_local_basedn() {
+    if [ -f "$TNS_ADMIN/ldap.ora" ]; then
+        grep -i "^DEFAULT_ADMIN_CONTEXT" $TNS_ADMIN/ldap.ora|sed 's/.*"\(.*\)".*/\1/'
+    else
+        echo $TVDLDAP_BASEDN
+    fi
+}
+
+# ------------------------------------------------------------------------------
 # Function...: get_basedn
 # Purpose....: get base correct base DN. Either default, ldap.ora or all, check
 #              if user provided base DN are valid
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function get_basedn() {
     TVDLDAP_BASEDN="${1}"
     LOCAL_BASEDN=""
@@ -261,10 +392,10 @@ function get_basedn() {
     echo $LOCAL_BASEDN
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: basedn_exists
 # Purpose....: check if base does exists in ldap.ora namingContexts
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function basedn_exists() {
     my_basedn=${1:-""}
     ALL_BASEDN=$(get_all_basedn)        # get list of all base DN
@@ -283,10 +414,10 @@ function basedn_exists() {
     fi
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: split_net_service_basedn
 # Purpose....: split base DN from full qualified Net Service Name
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function split_net_service_basedn() {
     my_netservice=${1:-""}
     if [ -n "${my_netservice}" ]; then
@@ -300,10 +431,10 @@ function split_net_service_basedn() {
     fi
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: split_net_service_cn
 # Purpose....: split Net Service Name from full qualified Net Service Name
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function split_net_service_cn() {
     my_netservice=${1:-""}
     if [ -n "${my_netservice}" ]; then
@@ -317,10 +448,10 @@ function split_net_service_cn() {
     fi
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: net_service_exists
 # Purpose....: check if Net Service Name does exists
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function net_service_exists() {
     my_netservice=${1:-""}
     my_basedn=${2:-"$(get_local_basedn)"}           # get the default Base DN from ldap.ora
@@ -330,8 +461,12 @@ function net_service_exists() {
     current_basedn=$(split_net_service_basedn ${my_netservice}) # get Base DN from Net Service Name
     current_basedn=${current_basedn:-$my_basedn}    # set the Base DN if not defined in Net Service Name
     
+    ldapsearch_options=$(ldapsearch_options)
     if [ -n "${current_cn}" ]; then
-        result=$(ldapsearch -h ${my_ldaphost} -p ${my_ldapport} -x -b $current_basedn -LLL -o "ldif-wrap=no" -s sub "(&(objectclass=orclNetService)(cn=$current_cn))" dn)
+        result=$(ldapsearch -h ${my_ldaphost} -p ${my_ldapport} -b $current_basedn $ldapsearch_options -s sub "(&(cn=${current_cn})(|(objectClasses=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" dn)
+        if [ $? -ne 0 ]; then
+            clean_quit 33 "ldapsearch"
+        fi
         if [ -z "$result" ]; then
             return 1
         else
@@ -340,10 +475,10 @@ function net_service_exists() {
     fi
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: check_bind_parameter
 # Purpose....: check the correct bind parameter and combination
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function check_bind_parameter() {
     TVDLDAP_BINDDN="${1}"
     TVDLDAP_BINDDN_PWD="${2}"
@@ -365,10 +500,10 @@ function check_bind_parameter() {
     echo "${BIND_PARA[@]}"
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: get_binddn_param
 # Purpose....: create Bind DN Parameter
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function get_binddn_param() {
     my_binddn=${1:-$TVDLDAP_BINDDN}
     if [ -n "$my_binddn" ]; then 
@@ -378,10 +513,28 @@ function get_binddn_param() {
     fi
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Function...: ask_bindpwd
+# Purpose....: Ask for the Bind password if not supported by the LDAP utilities
+# ------------------------------------------------------------------------------
+function ask_bindpwd() {
+    if [ -n "$TVDLDAP_BINDDN_PWDASK" ] && [ -n "$TVDLDAP_BINDDN_PWD" ]; then
+        if [ "${TVDLDAP_BINDDN_PWDASK^^}" == "TRUE" ] && [ "${TVDLDAP_LDAPTOOLS^^}" == "OPENLDAP" ]; then 
+            export TVDLDAP_BINDDN_PWDASK=$TVDLDAP_BINDDN_PWDASK
+        else
+            echo -n Password: 
+            read -s password
+            echo
+            export TVDLDAP_BINDDN_PWD="$password"
+            export TVDLDAP_BINDDN_PWDASK="FALSE"
+        fi
+    fi
+}
+
+# ------------------------------------------------------------------------------
 # Function...: get_bindpwd_param
 # Purpose....: create Bind password parameter
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function get_bindpwd_param() {
     my_bindpwd=${1:-$TVDLDAP_BINDDN_PWD}
     my_bindpwd_ask=${2:-$TVDLDAP_BINDDN_PWDASK}
@@ -391,9 +544,20 @@ function get_bindpwd_param() {
     elif [ "${my_bindpwd_ask^^}" == "TRUE" ]; then 
         echo "-W"
     elif [ -n "$my_bindpwd_file" ]; then
+        # check if bind password file does exists
         if [ -f "$my_bindpwd_file" ]; then
-            echo "-y $my_bindpwd_file"
+            # set the bind password parameter for OpenLDAP
+            if [ "${TVDLDAP_LDAPTOOLS^^}" == "OPENLDAP" ]; then
+                echo "-y $my_bindpwd_file"
+            # set the bind password parameter for OUD
+            elif [ "${TVDLDAP_LDAPTOOLS^^}" == "OUD" ]; then
+                echo "-j $my_bindpwd_file"
+            # set the bind password for anything else
+            else
+                echo "-w $(cat $my_bindpwd_file)"
+            fi
         else
+            # quit if the password file is not accessible
             clean_quit 25 $my_bindpwd_file
         fi
     else
@@ -401,37 +565,37 @@ function get_bindpwd_param() {
     fi
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: get_ldaphost
 # Purpose....: get ldap host from ldap.ora
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function get_ldaphost() {
     if [ -f "$TNS_ADMIN/ldap.ora" ]; then
-        grep -i DIRECTORY_SERVERS $TNS_ADMIN/ldap.ora|sed 's/.*(\(.*\),.*/\1/'| cut -d: -f1
+        grep -i "^DIRECTORY_SERVERS" $TNS_ADMIN/ldap.ora|sed 's/.*(\([^]]*\)).*/\1/g'|cut -d, -f1| cut -d: -f1
     else
-        echo $TVDLDAP_DEFAULT_LDAPHOST
+        echo ${TVDLDAP_LDAPHOST:-$TVDLDAP_DEFAULT_LDAPHOST}
     fi
 }
 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: get_ldapport
 # Purpose....: get ldap port from ldap.ora
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function get_ldapport() {
     if [ -f "$TNS_ADMIN/ldap.ora" ]; then
-        grep -i DIRECTORY_SERVERS $TNS_ADMIN/ldap.ora|sed 's/.*(\(.*\),.*/\1/'| cut -d: -f2
+        grep -i "^DIRECTORY_SERVERS" $TNS_ADMIN/ldap.ora|sed 's/.*(\([^]]*\)).*/\1/g'|cut -d, -f1| cut -d: -f2
     else
-        echo $TVDLDAP_DEFAULT_LDAPPORT
+        echo ${TVDLDAP_LDAPPORT:-$TVDLDAP_DEFAULT_LDAPPORT}
     fi
 }
 
-# - EOF Functions -----------------------------------------------------------
+# - EOF Functions --------------------------------------------------------------
 
-# - Initialization ----------------------------------------------------------
+# - Initialization -------------------------------------------------------------
 
-# - EOF Initialization -------------------------------------------------------
+# - EOF Initialization ---------------------------------------------------------
  
-# - Main ---------------------------------------------------------------------
+# - Main -----------------------------------------------------------------------
 # check if script is sourced and return/exit
 if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
     echo_debug "DEBUG: Script ${BASH_SOURCE[0]} is sourced from ${0}"
@@ -439,4 +603,4 @@ else
     echo "INFO : Script ${BASH_SOURCE[0]} is executed directly. No action is performed."
     clean_quit
 fi
-# --- EOF --------------------------------------------------------------------
+# --- EOF ----------------------------------------------------------------------
