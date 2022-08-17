@@ -1,60 +1,67 @@
 #!/bin/bash
-# ----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# ----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: tns_test.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.01.27
+# Date.......: 2022.08.17
 # Revision...: 
-# Purpose....: Test LDAP entries using tnsping
+# Purpose....: Test LDAP entries using tnsping and sqlplus
 # Notes......: --
 # Reference..: --
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# ----------------------------------------------------------------------------
-# - Customization ------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# - Customization --------------------------------------------------------------
 # - just add/update any kind of customized environment variable here
 
-# - End of Customization ----------------------------------------------------
+# - End of Customization -------------------------------------------------------
 
 # Define a bunch of bash option see 
 # https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
 # https://www.davidpashley.com/articles/writing-robust-shell-scripts/
-set -o nounset          # exit if script try to use an uninitialised variable
-set -o errexit          # exit script if any statement returns a non-true return value
-set -o pipefail         # pipefail exit after 1st piped commands failed
+set -o nounset                      # exit if script try to use an uninitialised variable
+# set -o errexit                      # exit script if any statement returns a non-true return value
+# set -o pipefail                     # pipefail exit after 1st piped commands failed
 
-# - Environment Variables ---------------------------------------------------
+# - Environment Variables ------------------------------------------------------
 # define generic environment variables
 VERSION=v1.9.6
-TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
-TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
-TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode
+TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"} # enable verbose mode
+TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}     # enable debug mode
+TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}     # enable quiet mode
 TVDLDAP_SCRIPT_NAME=$(basename ${BASH_SOURCE[0]})
 TVDLDAP_BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 TVDLDAP_LOG_DIR="$(dirname ${TVDLDAP_BIN_DIR})/log"
-
+padding='.................................................'
 # define logfile and logging
 LOG_BASE=${LOG_BASE:-"${TVDLDAP_LOG_DIR}"} # Use script log directory as default logbase
 TIMESTAMP=$(date "+%Y.%m.%d_%H%M%S")
 readonly LOGFILE="$LOG_BASE/$(basename $TVDLDAP_SCRIPT_NAME .sh)_$TIMESTAMP.log"
-# - EOF Environment Variables -----------------------------------------------
 
-# - Functions ---------------------------------------------------------------
-# ---------------------------------------------------------------------------
+# define tempfile for ldapsearch
+TEMPFILE="$LOG_BASE/$(basename $TVDLDAP_SCRIPT_NAME .sh)_$$.ldif"
+TNSPING_TEMPFILE="$LOG_BASE/$(basename $TVDLDAP_SCRIPT_NAME .sh)_tnsping_$$.log"
+# - EOF Environment Variables --------------------------------------------------
+
+# - Functions ------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Function...: Usage
 # Purpose....: Display Usage and exit script
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function Usage() {
     
     # define default values for function arguments
-    error=${1:-"0"}
-    error_value=${2:-""}
+    error=${1:-"0"}                 # default error number
+    error_value=${2:-""}            # default error message
     cat << EOI
 
-  Usage: ${TVDLDAP_SCRIPT_NAME} [options] [bind options]
+  Usage: ${TVDLDAP_SCRIPT_NAME} [options] [test options] [bind options] [search options] [services]
+
+  where:
+    services	        Comma separated list of Oracle Net Service Names to test
 
   Common Options:
     -m                  Usage this message
@@ -64,28 +71,64 @@ function Usage() {
                         specific base DN or ALL to search Net Service Name in
                         all available namingContexts. By the default the Base
                         DN is derived from a fully qualified Net Service Name.
-                        Otherwise the default Base DN is taken from ldap.ora
-    -h <HOST>           LDAP server (default take from ldap.ora)
-    -p <PORT>           port on LDAP server (default take from ldap.ora)
-
+                        Otherwise the default Base DN is taken from ldap.ora. Can
+                        also be specified by setting TVDLDAP_BASEDN.
+    -h <HOST>           LDAP server (default take from ldap.ora). Can be specified
+                        by setting TVDLDAP_LDAPHOST.
+    -p <PORT>           port on LDAP server (default take from ldap.ora). Can be
+                        specified by setting TVDLDAP_LDAPPORT.
+    -t <DURATION>       Specific a timeout for the test commands using core utility
+                        timeout. DURATION is a number with an optional suffix: 's'
+                        for seconds (the default), 'm' for minutes, 'h' for
+                        hours or 'd' for days. A duration of 0 disables the
+                        associated timeout.     
+  
+  Test Options:
+    -U <USERNAME>       Username for SQLPlus test. If no username is specified,
+                        the SQLPlus test will be omitted. Can be specified by
+                        setting TVDLDAP_SQL_USER.
+    -c <PASSWORD>       SQLPlus password. Can be specified by setting TVDLDAP_SQL_PWD.
+    -C                  prompt for SQLPlus password. Can be specified by setting
+                        TVDLDAP_SQL_PWDASK.
+    -Z <PASSWORD FILE>  Read password from file. Can be specified by setting
+                        TVDLDAP_SQL_PWDFILE.
+  
   Bind Options:
-    -D <BINDDN>         Bind DN (default ANONYMOUS)
-    -w <PASSWORD>       Bind password
-    -W                  prompt for bind password
-    -y <PASSWORD FILE>  Read password from file
+    -D <BINDDN>         Bind DN (default ANONYMOUS). Can be specified by setting
+                        TVDLDAP_BINDDN.
+    -w <PASSWORD>       Bind password. Can be specified by setting TVDLDAP_BINDDN_PWD.
+    -W                  prompt for bind password. Can be specified by setting
+                        TVDLDAP_BINDDN_PWDASK.
+    -y <PASSWORD FILE>  Read password from file. Can be specified by setting
+                        TVDLDAP_BINDDN_PWDFILE.
+
+  Search options:
+    -S <NETSERVICE>     Oracle Net Service Names to search for
+                        (default \$ORACLE_SID)
+
+  Configuration file:
+    The script does load configuration files to define default values as an
+    alternative for command line parameter. e.g. to set a bind DN TVDLDAP_BINDDN
+    LDAP hostname TVDLDAP_LDAPHOST, etc. The configuration files are loaded in
+    the following order:
+
+    1.  ${TVDLDAP_ETC_DIR}/${TOOL_BASE_NAME}.conf
+    2.  ${TVDLDAP_ETC_DIR}/${TOOL_BASE_NAME}_custom.conf
+    3.  ${ETC_BASE}/${TOOL_BASE_NAME}.conf
+    4.  ${ETC_BASE}/${TOOL_BASE_NAME}_custom.conf
+    5.  Command line parameter
     
-  Logfile : ${LOGFILE}
+    Logfile : ${LOGFILE}
 
 EOI
     dump_runtime_config     # dump current tool specific environment in debug mode
     clean_quit ${error} ${error_value}
 }
-# - EOF Functions -----------------------------------------------------------
+# - EOF Functions --------------------------------------------------------------
 
-# - Initialization ----------------------------------------------------------
-# initialize logfile
-touch $LOGFILE 2>/dev/null
-exec &> >(tee -a "$LOGFILE")    # Open standard out at `$LOG_FILE` for write.  
+# - Initialization -------------------------------------------------------------
+touch $LOGFILE 2>/dev/null          # initialize logfile
+exec &> >(tee -a "$LOGFILE")        # Open standard out at `$LOG_FILE` for write.  
 exec 2>&1  
 echo "INFO : Start ${TVDLDAP_SCRIPT_NAME} on host $(hostname) at $(date)"
 
@@ -97,11 +140,14 @@ else
     exit 5
 fi
 
-# load configuration files
-load_config
+load_config                 # load configur26ation files. File list in TVDLDAP_CONFIG_FILES
+
+# initialize tempfile for ldapsearch output
+touch $TEMPFILE 2>/dev/null || clean_quit 25 $TEMPFILE
+touch $TNSPING_TEMPFILE 2>/dev/null || clean_quit 25 $TNSPING_TEMPFILE
 
 # get options
-while getopts mvdb:h:p:D:w:Wy:E: CurOpt; do
+while getopts mvdb:h:p:D:w:Wy:E:t:U:c:CZ:S: CurOpt; do
     case ${CurOpt} in
         m) Usage 0;;
         v) TVDLDAP_VERBOSE="TRUE" ;;
@@ -113,86 +159,214 @@ while getopts mvdb:h:p:D:w:Wy:E: CurOpt; do
         w) TVDLDAP_BINDDN_PWD="${OPTARG}";; 
         W) TVDLDAP_BINDDN_PWDASK="TRUE";; 
         y) TVDLDAP_BINDDN_PWDFILE="${OPTARG}";; 
+        t) TVDLDAP_TIMEMOUT="${OPTARG}";; 
+        U) TVDLDAP_SQL_USER="${OPTARG}";; 
+        c) TVDLDAP_SQL_PWD="${OPTARG}";; 
+        C) TVDLDAP_SQL_PWDASK="TRUE";; 
+        Z) TVDLDAP_SQL_PWDFILE="${OPTARG}";; 
+        S) NETSERVICE=${OPTARG};;
         E) clean_quit "${OPTARG}";;
         *) Usage 2 $*;;
     esac
 done
 
-check_openldap_tools    # check tools required by tvdldap
+check_tools             # check if we do have the required LDAP tools available
+check_ldap_tools        # check what kind of LDAP tools we do have e.g. 
+                        # OpenLDAP, Oracle DB or Oracle Unified Directory
 dump_runtime_config     # dump current tool specific environment in debug mode
+
+# get the ldapsearch options based on available tools
+ldapsearch_options=$(ldapsearch_options)
 
 # check if we do hav a tnsping
 if ! command_exists tnsping; then
     clean_quit 10 tnsping
 fi
 
+# check if we do hav a sqlplus
+if ! command_exists sqlplus; then
+    clean_quit 10 sqlplus
+fi
+
+# Default values
+export NETSERVICE=${NETSERVICE:-""}
+
+# check for Service and Arguments
+if [ -z "$NETSERVICE" ] && [ $# -ne 0 ]; then
+    echo_debug "DEBUG: Process default NETSERVICE"
+    if [[ "$1" =~ ^-.*  ]]; then
+        echo_debug "DEBUG: Set NETSERVICE to ALL"
+        NETSERVICE="ALL"          # default service to * if Argument starting with dash 
+    else
+        echo_debug "DEBUG: Set NETSERVICE to $1"
+        NETSERVICE=$1             # default service to Argument if not starting with dash
+    fi
+else
+    echo_debug "DEBUG: Set NETSERVICE to ALL"
+    NETSERVICE=${NETSERVICE:-"ALL"}
+fi
+
 # get default values for LDAP Server
 TVDLDAP_LDAPHOST=${TVDLDAP_LDAPHOST:-$(get_ldaphost)}
 TVDLDAP_LDAPPORT=${TVDLDAP_LDAPPORT:-$(get_ldapport)}
 
+# default time out setting
+TVDLDAP_TIMEMOUT=${TVDLDAP_TIMEMOUT:-0}
+
+# Check if timeout is defined and verify timeout command
+if [ -n "$TVDLDAP_TIMEMOUT" ] && [ $TVDLDAP_TIMEMOUT -ne 0 ]; then
+    if ! command_exists timeout; then
+        clean_quit 10 timeout
+    fi
+    timeout_command="timeout $TVDLDAP_TIMEMOUT"
+else
+    echo "INFO : Skip test timeout as duration is set to $TVDLDAP_TIMEMOUT."
+    timeout_command=""
+fi
+
 # get bind parameter
+ask_bindpwd                         # ask for the bind password if TVDLDAP_BINDDN_PWDASK
+                                    # is TRUE and LDAP tools are not OpenLDAP
 current_binddn=$(get_binddn_param "$TVDLDAP_BINDDN" )
 current_bindpwd=$(get_bindpwd_param "$TVDLDAP_BINDDN_PWD" ${TVDLDAP_BINDDN_PWDASK} "$TVDLDAP_BINDDN_PWDFILE")
 if [ -n "$current_binddn" ] && [ -z "${current_bindpwd}" ]; then clean_quit 4; fi
 
-# get base DN information
-BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
-# - EOF Initialization -------------------------------------------------------
- 
-# - Main ---------------------------------------------------------------------
-echo_debug "DEBUG: ldapsearch using:"
-echo_debug "DEBUG: LDAP Host            = $TVDLDAP_LDAPHOST"
-echo_debug "DEBUG: LDAP Port            = $TVDLDAP_LDAPPORT"
-echo_debug "DEBUG: Bind DN              = $TVDLDAP_BINDDN"
-echo_debug "DEBUG: Bind PWD             = $TVDLDAP_BINDDN_PWD"
-echo_debug "DEBUG: Bind PWD File        = $TVDLDAP_BINDDN_PWDFILE"
-echo_debug "DEBUG: Bind parameter       = $current_binddn $current_bindpwd"
-echo_debug "DEBUG: Base DN              = $BASEDN_LIST"
-
-echo
-
-# Set BASEDN_LIST to current Base DN from Net Service Name
-BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
-
-echo_debug "DEBUG: current Base DN list         = $BASEDN_LIST"
-for basedn in ${BASEDN_LIST}; do                # loop over base DN
-    if basedn_exists ${basedn}; then
-        echo "INFO : Process base dn $basedn"
-        domain=$(echo $basedn|sed -e 's/,dc=/\./g' -e 's/dc=//g')
-        i=0                                         # init counter to test for results
-        if [ -n "$current_binddn" ]; then           # check if bind dn is defined
-            while IFS= read -r result ; do          # loop over ldapsearch results 
-                i=$((i+1))                          # inc counter to count results
-                cn=$(echo ${result}| cut -d ';' -f 1 | cut -d " " -f 2)
-                NetDescString=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2-)
-                echo -n "INFO: Test Net Service Connect String for ${cn}.${domain} ... "
-                #tnsping "${NetDescString}" >/dev/null 2>&1
-                
-                if ! tnsping "${NetDescString}" >/dev/null 2>&1; then
-                    echo "NOK"
-                else
-                    echo "OK"
-                fi
-            done < <(ldapsearch -p ${TVDLDAP_LDAPPORT} -h ${TVDLDAP_LDAPHOST} "$current_binddn" $current_bindpwd -x -b "$basedn" -LLL -o "ldif-wrap=no" -s sub "(&(objectclass=orclNetService)(cn=*))" cn orclNetDescString|grep -iv '^dn: '| sed 's/$/;/g' | sed 's/^;$/DELIM/g'| tr -d '\n'| sed 's/DELIM/\n/g')
+# get the SQL test password if user name is defined
+if [ -n "$TVDLDAP_SQL_USER" ]; then
+    if [ -z "$TVDLDAP_SQL_PWD" ]; then
+        # try to get the password from file if TVDLDAP_SQL_PWD is empty
+        if [ -f "$TVDLDAP_SQL_PWDFILE" ]; then
+            TVDLDAP_SQL_PWD=$(cat $TVDLDAP_SQL_PWDFILE)
+        elif [ "${TVDLDAP_SQL_PWDASK^^}" == "TRUE" ]; then
+            read -p "SQLPlus Password:" TVDLDAP_SQL_PWD
         else
-            while IFS= read -r result ; do          # loop over ldapsearch results 
-                i=$((i+1))                          # inc counter to count results
-                cn=$(echo ${result}| cut -d ';' -f 1 | cut -d " " -f 2)
-                NetDescString=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2-)
-                echo -n "INFO: Test Net Service Connect String for ${cn}.${domain} ... "
-                #tnsping "${NetDescString}" >/dev/null 2>&1
-                
-                if ! tnsping "${NetDescString}" >/dev/null 2>&1; then
-                    echo "NOK"
-                else
-                    echo "OK"
-                fi
-            done < <(ldapsearch -p ${TVDLDAP_LDAPPORT} -h ${TVDLDAP_LDAPHOST} -x -b "$basedn" -LLL -o "ldif-wrap=no" -s sub "(&(objectclass=orclNetService)(cn=*))" cn orclNetDescString|grep -iv '^dn: '| sed 's/$/;/g' | sed 's/^;$/DELIM/g'| tr -d '\n'| sed 's/DELIM/\n/g')
+            echo "WARN : No password defined. Using dummy password to run SQLPlus tests."
+            TVDLDAP_SQL_PWD="tiger"
         fi
     fi
+else
+    echo "WARN : Skip SQLPlus test. No user name defined." 
+fi
+
+# get base DN information
+BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
+# - EOF Initialization ----------------------------------------------------------
+ 
+# - Main ------------------------------------------------------------------------
+echo_debug "DEBUG: Configuration / Variables:"
+echo_debug "DEBUG: LDAP Host............... = $TVDLDAP_LDAPHOST"
+echo_debug "DEBUG: LDAP Port............... = $TVDLDAP_LDAPPORT"
+echo_debug "DEBUG: Bind DN................. = $TVDLDAP_BINDDN"
+echo_debug "DEBUG: Bind PWD................ = $TVDLDAP_BINDDN_PWD"
+echo_debug "DEBUG: Bind PWD File........... = $TVDLDAP_BINDDN_PWDFILE"
+echo_debug "DEBUG: Bind parameter.......... = $current_binddn $current_bindpwd"
+echo_debug "DEBUG: Base DN................. = $BASEDN_LIST"
+echo_debug "DEBUG: Net Service Names....... = $NETSERVICE"
+echo_debug "DEBUG: ldapsearch options...... = $ldapsearch_options"
+echo_debug "DEBUG: Command Timeout......... = $TVDLDAP_TIMEMOUT"
+echo_debug "DEBUG: SQL Test User........... = $TVDLDAP_SQL_USER"
+echo_debug "DEBUG: SQL Test PWD............ = $TVDLDAP_SQL_PWD"
+echo_debug "DEBUG: SQL Test PWD File....... = $TVDLDAP_SQL_PWDFILE"
+
+for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
+    echo_debug "DEBUG: process service $service"
+    # set current_cn to * for all 
+    if [ "${NETSERVICE^^}" == "ALL" ]; then
+        current_basedn=""
+        current_cn="*"
+        echo_debug "DEBUG: current Net Service Names    = $NETSERVICE"
+    else
+        current_basedn=$(split_net_service_basedn ${service})
+        current_cn=$(split_net_service_cn ${service})
+        echo_debug "DEBUG: current Net Service Names    = $current_cn"
+    fi
+    
+    # Set BASEDN_LIST to current Base DN taken from Net Service Name
+    if [ -n "${current_basedn}" ]; then
+        BASEDN_LIST=${current_basedn}
+    else 
+        BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
+    fi
+
+    echo_debug "DEBUG: current Base DN list........ = $BASEDN_LIST"
+    for basedn in ${BASEDN_LIST}; do                # loop over base DN
+        if basedn_exists ${basedn}; then
+            echo "INFO : Process base dn $basedn"
+            domain=$(echo $basedn|sed -e 's/,dc=/\./g' -e 's/dc=//g')
+            # run ldapsearch an write output to tempfile
+            ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+                ${current_binddn:+"$current_binddn"} ${current_bindpwd} \
+                ${ldapsearch_options} -b "$basedn" -s sub \
+                "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" \
+                cn orclNetDescString aliasedObjectName>$TEMPFILE
+            if [ $? -ne 0 ]; then
+                clean_quit 33 "ldapsearch"
+            fi
+            # check if tempfile does exist and has some values
+            if [ -s "$TEMPFILE" ] ; then
+                echo "" >> $TEMPFILE    # add a new line to the tempfile
+                # loop over ldapsearch results
+                for result in $(grep -iv '^dn: ' $TEMPFILE | sed -n '1 {h; $ !d}; $ {x; s/\n //g; p}; /^ / {H; d}; /^ /! {x; s/\n //g; p}'| sed 's/$/;/g' | sed 's/^;$/DELIM/g' | tr -d '\n'| sed 's/DELIM/\n/g'|tr -d ' '); do
+                    
+                    cn=$(echo ${result}| cut -d ';' -f 1 | cut -d " " -f 2 | sed 's/cn://gi')
+                    if [[ "$result" == *orclNetDescString* ]]; then
+                        NetDescString=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2- |sed 's/orclNetDescString://gi')
+                    elif [[ "$result" == *aliasedObjectName* ]]; then
+                        NetDescString=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2- |sed 's/aliasedObjectName://gi')
+                        NetDescString="$(split_net_service_cn ${NetDescString}).${domain}"
+                    fi
+
+                    NetDescString=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2- |sed 's/orclNetDescString://gi')
+                    current_netservice="${cn}.${domain}"
+                    
+                    # add a few debug messages
+                    echo_debug "DEBUG: ${result}"
+                    echo_debug "DEBUG: cn.............. : $cn"
+                    echo_debug "DEBUG: NetDescString... : $NetDescString"
+
+                    # run tnsping checks for the Net Service Connect String
+                    printf "INFO : Test Net Service Connect String for %s %s" "${current_netservice}" "${padding:${#current_netservice}}"
+                    tnsping_error=0
+                    $timeout_command tnsping "${NetDescString}" >$TNSPING_TEMPFILE 2>&1 || tnsping_error=$?
+                    TNSPING_STATUS=$(cat $TNSPING_TEMPFILE )
+                    if [[ $tnsping_error -ne 0 ]] || [[ $TNSPING_STATUS == *"TNS-"* ]]; then
+                        # Handle error if tnsping return something with TNS-
+                        TNSERR=$(echo "$TNSPING_STATUS"|sed -n 's/.*\(TNS\-[0-9]*\).*/\1/p')
+                        TNSERR=${TNSERR:-"timed out ${TVDLDAP_TIMEMOUT}s"}
+                        echo "NOK ($TNSERR)"
+                        echo "# tnsping error/timeout $TNSERR"  >>"$(dirname $LOGFILE)/$(basename $LOGFILE .log).errors.log"
+                        echo "${cn}.${domain}=${NetDescString}" >>"$(dirname $LOGFILE)/$(basename $LOGFILE .log).errors.log"
+                    else
+                        # Prozess sqlplus check if a login user is defined and tnsping does not create an error
+                        if [ -n "$TVDLDAP_SQL_USER" ] && [ -n "$TVDLDAP_SQL_PWD" ]; then
+SQLPLUS_STATUS=$(sqlplus -S -L /nolog <<EOFSQL
+connect $TVDLDAP_SQL_USER/$TVDLDAP_SQL_PWD@${NetDescString}
+EOFSQL
+)
+                            # Check return code for 0 / successfull
+                            if [[ ( $? -eq 0  ) && ( $SQLPLUS_STATUS == *"ORA-01017"* || $SQLPLUS_STATUS == *"ORA-28000"* || -z "$SQLPLUS_STATUS" ) ]]; then
+                                echo "OK  (tnsping, sqlplus)"
+                            else
+                                # all other case should report not OK
+                                ORAERR=$(echo "$SQLPLUS_STATUS"|sed -n 's/.*\(ORA\-[0-9]*\).*/\1/p')
+                                echo "NOK ($ORAERR)"   
+                                echo "# SQLPlus login error $ORAERR"    >>"$(dirname $LOGFILE)/$(basename $LOGFILE .log).errors.log"
+                                echo "${cn}.${domain}=${NetDescString}" >>"$(dirname $LOGFILE)/$(basename $LOGFILE .log).errors.log"
+                            fi
+                        else
+                            echo "OK  (tnsping)"
+                        fi
+                    fi
+                done
+            else
+                echo "WARN : No service found in ${basedn}"
+            fi
+        else
+            echo "WARN : Base DN ${basedn} not found"
+        fi
+    done
 done
 
-# purge log files
-rotate_logfiles
-clean_quit
-# --- EOF --------------------------------------------------------------------
+rotate_logfiles                     # purge log files based on TVDLDAP_KEEP_LOG_DAYS
+clean_quit                          # clean exit with return code 0
+# --- EOF ----------------------------------------------------------------------
