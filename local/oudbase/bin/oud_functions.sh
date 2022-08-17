@@ -120,8 +120,9 @@ function CleanAndQuit() {
         10) DoMsg "ERR  : Exit Code ${1}. OUD_BASE not set or $OUD_BASE not available.";;
         11) DoMsg "ERR  : Exit Code ${1}. Could not touch file ${2}";;
         12) DoMsg "ERR  : Exit Code ${1}. Can not create directory ${2}";;
-        13) DoMsg "ERR  : Exit Code ${1}. Directory ${2} is not writeable";;
+        13) DoMsg "ERR  : Exit Code ${1}. Directory ${2} is not read / writeable";;
         14) DoMsg "ERR  : Exit Code ${1}. Directory ${2} already exists";;
+        15) DoMsg "ERR  : Exit Code ${1}. Cloud not access file ${2}";;
         21) DoMsg "ERR  : Exit Code ${1}. Could not load \${HOME}/.OUD_BASE";;
         30) DoMsg "ERR  : Exit Code ${1}. Some backups failed";;
         31) DoMsg "ERR  : Exit Code ${1}. Some exports failed";;
