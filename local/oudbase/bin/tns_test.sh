@@ -29,9 +29,9 @@ set -o nounset                      # exit if script try to use an uninitialised
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
 VERSION=v1.9.6
-TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"} # enable verbose mode
-TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}     # enable debug mode
-TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}     # enable quiet mode
+TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
+TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
+TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode
 TVDLDAP_SCRIPT_NAME=$(basename ${BASH_SOURCE[0]})
 TVDLDAP_BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 TVDLDAP_LOG_DIR="$(dirname ${TVDLDAP_BIN_DIR})/log"

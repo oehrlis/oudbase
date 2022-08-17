@@ -18,7 +18,7 @@
 # see git revision history with git log for more information on changes
 # ------------------------------------------------------------------------------
 
-# - Default Values -------------------------------------------------------------
+# - Default Values ------------------------------------------------------
 VERSION=v1.9.6
 JRE_HOME=$JAVA_HOME/jre/
 EUSMLIBDIR=$ORACLE_BASE/local/oudbase/lib

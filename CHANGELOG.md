@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] -
 
 ### Added
+### Changed
+
+### Fixed
+
+### Removed
+
+## [2.0.0] - 2022-08-16
+
+### Added
 
 - add initial version of scripts for Oracle Net Service Names administration
   based on OpenLDAP client tools.
@@ -22,8 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [tns_test.sh](local/oudbase/bin/tns_test.sh) Test LDAP entries using tnsping.
 
 ### Changed
-
-- Update all file header to latest information
 
 ### Fixed
 
@@ -58,3 +65,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [unreleased]: https://github.com/oehrlis/oudbase
 [1.9.5]: https://github.com/oehrlis/oudbase/releases/tag/v1.9.5
 [1.9.6]: https://github.com/oehrlis/oudbase/releases/tag/v1.9.6
+[2.0.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.0.0

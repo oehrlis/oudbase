@@ -23,7 +23,7 @@
 export LOG_BASE=${LOG_BASE-"/tmp"}
 # - End of Customization -------------------------------------------------------
 
-# - Default Values -------------------------------------------------------------
+# - Default Values ------------------------------------------------------
 VERSION=v1.9.6
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="TRUE"                                  # enable verbose mode
