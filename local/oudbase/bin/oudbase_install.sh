@@ -1,12 +1,12 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: oudbase_install.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2018.03.18
+# Date.......: 2022.08.17
 # Revision...: --
 # Purpose....: This script is used as base install script for the OUD 
 #              Environment
@@ -14,16 +14,16 @@
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...::175
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - Customization -------------------------------------------------------
+# - Customization --------------------------------------------------------------
 export LOG_BASE=${LOG_BASE-"/tmp"}
-# - End of Customization ------------------------------------------------
+# - End of Customization -------------------------------------------------------
 
-# - Default Values ------------------------------------------------------
+# - Default Values -------------------------------------------------------------
 VERSION=v1.9.6
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="TRUE"                                  # enable verbose mode
@@ -62,13 +62,13 @@ DEFAULT_OUDSM_DOMAIN_BASE_NAME="domains"
 DEFAULT_PRODUCT_BASE_NAME="product"
 OUD_CORE_CONFIG="oudenv_core.conf"
 
-# - End of Default Values -----------------------------------------------
+# - End of Default Values ------------------------------------------------------
 
-# - Functions -----------------------------------------------------------
+# - Functions ------------------------------------------------------------------
 
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Purpose....: Display Usage
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function Usage()
 {
     VERBOSE="TRUE"
@@ -105,9 +105,9 @@ function Usage()
     fi
 }
 
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Purpose....: Display Message with time stamp
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function DoMsg()
 {
     INPUT=${1}
@@ -149,9 +149,9 @@ function DoMsg()
     fi
 }
 
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Purpose....: Clean up before exit
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function CleanAndQuit()
 {
     if [ ${1} -gt 0 ]; then
@@ -177,9 +177,9 @@ function CleanAndQuit()
     exit ${1}
 }
 
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Purpose....: get the payload from script
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function UntarPayload()
 {
     # default values for payload
@@ -222,9 +222,9 @@ function UntarPayload()
     fi
 }
 
-# - EOF Functions -------------------------------------------------------
+# - EOF Functions --------------------------------------------------------------
 
-# - Initialization ------------------------------------------------------
+# - Initialization -------------------------------------------------------------
 tty >/dev/null 2>&1
 pTTY=$?
 
@@ -242,7 +242,7 @@ else
     CleanAndQuit 11 ${LOGFILE} # Define a clean exit
 fi
 
-# - Main ----------------------------------------------------------------
+# - Main -----------------------------------------------------------------------
 DoMsg "${START_HEADER}"
 if [ $# -lt 1 ]; then
     Usage 1
@@ -444,7 +444,7 @@ UntarPayload
 
 # restore customized config files
 if [ "${SAVE_CONFIG}" = "TRUE" ]; then
-    DoMsg "INFO : Restore cusomized config files"
+    DoMsg "INFO : Restore customized config files"
     for i in ${CONFIG_FILES} ${OUD_CORE_CONFIG}; do
         if [ -f ${ETC_BASE}/$i.save ]; then
             if ! cmp ${ETC_BASE}/$i.save ${ETC_BASE}/$i >/dev/null 2>&1 ; then
@@ -612,4 +612,4 @@ fi
 CleanAndQuit 0
 
 # NOTE: Don't place any newline characters after the last line below.
-# - EOF Script ----------------------------------------------------------
+# - EOF Script -----------------------------------------------------------------

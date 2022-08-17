@@ -1,29 +1,29 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: oud_start_stop_all
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2018.03.18
+# Date.......: 2022.07.17
 # Revision...: --
 # Purpose....: Wrapper Script for oud_start_stop.sh to start/stop OUD Instances 
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - Default Values ------------------------------------------------------
+# - Default Values -------------------------------------------------------------
 VERSION=v1.9.6
 SCRIPT_NAME=$(basename $0)
 export OUDBASE_BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
-# - End of Default Values -----------------------------------------------
+# - End of Default Values ------------------------------------------------------
 
-# - Main ----------------------------------------------------------------
+# - Main -----------------------------------------------------------------------
 ${OUDBASE_BIN}/oud_start_stop.sh -v -a $1
-# - EOF -----------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------

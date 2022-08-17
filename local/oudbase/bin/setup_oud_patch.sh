@@ -1,12 +1,12 @@
 #!/bin/bash
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 11_setup_oud_patch.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.03.11
+# Date.......: 2022.08.17
 # Revision...: 
 # Purpose....: Script to patch Oracle Unified Directory binaries
 # Notes......: - Script would like to be executed as oracle :-)
@@ -17,11 +17,11 @@
 # Reference..: --
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history for more information on changes/updates
-# ---------------------------------------------------------------------------
-# - Environment Variables ---------------------------------------------------
+# ------------------------------------------------------------------------------
+# - Environment Variables ------------------------------------------------------
 VERSION=v1.9.6
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
@@ -71,13 +71,13 @@ export ORACLE_HOME="${ORACLE_HOME:-${ORACLE_BASE}/product/${ORACLE_HOME_NAME}}"
 # define generic variables for software, download etc
 export JAVA_HOME=${JAVA_HOME:-$(dirname $(dirname $(find ${ORACLE_BASE} /usr/java -name javac 2>/dev/null|sort -r|head -1) 2>/dev/null) 2>/dev/null)}
 CURRENT_DIR=$(pwd)
-# - EOF Environment Variables -----------------------------------------------
+# - EOF Environment Variables --------------------------------------------------
 
-# - Functions -----------------------------------------------------------
-# -----------------------------------------------------------------------
+# - Functions ------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function Usage() {
 # Purpose....: Display Usage
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     VERBOSE="TRUE"
     DoMsg "Usage, ${SCRIPT_NAME} [-hvA] [-b <ORACLE_BASE>] "
     DoMsg "    [-j <JAVA_HOME>] [-l <LOCK FILE>] [-m <ORACLE_HOME>]"
@@ -117,9 +117,9 @@ function Usage() {
 }
 
 function install_patch {
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Purpose....: function to install a DB patch using opatch apply 
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     PATCH_PKG=${1:-""}
     if [ -n "${PATCH_PKG}" ]; then
         if get_software "${PATCH_PKG}"; then        # Check and get binaries
@@ -148,8 +148,8 @@ function install_patch {
         DoMsg "INFO : No package specified. Skip patch installation."
     fi
 }
-# - EOF Functions -------------------------------------------------------
-# - Initialization ----------------------------------------------------------
+# - EOF Functions --------------------------------------------------------------
+# - Initialization -------------------------------------------------------------
 # Make sure root does not run our script
 if [ ! $EUID -ne 0 ]; then
    CleanAndQuit 3 "root"
@@ -227,10 +227,10 @@ DoMsg "INFO : OUD_OPATCH_PKG        = ${OUD_OPATCH_PKG:-n/a}"
 DoMsg "INFO : OUI_PATCH_PKG         = ${OUI_PATCH_PKG:-n/a}"
 DoMsg "INFO : COHERENCE_PATCH_PKG   = ${COHERENCE_PATCH_PKG:-n/a}"
 DoMsg "INFO : OUD_ONEOFF_PKGS       = ${OUD_ONEOFF_PKGS:-n/a}"
-# - EOF Initialization ------------------------------------------------------
+# - EOF Initialization ---------------------------------------------------------
 
-# - Main --------------------------------------------------------------------
-# - Install OPatch ----------------------------------------------------------
+# - Main -----------------------------------------------------------------------
+# - Install OPatch -------------------------------------------------------------
 DoMsg "INFO : Step 1 Install OPatch (${OUD_OPATCH_PKG}) ---------------------"
 if [ -n "${OUD_OPATCH_PKG}" ]; then
     if get_software "${OUD_OPATCH_PKG}"; then       # Check and get binaries
@@ -251,7 +251,7 @@ else
     DoMsg "INFO : No OPatch package specified. Skip OPatch update."
 fi
 
-# - Install OUI patch -------------------------------------------------------
+# - Install OUI patch ----------------------------------------------------------
 DoMsg "INFO : Step 2 Install OUI patch (${OUI_PATCH_PKG}) -------------------"
 install_patch ${OUI_PATCH_PKG}
 
@@ -262,7 +262,7 @@ else
     DoMsg "INFO : OUD_TYPE=${OUD_TYPE} Skip FMW patch -----------------------"
 fi
 
-# - Install Coherence patch -------------------------------------------------------
+# - Install Coherence patch ----------------------------------------------------
 DoMsg "INFO : Step 4 Install Coherence patch (${COHERENCE_PATCH_PKG}) ------------"
 if [ "${OUD_TYPE}" == "OUDSM12" ]; then
     if [ -n "${COHERENCE_PATCH_PKG}" ]; then
@@ -295,7 +295,7 @@ else
     DoMsg "INFO : OUD_TYPE=${OUD_TYPE} Skip Coherence patch -----------------------"
 fi
 
-# - Install OUD patch -------------------------------------------------------
+# - Install OUD patch ----------------------------------------------------------
 DoMsg "INFO : Step 5 Install OUD patch (${OUD_PATCH_PKG}) -------------------"
 install_patch ${OUD_PATCH_PKG}
 
@@ -346,4 +346,4 @@ if [ "${SLIM^^}" == "TRUE" ]; then
     rm -rf /tmp/OraInstall*
     rm -rf ${ORACLE_HOME}/.patch_storage            # remove patch storage
 fi
-# --- EOF --------------------------------------------------------------------
+# --- EOF ----------------------------------------------------------------------

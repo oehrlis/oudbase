@@ -1,12 +1,12 @@
 #!/bin/bash
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: oud_functions.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.03.05
+# Date.......: 2022.08.17
 # Revision...: 
 # Purpose....: Common OUD Base functions.
 # Notes......: Has to be source in the vagrant provisioning bash scripts to load
@@ -14,15 +14,15 @@
 # Reference..: --
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history for more information on changes/updates
-# ---------------------------------------------------------------------------
-# - Customization -----------------------------------------------------------
+# ------------------------------------------------------------------------------
+# - Customization --------------------------------------------------------------
 
-# - End of Customization ----------------------------------------------------
+# - End of Customization -------------------------------------------------------
 
-# - Environment Variables ---------------------------------------------------
+# - Environment Variables ------------------------------------------------------
 # define default values 
 VERSION=v1.9.6
 DOAPPEND=${DOAPPEND:-"TRUE"}                    # enable log file append
@@ -31,19 +31,19 @@ DEBUG=${DEBUG:-"FALSE"}                         # enable debug mode
 SEND_MAIL=${SEND_MAIL:-"UNDEF"} 
 SOFTWARE=${SOFTWARE:-"${ORACLE_BASE}/software"} # local software stage folder
 SOFTWARE_REPO=${SOFTWARE_REPO:-""}              # URL to software for curl fallback
-# - EOF Environment Variables -----------------------------------------------
+# - EOF Environment Variables --------------------------------------------------
 
-# - Functions ---------------------------------------------------------------
-# -----------------------------------------------------------------------
+# - Functions ------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Purpose....: Display Usage
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function oud_test() {
     echo "hello world"
 }
 
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Purpose....: Display Message with time stamp
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function DoMsg()
 {
     INPUT=${1}
@@ -87,9 +87,9 @@ function DoMsg()
     fi
 }
 
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Purpose....: Clean up before exit
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 function CleanAndQuit() {
     STATUS="INFO"
     if [ ${1} -gt 0 ]; then
@@ -155,10 +155,10 @@ function CleanAndQuit() {
 }
 
 function running_in_docker() {
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Purpose....:  Function for checking whether the process is running in a 
 #               container. It return 0 if YES or 1 if NOT.
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     if [ -e /proc/self/cgroup ]; then
         awk -F/ '$2 == "docker"' /proc/self/cgroup | read
     else
@@ -167,10 +167,10 @@ function running_in_docker() {
 }
 
 function get_software {
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Purpose....: Verify if the software package is available if not try to 
 #              download it from $SOFTWARE_REPO
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
     PKG=$1
     if [ ! -s "${SOFTWARE}/${PKG}" ]; then
         if [ ! -z "${SOFTWARE_REPO}" ]; then
@@ -190,7 +190,7 @@ function get_software {
         return 0
     fi
 }
-# - EOF Functions -----------------------------------------------------------
+# - EOF Functions --------------------------------------------------------------
 # check if script is sourced and return/exit
 if [ "${DEBUG^^}" == "TRUE" ]; then
     if [ "${BASH_SOURCE[0]}" != "${0}" ]; then
@@ -199,4 +199,4 @@ if [ "${DEBUG^^}" == "TRUE" ]; then
         echo "INFO : Script ${BASH_SOURCE[0]} is executed. No action is performed"
     fi
 fi
-# --- EOF --------------------------------------------------------------------
+# --- EOF ----------------------------------------------------------------------
