@@ -1,31 +1,31 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 11_reset_root_passwords.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.06.30
+# Date.......: 2022.08.17
 # Usage......: 11_reset_root_passwords.sh
 # Purpose....: Script to reset admin user passwords
 # Notes......: 
 # Reference..: 
 # License...: Licensed under the Universal Permissive License v 1.0 as 
 #             shown at http://oss.oracle.com/licenses/upl.
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - load instance environment -----------------------------------------------
+# - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
 
 # Get the root users
 echo "- get root user from directory -----------------------------------------------"
 ROOT_USERS=($(${OUD_INSTANCE_HOME}/OUD/bin/ldapsearch --hostname ${HOST} --port $PORT_ADMIN --trustAll --useSSL -D "${DIRMAN}" -j $PWD_FILE -b "cn=config" "(&(objectClass=ds-cfg-root-dn-user)("'!'"(${DIRMAN})))" cn|grep -i 'cn:'|sed 's/cn: //i'))
 
-# - configure instance ------------------------------------------------------
+# - configure instance ---------------------------------------------------------
 echo "- reset admin user password for OUD instance ${OUD_INSTANCE} using:"
 echo "HOSTNAME          : ${HOST}"
 echo "PORT_ADMIN        : ${PORT_ADMIN}"
@@ -82,4 +82,4 @@ for user in "${ROOT_USERS[@]}"; do
   fi
   unset ADMIN_PASSWORD
 done
-# - EOF ---------------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------

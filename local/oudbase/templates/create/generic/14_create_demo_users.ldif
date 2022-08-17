@@ -1,24 +1,24 @@
 version: 1
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 14_create_demo_users.ldif 
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.07.01
+# Date.......: 2022.08.17
 # Revision...: 
 # Purpose....: Trivadis LAB LDIF file for regular LDAP
 # Notes......: 
 # Reference..: --
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history for more information on changes/updates
-# ---------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - Oraganization -------------------------------------------------------
+# - Oraganization --------------------------------------------------------------
 # create a couple of Departments / Organisation Units
 # dn: ou=USER_OU,BASEDN
 # changetype: add
@@ -68,7 +68,7 @@ objectClass: top
 objectClass: organizationalUnit
 ou: Operations
 
-# - users ---------------------------------------------------------------
+# - users ----------------------------------------------------------------------
 # create a couple of users
 dn: cn=Ben King,ou=Senior Management,ou=USER_OU,BASEDN
 changetype: add
@@ -405,7 +405,7 @@ displayName: Jason  Walters
 departmentNumber: 50
 mail: Jason.Walters@trivadislabs.com
 
-# - groups --------------------------------------------------------------
+# - groups ---------------------------------------------------------------------
 # create a couple of groups
 # dn: ou=GROUP_OU,BASEDN
 # changetype: add
@@ -506,4 +506,4 @@ cn: Trivadis LAB Management
 uniqueMember: cn=Honey Rider,ou=Human Resources,ou=USER_OU,BASEDN
 uniqueMember: cn=Vesper Lynd,ou=Human Resources,ou=USER_OU,BASEDN
 displayName: Trivadis LAB Human Resources
-# - EOF -----------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------
