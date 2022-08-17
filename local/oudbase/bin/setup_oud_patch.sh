@@ -237,7 +237,7 @@ done
 export SOFTWARE_LIST=$(echo $SOFTWARE_LIST|sed 's/.$//')
 
 # check Software folder
-if [ -d "${SOFTWARE}" ] || [ -w "${SOFTWARE}" ];; then
+if [ -d "${SOFTWARE}" ] || [ -w "${SOFTWARE}" ]; then
     TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
     for i in ${SOFTWARE_LIST//;/ }; do
         if [ ! -f ${SOFTWARE}/$i ]; then

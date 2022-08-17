@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix if syntax in [setup_oud_patch.sh](local/oudbase/bin/setup_oud_patch.sh)
+  and [setup_oud.sh](local/oudbase/bin/setup_oud.sh)
+
 ### Removed
 
 ## [2.1.1] - 2022-08-17
