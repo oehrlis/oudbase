@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update File header to latest Date, Version etc Information
 - Change license in all files to Apache
+- change behavior how log and tempfiles are removed in [setup_oud_patch.sh](local/oudbase/bin/setup_oud_patch.sh)
+  and [setup_oud.sh](local/oudbase/bin/setup_oud.sh)
 
 ## [2.0.0] - 2022-08-16
 
@@ -41,12 +43,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - [tns_modify.sh](local/oudbase/bin/tns_modify.sh) script to modify TNS Names entries.
   - [tns_search.sh](local/oudbase/bin/tns_search.sh) script to search TNS Names entries.
   - [tns_test.sh](local/oudbase/bin/tns_test.sh) Test LDAP entries using tnsping.
-
-### Changed
-
-### Fixed
-
-### Removed
 
 ## [1.9.6] - 2022-08-15
 
@@ -78,3 +74,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.9.5]: https://github.com/oehrlis/oudbase/releases/tag/v1.9.5
 [1.9.6]: https://github.com/oehrlis/oudbase/releases/tag/v1.9.6
 [2.0.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.0.0
+[2.1.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.1.0
