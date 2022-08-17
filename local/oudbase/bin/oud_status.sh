@@ -23,7 +23,7 @@ export OPENDS_JAVA_ARGS=-Dcom.sun.jndi.ldap.object.disableEndpointIdentification
 export OUD_CON_HANDLER=${OUD_CON_HANDLER:-"LDAP LDAPS"}
 # - End of Customization -------------------------------------------------------
 
-# - Default Values -------------------------------------------------------------
+# - Default Values ------------------------------------------------------
 VERSION=v1.9.6
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
