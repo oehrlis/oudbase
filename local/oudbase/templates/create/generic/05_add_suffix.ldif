@@ -1,12 +1,12 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 03_config_NET_realm.ldif
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2018.03.18
+# Date.......: 2022.08.17
 # Revision...: --
 # Purpose....: NET realm configuration for the user and group search base
 # Notes......: The LDIF file is loaded by the script 03_config_NET_realm.sh 
@@ -14,10 +14,10 @@
 #
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: GPL-3.0+
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 #version: 1
 # Update common EUS Configuration
@@ -65,4 +65,4 @@ aci: (target = "ldap:///BASEDN")(targetattr = "* || +")(targetscope = "base") (v
 aci: (target = "ldap:///BASEDN")(targetattr = "* || +")(targetscope = "subtree") (version 3.0; acl "All full write access"; allow (compare,search,add,write,read,delete) groupdn = "ldap:///cn=role_oud_admins,ou=GROUP_OU,LOCAL_OU,ROOTDN";)
 aci: (target = "ldap:///BASEDN")(targetattr = "* || +")(targetscope = "subtree") (version 3.0; acl "All full read access"; allow (read,search) groupdn = "ldap:///cn=group_all_ro,ou=GROUP_OU,LOCAL_OU,ROOTDN";)
 
-# - EOF -----------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------

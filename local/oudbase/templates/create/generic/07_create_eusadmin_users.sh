@@ -1,30 +1,30 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 07_create_eusadmin_users.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.07.01
+# Date.......: 2022.08.17
 # Revision...: --
 # Purpose....: Script to create EUS Context Admin according to MOS Note 1996363.1.
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
-# License....: Licensed under the Universal Permissive License v 1.0 as 
-#              shown at https://oss.oracle.com/licenses/upl.
-# -----------------------------------------------------------------------
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - load instance environment -------------------------------------------
+# - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
 export EUSADMIN_USERS_PWD_FILE=${EUSADMIN_USERS_PWD_FILE:-"${OUD_INSTANCE_ADMIN}/etc/${EUS_USER_NAME}_pwd.txt"}
 export EUS_USER_NAME=${EUS_USER_NAME:-"eusadmin"}
 export EUS_USER_DN=${EUS_USER_DN:-"cn=${EUS_USER_NAME},cn=oraclecontext"}
 
-# - configure instance --------------------------------------------------
+# - configure instance ---------------------------------------------------------
 echo "Create EUS Admin user for OUD instance ${OUD_INSTANCE} using:"
 echo "  BASEDN                  : ${BASEDN}"
 echo "  EUS_USER_NAME           : ${EUS_USER_NAME}"
@@ -145,4 +145,4 @@ ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig set-access-control-handler-prop \
     --no-prompt \
     --verbose \
     --trustAll
-# - EOF -----------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------

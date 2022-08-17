@@ -1,29 +1,29 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name.......: 05_add_suffix.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2020.06.26
+# Date.......: 2022.08.17
 # Usage......: 05_add_suffix.sh
 # Purpose....: Simple script to add the different NET suffixes
 # Notes......: 
 # Reference..: 
 # License...: Licensed under the Universal Permissive License v 1.0 as 
 #             shown at http://oss.oracle.com/licenses/upl.
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-# - load instance environment -----------------------------------------------
+# - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
 LDIFFILE="$(dirname $0)/$(basename $0 .sh).ldif"      # LDIF file based on script name
 CONFIGFILE="$(dirname $0)/$(basename $0 .sh).conf"    # config file based on script name
 
-# - create instance ---------------------------------------------------------
+# - create instance ------------------------------------------------------------
 echo "Configure OUD instance ${OUD_INSTANCE} using:"
 echo "HOSTNAME          : ${HOST}"
 echo "PORT_SSL          : ${PORT_SSL}"
@@ -39,7 +39,7 @@ if [ ! -n "${ALL_SUFFIX}" ]; then
   exit
 fi
 
-# - add suffix --------------------------------------------------------------
+# - add suffix -----------------------------------------------------------------
 for suffix in ${ALL_SUFFIX}; do
   environment=$(echo $suffix|cut -d, -f1|sed 's/dc=//i')
   workflow_element="local_net_${environment}_DB"
@@ -83,4 +83,4 @@ for suffix in ${ALL_SUFFIX}; do
     --defaultAdd \
     --filename "${NET_LDIFFILE}"
 done
-# - EOF ---------------------------------------------------------------------
+# - EOF ------------------------------------------------------------------------
