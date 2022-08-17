@@ -1,10 +1,10 @@
 #!/bin/bash
 # -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # -----------------------------------------------------------------------
 # Name.......: 20_wait_for_host2.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2019.09.26
 # Usage......: 20_wait_for_host2.sh
