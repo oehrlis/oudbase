@@ -1,23 +1,23 @@
 #!/bin/bash
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
+# ------------------------------------------------------------------------------
+# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
-# Name.......: 01_create_eus_instance.sh
+# ------------------------------------------------------------------------------
+# Name.......: create_domain.sh
 # Author.....: Patrick Joss (jpa) patrick.joss@trivadis.com
-# Editor.....: Patrick Joss
-# Date.......: 2020.12.16
+# Editor.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
+# Date.......: 2022.08.17
 # Revision...: --
 # Purpose....: Script to create an empty weblogic domain 
 #              with template Basic WebLogic Server Domain  
 # Notes......: 
 # Reference..: https://github.com/oehrlis/oudbase
-# License....: Licensed under the Universal Permissive License v 1.0 as 
-#              shown at https://oss.oracle.com/licenses/upl.
-# -----------------------------------------------------------------------
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
 # Modified...:
 # see git revision history with git log for more information on changes
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 ORACLE_BASE=${ORACLE_BASE:-"/u00/app/oracle"}
 DOMAIN_NAME=${DOMAIN_NAME:-"BaseDomain"}
