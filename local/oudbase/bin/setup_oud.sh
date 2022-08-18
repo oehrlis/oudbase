@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.07.17
-# Version....: v2.2.1
+# Version....: v2.3.1
 # Purpose....: generic script to install Oracle Unified Directory binaries.
 # Notes......: Script would like to be executed as oracle :-).
 # Reference..: --
@@ -31,7 +31,7 @@
 # - End of Customization -------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v2.2.1
+VERSION=v2.3.1
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"

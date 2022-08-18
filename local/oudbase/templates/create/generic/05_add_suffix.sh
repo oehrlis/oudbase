@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Version....: v2.2.1
+# Version....: v2.3.1
 # Usage......: 05_add_suffix.sh
 # Purpose....: Simple script to add the different NET suffixes
 # Notes......: 
