@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.2.1] - 2022-08-18
+
+### Added
+
+- update replication script to include additional suffix defined in *ALL_SUFFIX*
+
 ## [2.1.2] - 2022-08-17
 
 ### Fixed

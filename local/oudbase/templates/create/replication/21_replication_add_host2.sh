@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Version....: v2.1.2
+# Version....: v2.2.1
 # Usage......: 21_replication_add_host2.sh
 # Purpose....: simple script to add and initialize replication
 # Notes......:  
@@ -69,6 +69,31 @@ ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication initialize \
 --hostDestination "${HOST2}" --portDestination "${PORT_ADMIN}" \
 --baseDN "${BASEDN}" --adminUID "${REPMAN}" \
 --adminPasswordFile "${PWD_FILE}" --trustAll --no-prompt --noPropertiesFile
+
+# check if we have other suffix defined
+if [ -n "${ALL_SUFFIX}" ]; then
+    # - loop through list of suffix ------------------------------------------------
+    for suffix in ${ALL_SUFFIX}; do
+        echo "enable replication for suffix (${suffix}) from $HOST1 to $HOST2"
+        ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication enable \
+        --host1 "${HOST1}" --port1 "${PORT_ADMIN}" --bindDN1 "${DIRMAN}" --bindPasswordFile1 "${PWD_FILE}" \
+        --host2 "${HOST2}" --port2 "${PORT_ADMIN}" --bindDN2 "${DIRMAN}" --bindPasswordFile2 "${PWD_FILE}" \
+        --replicationPort1 "${PORT_REP}" --secureReplication1 \
+        --replicationPort2 "${PORT_REP}" --secureReplication2 \
+        --baseDN "${suffix}" --adminUID "${REPMAN}" \
+        --adminPasswordFile "${PWD_FILE}" --trustAll --no-prompt --noPropertiesFile
+
+        # - initialize replication -----------------------------------------------------
+        echo "initialize replication for suffix ${suffix} on $HOST2 from $HOST1"
+        ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication initialize \
+        --hostSource "${HOST1}" --portSource "${PORT_ADMIN}" \
+        --hostDestination "${HOST2}" --portDestination "${PORT_ADMIN}" \
+        --baseDN "${suffix}" --adminUID "${REPMAN}" \
+        --adminPasswordFile "${PWD_FILE}" --trustAll --no-prompt --noPropertiesFile
+    done
+else
+    echo "NO additional NET suffix defined. No suffix specific replication configuration required..."
+fi
 
 # - check status of replication ------------------------------------------------
 ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication status -h "${HOST1}" -p "${PORT_ADMIN}" \

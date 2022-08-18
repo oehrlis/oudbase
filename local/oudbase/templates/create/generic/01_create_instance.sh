@@ -3,11 +3,11 @@
 # Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # ------------------------------------------------------------------------------
-# Name.......: 01_create_eus_instance.sh
+# Name.......: 01_create_instance.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Version....: v2.1.2
+# Version....: v2.2.1
 # Purpose....: Script to create the OUD instance with EUS context 
 #              using oud-setup.
 # Notes......: Will skip oud-proxy-setup if config.ldif already exists
