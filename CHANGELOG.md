@@ -16,6 +16,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.3.1] - 2022-08-18
+
+### Changed
+
+- Change configuration file for TNS tools to *oudenv.conf* and *oudenv_custom.conf*
+  rather than tool base name e.g. *oudbase* or *tvdldap*
+- Move unused configuration scripts to [misc](local/oudbase/templates/create/misc/README.md)
+  e.g. [18_migrate_keystore.sh](local/oudbase/templates/create/misc/18_migrate_keystore.sh) and
+  [19_export_trustcert_keystore.sh](local/oudbase/templates/create/misc/19_export_trustcert_keystore.sh)
+
+### Add
+
+- add variable *HOST1* and *HOST2* to generic [00_init_environment](local/oudbase/templates/create/generic/00_init_environment)
+
 ## [2.2.1] - 2022-08-18
 
 ### Added
