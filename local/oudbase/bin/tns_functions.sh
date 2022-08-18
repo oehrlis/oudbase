@@ -55,6 +55,7 @@ export TVDLDAP_LOG_DIR="$(dirname ${TVDLDAP_BIN_DIR})/log"
 export TVDLDAP_ETC_DIR="$(dirname ${TVDLDAP_BIN_DIR})/etc"
 export TVDLDAP_BASE=$(dirname ${TVDLDAP_BIN_DIR})
 export TOOL_BASE_NAME=$(basename ${TVDLDAP_BASE})
+export TOOL_OUD_BASE_NAME="oudenv"
 export TVDLDAP_CONFIG_FILES=""
 export TVDLDAP_KEEP_LOG_DAYS=${TVDLDAP_KEEP_LOG_DAYS:-$TVDLDAP_DEFAULT_KEEP_LOG_DAYS}
 padding='............................'
@@ -297,10 +298,14 @@ function clean_quit() {
 # Function...: load_config
 # Purpose....: Load package specific configuration files
 # ------------------------------------------------------------------------------
-function load_config() {
+function load() {
     echo_debug "DEBUG: Start to source configuration files"
-    for config in   ${TVDLDAP_ETC_DIR}/${TOOL_BASE_NAME}.conf \
+    for config in   ${TVDLDAP_ETC_DIR}/${TOOL_OUD_BASE_NAME}.conf \
+                    ${TVDLDAP_ETC_DIR}/${TOOL_OUD_BASE_NAME}_custom.conf \
+                    ${TVDLDAP_ETC_DIR}/${TOOL_BASE_NAME}.conf \
                     ${TVDLDAP_ETC_DIR}/${TOOL_BASE_NAME}_custom.conf \
+                    ${ETC_BASE}/${TOOL_OUD_BASE_NAME}.conf \
+                    ${ETC_BASE}/${TOOL_OUD_BASE_NAME}_custom.conf \
                     ${ETC_BASE}/${TOOL_BASE_NAME}.conf \
                     ${ETC_BASE}/${TOOL_BASE_NAME}_custom.conf; do
         if [ -f "${config}" ]; then
