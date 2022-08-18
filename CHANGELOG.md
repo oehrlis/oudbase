@@ -12,9 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- enable OUD Access logger in all templates
+- disable OUD Access control logger in all templates
+
 ### Fixed
 
 - fix function name *load_config* in *tns_functions.sh*
+- fix wrong *objectClass* in *net_service_exists*
 
 ### Removed
 
