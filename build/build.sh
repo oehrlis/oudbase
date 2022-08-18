@@ -63,7 +63,7 @@ sed -i "s/v[0-9]\+\.[0-9]\+\.[0-9]\+/${VERSION}/" $(find . -name .version)
 
 # create sha hash's
 echo "Create sha hashs for all files"
-find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" ! -iname "*.log" ! -iname "oudbase_install.sh" \) \
+find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" ! -iname "*.log" ! -iname "oudbase_install.sh" ! -iname "oudbase_install.tgz" \) \
   -print0 | xargs -0 shasum >${SCRIPT_DIR}/../local/oudbase/doc/.oudbase.sha
 
 # Tar all together
