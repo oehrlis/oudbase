@@ -468,7 +468,7 @@ function net_service_exists() {
     
     ldapsearch_options=$(ldapsearch_options)
     if [ -n "${current_cn}" ]; then
-        result=$(ldapsearch -h ${my_ldaphost} -p ${my_ldapport} -b $current_basedn $ldapsearch_options -s sub "(&(cn=${current_cn})(|(objectClasses=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" dn)
+        result=$(ldapsearch -h ${my_ldaphost} -p ${my_ldapport} -b $current_basedn $ldapsearch_options -s sub "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" dn)
         if [ $? -ne 0 ]; then
             clean_quit 33 "ldapsearch"
         fi
