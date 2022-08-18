@@ -20,8 +20,6 @@ be used to setup / run .LDIF and .CONF files.
 - [14_create_demo_users.ldif](14_create_demo_users.ldif) LDIF file loaded by wrapper script `14_create_demo_users.sh`.
 - [14_create_demo_users.sh](14_create_demo_users.sh) Wrapper script to create a couple of users and groups.
 - [15_reset_user_passwords.sh](15_reset_user_passwords.sh) Reset all passwords for the demo users to $DEFAULT_PASSWORD.
-- [18_migrate_keystore.sh](18_migrate_keystore.sh) Script to migrate the java keystore to PKCS12
-- [19_export_trustcert_keystore.sh](19_export_trustcert_keystore.sh) Script to export the trust certificat from the java keystore.
 - [setup_oud_instance](setup_oud_instance) Script to create the OUD instance. The script will go execute all `0?_*.sh` and `1?_*.sh` files create the instance. All files in sequence after `19_*.sh` have to be executed manually. This includes the replication.
 
 Using the scripts from the template, creating an OUD instance is relatively
