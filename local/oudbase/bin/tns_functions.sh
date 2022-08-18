@@ -298,7 +298,7 @@ function clean_quit() {
 # Function...: load_config
 # Purpose....: Load package specific configuration files
 # ------------------------------------------------------------------------------
-function load() {
+function load_config() {
     echo_debug "DEBUG: Start to source configuration files"
     for config in   ${TVDLDAP_ETC_DIR}/${TOOL_OUD_BASE_NAME}.conf \
                     ${TVDLDAP_ETC_DIR}/${TOOL_OUD_BASE_NAME}_custom.conf \

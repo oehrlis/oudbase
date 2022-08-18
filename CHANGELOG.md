@@ -14,7 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- fix function name *load_config* in *tns_functions.sh*
+
 ### Removed
+
+- update build script and remove *oudbase_install.tgz* from the package checksum file
 
 ## [2.3.1] - 2022-08-18
 
