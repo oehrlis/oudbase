@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Version....: v2.3.1
+# Version....: v2.4.0
 # Purpose....: File for setting the instance-specific environment. 
 #              The setup scripts are based on the OUD Base environment. 
 #              If OUD Base is not used, you may have to adapt this file 

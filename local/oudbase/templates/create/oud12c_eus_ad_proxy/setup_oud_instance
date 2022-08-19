@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Version....: v2.3.1
+# Version....: v2.4.0
 # Usage......: setup_oud_instance
 # Purpose....: Script to create the OUD instance
 # Notes......: The script will go execute all 0?_*.sh and 1?_*.sh files

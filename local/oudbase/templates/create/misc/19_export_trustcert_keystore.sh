@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Version....: v2.3.1
+# Version....: v2.4.0
 # Purpose....: Script to export the java keystore to PKCS12
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase

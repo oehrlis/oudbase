@@ -7,7 +7,7 @@
 # Author.....: Patrick Joss (jpa) patrick.joss@trivadis.com
 # Editor.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Date.......: 2022.08.17
-# Version....: v2.3.1
+# Version....: v2.4.0
 # Purpose....: Script to create an empty weblogic domain 
 #              with template Basic WebLogic Server Domain  
 # Notes......: 

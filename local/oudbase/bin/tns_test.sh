@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Version....: v2.3.1
+# Version....: v2.4.0
 # Purpose....: Test LDAP entries using tnsping and sqlplus
 # Notes......: --
 # Reference..: --
@@ -28,7 +28,7 @@ set -o nounset                      # exit if script try to use an uninitialised
 
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v2.3.1
+VERSION=v2.4.0
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode

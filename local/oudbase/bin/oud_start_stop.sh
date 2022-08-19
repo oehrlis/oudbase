@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Version....: v2.3.1
+# Version....: v2.4.0
 # Purpose....: Bash Script to start/stop OUD Instances 
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
@@ -22,7 +22,7 @@ export OPENDS_JAVA_ARGS=-Dcom.sun.jndi.ldap.object.disableEndpointIdentification
 # - End of Customization -------------------------------------------------------
  
 # - Default Values ------------------------------------------------------
-VERSION=v2.3.1
+VERSION=v2.4.0
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 FORCE="FALSE"                                   # enable force restart
