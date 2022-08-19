@@ -12,6 +12,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+### Fixed
+
+### Removed
+
+## [2.4.0] - 2022-08-19
+
+### Added
+
+### Changed
+
 - enable OUD Access logger in all templates
 - disable OUD Access control logger in all templates
 - remove *set -o nounset* in *tns_functions.sh*
@@ -122,3 +132,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [1.9.6]: https://github.com/oehrlis/oudbase/releases/tag/v1.9.6
 [2.0.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.0.0
 [2.1.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.1.0
+[2.1.1]: https://github.com/oehrlis/oudbase/releases/tag/v2.1.1
+[2.1.2]: https://github.com/oehrlis/oudbase/releases/tag/v2.1.2
+[2.2.1]: https://github.com/oehrlis/oudbase/releases/tag/v2.2.1
+[2.3.1]: https://github.com/oehrlis/oudbase/releases/tag/v2.3.1
+[2.4.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.4.0
