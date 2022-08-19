@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - enable OUD Access logger in all templates
 - disable OUD Access control logger in all templates
+- remove *set -o nounset* in *tns_functions.sh*
+- remove *set -o errexit* in *tns_functions.sh*
+- remove *set -o pipefail* in *tns_functions.sh*
 
 ### Fixed
 

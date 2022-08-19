@@ -36,9 +36,9 @@ TVDLDAP_DEFAULT_LDAPTOOLS=""
 # Define a bunch of bash option see 
 # https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
 # https://www.davidpashley.com/articles/writing-robust-shell-scripts/
-set -o nounset                      # exit if script try to use an uninitialised variable
-set -o errexit                      # exit script if any statement returns a non-true return value
-set -o pipefail                     # pipefail exit after 1st piped commands failed
+# set -o nounset                      # exit if script try to use an uninitialised variable
+# set -o errexit                      # exit script if any statement returns a non-true return value
+# set -o pipefail                     # pipefail exit after 1st piped commands failed
 
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
