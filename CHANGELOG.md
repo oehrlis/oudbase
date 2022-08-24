@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- add [p34287807_122140_Generic.zip](https://updates.oracle.com/Orion/Services/download/p34287807_122140_Generic.zip?aru=24823841&patch_file=p34287807_122140_Generic.zip) to the list of one off patch to fix the
+  log4j vulnerability in *Oracle Unified Directory* common objects see also
+  Oracle Support Document [2806740.2](https://support.oracle.com/epmos/faces/DocumentDisplay?id=2806740.2)
+  *Critical Patch Update (CPU) Patch Advisor for Oracle Fusion Middleware - Updated for July 2022*
+  and Oracle Support Document [1074055.1](https://support.oracle.com/epmos/faces/DocumentDisplay?id=1074055.1)
+  *Security Vulnerability FAQ for Oracle Database and Fusion Middleware Products*
+
 ### Changed
 
 ### Fixed
