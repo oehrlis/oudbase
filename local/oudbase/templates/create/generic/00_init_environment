@@ -44,6 +44,9 @@ export PORT_REST_HTTPS=${PORT_REST_HTTPS:-"1081"}
 # - End of default environment variables ---------------------------------------
 
 # - Customization --------------------------------------------------------------
+# - Miscellaneous Customizations
+# <CUSTOM>
+
 # - Instance information
 export DIRMAN="cn=Directory Manager"
 export REPMAN=admin
