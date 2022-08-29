@@ -10,17 +10,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- add comment for *CUSTOM* section in config of templates.
-- add support for subfolders in [oud_functions.sh](local/oudbase/bin/oud_functions.sh)
-  to fix issue #104
-
 ### Changed
 
 ### Fixed
 
-- Fix issue Update OUD default Packages #95
-
 ### Removed
+
+## [2.6.0] - 2022-08-29
+
+### Added
+
+- add comment for *CUSTOM* section in config of templates.
+- add support for subfolders in [oud_functions.sh](local/oudbase/bin/oud_functions.sh)
+  to fix issue #104
+- add support for subfolders in [setup_oud.sh](local/oudbase/bin/setup_oud.sh)
+  to fix issue #104
+- add support for subfolders in [setup_oud_patch.sh](local/oudbase/bin/setup_oud_patch.sh)
+  to fix issue #104
+
+### Fixed
+
+- Fix issue *Update OUD default Packages* #95
+- Fix issue *setup_oud.sh and setup_oud_patch.sh wrong package checks* #105
 
 ## [2.5.0] - 2022-08-24
 
