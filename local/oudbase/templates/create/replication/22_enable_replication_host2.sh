@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
-# Version....: v2.5.0
+# Version....: v2.6.0
 # Usage......: 22_enable_replication_host2.sh
 # Purpose....: simple script to enable and initialize replication
 # Notes......:  
