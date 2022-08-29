@@ -10,9 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- add comment for *CUSTOM* section in config of templates.
+- add support for subfolders in [oud_functions.sh](local/oudbase/bin/oud_functions.sh)
+  to fix issue #104
+
 ### Changed
 
 ### Fixed
+
+- Fix issue Update OUD default Packages #95
 
 ### Removed
 
