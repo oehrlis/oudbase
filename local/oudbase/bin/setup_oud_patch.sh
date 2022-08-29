@@ -120,9 +120,10 @@ function install_patch {
     PATCH_PKG=${1:-""}
     if [ -n "${PATCH_PKG}" ]; then
         if get_software "${PATCH_PKG}"; then        # Check and get binaries
+            SOFTWARE_PKG=$(find ${SOFTWARE} -name ${PATCH_PKG} 2>/dev/null| head -1)
             PATCH_ID=$(echo ${PATCH_PKG}| sed -E 's/p([[:digit:]]+).*/\1/')
-            DoMsg "INFO : unzip ${SOFTWARE}/${PATCH_PKG} to ${TMP_DIR}"
-            unzip -q -o ${SOFTWARE}/${PATCH_PKG} \
+            DoMsg "INFO : unzip ${SOFTWARE_PKG} to ${TMP_DIR}"
+            unzip -q -o ${SOFTWARE_PKG} \
                 -d ${TMP_DIR}/                         # unpack OPatch binary package
             cd ${TMP_DIR}/${PATCH_ID}
             ${ORACLE_HOME}/OPatch/opatch apply -silent -jre $JAVA_HOME
@@ -133,7 +134,7 @@ function install_patch {
             fi
             cd -
             # remove binary packages on docker builds
-            running_in_docker && rm -rf ${SOFTWARE}/${PATCH_PKG}
+            running_in_docker && rm -rf ${SOFTWARE_PKG}
             rm -rf ${TMP_DIR}/${PATCH_ID}          # remove the binary packages
             rm -rf ${TMP_DIR}/PatchSearch.xml          # remove the binary packages
             DoMsg "INFO : Successfully install patch package ${PATCH_PKG}"
@@ -209,7 +210,16 @@ fi
 
 # Create a list of software based on environment variables ending with _PKG or _PKGS
 SOFTWARE_LIST=""                        # initial values of SOFTWARE_LIST
-for i in $(env|cut -d= -f1|grep '_PKG$\|_PKGS$'); do
+SOFTWARE_VARIABLES=""                   # initial list SOFTWARE VARIABLES
+if [ "${OUD_TYPE}" == "OUDSM12" ]; then
+    # create list of software for OUD and collocated installations
+    SOFTWARE_VARIABLES=$(env|cut -d= -f1|grep '_PKG$\|_PKGS$'|grep -v '^DEFAULT')
+else
+    # create list of software for OUD and standalone installations
+    SOFTWARE_VARIABLES=$(env|cut -d= -f1|grep '_PKG$\|_PKGS$'|grep -v '^DEFAULT\|^FMW\|^COHERENCE')
+fi
+
+for i in ${SOFTWARE_VARIABLES}; do
     # check if environment variable is not empty and value not yet part of SOFTWARE_LIST
     if [ -n "${!i}" ] && [[ $SOFTWARE_LIST != *"${!i}"* ]]; then
         SOFTWARE_LIST+="${!i};"
@@ -221,7 +231,7 @@ export SOFTWARE_LIST=$(echo $SOFTWARE_LIST|sed 's/.$//')
 if [ -d "${SOFTWARE}" ] || [ -w "${SOFTWARE}" ]; then
     TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
     for i in ${SOFTWARE_LIST//;/ }; do
-        if [ ! -f ${SOFTWARE}/$i ]; then
+        if [ $(find ${SOFTWARE} -name $i | wc -l) -eq 0 ]; then
             CleanAndQuit 15 ${i}             # Define a clean exit
         fi
     done
@@ -255,15 +265,16 @@ DoMsg "INFO : OUD_ONEOFF_PKGS       = ${OUD_ONEOFF_PKGS:-n/a}"
 DoMsg "INFO : Step 1 Install OPatch (${OUD_OPATCH_PKG}) ---------------------"
 if [ -n "${OUD_OPATCH_PKG}" ]; then
     if get_software "${OUD_OPATCH_PKG}"; then       # Check and get binaries
-        DoMsg "INFO : unzip ${SOFTWARE}/${OUD_OPATCH_PKG} to ${TMP_DIR}"
-        unzip -q -o ${SOFTWARE}/${OUD_OPATCH_PKG} \
+        SOFTWARE_PKG=$(find ${SOFTWARE} -name ${OUD_OPATCH_PKG} 2>/dev/null| head -1)
+        DoMsg "INFO : unzip ${SOFTWARE_PKG} to ${TMP_DIR}"
+        unzip -q -o ${SOFTWARE_PKG} \
             -d ${TMP_DIR}/                         # unpack OPatch binary package
         # install the OPatch using java
         $JAVA_HOME/bin/java -jar ${TMP_DIR}/6880880/opatch_generic.jar \
             -ignoreSysPrereqs -force \
             -silent oracle_home=${ORACLE_HOME}
         rm -rf ${TMP_DIR}/6880880
-        running_in_docker && rm -rf ${SOFTWARE}/${OUD_OPATCH_PKG}
+        running_in_docker && rm -rf ${SOFTWARE_PKG}
     else
         DoMsg "WARN : Could not find local or remote patch package ${OUD_OPATCH_PKG}. Skip patch installation for ${OUD_OPATCH_PKG}"
         DoMsg "WARN : Skip patch installation."
@@ -288,9 +299,10 @@ DoMsg "INFO : Step 4 Install Coherence patch (${COHERENCE_PATCH_PKG}) ----------
 if [ "${OUD_TYPE}" == "OUDSM12" ]; then
     if [ -n "${COHERENCE_PATCH_PKG}" ]; then
         if get_software "${COHERENCE_PATCH_PKG}"; then        # Check and get binaries
-            COHERENCE_PATCH_ID=$(unzip -qql ${SOFTWARE}/${COHERENCE_PATCH_PKG}| sed -r '1 {s/([ ]+[^ ]+){3}\s+//;q}')
-            DoMsg "INFO : unzip ${SOFTWARE}/${COHERENCE_PATCH_PKG} to ${TMP_DIR}"
-            unzip -q -o ${SOFTWARE}/${COHERENCE_PATCH_PKG} \
+            SOFTWARE_PKG=$(find ${SOFTWARE} -name ${COHERENCE_PATCH_PKG} 2>/dev/null| head -1)
+            COHERENCE_PATCH_ID=$(unzip -qql ${SOFTWARE_PKG}| sed -r '1 {s/([ ]+[^ ]+){3}\s+//;q}')
+            DoMsg "INFO : unzip ${SOFTWARE_PKG} to ${TMP_DIR}"
+            unzip -q -o ${SOFTWARE_PKG} \
                 -d ${TMP_DIR}/                         # unpack OPatch binary package
             cd ${TMP_DIR}/${COHERENCE_PATCH_ID}
             ${ORACLE_HOME}/OPatch/opatch apply -silent
@@ -301,7 +313,7 @@ if [ "${OUD_TYPE}" == "OUDSM12" ]; then
             fi
             cd -
             # remove binary packages on docker builds
-            running_in_docker && rm -rf ${SOFTWARE}/${COHERENCE_PATCH_PKG}
+            running_in_docker && rm -rf ${SOFTWARE_PKG}
             rm -rf ${TMP_DIR}/${COHERENCE_PATCH_ID}          # remove the binary packages
             rm -rf ${TMP_DIR}/PatchSearch.xml          # remove the binary packages
             DoMsg "INFO : Successfully install patch package ${PATCH_PKG}"

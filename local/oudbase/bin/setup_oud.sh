@@ -199,9 +199,19 @@ fi
 
 # Create a list of software based on environment variables ending with _PKG or _PKGS
 SOFTWARE_LIST=""                        # initial values of SOFTWARE_LIST
-for i in $(env|cut -d= -f1|grep '_PKG$\|_PKGS$'); do
+SOFTWARE_VARIABLES=""                   # initial list SOFTWARE VARIABLES
+if [ "${OUD_TYPE}" == "OUDSM12" ]; then
+    # create list of software for OUD and collocated installations
+    SOFTWARE_VARIABLES=$(env|cut -d= -f1|grep '_PKG$\|_PKGS$'|grep -v '^DEFAULT')
+else
+    # create list of software for OUD and standalone installations
+    SOFTWARE_VARIABLES=$(env|cut -d= -f1|grep '_PKG$\|_PKGS$'|grep -v '^DEFAULT\|^FMW\|^COHERENCE')
+fi
+
+for i in ${SOFTWARE_VARIABLES}; do
     # check if environment variable is not empty and value not yet part of SOFTWARE_LIST
     if [ -n "${!i}" ] && [[ $SOFTWARE_LIST != *"${!i}"* ]]; then
+        echo $i=${!i}
         SOFTWARE_LIST+="${!i};"
     fi
 done
@@ -211,7 +221,7 @@ export SOFTWARE_LIST=$(echo $SOFTWARE_LIST|sed 's/.$//')
 if [ -d "${SOFTWARE}" ] || [ -w "${SOFTWARE}" ]; then
     TMP_DIR=$(mktemp -p ${SOFTWARE} -d)             # create a temp directory
     for i in ${SOFTWARE_LIST//;/ }; do
-        if [ ! -f ${SOFTWARE}/$i ]; then
+        if [ $(find ${SOFTWARE} -name $i | wc -l) -eq 0 ]; then
             CleanAndQuit 15 ${i}             # Define a clean exit
         fi
     done
@@ -292,10 +302,11 @@ if [ "${OUD_TYPE}" == "OUDSM12" ]; then
     export OUD_INSTALL_TYPE='Collocated Oracle Unified Directory Server (Managed through WebLogic server)'
     if [ -n "${FMW_BASE_PKG}" ]; then
         if get_software "${FMW_BASE_PKG}"; then          # Check and get binaries
+            SOFTWARE_PKG=$(find ${SOFTWARE} -name ${FMW_BASE_PKG} 2>/dev/null| head -1)
             cd ${TMP_DIR}
             # unpack OUD binary package
             FMW_BASE_LOG=$(basename ${FMW_BASE_PKG} .zip).log
-            ${JAVA_HOME}/bin/jar xvf ${SOFTWARE}/${FMW_BASE_PKG} >${FMW_BASE_LOG}
+            ${JAVA_HOME}/bin/jar xvf ${SOFTWARE_PKG} >${FMW_BASE_LOG}
 
             # get the jar file name from the logfile
             FMW_BASE_JAR=$(grep -i jar ${FMW_BASE_LOG} |cut -d' ' -f3| tr -d " ")
@@ -321,10 +332,11 @@ fi
 DoMsg "INFO : Install Oracle OUD binaries ----------------------------------------"
 if [ -n "${OUD_BASE_PKG}" ]; then
     if get_software "${OUD_BASE_PKG}"; then          # Check and get binaries
+        SOFTWARE_PKG=$(find ${SOFTWARE} -name ${OUD_BASE_PKG} 2>/dev/null| head -1)
         cd ${TMP_DIR}
         # unpack OUD binary package
         OUD_BASE_LOG=$(basename ${OUD_BASE_PKG} .zip).log
-        ${JAVA_HOME}/bin/jar xvf ${SOFTWARE}/${OUD_BASE_PKG} >${OUD_BASE_LOG}
+        ${JAVA_HOME}/bin/jar xvf ${SOFTWARE_PKG} >${OUD_BASE_LOG}
         # identify OUD major release based on OUD_TYPE
         if [ "${OUD_TYPE}" == "OUD12" ] || [ "${OUD_TYPE}" == "OUDSM12" ]; then
             DoMsg "INFO : Start to install OUD 12c (${OUD_TYPE})"
@@ -341,7 +353,7 @@ if [ -n "${OUD_BASE_PKG}" ]; then
 
             # remove files on docker builds
             rm -rf ${TMP_DIR}/$OUD_BASE_JAR
-            running_in_docker && rm -rf ${SOFTWARE}/${OUD_BASE_PKG}
+            running_in_docker && rm -rf ${SOFTWARE_PKG}
         else
             DoMsg "INFO : Start to install OUD 11g"
             chmod -R u+x ${TMP_DIR}/Disk1
@@ -356,7 +368,7 @@ if [ -n "${OUD_BASE_PKG}" ]; then
         
             # remove files on docker builds
             rm -rf ${TMP_DIR}/Disk1
-            running_in_docker && rm -rf ${SOFTWARE}/${OUD_BASE_PKG}
+            running_in_docker && rm -rf ${SOFTWARE_PKG}
         fi
     else
         CleanAndQuit 80 ${OUD_BASE_PKG}
