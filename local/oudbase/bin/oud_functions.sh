@@ -173,7 +173,8 @@ function get_software {
 #              download it from $SOFTWARE_REPO
 # ------------------------------------------------------------------------------
     PKG=$1
-    if [ ! -s "${SOFTWARE}/${PKG}" ]; then
+    SOFTWARE_PKG=$(find ${SOFTWARE} -name ${PKG} 2>/dev/null| head -1)
+    if [ -z "${SOFTWARE_PKG}" ] || [ ! --s "${SOFTWARE_PKG}" ]; then 
         if [ ! -z "${SOFTWARE_REPO}" ]; then
             echo " - Try to download ${PKG} from ${SOFTWARE_REPO}"
             curl -f ${SOFTWARE_REPO}/${PKG} -o ${SOFTWARE}/${PKG} 2>&1
@@ -187,7 +188,7 @@ function get_software {
             return 1
         fi
     else
-        echo " - Found package ${PKG} for installation."
+        echo " - Found package ${PKG} for installation in $(dirname ${SOFTWARE_PKG})."
         return 0
     fi
 }
