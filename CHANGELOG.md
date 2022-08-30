@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- fix bug in *get_software*
+- fix bug not removing temp directories when exit with error
+- fix bug *oud_export.sh* EXCLUDED_BACKENDS list minor error #103
+
 ### Removed
 
 ## [2.6.0] - 2022-08-29

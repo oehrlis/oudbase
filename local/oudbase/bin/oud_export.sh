@@ -217,7 +217,7 @@ for oud_inst in ${OUD_INST_LIST}; do
             DoMsg "INFO : [$oud_inst] get backends for $oud_inst"
             IFS=$'\n'
             # read all backends into an array
-            EXCLUDED_BACKENDS="adminRoot|ads-truststore|ads-truststore|monitor|backup|tasks|virtualAcis"
+            EXCLUDED_BACKENDS="adminRoot|ads-truststore|monitor|backup|tasks|virtualAcis"
             DoMsg "INFO : [$oud_inst] exclude backends $(echo $EXCLUDED_BACKENDS|sed 's/|/\, /g')"
             backends=($(list-backends|egrep -v "[.:]\s*$|${EXCLUDED_BACKENDS}"|tail -n +3|sed 's/"//g'))
         fi
