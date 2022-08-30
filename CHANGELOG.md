@@ -16,6 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.7.0] - 2022-08-30
+
+### Added
+
+### Changed
+
+- Clean up default package names and variables
+
+### Fixed
+
+### Removed
+
 ## [2.6.0] - 2022-08-29
 
 ### Added
