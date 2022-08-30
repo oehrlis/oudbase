@@ -736,6 +736,8 @@ if [ "${1}" = "" ]; then
 elif [ "${1}" == "SILENT" ]; then
     export OUD_INSTANCE=${OUD_DEFAULT_INSTANCE} 
     export SILENT="SILENT"
+elif [[ "${1}" =~ [^a-zA-Z0-9_-] ]]; then
+    export OUD_INSTANCE=${OUD_DEFAULT_INSTANCE}
 else
     export OUD_INSTANCE=${1}
 fi
@@ -799,8 +801,9 @@ elif [ "${OUD_INSTANCE}" == "n/a" ]; then
     RECREATE="FALSE"
 else # print error and keep current setting
     echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUDTAB} or ${OUD_INSTANCE_BASE}"
-    export OUD_INSTANCE=${OUD_INSTANCE_LAST}
-    return 1
+    echo "ERROR: Set environment to ${OUD_DEFAULT_INSTANCE}."
+    export OUD_INSTANCE=${OUD_DEFAULT_INSTANCE}
+    RECREATE="FALSE"
 fi
 
 # re-create a few stuff if necessary 

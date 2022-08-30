@@ -25,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Clean up default package names and variables
+- *oudenv.sh* parameter is now checked for valid characters e.g. alphanumeric
+  plus - and _
 
 ### Fixed
 
