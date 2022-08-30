@@ -51,10 +51,12 @@ cp ${SCRIPT_DIR}/../LICENSE ${SCRIPT_DIR}/../local/oudbase/doc
 
 # update version in *.sh files
 VERSION=$(head -1 ${PACKAG_BASE}/VERSION |sed -E 's/.*(v[0-9]+.[0-9]+.[0-9]+).*/\1/')
+DATE=$(date "+%Y.%m.%d")
 
 for i in ./bin/* ./etc/* $(find ./templates -type f); do
     echo "update version to ${VERSION} in file $i"
     sed -i -E "s/^VERSION=.*/VERSION=${VERSION}/" $i 
+    sed -i -E "s/^# Date\.\.\.\.\.\.\.:.*/# Date.......: ${DATE}/" $i  
     sed -i -E "s/^# Version\.\.\.\.:.*/# Version....: ${VERSION}/" $i  
 done
 
@@ -62,7 +64,7 @@ done
 sed -i "s/v[0-9]\+\.[0-9]\+\.[0-9]\+/${VERSION}/" $(find . -name .version)
 
 # create sha hash's
-echo "Create sha hashs for all files"
+echo "Create sha hash values for all files"
 find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" ! -iname "*.log" ! -iname "oudbase_install.sh" ! -iname "oudbase_install.tgz" \) \
   -print0 | xargs -0 shasum >${SCRIPT_DIR}/../local/oudbase/doc/.oudbase.sha
 
