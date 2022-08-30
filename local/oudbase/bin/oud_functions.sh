@@ -145,6 +145,10 @@ function CleanAndQuit() {
         ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
     esac
  
+    # clean up potential Temp directories
+    if [ -n "$TMP_DIR" ] && [ -d "$TMP_DIR" ]; then rm -rf "${TMP_DIR}"; fi
+    if [ -n "$DEFAULT_TMP_DIR" ] && [ -d "$DEFAULT_TMP_DIR" ]; then rm -rf "${DEFAULT_TMP_DIR}"; fi
+    
     # if we do have mail addresses we will send some mails...
     if [ "${SEND_MAIL}" = "TRUE" ] && [ -n "${MAILADDRESS}" ]; then
         # check how much lines we do have to tail
@@ -174,7 +178,7 @@ function get_software {
 # ------------------------------------------------------------------------------
     PKG=$1
     SOFTWARE_PKG=$(find ${SOFTWARE} -name ${PKG} 2>/dev/null| head -1)
-    if [ -z "${SOFTWARE_PKG}" ] || [ ! --s "${SOFTWARE_PKG}" ]; then 
+    if [ -z "${SOFTWARE_PKG}" ] || [ ! -s "${SOFTWARE_PKG}" ]; then 
         if [ ! -z "${SOFTWARE_REPO}" ]; then
             echo " - Try to download ${PKG} from ${SOFTWARE_REPO}"
             curl -f ${SOFTWARE_REPO}/${PKG} -o ${SOFTWARE}/${PKG} 2>&1
