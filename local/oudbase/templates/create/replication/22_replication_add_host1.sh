@@ -6,8 +6,8 @@
 # Name.......: 21_replication_add_host1.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.08.17
-# Version....: v2.6.0
+# Date.......: 2022.08.30
+# Version....: v2.7.0
 # Usage......: 21_replication_add_host1.sh
 # Purpose....: simple script to add and initialize replication
 # Notes......:  
