@@ -6,7 +6,7 @@
 # Name.......: setup_oud.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.07.17
+# Date.......: 2022.08.30
 # Version....: v2.6.0
 # Purpose....: generic script to install Oracle Unified Directory binaries.
 # Notes......: Script would like to be executed as oracle :-).
@@ -18,16 +18,18 @@
 # see git revision history for more information on changes/updates
 # ------------------------------------------------------------------------------
 # - Customization --------------------------------------------------------------
-# OUD_BASE_PKG="p30188352_122140_Generic.zip"         # OUD 12.2.1.4.0
-# FMW_BASE_PKG="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"         # ORACLE FUSION MIDDLEWARE 12C (12.2.1.4.0) INFRASTRUCTURE (Patchset)
-# OUD_PATCH_PKG="p31400392_122140_Generic.zip"        # OUD BUNDLE PATCH 12.2.1.4.200204 (Patch) 
-# FMW_PATCH_PKG="p31537019_122140_Generic.zip"        # WLS PATCH SET UPDATE 12.2.1.4.191220 (Patch) 
-# OUD_OPATCH_PKG="p28186730_139424_Generic.zip"       # OPATCH 13.9.4.2.2 FOR FMW/WLS 12.2.1.3.0 AND 12.2.1.4.0 (Patch) 
-# OUI_PATCH_PKG=""
-# COHERENCE_PATCH_PKG="p30729380_122140_Generic.zip"  # Coherence 12.2.1.4.3 Cumulative Patch using OPatch (Patch) 
+# define default software packages
+DEFAULT_FMW_BASE_PKG="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"
+DEFAULT_OUD_BASE_PKG="p30188352_122140_Generic.zip"
+DEFAULT_OUD_PATCH_PKG="p34039288_122140_Generic.zip"
+DEFAULT_FMW_PATCH_PKG="p34236279_122140_Generic.zip"
+DEFAULT_OUD_OPATCH_PKG="p28186730_1394210_Generic.zip"
+DEFAULT_OUI_PATCH_PKG=""
+DEFAULT_COHERENCE_PATCH_PKG="p34248976_122140_Generic.zip"
+DEFAULT_OUD_ONEOFF_PKGS="p34287807_122140_Generic.zip"
+
 # ORACLE_HOME_NAME="oud12.2.1.4.0"                    # Name of the Oracle Home directory
 # ORACLE_HOME="${ORACLE_BASE}/product/${ORACLE_HOME_NAME}"
-
 # - End of Customization -------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
@@ -53,19 +55,9 @@ DEFAULT_RSP_FILE=${DEFAULT_TMP_DIR}/oud_install.rsp     # default response file
 DEFAULT_LOCK_FILE=${DEFAULT_TMP_DIR}/oraInst.loc        # default lock file
 DEFAULT_OUD_TYPE=${OUD_TYPE:-"OUD12"}
 
-# define default software packages
-DEFAULT_FMW_BASE_PKG="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"
-DEFAULT_OUD_BASE_PKG="p30188352_122140_Generic.zip"
-DEFAULT_OUD_PATCH_PKG="p34039288_122140_Generic.zip"
-DEFAULT_FMW_PATCH_PKG="p34236279_122140_Generic.zip"
-DEFAULT_OUD_OPATCH_PKG="p28186730_1394210_Generic.zip"
-DEFAULT_OUI_PATCH_PKG=""
-DEFAULT_COHERENCE_PATCH_PKG="p34248976_122140_Generic.zip"
-DEFAULT_OUD_ONEOFF_PKGS="p34287807_122140_Generic.zip"
-
 # define the software packages default is just the OUD 12.2.1.4 base package
-export OUD_BASE_PKG=${OUD_BASE_PKG:-"p30188352_122140_Generic.zip"} # OUD 12.2.1.4.0
-export FMW_BASE_PKG=${FMW_BASE_PKG:-"fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"}                             
+export OUD_BASE_PKG=${OUD_BASE_PKG:-"${DEFAULT_OUD_BASE_PKG}"} # OUD 12.2.1.4.0
+export FMW_BASE_PKG=${FMW_BASE_PKG:-"${DEFAULT_FMW_BASE_PKG}"}                             
 export OUD_PATCH_PKG=${OUD_PATCH_PKG:-""}
 export FMW_PATCH_PKG=${FMW_PATCH_PKG:-""}
 export OUD_OPATCH_PKG=${OUD_OPATCH_PKG:-""}
@@ -211,7 +203,6 @@ fi
 for i in ${SOFTWARE_VARIABLES}; do
     # check if environment variable is not empty and value not yet part of SOFTWARE_LIST
     if [ -n "${!i}" ] && [[ $SOFTWARE_LIST != *"${!i}"* ]]; then
-        echo $i=${!i}
         SOFTWARE_LIST+="${!i};"
     fi
 done

@@ -3,10 +3,10 @@
 # Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
 # Saegereistrasse 29, 8152 Glattbrugg, Switzerland
 # ------------------------------------------------------------------------------
-# Name.......: 11_setup_oud_patch.sh
+# Name.......: setup_oud_patch.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.08.17
+# Date.......: 2022.08.30
 # Version....: v2.6.0
 # Purpose....: Script to patch Oracle Unified Directory binaries
 # Notes......: - Script would like to be executed as oracle :-)
@@ -21,7 +21,22 @@
 # Modified...:
 # see git revision history for more information on changes/updates
 # ---------------------------------------------------------------------------
-# - Environment Variables ---------------------------------------------------
+# - Customization --------------------------------------------------------------
+# define default software packages
+DEFAULT_FMW_BASE_PKG="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"
+DEFAULT_OUD_BASE_PKG="p30188352_122140_Generic.zip"
+DEFAULT_OUD_PATCH_PKG="p34039288_122140_Generic.zip"
+DEFAULT_FMW_PATCH_PKG="p34236279_122140_Generic.zip"
+DEFAULT_OUD_OPATCH_PKG="p28186730_1394210_Generic.zip"
+DEFAULT_OUI_PATCH_PKG=""
+DEFAULT_COHERENCE_PATCH_PKG="p34248976_122140_Generic.zip"
+DEFAULT_OUD_ONEOFF_PKGS="p34287807_122140_Generic.zip"
+
+# ORACLE_HOME_NAME="oud12.2.1.4.0"                    # Name of the Oracle Home directory
+# ORACLE_HOME="${ORACLE_BASE}/product/${ORACLE_HOME_NAME}"
+# - End of Customization -------------------------------------------------------
+
+# - Default Values ------------------------------------------------------
 VERSION=v2.6.0
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
@@ -39,16 +54,7 @@ export SETUP_OUD_PATCH="setup_oud_patch.sh"     # OUD patch script
 export OUD_FUNCTIONS="oud_functions.sh"         # OUD oud_functions script
 # source common functions from oud_functions.sh
 . ${SCRIPT_DIR}/${OUD_FUNCTIONS}
-DEFAULT_TMP_DIR=$(mktemp -d)          
-# define default software packages
-DEFAULT_FMW_BASE_PKG="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"
-DEFAULT_OUD_BASE_PKG="p30188352_122140_Generic.zip"
-DEFAULT_OUD_PATCH_PKG="p34039288_122140_Generic.zip"
-DEFAULT_FMW_PATCH_PKG="p34236279_122140_Generic.zip"
-DEFAULT_OUD_OPATCH_PKG="p28186730_1394210_Generic.zip"
-DEFAULT_OUI_PATCH_PKG=""
-DEFAULT_COHERENCE_PATCH_PKG="p34248976_122140_Generic.zip"
-DEFAULT_OUD_ONEOFF_PKGS="p34287807_122140_Generic.zip"
+DEFAULT_TMP_DIR=$(mktemp -d)                            # create a temp directory
 
 # define the software packages
 export OUD_PATCH_PKG=${OUD_PATCH_PKG:-""}
@@ -248,6 +254,7 @@ DoMsg "INFO : ORACLE_INVENTORY      = ${ORACLE_INVENTORY:-n/a}"
 DoMsg "INFO : OUD_TYPE              = ${OUD_TYPE:-n/a}"
 DoMsg "INFO : SOFTWARE              = ${SOFTWARE:-n/a}"
 DoMsg "INFO : SOFTWARE_REPO         = ${SOFTWARE_REPO:-n/a}"
+DoMsg "INFO : DEFAULT_TMP_DIR       = ${DEFAULT_TMP_DIR:-n/a}"
 DoMsg "INFO : TMP_DIR               = ${TMP_DIR:-n/a}"
 DoMsg "INFO : OUD_BASE_PKG          = ${OUD_BASE_PKG:-n/a}"
 DoMsg "INFO : FMW_BASE_PKG          = ${FMW_BASE_PKG:-n/a}"
