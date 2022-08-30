@@ -87,15 +87,16 @@ function Usage() {
 # ------------------------------------------------------------------------------
     VERBOSE="TRUE"
     DoMsg "Usage, ${SCRIPT_NAME} [-hvAL] [-b <ORACLE_BASE>] [-i <ORACLE_INVENTORY>]"
-    DoMsg "    [-j <JAVA_HOME>] [-l <LOCK FILE>] [-m <ORACLE_HOME>]"
-    DoMsg "    [-n <ORACLE_HOME_NAME>] [-r <RESPONSE FILE>] [-t <INSTALL TYPE>]"
-    DoMsg "    [-C <COHERENCE_PATCH_PKG>] [-O <OUD_BASE_PKG FILE>] [-P <OUD_ONEOFF_PKGS>]"
-    DoMsg "    [-T <OUD_PATCH_PKG>] [-U <FMW_PATCH_PKG>] [-V <OUD_OPATCH_PKG>]"
-    DoMsg "    [-W <FMW_BASE_PKG>] [-I <OUI_PATCH_PKG>]"
+    DoMsg "    [-S <SOFTWARE>] [-R <SOFTWARE_REPO>] [-j <JAVA_HOME>] [-l <LOCK FILE>]"
+    DoMsg "    [-m <ORACLE_HOME>] [-n <ORACLE_HOME_NAME>] [-r <RESPONSE FILE>]"
+    DoMsg "    [-t <INSTALL TYPE>] [-C <COHERENCE_PATCH_PKG>] [-O <OUD_BASE_PKG FILE>]"
+    DoMsg "    [-P <OUD_ONEOFF_PKGS>] [-T <OUD_PATCH_PKG>] [-U <FMW_PATCH_PKG>]"
+    DoMsg "    [-V <OUD_OPATCH_PKG>] [-W <FMW_BASE_PKG>] [-I <OUI_PATCH_PKG>]"
     DoMsg ""
     DoMsg "    -b <ORACLE_BASE>         ORACLE_BASE Directory. (default \$ORACLE_BASE=${ORACLE_BASE})"
     DoMsg "    -i <ORACLE_INVENTORY>    ORACLE_INVENTORY Directory. (default \$ORACLE_INVENTORY=${ORACLE_INVENTORY})"
     DoMsg "    -S <SOFTWARE>            Directory containing the installation packages and software. (default \$SOFTWARE=${ORACLE_BASE}/software)"
+    DoMsg "    -R <SOFTWARE_REPO>       URL of a software repository to to download the packages/software alternatively. (default \$SOFTWARE_REPO=${SOFTWARE_REPO})"
     DoMsg "    -h                       Usage this message"
     DoMsg "    -j <JAVA_HOME>           JAVA_HOME directory. If not set we will search for java in \$ORACLE_BASE/products)"
     DoMsg "    -l <LOCK FILE>           Specify a dedicated lock file (default ${DEFAULT_LOCK_FILE})"
@@ -147,7 +148,7 @@ fi
 running_in_docker && export OPATCH_NO_FUSER=true
 
 # usage and getopts
-while getopts b:i:S:hj:l:m:n:r:t:vALC:O:P:T:U:V:W:I:E: arg; do
+while getopts b:i:S:R:hj:l:m:n:r:t:vALC:O:P:T:U:V:W:I:E: arg; do
     case $arg in
         h) Usage 0;;
         l) LOCK_FILE="${OPTARG}";;
@@ -156,6 +157,7 @@ while getopts b:i:S:hj:l:m:n:r:t:vALC:O:P:T:U:V:W:I:E: arg; do
         b) export ORACLE_BASE="${OPTARG}";;
         i) export ORACLE_INVENTORY="${OPTARG}";;
         S) export SOFTWARE="${OPTARG}";;
+        R) export SOFTWARE_REPO="${OPTARG}";;
         j) export JAVA_HOME="${OPTARG}";;
         m) export ORACLE_HOME="${OPTARG}";;
         n) export ORACLE_HOME_NAME="${OPTARG}";;
