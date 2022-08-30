@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add parameter "-S" for local and *-R* for remote software repository. See issue #96
+
 ### Changed
 
 - Clean up default package names and variables
