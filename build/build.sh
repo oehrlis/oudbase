@@ -54,7 +54,7 @@ VERSION=$(head -1 ${PACKAG_BASE}/VERSION |sed -E 's/.*(v[0-9]+.[0-9]+.[0-9]+).*/
 DATE=$(date "+%Y.%m.%d")
 
 for i in ./bin/* ./etc/* $(find ./templates -type f); do
-    echo "update version to ${VERSION} in file $i"
+    echo "update version to ${VERSION} and date to ${DATE} in file $i"
     sed -i -E "s/^VERSION=.*/VERSION=${VERSION}/" $i 
     sed -i -E "s/^# Date\.\.\.\.\.\.\.:.*/# Date.......: ${DATE}/" $i  
     sed -i -E "s/^# Version\.\.\.\.:.*/# Version....: ${VERSION}/" $i  
