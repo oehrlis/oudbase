@@ -6,8 +6,8 @@
 # Name.......: 02_config_basedn.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.08.30
-# Version....: v2.7.0
+# Date.......: 2022.09.03
+# Version....: v2.7.1
 # Purpose....: Script to configure base DN and add ou's for users and groups.
 # Notes......: BaseDN in 02_config_basedn.ldif will be updated before
 #              it is loaded using ldapmodify.

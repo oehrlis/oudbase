@@ -6,8 +6,8 @@
 # Name.......: setup_oud.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.08.30
-# Version....: v2.7.0
+# Date.......: 2022.09.03
+# Version....: v2.7.1
 # Purpose....: generic script to install Oracle Unified Directory binaries.
 # Notes......: Script would like to be executed as oracle :-).
 # Reference..: --
@@ -33,7 +33,7 @@ DEFAULT_OUD_ONEOFF_PKGS="p34287807_122140_Generic.zip"
 # - End of Customization -------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v2.7.0
+VERSION=v2.7.1
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"

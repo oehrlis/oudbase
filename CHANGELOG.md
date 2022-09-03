@@ -197,3 +197,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [2.3.1]: https://github.com/oehrlis/oudbase/releases/tag/v2.3.1
 [2.4.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.4.0
 [2.5.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.5.0
+[2.6.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.6.0
+[2.7.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.7.0
+[2.7.1]: https://github.com/oehrlis/oudbase/releases/tag/v2.7.1
