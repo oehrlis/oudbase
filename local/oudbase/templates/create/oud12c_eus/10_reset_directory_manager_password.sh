@@ -6,8 +6,8 @@
 # Name.......: 10_reset_directory_***REMOVED***_password.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.08.30
-# Version....: v2.7.0
+# Date.......: 2022.09.03
+# Version....: v2.7.1
 # Purpose....: Adjust cn=Directory Manager to use new password storage scheme
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
