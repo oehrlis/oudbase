@@ -16,6 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.7.1] - 2022-09-03
+
+### Added
+
+- add *oud.crontab* back to *etc* due to dependency in deployments
+
+### Changed
+
+- add alias *dsrs* to *oudbase* help
+
 ## [2.7.0] - 2022-08-30
 
 ### Added
