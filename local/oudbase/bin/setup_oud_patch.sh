@@ -245,6 +245,21 @@ if [ -d "${SOFTWARE}" ] || [ -w "${SOFTWARE}" ]; then
 else
     DoMsg "INFO : Sofware repository is ready"
 fi
+
+DoMsg "INFO : Check installed components"
+if [ -x "$ORACLE_HOME/oui/bin/viewInventory.sh" ]; then
+    inventory=$($ORACLE_HOME/oui/bin/viewInventory.sh|grep 'FeatureSet' |grep -w 'opatch\|oud\|wls4fmw\|coherence'| sort --unique| cut -d: -f2|cut -d' ' -f2)
+    [[ "$inventory" == *"opatch"* ]]    && export OPATCH_INSTALLED="TRUE"
+    [[ "$inventory" == *"oud"* ]]       && export OUD_INSTALLED="TRUE"
+    [[ "$inventory" == *"wls4fmw"* ]]   && export WLS_INSTALLED="TRUE"
+    [[ "$inventory" == *"coherence"* ]] && export COHERENCE_INSTALLED="TRUE"
+else
+    export OPATCH_INSTALLED=""
+    export OUD_INSTALLED=""
+    export WLS_INSTALLED=""
+    export COHERENCE_INSTALLED=""
+fi
+
 # show what we will create later on...
 DoMsg "INFO : Prepare Oracle OUD patch installation ---------------------------"
 DoMsg "INFO : ORACLE_ROOT           = ${ORACLE_ROOT:-n/a}"
@@ -265,13 +280,17 @@ DoMsg "INFO : OUD_OPATCH_PKG        = ${OUD_OPATCH_PKG:-n/a}"
 DoMsg "INFO : OUI_PATCH_PKG         = ${OUI_PATCH_PKG:-n/a}"
 DoMsg "INFO : COHERENCE_PATCH_PKG   = ${COHERENCE_PATCH_PKG:-n/a}"
 DoMsg "INFO : OUD_ONEOFF_PKGS       = ${OUD_ONEOFF_PKGS:-n/a}"
+DoMsg "INFO : OPATCH_INSTALLED      = ${OPATCH_INSTALLED:-n/a}"
+DoMsg "INFO : OUD_INSTALLED         = ${OUD_INSTALLED:-n/a}"
+DoMsg "INFO : WLS_INSTALLED         = ${WLS_INSTALLED:-n/a}"
+DoMsg "INFO : COHERENCE_INSTALLED   = ${COHERENCE_INSTALLED:-n/a}"
 
 # - EOF Initialization ---------------------------------------------------------
 
 # - Main -----------------------------------------------------------------------
 # - Install OPatch -------------------------------------------------------------
 DoMsg "INFO : Step 1 Install OPatch (${OUD_OPATCH_PKG}) ---------------------"
-if [ -n "${OUD_OPATCH_PKG}" ]; then
+if [ -n "${OUD_OPATCH_PKG}" ] && [ "${OPATCH_INSTALLED^^}" == "TRUE" ]; then
     if get_software "${OUD_OPATCH_PKG}"; then       # Check and get binaries
         SOFTWARE_PKG=$(find ${SOFTWARE} -name ${OUD_OPATCH_PKG} 2>/dev/null| head -1)
         DoMsg "INFO : unzip ${SOFTWARE_PKG} to ${TMP_DIR}"
@@ -293,11 +312,19 @@ fi
 
 # - Install OUI patch ----------------------------------------------------------
 DoMsg "INFO : Step 2 Install OUI patch (${OUI_PATCH_PKG}) -------------------"
-install_patch ${OUI_PATCH_PKG}
+if [ -n "${OUI_PATCH_PKG}" ]; then
+    install_patch ${OUI_PATCH_PKG}
+else
+    DoMsg "INFO : No OUI patch package specified/found. Skip OUI patch installation."
+fi
 
 DoMsg "INFO : Step 3 Install FMW patch (${FMW_PATCH_PKG}) -------------------"
 if [ "${OUD_TYPE}" == "OUDSM12" ]; then
-    install_patch ${FMW_PATCH_PKG}
+    if [ -n "${FMW_PATCH_PKG}" ] && [ "${WLS_INSTALLED^^}" == "TRUE" ]; then
+        install_patch ${FMW_PATCH_PKG}
+    else
+       DoMsg "INFO : No WLS patch package specified/found. Skip WLS patch installation."
+    fi
 else
     DoMsg "INFO : OUD_TYPE=${OUD_TYPE} Skip FMW patch -----------------------"
 fi
@@ -305,7 +332,7 @@ fi
 # - Install Coherence patch ----------------------------------------------------
 DoMsg "INFO : Step 4 Install Coherence patch (${COHERENCE_PATCH_PKG}) ------------"
 if [ "${OUD_TYPE}" == "OUDSM12" ]; then
-    if [ -n "${COHERENCE_PATCH_PKG}" ]; then
+    if [ -n "${COHERENCE_PATCH_PKG}" ] && [ "${COHERENCE_INSTALLED^^}" == "TRUE" ]; then
         if get_software "${COHERENCE_PATCH_PKG}"; then        # Check and get binaries
             SOFTWARE_PKG=$(find ${SOFTWARE} -name ${COHERENCE_PATCH_PKG} 2>/dev/null| head -1)
             COHERENCE_PATCH_ID=$(unzip -qql ${SOFTWARE_PKG}| sed -r '1 {s/([ ]+[^ ]+){3}\s+//;q}')
@@ -338,9 +365,13 @@ fi
 
 # - Install OUD patch ----------------------------------------------------------
 DoMsg "INFO : Step 5 Install OUD patch (${OUD_PATCH_PKG}) -------------------"
-install_patch ${OUD_PATCH_PKG}
+if [ -n "${OUD_PATCH_PKG}" ] && [ "${OUD_INSTALLED^^}" == "TRUE" ]; then
+    install_patch ${OUD_PATCH_PKG}
+else
+    DoMsg "INFO : No OUD patch package specified/found. Skip OUD patch installation."
+fi
 
-echo " - Step 6: Install One-off patches ------------------------------------"
+DoMsg "INFO : Step 6: Install One-off patches ------------------------------------"
 if [ -n "${OUD_ONEOFF_PKGS}" ]; then
     for oneoff_patch in $(echo "${OUD_ONEOFF_PKGS}"|sed s/\;/\ /g); do
         DoMsg "INFO : Step 6.x: Install One-off patch ${oneoff_patch} ------------"

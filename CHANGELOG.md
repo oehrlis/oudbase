@@ -16,6 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.8.0] - 2022-10-24
+
+### Added
+
+- add check for installed components and features in *setup_oud_patch.sh*
+
+### Changed
+
+### Fixed
+
 ## [2.7.1] - 2022-09-03
 
 ### Added
