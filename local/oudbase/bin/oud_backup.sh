@@ -18,7 +18,7 @@
 # see git revision history with git log for more information on changes
 # ------------------------------------------------------------------------------
 # - Customization --------------------------------------------------------------
-export OPENDS_JAVA_ARGS=-Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true
+
 # - End of Customization -------------------------------------------------------
  
 # - Default Values ------------------------------------------------------

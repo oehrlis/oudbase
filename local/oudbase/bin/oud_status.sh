@@ -19,7 +19,7 @@
 # ------------------------------------------------------------------------------
 # - Customization --------------------------------------------------------------
 export OUD_ROOT_DN=${OUD_ROOT_DN:-"postgasse.org"}
-export OPENDS_JAVA_ARGS=-Dcom.sun.jndi.ldap.object.disableEndpointIdentification=true
+
 export OUD_CON_HANDLER=${OUD_CON_HANDLER:-"LDAP LDAPS"}
 # - End of Customization -------------------------------------------------------
 
