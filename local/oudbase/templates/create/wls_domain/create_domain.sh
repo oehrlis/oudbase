@@ -6,8 +6,8 @@
 # Name.......: create_domain.sh
 # Author.....: Patrick Joss (jpa) patrick.joss@trivadis.com
 # Editor.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
-# Date.......: 2022.09.03
-# Version....: v2.7.1
+# Date.......: 2022.10.24
+# Version....: v2.8.0
 # Purpose....: Script to create an empty weblogic domain 
 #              with template Basic WebLogic Server Domain  
 # Notes......: 

@@ -4,8 +4,8 @@
 # ------------------------------------------------------------------------------
 # File-Name..: oud_instance.service
 # Author.....: Stefan Oehrli, stefan.oehrli at trivadis.com
-# Date.......: 2022.09.03
-# Version....: v2.7.1
+# Date.......: 2022.10.24
+# Version....: v2.8.0
 # Purpose....: Unit file for OUD Instance
 # Usage......: systemctl enable oud.service
 # Notes......: 
