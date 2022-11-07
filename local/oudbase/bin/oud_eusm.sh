@@ -6,8 +6,8 @@
 # Name.......: oud_eusm.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.09.03
-# Version....: v2.7.1
+# Date.......: 2022.10.24
+# Version....: v2.8.0
 # Purpose....: Shell script for EUS admin tool (command line)
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
@@ -19,7 +19,7 @@
 # ------------------------------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v2.7.1
+VERSION=v2.8.0
 JRE_HOME=$JAVA_HOME/jre/
 EUSMLIBDIR=$ORACLE_BASE/local/oudbase/lib
 ORACLEPKI=$ORACLE_HOME/oracle_common/modules/oracle.pki/oraclepki.jar

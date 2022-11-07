@@ -6,8 +6,8 @@
 # Name.......: 99_completion_status.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.09.03
-# Version....: v2.7.1
+# Date.......: 2022.10.24
+# Version....: v2.8.0
 # Usage......: 99_completion_status.sh
 # Purpose....: simple touch completion status
 # Notes......:  
