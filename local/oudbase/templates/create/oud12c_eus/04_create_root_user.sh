@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.11.08
-# Version....: v2.9.0
+# Version....: v2.9.1
 # Usage......: 04_create_root_user.sh
 # Purpose....: Script für das erstellen der root User
 # Notes......: Das Script für die dsconfig Kommandos aus 04_create_root_user.conf
