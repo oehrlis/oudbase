@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.9.1] - 2022-11-07
+
+### Fixed
+
+- define a default value for *TNS_ADMIN*. For *tns_function.sh* it is *TVDLDAP_ETC_DIR*
+  where for *tns_dump.sh* and *tns_load.sh* it is the current folder.
+
 ## [2.9.0] - 2022-11-07
 
 ### Changed

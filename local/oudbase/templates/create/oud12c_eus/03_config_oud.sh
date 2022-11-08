@@ -7,7 +7,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.11.08
-# Version....: v2.9.0
+# Version....: v2.9.1
 # Purpose....: Script to configure the OUD proxy instance.
 # Notes......: The config file 03_config_oud_proxy.conf is executed using
 #              dsconfig in batch mode. If required, each command can 
