@@ -6,8 +6,8 @@
 # Name.......: 15_reset_user_passwords.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.10.24
-# Version....: v2.8.0
+# Date.......: 2022.11.08
+# Version....: v2.9.0
 # Usage......: 15_reset_user_passwords.sh
 # Purpose....: Script to reset admin user passwords
 # Notes......: 

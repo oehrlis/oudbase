@@ -6,8 +6,8 @@
 # Name.......: 03_config_NET_realm.ldif
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.10.24
-# Version....: v2.8.0
+# Date.......: 2022.11.08
+# Version....: v2.9.0
 # Purpose....: NET realm configuration for the user and group search base
 # Notes......: The LDIF file is loaded by the script 03_config_NET_realm.sh 
 #              If necessary it can also be imported manually.
