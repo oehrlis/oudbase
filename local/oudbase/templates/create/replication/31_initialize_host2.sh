@@ -6,8 +6,8 @@
 # Name.......: 31_initialize_host2.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.10.24
-# Version....: v2.8.0
+# Date.......: 2022.11.08
+# Version....: v2.9.0
 # Usage......: 31_initialize_host2.sh
 # Purpose....: simple script to initialize replication
 # Notes......:  

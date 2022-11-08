@@ -16,6 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.9.0] - 2022-11-07
+
+### Changed
+
+- update latest patch information in [setup_oud.sh](local/oudbase/bin/setup_oud.sh)
+- update latest patch information in [setup_oud_patch.sh](local/oudbase/bin/setup_oud_patch.sh)
+- move variable *OPENDS_JAVA_ARGS* to *oudenv_custom.conf* template
+
+### Fixed
+
+- add *MybindDN* as parameter to *export-ldif* in *oud_export.sh*.
+
 ## [2.8.0] - 2022-10-24
 
 ### Added
