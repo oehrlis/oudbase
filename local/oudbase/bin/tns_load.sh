@@ -16,7 +16,7 @@
 # ------------------------------------------------------------------------------
 # - Customization --------------------------------------------------------------
 # - just add/update any kind of customized environment variable here
-DEFAULT_OUTPUT_DIR=$TNS_ADMIN
+DEFAULT_OUTPUT_DIR=${TNS_ADMIN:-$(pwd)}
 DEFAULT_FILE_PREFIX="ldap_dump"
 # - End of Customization -------------------------------------------------------
 
