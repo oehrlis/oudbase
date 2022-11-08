@@ -231,10 +231,10 @@ for oud_inst in ${OUD_INST_LIST}; do
             DoMsg "INFO : [$oud_inst] start export backendID ${backend_id} with base DN ${backend_basedn}"
             DoMsg "INFO : [$oud_inst] export log file ${INST_LOG_FILE}"
 
-            EXPORT_COMMAND="${OUD_BIN}/export-ldif --hostname ${HOST} --port $PORT_ADMIN ${COMPRESS} --trustAll --bindPasswordFile ${MybindPasswordFile} --backendID \"${backend_id}\" --ldifFile \"${OUD_EXPORT_DIR}/export_${oud_inst}_${backend_id}_${DATE_STRING}.${SUFFIX}\""
+            EXPORT_COMMAND="${OUD_BIN}/export-ldif --hostname ${HOST} --port $PORT_ADMIN --bindDN "${MybindDN}" ${COMPRESS} --trustAll --bindPasswordFile ${MybindPasswordFile} --backendID \"${backend_id}\" --ldifFile \"${OUD_EXPORT_DIR}/export_${oud_inst}_${backend_id}_${DATE_STRING}.${SUFFIX}\""
             echo -e "\n${EXPORT_COMMAND}" >>${INST_LOG_FILE}
             
-            ${OUD_BIN}/export-ldif --hostname ${HOST} --port $PORT_ADMIN ${COMPRESS} --trustAll --bindPasswordFile ${MybindPasswordFile} --backendID "${backend_id}" --ldifFile "${OUD_EXPORT_DIR}/export_${oud_inst}_${backend_id}_${DATE_STRING}.${SUFFIX}">>${INST_LOG_FILE} 2>&1
+            ${OUD_BIN}/export-ldif --hostname ${HOST} --port $PORT_ADMIN --bindDN "${MybindDN}" ${COMPRESS} --trustAll --bindPasswordFile ${MybindPasswordFile} --backendID "${backend_id}" --ldifFile "${OUD_EXPORT_DIR}/export_${oud_inst}_${backend_id}_${DATE_STRING}.${SUFFIX}">>${INST_LOG_FILE} 2>&1
             OUD_ERROR=$?
             DoMsg "INFO : [$oud_inst] cat lines from export log ${INST_LOG_FILE}"
             DoMsg "$(sed -n "/${backend_id}/,\$p" ${INST_LOG_FILE})"
