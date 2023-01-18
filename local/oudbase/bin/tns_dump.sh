@@ -20,13 +20,6 @@ DEFAULT_OUTPUT_DIR=${TNS_ADMIN:-$(pwd)}
 DEFAULT_FILE_PREFIX="ldap_dump"
 # - End of Customization -------------------------------------------------------
 
-# Define a bunch of bash option see 
-# https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
-# https://www.davidpashley.com/articles/writing-robust-shell-scripts/
-set -o nounset                      # exit if script try to use an uninitialised variable
-set -o errexit                      # exit script if any statement returns a non-true return value
-set -o pipefail                     # pipefail exit after 1st piped commands failed
-
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
 VERSION=v2.9.1
@@ -37,13 +30,6 @@ TVDLDAP_SCRIPT_NAME=$(basename ${BASH_SOURCE[0]})
 TVDLDAP_BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 TVDLDAP_LOG_DIR="$(dirname ${TVDLDAP_BIN_DIR})/log"
 
-# define logfile and logging
-LOG_BASE=${LOG_BASE:-"${TVDLDAP_LOG_DIR}"} # Use script log directory as default logbase
-TIMESTAMP=$(date "+%Y.%m.%d_%H%M%S")
-readonly LOGFILE="$LOG_BASE/$(basename $TVDLDAP_SCRIPT_NAME .sh)_$TIMESTAMP.log"
-
-# define tempfile for ldapsearch
-TEMPFILE="$LOG_BASE/$(basename $TVDLDAP_SCRIPT_NAME .sh)_$$.ldif"
 # - EOF Environment Variables --------------------------------------------------
 
 # - Functions ------------------------------------------------------------------
@@ -117,6 +103,32 @@ EOI
 # - EOF Functions --------------------------------------------------------------
 
 # - Initialization -------------------------------------------------------------
+# Check OUD_BASE and load if necessary
+if [ "${OUD_BASE}" = "" ]; then
+    if [ -f "${HOME}/.OUD_BASE" ]; then
+        . "${HOME}/.OUD_BASE"
+    else
+        CleanAndQuit 21
+    fi
+fi
+ 
+# Check if OUD_BASE exits
+if [ "${OUD_BASE}" = "" ] || [ ! -d "${OUD_BASE}" ]; then
+    CleanAndQuit 10
+fi
+ 
+OUDENV=$(find $OUD_BASE -name oudenv.sh)
+# Load OUD environment
+. "${OUDENV}" SILENT
+
+# define logfile and logging
+LOG_BASE=${LOG_BASE:-"${TVDLDAP_LOG_DIR}"} # Use script log directory as default logbase
+TIMESTAMP=$(date "+%Y.%m.%d_%H%M%S")
+readonly LOGFILE="$LOG_BASE/$(basename $TVDLDAP_SCRIPT_NAME .sh)_$TIMESTAMP.log"
+
+# define tempfile for ldapsearch
+TEMPFILE="$LOG_BASE/$(basename $TVDLDAP_SCRIPT_NAME .sh)_$$.ldif"
+
 touch $LOGFILE 2>/dev/null          # initialize logfile
 exec &> >(tee -a "$LOGFILE")        # Open standard out at `$LOG_FILE` for write.  
 exec 2>&1  
@@ -165,11 +177,18 @@ dump_runtime_config     # dump current tool specific environment in debug mode
 # get the ldapsearch options based on available tools
 ldapsearch_options=$(ldapsearch_options)
 
-# Default values
-OUTPUT_DIR=${OUTPUT_DIR:-$DEFAULT_OUTPUT_DIR}
+# Default value for OUTPUT_FILE is null
 OUTPUT_FILE=${OUTPUT_FILE:-""}
 
-# Default values
+# set the default value for OUTPUT_DIR
+if [ -z "$OUTPUT_FILE" ]; then
+    # use DEFAULT_OUTPUT_DIR when OUTPUT_FILE and OUTPUT_DIR not defined
+    OUTPUT_DIR=${OUTPUT_DIR:-$DEFAULT_OUTPUT_DIR}
+else
+    # use PATH of OUTPUT_FILE when OUTPUT_FILE defined and OUTPUT_DIR not defined
+    OUTPUT_DIR=${OUTPUT_DIR:-$(dirname $OUTPUT_FILE)}
+fi
+
 export NETSERVICE=${NETSERVICE:-""}
 
 # check for Service and Arguments
@@ -281,10 +300,10 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                 # loop over ldapsearch results
                 for result in $(grep -iv '^dn: ' $TEMPFILE | sed -n '1 {h; $ !d}; $ {x; s/\n //g; p}; /^ / {H; d}; /^ /! {x; s/\n //g; p}'| sed 's/$/;/g' | sed 's/^;$/DELIM/g' | tr -d '\n'| sed 's/DELIM/\n/g'|tr -d ' '); do
                     echo_debug "DEBUG: ${result}"
-                    cn=$(echo ${result}| cut -d ';' -f 1 | cut -d " " -f 2 | sed 's/cn://gi')
+                    cn=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f 2 | sed 's/cn://gi')
                     # check for aliasedObjectName or orclNetDescString
                     if [[ "$result" == *orclNetDescString* ]]; then
-                        NetDescString=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2- |sed 's/orclNetDescString://gi')
+                        NetDescString=$(echo ${result}| cut -d ';' -f 1 | cut -d " " -f2- |sed 's/orclNetDescString://gi')
                         echo "${cn}.${domain}=${NetDescString}" >>${OUTPUT_DIR}/${dump_file}
                     elif [[ "$result" == *aliasedObjectName* ]]; then
                         aliasedObjectName=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2- |sed 's/aliasedObjectName://gi')
