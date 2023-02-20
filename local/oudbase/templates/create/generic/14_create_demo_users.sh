@@ -6,8 +6,8 @@
 # Name.......: 14_create_demo_users.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.11.08
-# Version....: v2.9.1
+# Date.......: 2023.02.20
+# Version....: v2.9.2
 # Purpose....: Script to create a couple of users and groups.
 # Notes......: BaseDN in 02_config_basedn.ldif will be updated before
 #              it is loaded using ldapmodify.
