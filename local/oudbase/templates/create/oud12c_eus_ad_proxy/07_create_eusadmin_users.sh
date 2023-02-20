@@ -6,8 +6,8 @@
 # Name.......: 07_create_eusadmin_users.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.11.08
-# Version....: v2.9.1
+# Date.......: 2023.02.20
+# Version....: v2.9.2
 # Purpose....: Script to create EUS Context Admin according to MOS Note 1996363.1.
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase

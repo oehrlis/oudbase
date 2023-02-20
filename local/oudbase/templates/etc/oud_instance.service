@@ -4,8 +4,8 @@
 # ------------------------------------------------------------------------------
 # File-Name..: oud_instance.service
 # Author.....: Stefan Oehrli, stefan.oehrli at trivadis.com
-# Date.......: 2022.11.08
-# Version....: v2.9.1
+# Date.......: 2023.02.20
+# Version....: v2.9.2
 # Purpose....: Unit file for OUD Instance
 # Usage......: systemctl enable oud.service
 # Notes......: 
@@ -38,14 +38,14 @@
 # ------------------------------------------------------------------------------
 
 [Unit]
-Description=OUD Instance
+Description=OUD Instance OUD_INSTANCE
 Wants=network.target
 After=network.target
  
 [Service]
 Type=forking
-User=oud
-Group=oud
+User=USER
+Group=GROUP
 WorkingDirectory=OUD_INSTANCE_HOME/OUD
 PIDFile=OUD_INSTANCE_HOME/OUD/logs/server.pid
 ExecStart=OUD_INSTANCE_HOME/OUD/bin/start-ds --quiet

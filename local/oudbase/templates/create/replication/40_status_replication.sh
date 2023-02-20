@@ -6,8 +6,8 @@
 # Name.......: 40_status_replication.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.11.08
-# Version....: v2.9.1
+# Date.......: 2023.02.20
+# Version....: v2.9.2
 # Usage......: 40_status_replication.sh
 # Purpose....: simple script to display replication status
 # Notes......:  

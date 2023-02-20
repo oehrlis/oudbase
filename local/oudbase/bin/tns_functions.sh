@@ -6,8 +6,8 @@
 # Name.......: tns_functions.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2022.11.08
-# Version....: v2.9.1
+# Date.......: 2023.02.20
+# Version....: v2.9.2
 # Purpose....: Common functions used by the TNS bash scripts.
 # Notes......: --
 # Reference..: --
@@ -42,7 +42,7 @@ TVDLDAP_DEFAULT_LDAPTOOLS=""
 
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v2.9.1
+VERSION=v2.9.2
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode
@@ -576,7 +576,9 @@ function get_bindpwd_param() {
 # Purpose....: get ldap host from ldap.ora
 # ------------------------------------------------------------------------------
 function get_ldaphost() {
-    if [ -f "$TNS_ADMIN/ldap.ora" ]; then
+    if [ -f "$TNS_ADMIN/ldap.ora" ] && [ ! -z ${TVDLDAP_LDAPHOST+x} ]; then
+        echo ${TVDLDAP_LDAPHOST}
+    elif [ -f "$TNS_ADMIN/ldap.ora" ] && [ -z ${TVDLDAP_LDAPHOST+x} ]; then
         grep -i "^DIRECTORY_SERVERS" $TNS_ADMIN/ldap.ora|sed 's/.*(\([^]]*\)).*/\1/g'|cut -d, -f1| cut -d: -f1
     else
         echo ${TVDLDAP_LDAPHOST:-$TVDLDAP_DEFAULT_LDAPHOST}
@@ -588,13 +590,14 @@ function get_ldaphost() {
 # Purpose....: get ldap port from ldap.ora
 # ------------------------------------------------------------------------------
 function get_ldapport() {
-    if [ -f "$TNS_ADMIN/ldap.ora" ]; then
+    if [ -f "$TNS_ADMIN/ldap.ora" ] && [ ! -z ${TVDLDAP_LDAPPORT+x} ]; then
+        echo ${TVDLDAP_LDAPPORT}
+    elif [ -f "$TNS_ADMIN/ldap.ora" ] && [ -z ${TVDLDAP_LDAPPORT+x} ]; then
         grep -i "^DIRECTORY_SERVERS" $TNS_ADMIN/ldap.ora|sed 's/.*(\([^]]*\)).*/\1/g'|cut -d, -f1| cut -d: -f2
     else
         echo ${TVDLDAP_LDAPPORT:-$TVDLDAP_DEFAULT_LDAPPORT}
     fi
 }
-
 # - EOF Functions --------------------------------------------------------------
 
 # - Initialization -------------------------------------------------------------
