@@ -16,6 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.10.0] - 2023-02-21
+
+### Changed
+
+- update latest patch information in [setup_oud.sh](local/oudbase/bin/setup_oud.sh)
+- update latest patch information in [setup_oud_patch.sh](local/oudbase/bin/setup_oud_patch.sh)
+- update documentation for [oud_instance.service](local/oudbase/templates/etc/oud_instance.service)
+
 ## [2.9.2] - 2023-02-20
 
 ### Fixed
