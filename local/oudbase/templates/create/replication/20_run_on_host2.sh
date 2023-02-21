@@ -6,8 +6,8 @@
 # Name.......: 20_wait_for_host2.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.02.20
-# Version....: v2.9.2
+# Date.......: 2023.02.21
+# Version....: v2.10.0
 # Usage......: 20_wait_for_host2.sh
 # Purpose....: Script to wait for other host to be ready
 # Notes......:  
