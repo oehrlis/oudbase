@@ -6,8 +6,8 @@
 # Name.......: tns_dump.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.02.20
-# Version....: v2.9.2
+# Date.......: 2023.02.21
+# Version....: v2.10.0
 # Purpose....: Dump entries as tnsnames.ora
 # Notes......: --
 # Reference..: --
@@ -22,7 +22,7 @@ DEFAULT_FILE_PREFIX="ldap_dump"
 
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v2.9.2
+VERSION=v2.10.0
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode

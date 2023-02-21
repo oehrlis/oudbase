@@ -6,8 +6,8 @@
 # Name.......: setup_oud_patch.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.02.20
-# Version....: v2.9.2
+# Date.......: 2023.02.21
+# Version....: v2.10.0
 # Purpose....: Script to patch Oracle Unified Directory binaries
 # Notes......: - Script would like to be executed as oracle :-)
 #              - If the required software is not in /opt/stage, an attempt is
@@ -37,7 +37,7 @@ DEFAULT_OUD_ONEOFF_PKGS=""
 # - End of Customization -------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v2.9.2
+VERSION=v2.10.0
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
