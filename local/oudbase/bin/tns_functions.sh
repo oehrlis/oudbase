@@ -55,6 +55,7 @@ export TVDLDAP_LOG_DIR="$(dirname ${TVDLDAP_BIN_DIR})/log"
 export TVDLDAP_ETC_DIR="$(dirname ${TVDLDAP_BIN_DIR})/etc"
 export TVDLDAP_BASE=$(dirname ${TVDLDAP_BIN_DIR})
 export TOOL_BASE_NAME=$(basename ${TVDLDAP_BASE})
+export TOOL_LDAP_BASE_NAME="tvdldap"
 export TOOL_OUD_BASE_NAME="oudenv"
 export TVDLDAP_CONFIG_FILES=""
 export TVDLDAP_KEEP_LOG_DAYS=${TVDLDAP_KEEP_LOG_DAYS:-$TVDLDAP_DEFAULT_KEEP_LOG_DAYS}
@@ -80,6 +81,7 @@ export TVDLDAP_TIMEMOUT=${TVDLDAP_TIMEMOUT:-$TVDLDAP_DEFAULT_TIMEMOUT}
 # initialize common variables
 export TVDLDAP_DRYRUN=${TVDLDAP_DRYRUN:-"FALSE"}
 export TVDLDAP_FORCE=${TVDLDAP_FORCE:-"FALSE"}
+export TVDLDAP_BULK=${TVDLDAP_BULK:-"FALSE"}
 export TVDLDAP_NETALIAS=${TVDLDAP_NETALIAS:-"FALSE"}
 export TNS_ADMIN=${TNS_ADMIN:-${TVDLDAP_ETC_DIR}}
 # - EOF Environment Variables --------------------------------------------------
@@ -98,8 +100,20 @@ function force_enabled () {
 }
 
 # ------------------------------------------------------------------------------
+# Function...: bulk_enabled
+# Purpose....: Check if BULK mode is enabled
+# ------------------------------------------------------------------------------
+function bulk_enabled () {
+    if [ "${TVDLDAP_BULK^^}" == "TRUE" ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# ------------------------------------------------------------------------------
 # Function...: alias_enabled
-# Purpose....: Check if FORCE mode is enabled
+# Purpose....: Check if NETALIAS suport is enabled
 # ------------------------------------------------------------------------------
 function alias_enabled () {
     if [ "${TVDLDAP_NETALIAS^^}" == "TRUE" ]; then
@@ -303,16 +317,22 @@ function load_config() {
     echo_debug "DEBUG: Start to source configuration files"
     for config in   ${TVDLDAP_ETC_DIR}/${TOOL_OUD_BASE_NAME}.conf \
                     ${TVDLDAP_ETC_DIR}/${TOOL_OUD_BASE_NAME}_custom.conf \
-                    ${TVDLDAP_ETC_DIR}/${TOOL_BASE_NAME}.conf \
-                    ${TVDLDAP_ETC_DIR}/${TOOL_BASE_NAME}_custom.conf \
+                    ${TVDLDAP_ETC_DIR}/${TOOL_LDAP_BASE_NAME}.conf \
+                    ${TVDLDAP_ETC_DIR}/${TOOL_LDAP_BASE_NAME}_custom.conf \
                     ${ETC_BASE}/${TOOL_OUD_BASE_NAME}.conf \
                     ${ETC_BASE}/${TOOL_OUD_BASE_NAME}_custom.conf \
-                    ${ETC_BASE}/${TOOL_BASE_NAME}.conf \
-                    ${ETC_BASE}/${TOOL_BASE_NAME}_custom.conf; do
-        if [ -f "${config}" ]; then
-            echo_debug "DEBUG: source configuration file ${config}"
-            . ${config}
-            export TVDLDAP_CONFIG_FILES="$TVDLDAP_CONFIG_FILES${config} "
+                    ${ETC_BASE}/${TOOL_LDAP_BASE_NAME}.conf \
+                    ${ETC_BASE}/${TOOL_LDAP_BASE_NAME}_custom.conf; do
+        if [[ "$TVDLDAP_CONFIG_FILES" == *"${config}"* ]]; then
+            echo_debug "DEBUG: configuration file ${config} already loaded"
+        else
+            if [ -f "${config}" ]; then
+                echo_debug "DEBUG: source configuration file ${config}"
+                . ${config}
+                export TVDLDAP_CONFIG_FILES="$TVDLDAP_CONFIG_FILES${config},"
+            else
+                echo_debug "DEBUG: skip configuration file ${config} as it does not exists"
+            fi
         fi
     done
 }
@@ -322,15 +342,17 @@ function load_config() {
 # Purpose....: Dump / display runtime configuration and variables
 # ------------------------------------------------------------------------------
 function dump_runtime_config() {
-    echo_debug "DEBUG: Dump current ${TOOL_BASE_NAME} specific environment variables"
+    echo_debug "DEBUG: Dump current ${TOOL_LDAP_BASE_NAME} specific environment variables"
+    echo_debug "---------------------------------------------------------------------------------"
     if [ "${TVDLDAP_DEBUG^^}" == "TRUE" ]; then
-        for i in $(env|grep -i "${TOOL_BASE_NAME}_"|sort); do
+        for i in $(env|grep -i "${TOOL_LDAP_BASE_NAME}_"|sort); do
         variable=$(echo "$i"|cut -d= -f1)
-        value=$(echo "$i"|cut -d= -f2)
+        value=$(echo "$i"|cut -d= -f2-)
         value=${value:-"undef"}
-        printf "DEBUG: %s%s %s\n" "${variable}" "${padding:${#variable}}" "${value}" 
+        printf 'DEBUG: %s%s %s\n' "${variable}" "${padding:${#variable}}" "${value}" 
         done
     fi
+    echo_debug "DEBUG: "    
 }
 
 # ------------------------------------------------------------------------------
