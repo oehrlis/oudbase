@@ -16,6 +16,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.10.1] - 2023-02-22
+
+### Changed
+
+- update layout for debug information in scripts
+
+### Fixed
+
+- Fix issue #112 *Debug mode does not dump env variables*
+
 ## [2.10.0] - 2023-02-21
 
 ### Changed
