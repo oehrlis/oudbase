@@ -317,16 +317,22 @@ function load_config() {
     echo_debug "DEBUG: Start to source configuration files"
     for config in   ${TVDLDAP_ETC_DIR}/${TOOL_OUD_BASE_NAME}.conf \
                     ${TVDLDAP_ETC_DIR}/${TOOL_OUD_BASE_NAME}_custom.conf \
-                    ${TVDLDAP_ETC_DIR}/${TOOL_BASE_NAME}.conf \
-                    ${TVDLDAP_ETC_DIR}/${TOOL_BASE_NAME}_custom.conf \
+                    ${TVDLDAP_ETC_DIR}/${TOOL_LDAP_BASE_NAME}.conf \
+                    ${TVDLDAP_ETC_DIR}/${TOOL_LDAP_BASE_NAME}_custom.conf \
                     ${ETC_BASE}/${TOOL_OUD_BASE_NAME}.conf \
                     ${ETC_BASE}/${TOOL_OUD_BASE_NAME}_custom.conf \
-                    ${ETC_BASE}/${TOOL_BASE_NAME}.conf \
-                    ${ETC_BASE}/${TOOL_BASE_NAME}_custom.conf; do
-        if [ -f "${config}" ]; then
-            echo_debug "DEBUG: source configuration file ${config}"
-            . ${config}
-            export TVDLDAP_CONFIG_FILES="$TVDLDAP_CONFIG_FILES${config} "
+                    ${ETC_BASE}/${TOOL_LDAP_BASE_NAME}.conf \
+                    ${ETC_BASE}/${TOOL_LDAP_BASE_NAME}_custom.conf; do
+        if [[ "$TVDLDAP_CONFIG_FILES" == *"${config}"* ]]; then
+            echo_debug "DEBUG: configuration file ${config} already loaded"
+        else
+            if [ -f "${config}" ]; then
+                echo_debug "DEBUG: source configuration file ${config}"
+                . ${config}
+                export TVDLDAP_CONFIG_FILES="$TVDLDAP_CONFIG_FILES${config},"
+            else
+                echo_debug "DEBUG: skip configuration file ${config} as it does not exists"
+            fi
         fi
     done
 }
