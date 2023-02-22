@@ -254,6 +254,7 @@ BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
  
 # - Main ------------------------------------------------------------------------
 echo_debug "DEBUG: Configuration / Variables:"
+echo_debug "---------------------------------------------------------------------------------"
 echo_debug "DEBUG: LDAP Host............... = $TVDLDAP_LDAPHOST"
 echo_debug "DEBUG: LDAP Port............... = $TVDLDAP_LDAPPORT"
 echo_debug "DEBUG: Bind DN................. = $TVDLDAP_BINDDN"
@@ -267,6 +268,7 @@ echo_debug "DEBUG: Command Timeout......... = $TVDLDAP_TIMEMOUT"
 echo_debug "DEBUG: SQL Test User........... = $TVDLDAP_SQL_USER"
 echo_debug "DEBUG: SQL Test PWD............ = $TVDLDAP_SQL_PWD"
 echo_debug "DEBUG: SQL Test PWD File....... = $TVDLDAP_SQL_PWDFILE"
+echo_debug "DEBUG: "
 
 for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
     echo_debug "DEBUG: process service $service"

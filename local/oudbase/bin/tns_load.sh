@@ -188,6 +188,7 @@ common_basedn=$(get_basedn "$TVDLDAP_BASEDN")
  
 # - Main ------------------------------------------------------------------------
 echo_debug "DEBUG: Configuration / Variables:"
+echo_debug "---------------------------------------------------------------------------------"
 echo_debug "DEBUG: LDAP Host............... = $TVDLDAP_LDAPHOST"
 echo_debug "DEBUG: LDAP Port............... = $TVDLDAP_LDAPPORT"
 echo_debug "DEBUG: Bind DN................. = $TVDLDAP_BINDDN"
@@ -198,6 +199,7 @@ echo_debug "DEBUG: Common Base DN.......... = $common_basedn"
 echo_debug "DEBUG: tnsnames file........... = $TNSNAMES_FILES"
 echo_debug "DEBUG: ldapmodify options...... = $ldapmodify_options"
 echo_debug "DEBUG: ldapadd options......... = $ldapadd_options"
+echo_debug "DEBUG: "
 
 for file in $TNSNAMES_FILES; do
     files_processed=$((files_processed+1))      # Count processed files

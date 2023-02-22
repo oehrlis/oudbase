@@ -238,6 +238,7 @@ fi
  
 # - Main ------------------------------------------------------------------------
 echo_debug "DEBUG: Configuration / Variables:"
+echo_debug "---------------------------------------------------------------------------------"
 echo_debug "DEBUG: LDAP Host............... = $TVDLDAP_LDAPHOST"
 echo_debug "DEBUG: LDAP Port............... = $TVDLDAP_LDAPPORT"
 echo_debug "DEBUG: Bind DN................. = $TVDLDAP_BINDDN"
@@ -249,6 +250,7 @@ echo_debug "DEBUG: Net Service Names....... = $NETSERVICE"
 echo_debug "DEBUG: Output directory........ = $OUTPUT_DIR"
 echo_debug "DEBUG: Output file............. = $OUTPUT_FILE"
 echo_debug "DEBUG: ldapsearch options...... = $ldapsearch_options"
+echo_debug "DEBUG: "
 
 for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
     echo_debug "DEBUG: process service $service"

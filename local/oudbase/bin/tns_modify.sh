@@ -193,6 +193,7 @@ current_cn=$(split_net_service_cn ${NETSERVICE})
  
 # - Main ------------------------------------------------------------------------
 echo_debug "DEBUG: Configuration / Variables:"
+echo_debug "---------------------------------------------------------------------------------"
 echo_debug "DEBUG: LDAP Host............... = $TVDLDAP_LDAPHOST"
 echo_debug "DEBUG: LDAP Port............... = $TVDLDAP_LDAPPORT"
 echo_debug "DEBUG: Bind DN................. = $TVDLDAP_BINDDN"
@@ -207,6 +208,7 @@ echo_debug "DEBUG: Net Service Description. = $NETDESCSTRING"
 echo_debug "DEBUG: Net Service Alias....... = $TVDLDAP_NETALIAS"
 echo_debug "DEBUG: ldapmodify options...... = $ldapmodify_options"
 echo_debug "DEBUG: ldapadd options......... = $ldapadd_options"
+echo_debug "DEBUG: "
 
 # Set BASEDN_LIST to current Base DN from Net Service Name
 if [ -n "${current_basedn}" ]; then BASEDN_LIST=${current_basedn}; fi
