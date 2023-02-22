@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.10.1] - 2023-02-22
 
+### Added
+
+- add function *bulk_enabled* to verify if bulk mode is enabled
+
 ### Changed
 
 - update layout for debug information in scripts
@@ -25,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix issue #112 *Debug mode does not dump env variables*
+- Fix issue #113 *Config files are loaded multiple times*
+- Fix issue #114 *Correct order for config files*
 
 ## [2.10.0] - 2023-02-21
 
