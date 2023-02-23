@@ -6,8 +6,8 @@
 # Name.......: 05_config_eus_realm.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.02.21
-# Version....: v2.10.0
+# Date.......: 2023.02.23
+# Version....: v2.11.0
 # Purpose....: Script to configure EUS realm to the OUD proxy instance.
 # Notes......: BaseDN in 05_config_eus_realm.ldif will be updated before
 #              it is loaded using ldapmodify.

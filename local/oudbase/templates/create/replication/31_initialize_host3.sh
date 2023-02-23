@@ -6,8 +6,8 @@
 # Name.......: 31_initialize_host3.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.02.21
-# Version....: v2.10.0
+# Date.......: 2023.02.23
+# Version....: v2.11.0
 # Usage......: 31_initialize_host3.sh
 # Purpose....: simple script to initialize replication
 # Notes......:  

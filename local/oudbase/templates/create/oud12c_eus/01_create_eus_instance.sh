@@ -6,8 +6,8 @@
 # Name.......: 01_create_eus_instance.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.02.21
-# Version....: v2.10.0
+# Date.......: 2023.02.23
+# Version....: v2.11.0
 # Purpose....: Script to create the OUD instance with EUS context 
 #              using oud-setup.
 # Notes......: Will skip oud-proxy-setup if config.ldif already exists
