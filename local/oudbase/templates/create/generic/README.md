@@ -15,7 +15,7 @@ be used to setup / run .LDIF and .CONF files.
 - [04_create_root_user.conf](04_create_root_user.conf) dsconfig batch file loaded by wrapper script `04_create_root_user.sh`.
 - [04_create_root_user.ldif](04_create_root_user.ldif) LDIF file loaded by wrapper script `04_create_root_user.sh`. 
 - [04_create_root_user.sh](04_create_root_user.sh) Wrapper script to create additional root user.
-- [10_reset_directory_***REMOVED***_password.sh](10_reset_directory_***REMOVED***_password.sh) Reset `cn=Directory Manager` password.
+- [10_reset_directory_manager_password.sh](10_reset_directory_manager_password.sh) Reset `cn=Directory Manager` password.
 - [11_reset_root_passwords.sh](11_reset_root_passwords.sh) Reset or regenerate all admin users passwords.
 - [14_create_demo_users.ldif](14_create_demo_users.ldif) LDIF file loaded by wrapper script `14_create_demo_users.sh`.
 - [14_create_demo_users.sh](14_create_demo_users.sh) Wrapper script to create a couple of users and groups.

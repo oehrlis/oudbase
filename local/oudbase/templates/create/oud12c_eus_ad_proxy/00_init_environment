@@ -1,10 +1,9 @@
 #!/bin/bash
 # ------------------------------------------------------------------------------
-# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
-# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# OraDBA - Oracle Database Infrastructur and Security, 5630 Muri, Switzerland
 # ------------------------------------------------------------------------------
 # Name.......: 00_init_environment
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.02.23
 # Version....: v2.11.0
@@ -71,7 +70,7 @@ export KEYSTOREPIN=${OUD_INSTANCE_HOME}/OUD/config/keystore.pin
 export AD_PDC_HOST="ad.trivadislabs.com"                                        # set the host name of your primary domain controller (PDC)
 export AD_PDC_PORT=389                                                          # set the LDAP port for your PDC
 export AD_PDC_USER="cn=oracle,cn=Users,dc=trivadislabs,dc=com"                  # set the MS AD account used by OUD to access AD
-export AD_PDC_PASSWORD='***REMOVED***'                                          # set the password for the MS AD account
+export AD_PDC_PASSWORD='LAB01schulung'                                          # set the password for the MS AD account
 export AD_PDC_PASSWORD_FILE="${OUD_INSTANCE_ADMIN}/etc/ad_pwd_file.txt"         # set the password file for the MS AD account
 
 # EUS Configuration

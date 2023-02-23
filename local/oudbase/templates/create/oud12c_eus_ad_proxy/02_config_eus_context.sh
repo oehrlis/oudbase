@@ -1,10 +1,9 @@
 #!/bin/bash
 # ------------------------------------------------------------------------------
-# Trivadis - Part of Accenture, Data Platform - Transactional Data Platform
-# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# OraDBA - Oracle Database Infrastructur and Security, 5630 Muri, Switzerland
 # ------------------------------------------------------------------------------
 # Name.......: 02_config_eus_context.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.02.23
 # Version....: v2.11.0

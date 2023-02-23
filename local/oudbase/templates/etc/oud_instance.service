@@ -1,9 +1,8 @@
 # ------------------------------------------------------------------------------
-# Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
-# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# OraDBA - Oracle Database Infrastructur and Security, 5630 Muri, Switzerland
 # ------------------------------------------------------------------------------
 # File-Name..: oud_instance.service
-# Author.....: Stefan Oehrli, stefan.oehrli at trivadis.com
+# Author.....: Stefan Oehrli, stefan.oehrli@oradba.ch
 # Date.......: 2023.02.23
 # Version....: v2.11.0
 # Purpose....: This is a template file for a systemd unit file for Oracle Unified 

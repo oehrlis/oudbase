@@ -1,9 +1,8 @@
 # ------------------------------------------------------------------------------
-# Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
-# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# OraDBA - Oracle Database Infrastructur and Security, 5630 Muri, Switzerland
 # ------------------------------------------------------------------------------
 # File-Name..: wls_oudsm.service
-# Author.....: Stefan Oehrli, stefan.oehrli at trivadis.com
+# Author.....: Stefan Oehrli, stefan.oehrli@oradba.ch
 # Date.......: 2023.02.23
 # Version....: v2.11.0
 # Purpose....: Unit file for OUDSM domain

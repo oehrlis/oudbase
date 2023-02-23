@@ -1,10 +1,9 @@
 #!/bin/bash
 # ------------------------------------------------------------------------------
-# Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
-# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# OraDBA - Oracle Database Infrastructur and Security, 5630 Muri, Switzerland
 # ------------------------------------------------------------------------------
 # Name.......: build.sh
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2022.08.17
 # Version....: 2.0.0

@@ -1,10 +1,9 @@
 version: 1
 # ------------------------------------------------------------------------------
-# Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
-# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# OraDBA - Oracle Database Infrastructur and Security, 5630 Muri, Switzerland
 # ------------------------------------------------------------------------------
 # Name.......: 14_create_demo_users.ldif 
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.02.23
 # Version....: v2.11.0
@@ -95,7 +94,7 @@ cn: Honey Rider
 sn: Rider
 uid: rider
 title: Manager
-***REMOVED***: cn=Ben King,ou=Senior Management,ou=USER_OU,BASEDN
+manager: cn=Ben King,ou=Senior Management,ou=USER_OU,BASEDN
 givenName: Honey
 departmentNumber: 70
 displayName: Honey Rider
@@ -111,7 +110,7 @@ cn: Vesper Lynd
 sn: Lynd
 uid: lynd
 title: Clerk
-***REMOVED***: cn=Honey Rider,ou=Human Resources,ou=USER_OU,BASEDN
+manager: cn=Honey Rider,ou=Human Resources,ou=USER_OU,BASEDN
 givenName: Vesper
 departmentNumber: 70
 displayName: Vesper Lynd
@@ -127,7 +126,7 @@ cn: Eugen Tanner
 sn: Tanner
 uid: tanner
 title: Administrator
-***REMOVED***: cn=Ian Fleming,ou=Information Technology,ou=USER_OU,BASEDN
+manager: cn=Ian Fleming,ou=Information Technology,ou=USER_OU,BASEDN
 givenName: Eugen
 departmentNumber: 60
 displayName: Eugen Tanner
@@ -143,7 +142,7 @@ cn: Ian Fleming
 sn: Fleming
 uid: fleming
 title: Manager
-***REMOVED***: cn=Ben King,ou=Senior Management,ou=USER_OU,BASEDN
+manager: cn=Ben King,ou=Senior Management,ou=USER_OU,BASEDN
 givenName: Ian
 displayName: Ian Fleming
 departmentNumber: 60
@@ -159,7 +158,7 @@ cn: John Gartner
 sn: Gartner
 uid: gartner
 title: Administrator
-***REMOVED***: cn=Ian Fleming,ou=Information Technology,ou=USER_OU,BASEDN
+manager: cn=Ian Fleming,ou=Information Technology,ou=USER_OU,BASEDN
 givenName: John
 displayName: John Gartner
 departmentNumber: 60
@@ -175,7 +174,7 @@ cn: Jim Clark
 sn: Clark
 uid: clark
 title: Manager
-***REMOVED***: cn=Ben King,ou=Senior Management,ou=USER_OU,BASEDN
+manager: cn=Ben King,ou=Senior Management,ou=USER_OU,BASEDN
 givenName: Jim
 displayName: Jim Clark
 departmentNumber: 20
@@ -191,7 +190,7 @@ cn: John Miller
 sn: Miller
 uid: miller
 title: Clerk
-***REMOVED***: cn=Jim Clark,ou=Accounting,ou=USER_OU,BASEDN
+manager: cn=Jim Clark,ou=Accounting,ou=USER_OU,BASEDN
 givenName: John
 displayName: John Miller
 departmentNumber: 20
@@ -207,7 +206,7 @@ cn: Douglas Adams
 sn: Adams
 uid: adams
 title: Clerk
-***REMOVED***: cn=Ernst Blofeld,ou=Research,ou=USER_OU,BASEDN
+manager: cn=Ernst Blofeld,ou=Research,ou=USER_OU,BASEDN
 givenName: Douglas
 displayName: Douglas Adams
 departmentNumber: 30
@@ -223,7 +222,7 @@ cn: Ernst Blofeld
 sn: Blofeld
 uid: blofeld
 title: Manager
-***REMOVED***: cn=Ben King,ou=Senior Management,ou=USER_OU,BASEDN
+manager: cn=Ben King,ou=Senior Management,ou=USER_OU,BASEDN
 givenName: Ernst
 displayName: Ernst Blofeld
 departmentNumber: 30
@@ -239,7 +238,7 @@ cn: Ford Prefect
 sn: Prefect
 uid: prefect
 title: Analyst
-***REMOVED***: cn=Ernst Blofeld,ou=Research,ou=USER_OU,BASEDN
+manager: cn=Ernst Blofeld,ou=Research,ou=USER_OU,BASEDN
 givenName: Ford
 displayName: Ford Prefect
 departmentNumber: 30
@@ -255,7 +254,7 @@ cn: James Scott
 sn: Scott
 uid: scott
 title: Engineer
-***REMOVED***: cn=Ernst Blofeld,ou=Research,ou=USER_OU,BASEDN
+manager: cn=Ernst Blofeld,ou=Research,ou=USER_OU,BASEDN
 givenName: James
 displayName: James Scott
 departmentNumber: 30
@@ -271,7 +270,7 @@ cn: Paul Smith
 sn: Smith
 uid: smith
 title: Engineer
-***REMOVED***: cn=Ernst Blofeld,ou=Research,ou=USER_OU,BASEDN
+manager: cn=Ernst Blofeld,ou=Research,ou=USER_OU,BASEDN
 givenName: Paul
 displayName: Paul Smith
 departmentNumber: 30
@@ -287,7 +286,7 @@ cn: Eve Moneypenny
 sn: Moneypenny
 uid: moneypenny
 title: Manager
-***REMOVED***: cn=Ben King,ou=Senior Management,ou=USER_OU,BASEDN
+manager: cn=Ben King,ou=Senior Management,ou=USER_OU,BASEDN
 givenName: Eve
 displayName: Eve Moneypenny
 departmentNumber: 40
@@ -303,7 +302,7 @@ cn: Monica Blake
 sn: Blake
 uid: blake
 title: Salesman
-***REMOVED***: cn=Eve Moneypenny,ou=Sales,ou=USER_OU,BASEDN
+manager: cn=Eve Moneypenny,ou=Sales,ou=USER_OU,BASEDN
 givenName: Monica
 displayName: Monica Blake
 departmentNumber: 40
@@ -319,7 +318,7 @@ cn: Paul Ward
 sn: Ward
 uid: ward
 title: Salesman
-***REMOVED***: cn=Eve Moneypenny,ou=Sales,ou=USER_OU,BASEDN
+manager: cn=Eve Moneypenny,ou=Sales,ou=USER_OU,BASEDN
 givenName: Paul
 displayName: Paul Ward
 departmentNumber: 40
@@ -335,7 +334,7 @@ cn: Arthur Dent
 sn: Dent
 uid: dent
 title: Salesman
-***REMOVED***: cn=Eve Moneypenny,ou=Sales,ou=USER_OU,BASEDN
+manager: cn=Eve Moneypenny,ou=Sales,ou=USER_OU,BASEDN
 givenName: Arthur
 displayName: Arthur Dent
 departmentNumber: 40
@@ -352,7 +351,7 @@ sn: Renton
 uid: renton
 title: Clerk
 givenName: Andy
-***REMOVED***: cn=Felix Leitner,ou=Operations,ou=USER_OU,BASEDN
+manager: cn=Felix Leitner,ou=Operations,ou=USER_OU,BASEDN
 displayName: Andy Renton
 departmentNumber: 50
 mail: Andy.Renton@trivadislabs.com
@@ -367,7 +366,7 @@ cn: Felix Leitner
 sn: Leitner
 uid: leitner
 title: Manager
-***REMOVED***: cn=Ben King,ou=Senior Management,ou=USER_OU,BASEDN
+manager: cn=Ben King,ou=Senior Management,ou=USER_OU,BASEDN
 givenName: Felix
 displayName: Felix Leitner
 departmentNumber: 50
@@ -383,7 +382,7 @@ cn: James Bond
 sn: Bond
 uid: bond
 title: Agent
-***REMOVED***: cn=Felix Leitner,ou=Operations,ou=USER_OU,BASEDN
+manager: cn=Felix Leitner,ou=Operations,ou=USER_OU,BASEDN
 givenName: James
 displayName: James Bond
 departmentNumber: 50
@@ -399,7 +398,7 @@ cn: Jason Walters
 sn: Walters
 uid: walters
 title: Agent
-***REMOVED***: cn=Felix Leitner,ou=Operations,ou=USER_OU,BASEDN
+manager: cn=Felix Leitner,ou=Operations,ou=USER_OU,BASEDN
 givenName: Jason
 displayName: Jason  Walters
 departmentNumber: 50

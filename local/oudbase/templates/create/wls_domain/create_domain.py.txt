@@ -1,9 +1,8 @@
 # ------------------------------------------------------------------------------
-# Trivadis - Part of Accenture, Platform Factory - Transactional Data Platform
-# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# OraDBA - Oracle Database Infrastructur and Security, 5630 Muri, Switzerland
 # ------------------------------------------------------------------------------
 # Name.......: create_domain.py.txt
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@accenture.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.02.23
 # Version....: v2.11.0
@@ -64,7 +63,7 @@ machine = create(machine_name, 'Machine')
 machine.setName(machine_name)
 
 # ------------------------------------------------------------------------------
-# Configure Node***REMOVED*** 
+# Configure Nodemanager 
 # ------------------------------------------------------------------------------
 cd('/NMProperties')
 set('ListenAddress', 'localhost')

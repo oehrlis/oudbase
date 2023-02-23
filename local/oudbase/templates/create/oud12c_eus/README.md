@@ -15,7 +15,7 @@ This folder contains all files to setup a EUS OUD instance with demo users. Corr
 - [05_config_eus_realm.ldif](05_config_eus_realm.ldif) LDIF file loaded by wrapper script `03_config_eus_realm.sh`.
 - [05_config_eus_realm.sh](05_config_eus_realm.sh) Wrapper script to configure EUS realm to the OUD instance.
 - [07_create_eusadmin_users.sh](07_create_eusadmin_users.sh) Script to create EUS Context Admin according to MOS Note 1996363.
-- [10_reset_directory_***REMOVED***_password.sh](10_reset_directory_***REMOVED***_password.sh) Reset `cn=Directory Manager` password.
+- [10_reset_directory_manager_password.sh](10_reset_directory_manager_password.sh) Reset `cn=Directory Manager` password.
 - [11_reset_root_passwords.sh](11_reset_root_passwords.sh) Reset or regenerate all admin users passwords.
 - [12_reset_eusadmin_password.sh](12_reset_eusadmin_password.sh) Reset or regenerate eusadmin user password.
 - [14_create_demo_users.ldif](14_create_demo_users.ldif) LDIF file loaded by wrapper script `14_create_demo_users.sh`.
