@@ -27,3 +27,4 @@ local/oudbase/lib/ldapjclnt19.jar
 /.externalToolBuilders/
 doc/oudbase.code-workspace
 local/oudbase/log/oud_export.log
+build/passwords.txt
