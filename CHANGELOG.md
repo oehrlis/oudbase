@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix issue #112 *Debug mode does not dump env variables*
 - Fix issue #113 *Config files are loaded multiple times*
 - Fix issue #114 *Correct order for config files*
+- Fix bug #122 and remove all legacy default passwords.
 
 ## [2.10.0] - 2023-02-21
 
