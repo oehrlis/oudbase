@@ -310,26 +310,40 @@ function clean_quit() {
 }
 
 # ------------------------------------------------------------------------------
+# Function...: get_list_of_config
+# Purpose....: create a list of configuration files
+# ------------------------------------------------------------------------------
+function get_list_of_config() {
+    ETC_PATH=""
+    if [ "${TVDLDAP_ETC_DIR}" == "${ETC_BASE}" ]; then
+        ETC_PATH=${TVDLDAP_ETC_DIR}
+    else
+        ETC_PATH="${TVDLDAP_ETC_DIR} ${ETC_BASE}"
+    fi
+    DEFAULT_TVDLDAP_CONFIG_FILES=""
+    for i in $ETC_PATH; do
+        for n in ${TOOL_OUD_BASE_NAME} ${TOOL_LDAP_BASE_NAME}; do
+            for m in ".conf" "_custom.conf"; do
+                echo $i/$n$m
+            done
+        done
+    done
+}
+
+# ------------------------------------------------------------------------------
 # Function...: load_config
 # Purpose....: Load package specific configuration files
 # ------------------------------------------------------------------------------
 function load_config() {
     echo_debug "DEBUG: Start to source configuration files"
-    for config in   ${TVDLDAP_ETC_DIR}/${TOOL_OUD_BASE_NAME}.conf \
-                    ${TVDLDAP_ETC_DIR}/${TOOL_OUD_BASE_NAME}_custom.conf \
-                    ${TVDLDAP_ETC_DIR}/${TOOL_LDAP_BASE_NAME}.conf \
-                    ${TVDLDAP_ETC_DIR}/${TOOL_LDAP_BASE_NAME}_custom.conf \
-                    ${ETC_BASE}/${TOOL_OUD_BASE_NAME}.conf \
-                    ${ETC_BASE}/${TOOL_OUD_BASE_NAME}_custom.conf \
-                    ${ETC_BASE}/${TOOL_LDAP_BASE_NAME}.conf \
-                    ${ETC_BASE}/${TOOL_LDAP_BASE_NAME}_custom.conf; do
+    for config in $(get_list_of_config); do
         if [[ "$TVDLDAP_CONFIG_FILES" == *"${config}"* ]]; then
             echo_debug "DEBUG: configuration file ${config} already loaded"
         else
             if [ -f "${config}" ]; then
                 echo_debug "DEBUG: source configuration file ${config}"
                 . ${config}
-                export TVDLDAP_CONFIG_FILES="$TVDLDAP_CONFIG_FILES${config},"
+                export TVDLDAP_CONFIG_FILES="$TVDLDAP_CONFIG_FILES,${config}"
             else
                 echo_debug "DEBUG: skip configuration file ${config} as it does not exists"
             fi
