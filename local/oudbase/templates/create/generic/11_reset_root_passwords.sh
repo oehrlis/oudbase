@@ -50,17 +50,17 @@ for user in "${ROOT_USERS[@]}"; do
     # Auto generate a password
     echo "- auto generate new password..."
     if [ $(command -v pwgen) ]; then 
-        s=$(pwgen -s -1 10)
+      s=$(pwgen -s -1 15)
     else 
-        while true; do
-            # use urandom to generate a random string
-            s=$(cat /dev/urandom | tr -dc "A-Za-z0-9" | fold -w 10 | head -n 1)
-            # check if the password meet the requirements
-            if [[ ${#s} -ge 10 && "$s" == *[A-Z]* && "$s" == *[a-z]* && "$s" == *[0-9]*  ]]; then
-                echo "$s"
-                break
-            fi
-        done
+      while true; do
+        # use urandom to generate a random string
+        s=$(cat /dev/urandom | tr -dc "A-Za-z0-9" | fold -w 15 | head -n 1)
+        # check if the password meet the requirements
+        if [[ ${#s} -ge 10 && "$s" == *[A-Z]* && "$s" == *[a-z]* && "$s" == *[0-9]*  ]]; then
+          echo "$s"
+          break
+        fi
+      done
     fi
     echo "- use auto generated password for user ${user}"
     ADMIN_PASSWORD=$s
