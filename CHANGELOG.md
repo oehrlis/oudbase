@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - add function *bulk_enabled* to verify if bulk mode is enabled
+- add function *bulk_get_list_of_configenabled* to create a list of possible
+  configuration files based on current environment variables.
 
 ### Changed
 
