@@ -438,15 +438,19 @@ function gen_password {
     fi
 
     # Auto generate a password
-    while true; do
-        # use urandom to generate a random string
-        s=$(cat /dev/urandom | tr -dc "A-Za-z0-9" | fold -w ${Length} | head -n 1)
-        # check if the password meet the requirements
-        if [[ ${#s} -ge ${Length} && "$s" == *[A-Z]* && "$s" == *[a-z]* && "$s" == *[0-9]*  ]]; then
-            echo "$s"
-            break
-        fi
-    done
+    if [ $(command -v pwgen) ]; then 
+        s=$(pwgen -s -1 15)
+    else 
+        while true; do
+            # use urandom to generate a random string
+            s=$(cat /dev/urandom | tr -dc "A-Za-z0-9" | fold -w 15 | head -n 1)
+            # check if the password meet the requirements
+            if [[ ${#s} -ge 10 && "$s" == *[A-Z]* && "$s" == *[a-z]* && "$s" == *[0-9]*  ]]; then
+                echo "$s"
+                break
+            fi
+        done
+    fi
 }
 
 # ------------------------------------------------------------------------------
