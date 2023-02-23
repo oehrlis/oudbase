@@ -112,13 +112,9 @@ function Usage() {
     LDAP hostname TVDLDAP_LDAPHOST, etc. The configuration files are loaded in
     the following order:
 
-    1.  ${TVDLDAP_ETC_DIR}/${TOOL_OUD_BASE_NAME}.conf
-    2.  ${TVDLDAP_ETC_DIR}/${TOOL_OUD_BASE_NAME}_custom.conf
-    3.  ${ETC_BASE}/${TOOL_OUD_BASE_NAME}.conf
-    4.  ${ETC_BASE}/${TOOL_OUD_BASE_NAME}_custom.conf
-    5.  Command line parameter
-    
-    Logfile : ${LOGFILE}
+$((get_list_of_config && echo "Command line parameter")|cat -b)
+
+  Logfile : ${LOGFILE}
 
 EOI
     dump_runtime_config     # dump current tool specific environment in debug mode
