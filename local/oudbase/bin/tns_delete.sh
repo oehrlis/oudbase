@@ -87,6 +87,8 @@ function Usage() {
     -S <NETSERVICE>     Oracle Net Service Names to delete (mandatory)
     -n                  Show what would be done but do not actually do it
     -F                  Force mode to modify existing entry
+    -B                  Bulk delete of Net Service Name. When enable bulk detele
+                        wildcards e.g. * will be supported for Net Service Name.
 
   Configuration file:
     The script does load configuration files to define default values as an
@@ -122,7 +124,7 @@ fi
 load_config                 # load configuration files. File list in TVDLDAP_CONFIG_FILES
 
 # get options
-while getopts mvdb:h:p:D:w:Wy:S:nFE: CurOpt; do
+while getopts mvdb:h:p:D:w:Wy:S:nFEB: CurOpt; do
     case ${CurOpt} in
         m) Usage 0;;
         v) TVDLDAP_VERBOSE="TRUE" ;;
@@ -135,6 +137,7 @@ while getopts mvdb:h:p:D:w:Wy:S:nFE: CurOpt; do
         W) TVDLDAP_BINDDN_PWDASK="TRUE";; 
         y) TVDLDAP_BINDDN_PWDFILE="${OPTARG}";; 
         F) TVDLDAP_FORCE="TRUE";; 
+        B) TVDLDAP_BULK="TRUE";; 
         n) TVDLDAP_DRYRUN="TRUE";; 
         S) NETSERVICE=${OPTARG};;
         E) clean_quit "${OPTARG}";;
@@ -187,6 +190,7 @@ BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
  
 # - Main ------------------------------------------------------------------------
 echo_debug "DEBUG: Configuration / Variables:"
+echo_debug "---------------------------------------------------------------------------------"
 echo_debug "DEBUG: LDAP Host............... = $TVDLDAP_LDAPHOST"
 echo_debug "DEBUG: LDAP Port............... = $TVDLDAP_LDAPPORT"
 echo_debug "DEBUG: Bind DN................. = $TVDLDAP_BINDDN"
@@ -196,6 +200,11 @@ echo_debug "DEBUG: Bind parameter.......... = $current_binddn $current_bindpwd"
 echo_debug "DEBUG: Base DN................. = $BASEDN_LIST"
 echo_debug "DEBUG: Net Service Names....... = $NETSERVICE"
 echo_debug "DEBUG: ldapsearch options...... = $ldapsearch_options"
+echo_debug "DEBUG: "
+
+if bulk_enabled; then
+    echo_debug "DEBUG: bulk mode enabled"
+fi
 
 for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
     echo_debug "DEBUG: process service $service"
