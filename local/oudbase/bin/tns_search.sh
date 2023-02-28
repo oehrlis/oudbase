@@ -22,9 +22,9 @@
 # https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
 # https://www.davidpashley.com/articles/writing-robust-shell-scripts/
 set -o nounset                      # exit if script try to use an uninitialised variable
-set -o errexit                      # exit script if any statement returns a non-true return value
-set -o pipefail                     # pipefail exit after 1st piped commands failed
-
+# set -o errexit                      # exit script if any statement returns a non-true return value
+# set -o pipefail                     # pipefail exit after 1st piped commands failed
+set -f
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
 VERSION=v2.12.0
@@ -160,11 +160,17 @@ export NETSERVICE=${NETSERVICE:-""}
 
 # check for Service and Arguments
 if [ -z "$NETSERVICE" ] && [ $# -ne 0 ]; then
+    echo_debug "DEBUG: Process default NETSERVICE"
     if [[ "$1" =~ ^-.*  ]]; then
-        NETSERVICE=$ORACLE_SID  # default service to ORACLE_SID if Argument starting with dash 
+        echo_debug "DEBUG: Set NETSERVICE to ALL"
+        NETSERVICE="ALL"          # default service to * if Argument starting with dash 
     else
-        NETSERVICE=$1           # default service to Argument if not starting with dash
+        echo_debug "DEBUG: Set NETSERVICE to $1"
+        NETSERVICE=$1             # default service to Argument if not starting with dash
     fi
+else
+    echo_debug "DEBUG: Set NETSERVICE to ALL"
+    NETSERVICE=${NETSERVICE:-"ALL"}
 fi
 
 # check for mandatory parameters
@@ -210,7 +216,7 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
     else 
         BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
     fi
-    
+
     echo_debug "DEBUG: current Base DN list........ = $BASEDN_LIST"
     echo_debug "DEBUG: current Net Service Names... = $current_cn"
     for basedn in ${BASEDN_LIST}; do                # loop over base DN
@@ -233,13 +239,13 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                 # loop over ldapsearch results
                 for result in $(grep -iv '^dn: ' $TEMPFILE | sed -n '1 {h; $ !d}; $ {x; s/\n //g; p}; /^ / {H; d}; /^ /! {x; s/\n //g; p}'| sed 's/$/;/g' | sed 's/^;$/DELIM/g' | tr -d '\n'| sed 's/DELIM/\n/g'|tr -d ' '); do
                     echo_debug "DEBUG: ${result}"
-                    cn=$(echo ${result}| cut -d ';' -f 1 | cut -d " " -f 2 | sed 's/cn://gi')
+                    cn=$(echo ${result}|sed 's/;*$//g'|sed 's/.*cn:\(.*\)\(;.*\|$\)/\1/')
                     # check for aliasedObjectName or orclNetDescString
                     if [[ "$result" == *orclNetDescString* ]]; then
-                        NetDescString=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2- |sed 's/orclNetDescString://gi')
+                        NetDescString=$(echo ${result}|sed 's/;*$//g'|sed 's/.*orclNetDescString:\(.*\)\(;.*\|$\)/\1/')
                         echo "${cn}.${domain}=${NetDescString}"
                     elif [[ "$result" == *aliasedObjectName* ]]; then
-                        aliasedObjectName=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2- |sed 's/aliasedObjectName://gi')
+                        aliasedObjectName=$(echo ${result}|sed 's/;*$//g'|sed 's/.*aliasedObjectName:\(.*\)\(;.*\|$\)/\1/')
                         echo "${cn}.${domain} alias to ${aliasedObjectName}"
                     fi
                 done

@@ -24,7 +24,7 @@
 set -o nounset                      # exit if script try to use an uninitialised variable
 # set -o errexit                      # exit script if any statement returns a non-true return value
 # set -o pipefail                     # pipefail exit after 1st piped commands failed
-
+set -f
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
 VERSION=v2.12.0
@@ -137,7 +137,7 @@ fi
 
 load_config                 # load configur26ation files. File list in TVDLDAP_CONFIG_FILES
 
-# initialize tempfile for ldapsearch output
+# initialize tempfile for the script
 touch $TEMPFILE 2>/dev/null || clean_quit 25 $TEMPFILE
 touch $TNSPING_TEMPFILE 2>/dev/null || clean_quit 25 $TNSPING_TEMPFILE
 
@@ -173,7 +173,7 @@ dump_runtime_config     # dump current tool specific environment in debug mode
 # get the ldapsearch options based on available tools
 ldapsearch_options=$(ldapsearch_options)
 
-# check if we do hav a tnsping
+# check if we do have a tnsping
 if ! command_exists tnsping; then
     clean_quit 10 tnsping
 fi
@@ -224,7 +224,7 @@ ask_bindpwd                         # ask for the bind password if TVDLDAP_BINDD
                                     # is TRUE and LDAP tools are not OpenLDAP
 current_binddn=$(get_binddn_param "$TVDLDAP_BINDDN" )
 current_bindpwd=$(get_bindpwd_param "$TVDLDAP_BINDDN_PWD" ${TVDLDAP_BINDDN_PWDASK} "$TVDLDAP_BINDDN_PWDFILE")
-if [ -n "$current_binddn" ] && [ -z "${current_bindpwd}" ]; then clean_quit 4; fi
+if [ -z "$current_binddn" ] && [ -z "${current_bindpwd}" ]; then clean_quit 4; fi
 
 # get the SQL test password if user name is defined
 if [ -n "$TVDLDAP_SQL_USER" ]; then
@@ -286,38 +286,39 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
     fi
 
     echo_debug "DEBUG: current Base DN list........ = $BASEDN_LIST"
+    echo_debug "DEBUG: current Net Service Names... = $current_cn"
     for basedn in ${BASEDN_LIST}; do                # loop over base DN
         if basedn_exists ${basedn}; then
             echo "INFO : Process base dn $basedn"
             domain=$(echo $basedn|sed -e 's/,dc=/\./g' -e 's/dc=//g')
-            # run ldapsearch an write output to tempfile
-            ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
-                ${current_binddn:+"$current_binddn"} ${current_bindpwd} \
-                ${ldapsearch_options} -b "$basedn" -s sub \
-                "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" \
-                cn orclNetDescString aliasedObjectName>$TEMPFILE
-            if [ $? -ne 0 ]; then
-                clean_quit 33 "ldapsearch"
+            if ! alias_enabled; then
+                # run ldapsearch an write output to tempfile
+                ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+                    ${current_binddn:+"$current_binddn"} ${current_bindpwd} \
+                    ${ldapsearch_options} -b "$basedn" -s sub \
+                    "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" \
+                    cn orclNetDescString aliasedObjectName>$TEMPFILE
+                # check if last command did run successfully
+                if [ $? -ne 0 ]; then clean_quit 33 "ldapsearch"; fi
             fi
             # check if tempfile does exist and has some values
-            if [ -s "$TEMPFILE" ] ; then
+            if [ -s "$TEMPFILE" ]; then
                 echo "" >> $TEMPFILE    # add a new line to the tempfile
                 # loop over ldapsearch results
                 for result in $(grep -iv '^dn: ' $TEMPFILE | sed -n '1 {h; $ !d}; $ {x; s/\n //g; p}; /^ / {H; d}; /^ /! {x; s/\n //g; p}'| sed 's/$/;/g' | sed 's/^;$/DELIM/g' | tr -d '\n'| sed 's/DELIM/\n/g'|tr -d ' '); do
-                    
-                    cn=$(echo ${result}| cut -d ';' -f 1 | cut -d " " -f 2 | sed 's/cn://gi')
+                    echo_debug "DEBUG: ${result}"
+                    cn=$(echo ${result}|sed 's/;*$//g'|sed 's/.*cn:\(.*\)\(;.*\|$\)/\1/')
+                    # check for aliasedObjectName or orclNetDescString
                     if [[ "$result" == *orclNetDescString* ]]; then
-                        NetDescString=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2- |sed 's/orclNetDescString://gi')
+                        NetDescString=$(echo ${result}|sed 's/;*$//g'|sed 's/.*orclNetDescString:\(.*\)\(;.*\|$\)/\1/')
                     elif [[ "$result" == *aliasedObjectName* ]]; then
                         NetDescString=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2- |sed 's/aliasedObjectName://gi')
                         NetDescString="$(split_net_service_cn ${NetDescString}).${domain}"
                     fi
-
-                    NetDescString=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2- |sed 's/orclNetDescString://gi')
                     current_netservice="${cn}.${domain}"
                     
                     # add a few debug messages
-                    echo_debug "DEBUG: ${result}"
+                    echo_debug "DEBUG: Query result.... : ${result}"
                     echo_debug "DEBUG: cn.............. : $cn"
                     echo_debug "DEBUG: NetDescString... : $NetDescString"
 
