@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.02.28
-# Version....: v2.12.0
+# Version....: v2.12.1
 # Purpose....: Script to configure the OUD proxy instance.
 # Notes......: The config file 03_config_oud_proxy.conf is executed using
 #              dsconfig in batch mode. If required, each command can 

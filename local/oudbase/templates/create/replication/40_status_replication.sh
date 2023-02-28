@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.02.28
-# Version....: v2.12.0
+# Version....: v2.12.1
 # Usage......: 40_status_replication.sh
 # Purpose....: simple script to display replication status
 # Notes......:  

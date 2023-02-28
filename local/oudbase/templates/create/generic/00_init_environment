@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.02.28
-# Version....: v2.12.0
+# Version....: v2.12.1
 # Purpose....: File for setting the instance-specific environment. 
 #              The setup scripts are based on the OUD Base environment. 
 #              If OUD Base is not used, you may have to adapt this file 

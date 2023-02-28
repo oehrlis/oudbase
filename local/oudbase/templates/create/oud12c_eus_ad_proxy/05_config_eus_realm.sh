@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.02.28
-# Version....: v2.12.0
+# Version....: v2.12.1
 # Purpose....: Script to configure EUS realm to the OUD proxy instance.
 # Notes......: BaseDN in 05_config_eus_realm.ldif will be updated before
 #              it is loaded using ldapmodify.

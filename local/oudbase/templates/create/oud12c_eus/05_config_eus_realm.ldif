@@ -5,7 +5,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.02.28
-# Version....: v2.12.0
+# Version....: v2.12.1
 # Purpose....: EUS realm configuration for the user and group search base
 # Notes......: The LDIF file is loaded by the script 03_config_eus_realm.sh 
 #              If necessary it can also be imported manually.
