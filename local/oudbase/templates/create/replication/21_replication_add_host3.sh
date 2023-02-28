@@ -5,8 +5,8 @@
 # Name.......: 21_replication_add_host2.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.02.23
-# Version....: v2.11.0
+# Date.......: 2023.02.28
+# Version....: v2.12.0
 # Usage......: 21_replication_add_host2.sh
 # Purpose....: simple script to add and initialize replication
 # Notes......:  

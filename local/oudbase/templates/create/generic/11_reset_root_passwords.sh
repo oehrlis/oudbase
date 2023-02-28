@@ -5,8 +5,8 @@
 # Name.......: 11_reset_root_passwords.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.02.23
-# Version....: v2.11.0
+# Date.......: 2023.02.28
+# Version....: v2.12.0
 # Usage......: 11_reset_root_passwords.sh
 # Purpose....: Script to reset admin user passwords
 # Notes......: 
