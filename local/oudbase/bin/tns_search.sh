@@ -39,8 +39,7 @@ TVDLDAP_LOG_DIR="$(dirname ${TVDLDAP_BIN_DIR})/log"
 LOG_BASE=${LOG_BASE:-"${TVDLDAP_LOG_DIR}"} # Use script log directory as default logbase
 TIMESTAMP=$(date "+%Y.%m.%d_%H%M%S")
 readonly LOGFILE="$LOG_BASE/$(basename $TVDLDAP_SCRIPT_NAME .sh)_$TIMESTAMP.log"
-
-# define tempfile for ldapsearch
+# define tempfile for the script
 TEMPFILE="$LOG_BASE/$(basename $TVDLDAP_SCRIPT_NAME .sh)_$$.ldif"
 # - EOF Environment Variables --------------------------------------------------
 
@@ -60,7 +59,7 @@ function Usage() {
 
   where:
     services	        Comma separated list of Oracle Net Service Names to search
-        
+
   Common Options:
     -m                  Usage this message
     -v                  Enable verbose mode (default \$TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE})
@@ -121,7 +120,7 @@ fi
 
 load_config                 # load configur26ation files. File list in TVDLDAP_CONFIG_FILES
 
-# initialize tempfile for ldapsearch output
+# initialize tempfile for the script
 touch $TEMPFILE 2>/dev/null || clean_quit 25 $TEMPFILE
 
 # get options
@@ -180,7 +179,7 @@ ask_bindpwd                         # ask for the bind password if TVDLDAP_BINDD
                                     # is TRUE and LDAP tools are not OpenLDAP
 current_binddn=$(get_binddn_param "$TVDLDAP_BINDDN" )
 current_bindpwd=$(get_bindpwd_param "$TVDLDAP_BINDDN_PWD" ${TVDLDAP_BINDDN_PWDASK} "$TVDLDAP_BINDDN_PWDFILE")
-if [ -n "$current_binddn" ] && [ -z "${current_bindpwd}" ]; then clean_quit 4; fi
+if [ -z "$current_binddn" ] && [ -z "${current_bindpwd}" ]; then clean_quit 4; fi
 
 # get base DN information
 BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
