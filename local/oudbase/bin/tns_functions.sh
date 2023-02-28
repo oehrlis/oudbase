@@ -298,6 +298,7 @@ function clean_quit() {
         31) echo "ERROR: Exit Code ${error}. Base DN ${error_value} does not exists..." >&2;;
         32) echo "ERROR: Exit Code ${error}. Base DN ALL not supported for ${error_value} ..." >&2;;
         33) echo "ERROR: Exit Code ${error}. Error running ${error_value} ..." >&2;;
+        40) echo "ERROR: Exit Code ${error}. Multiple entries found (No. ${error_value}). Use bulk mode -B or specify the Net Service Name exactly." >&2;;
         *)  echo "ERROR: Exit Code ${error}. But do not no realy why..." >&2;;
     esac
 
@@ -389,7 +390,7 @@ function get_all_basedn() {
     ldapsearch_options=$(ldapsearch_options)
     ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} -b "" \
         ${ldapsearch_options} -s base "(objectClass=*)" \
-        namingContexts| grep -i namingContexts| sed 's/namingContexts=//g' | cut -d: -f2| xargs
+        namingContexts| grep -i namingContexts| sed 's/namingContexts=//g' | grep -iv 'cn=changelog\|cn=OracleContext\|cn=OracleSchemaVersion' | cut -d: -f2| xargs
     if [ $? -ne 0 ]; then
         clean_quit 33 "ldapsearch"
     fi
