@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.02.28
-# Version....: v2.12.1
+# Version....: v2.12.2
 # Purpose....: Delete a tns entry
 # Notes......: --
 # Reference..: --
@@ -27,7 +27,7 @@ set -o pipefail                     # pipefail exit after 1st piped commands fai
 set -f
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v2.12.1
+VERSION=v2.12.2
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode

@@ -16,6 +16,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.12.2] - 2023.02.28
+
+### Fixed
+
+- issue in *tns_dump.sh* query results for *cn* and *NetDescString* have been
+  mixed up.
+
 ## [2.12.1] - 2023.02.28
 
 ### Fixed
