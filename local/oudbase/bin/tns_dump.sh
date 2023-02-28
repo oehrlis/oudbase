@@ -15,7 +15,7 @@
 # ------------------------------------------------------------------------------
 # - Customization --------------------------------------------------------------
 # - just add/update any kind of customized environment variable here
-DEFAULT_OUTPUT_DIR=${TNS_ADMIN:-$(pwd)}
+DEFAULT_OUTPUT_DIR=${TNS_ADMIN}
 DEFAULT_FILE_PREFIX="ldap_dump"
 # - End of Customization -------------------------------------------------------
 
@@ -28,7 +28,9 @@ TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet m
 TVDLDAP_SCRIPT_NAME=$(basename ${BASH_SOURCE[0]})
 TVDLDAP_BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 TVDLDAP_LOG_DIR="$(dirname ${TVDLDAP_BIN_DIR})/log"
-
+DEFAULT_OUTPUT_DIR=${DEFAULT_OUTPUT_DIR:-$TVDLDAP_LOG_DIR}
+DEFAULT_OUTPUT_DIR=${DEFAULT_OUTPUT_DIR:-$(pwd)}
+set -f
 # - EOF Environment Variables --------------------------------------------------
 
 # - Functions ------------------------------------------------------------------
@@ -143,7 +145,7 @@ load_config                 # load configur26ation files. File list in TVDLDAP_C
 touch $TEMPFILE 2>/dev/null || clean_quit 25 $TEMPFILE
 
 # get options
-while getopts mvdb:h:p:D:w:Wy:o:T:FE:S: CurOpt; do
+while getopts mvdb:h:p:D:w:Wy:o:T:FnE:S: CurOpt; do
     case ${CurOpt} in
         m) Usage 0;;
         v) TVDLDAP_VERBOSE="TRUE" ;;
@@ -158,6 +160,7 @@ while getopts mvdb:h:p:D:w:Wy:o:T:FE:S: CurOpt; do
         T) OUTPUT_DIR="${OPTARG}";;
         o) OUTPUT_FILE="${OPTARG}";;
         F) TVDLDAP_FORCE="TRUE";;
+        n) TVDLDAP_DRYRUN="TRUE";; 
         S) NETSERVICE=${OPTARG};; 
         E) clean_quit "${OPTARG}";;
         *) Usage 2 $*;;
@@ -278,40 +281,44 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                 dump_file=$OUTPUT_FILE
             fi
 
-            echo "INFO : Dump Net Service Names from $basedn to ${OUTPUT_DIR}/${dump_file}"
-            echo "# LDAP Net Service Description dump for base DN ${basedn}" >>${OUTPUT_DIR}/${dump_file}
-            echo "# Dump Date : $(date)" >>${OUTPUT_DIR}/${dump_file}
-            if ! alias_enabled; then
-                # run ldapsearch an write output to tempfile
-                ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
-                    ${current_binddn:+"$current_binddn"} ${current_bindpwd} \
-                    ${ldapsearch_options} -b "$basedn" -s sub \
-                    "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" \
-                    cn orclNetDescString aliasedObjectName>$TEMPFILE
-                # check if last command did run successfully
-                if [ $? -ne 0 ]; then clean_quit 33 "ldapsearch"; fi
-            fi
-            # check if tempfile does exist and has some values
-            if [ -s "$TEMPFILE" ] ; then
-                echo "" >> $TEMPFILE    # add a new line to the tempfile
-                # loop over ldapsearch results
-                for result in $(grep -iv '^dn: ' $TEMPFILE | sed -n '1 {h; $ !d}; $ {x; s/\n //g; p}; /^ / {H; d}; /^ /! {x; s/\n //g; p}'| sed 's/$/;/g' | sed 's/^;$/DELIM/g' | tr -d '\n'| sed 's/DELIM/\n/g'|tr -d ' '); do
-                    echo_debug "DEBUG: ${result}"
-                    cn=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f 2 | sed 's/cn://gi')
-                    # check for aliasedObjectName or orclNetDescString
-                    if [[ "$result" == *orclNetDescString* ]]; then
-                        NetDescString=$(echo ${result}| cut -d ';' -f 1 | cut -d " " -f2- |sed 's/orclNetDescString://gi')
-                        echo "${cn}.${domain}=${NetDescString}" >>${OUTPUT_DIR}/${dump_file}
-                    elif [[ "$result" == *aliasedObjectName* ]]; then
-                        aliasedObjectName=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2- |sed 's/aliasedObjectName://gi')
-                        echo "# ${cn}.${domain} alias to ${aliasedObjectName}" >>${OUTPUT_DIR}/${dump_file}
-                    fi
-                done
+            if ! dryrun_enabled; then
+                echo "INFO : Dump Net Service Names from $basedn to ${OUTPUT_DIR}/${dump_file}"
+                echo "# LDAP Net Service Description dump for base DN ${basedn}" >>${OUTPUT_DIR}/${dump_file}
+                echo "# Dump Date : $(date)" >>${OUTPUT_DIR}/${dump_file}
+                if ! alias_enabled; then
+                    # run ldapsearch an write output to tempfile
+                    ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+                        ${current_binddn:+"$current_binddn"} ${current_bindpwd} \
+                        ${ldapsearch_options} -b "$basedn" -s sub \
+                        "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" \
+                        cn orclNetDescString aliasedObjectName>$TEMPFILE
+                    # check if last command did run successfully
+                    if [ $? -ne 0 ]; then clean_quit 33 "ldapsearch"; fi
+                fi
+                # check if tempfile does exist and has some values
+                if [ -s "$TEMPFILE" ] ; then
+                    echo "" >> $TEMPFILE    # add a new line to the tempfile
+                    # loop over ldapsearch results
+                    for result in $(grep -iv '^dn: ' $TEMPFILE | sed -n '1 {h; $ !d}; $ {x; s/\n //g; p}; /^ / {H; d}; /^ /! {x; s/\n //g; p}'| sed 's/$/;/g' | sed 's/^;$/DELIM/g' | tr -d '\n'| sed 's/DELIM/\n/g'|tr -d ' '); do
+                        echo_debug "DEBUG: ${result}"
+                        cn=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f 2 | sed 's/cn://gi')
+                        # check for aliasedObjectName or orclNetDescString
+                        if [[ "$result" == *orclNetDescString* ]]; then
+                            NetDescString=$(echo ${result}| cut -d ';' -f 1 | cut -d " " -f2- |sed 's/orclNetDescString://gi')
+                            echo "${cn}.${domain}=${NetDescString}" >>${OUTPUT_DIR}/${dump_file}
+                        elif [[ "$result" == *aliasedObjectName* ]]; then
+                            aliasedObjectName=$(echo ${result}| cut -d ';' -f 2 | cut -d " " -f2- |sed 's/aliasedObjectName://gi')
+                            echo "# ${cn}.${domain} alias to ${aliasedObjectName}" >>${OUTPUT_DIR}/${dump_file}
+                        fi
+                    done
+                else
+                    echo "WARN : No Net Service Name / Alias found in ${basedn}"
+                    echo "# No Net Service Name / Alias found in ${basedn}" >>${OUTPUT_DIR}/${dump_file}   
+                fi
+                echo >>${OUTPUT_DIR}/${dump_file}
             else
-                echo "WARN : No Net Service Name / Alias found in ${basedn}"
-                echo "# No Net Service Name / Alias found in ${basedn}" >>${OUTPUT_DIR}/${dump_file}   
+                echo "INFO : Dry run enabled, skip dump Net Service Names from $basedn to ${OUTPUT_DIR}/${dump_file}"
             fi
-            echo >>${OUTPUT_DIR}/${dump_file}
         else
             echo "WARN : Base DN ${basedn} not found"
         fi
