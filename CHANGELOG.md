@@ -16,6 +16,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.12.0] - 2023.02.28
+
+### Added
+
+- add *dry run* mode for *tns_dump.sh*
+- add bulk delete function to *tns_delete.sh*. This allows to delete tns entries
+  based on wildcard search.
+- add auto dump for bulk deletes in *tns_delete.sh*. Every bulk delete will explicitly
+  create a dump in $LOG_BASE.
+
+### Changed
+
+- update exit errors in *tns_functions.sh*
+- update status and error output in *tns_delete.sh*
+
+### Fixed
+
+- fix variable check in *tns_search.sh*
+
 ## [2.11.0] - 2023-02-23
 
 ### Added
