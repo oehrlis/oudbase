@@ -37,6 +37,8 @@ TVDLDAP_BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd
 TVDLDAP_LOG_DIR="$(dirname ${TVDLDAP_BIN_DIR})/log"
 DEFAULT_OUTPUT_DIR=${DEFAULT_OUTPUT_DIR:-$TVDLDAP_LOG_DIR}
 DEFAULT_OUTPUT_DIR=${DEFAULT_OUTPUT_DIR:-$(pwd)}
+files_processed=0                           # Counter for processed files 
+entries_processed=0                         # Counter for processed entries 
 
 # define logfile and logging
 LOG_BASE=${LOG_BASE:-"${TVDLDAP_LOG_DIR}"} # Use script log directory as default logbase
@@ -269,8 +271,10 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
             domain=$(echo $basedn|sed -e 's/,dc=/\./g' -e 's/dc=//g')
             if [ -z "$OUTPUT_FILE" ]; then
                 dump_file="${DEFAULT_FILE_PREFIX}_${domain}_${TIMESTAMP}.ora"
+                files_processed=$((files_processed+1))  # Count processed files
             else
                 dump_file=$OUTPUT_FILE
+                files_processed=1
             fi
 
             if ! dryrun_enabled; then
@@ -312,6 +316,7 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                     echo "# No Net Service Name / Alias found in ${basedn}" >>${OUTPUT_DIR}/${dump_file}   
                 fi
                 echo >>${OUTPUT_DIR}/${dump_file}
+                entries_processed=$((entries_processed+1))  # Count processed entries
             else
                 echo "INFO : Dry run enabled, skip dump Net Service Names from $basedn to ${OUTPUT_DIR}/${dump_file}"
             fi
@@ -320,6 +325,11 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
         fi
     done
 done
+
+echo "INFO : Status information about the dumping process"
+echo "INFO : Processed BaseDN...... = $BASEDN_LIST"
+echo "INFO : Processed files....... = $files_processed"
+echo "INFO : Dumped TNS entries.... = $entries_processed"
 
 rotate_logfiles                     # purge log files based on TVDLDAP_KEEP_LOG_DAYS
 clean_quit                          # clean exit with return code 0
