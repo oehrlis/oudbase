@@ -636,6 +636,39 @@ function get_ldapport() {
 }
 
 # ------------------------------------------------------------------------------
+# Function...: join_dotora
+# Purpose....: Join net service string in the tnsnames.ora file. 
+# ------------------------------------------------------------------------------
+function join_dotora () {
+awk '
+BEGIN {
+    lastcomment=0;
+}
+
+{ #MAIN
+    if ($0 ~ "^[[:space:]]*#") {  # just skip any comments and print as is
+        if (lastcomment==0) { printf("\n"); }
+        print;
+        lastcomment=1;
+        next;
+    }
+    lastcomment=0;
+    
+    gsub(/[[:space:]]+/, "",$0)     # remove space and tab characters
+    if ($0 ~ "^[[:alnum:]].*=") {   # Check for matching string
+        printf("\n");
+        printf "%s", $0
+    } else { 
+        printf "%s", $0
+    }
+}
+END {
+ # new line at the end of file
+ printf("\n");
+}' 
+}
+
+# ------------------------------------------------------------------------------
 # Function...: tidy_dotora
 # Purpose....: Tidy up the tnsnames.ora file. 
 # Reference..: The awk is taken from Ludovico Caldara https://www.ludovicocaldara.net/dba/tidy_dotora/

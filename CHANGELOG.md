@@ -20,10 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- add new function *tidy_dotora* to format the net service connect sting. The fuction
+- add new function *tidy_dotora* to format the net service connect sting. The function
   is based on [Ludovico Caldara](https://www.ludovicocaldara.net/dba/tidy_dotora/)
   and [Jeremy Scheider](https://ardentperf.com/2008/11/28/parsing-listenerora-with-awk-and-sed/)
   work.
+- add new function *join_dotora* to join service connect sting into one line
 
 ### Fixed
 
