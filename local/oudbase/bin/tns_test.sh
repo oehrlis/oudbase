@@ -374,6 +374,7 @@ EOFSQL
     done
 done
 
+echo "INFO :"
 echo "INFO : Status information about the tns test process"
 echo "INFO : Processed BaseDN...... = $BASEDN_LIST"
 echo "INFO : Tested TNS entries.... = $entries_processed"

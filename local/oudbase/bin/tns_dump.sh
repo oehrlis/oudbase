@@ -326,6 +326,7 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
     done
 done
 
+echo "INFO :"
 echo "INFO : Status information about the dumping process"
 echo "INFO : Processed BaseDN...... = $BASEDN_LIST"
 echo "INFO : Processed files....... = $files_processed"

@@ -293,6 +293,7 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
 done
 
 if bulk_enabled; then
+    echo "INFO :"
     echo "INFO : Status information about bulk delete process"
     echo "INFO : Processed BaseDN........ = ${BASEDN_LIST}"
     echo "INFO : Net Service Names....... = $NETSERVICE"
