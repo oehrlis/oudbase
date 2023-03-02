@@ -30,6 +30,7 @@ TVDLDAP_DEFAULT_SQL_PWD=""
 TVDLDAP_DEFAULT_SQL_PWDASK="FALSE"
 TVDLDAP_DEFAULT_SQL_PWDFILE=""
 TVDLDAP_DEFAULT_LDAPTOOLS=""
+TVDLDAP_DEFAULT_DUMP_FORMAT="SINGLE"
 # - End of Customization -------------------------------------------------------
 
 # Define a bunch of bash option see 
