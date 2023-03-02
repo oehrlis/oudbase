@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - *tns_dump.sh* add process status information
+- *tns_load.sh* add process status information
 
 ### Changed
 

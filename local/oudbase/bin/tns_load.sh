@@ -40,6 +40,8 @@ entries_processed=0                         # Counter for processed entries
 entries_loaded=0                            # Counter for loaded entries 
 entries_skipped=0                           # Counter for skipped entries 
 entries_rejected=0                          # Counter for rejected entries 
+basedn_processed=""                         # BaseDN processed
+basedn_array=()                             # BaseDN array
 # define logfile and logging
 LOG_BASE=${LOG_BASE:-"${TVDLDAP_LOG_DIR}"} # Use script log directory as default logbase
 TIMESTAMP=$(date "+%Y.%m.%d_%H%M%S")
@@ -234,6 +236,7 @@ for file in $TNSNAMES_FILES; do
         echo_debug "DEBUG: cn               => $current_cn"
         echo_debug "DEBUG: basedn           => $current_basedn"
         echo_debug "DEBUG: NetDescString    => $NetDescString"
+        basedn_array+=("$current_cn")
         # check if net service entry exists => skip if force = FALSE
         if ! net_service_exists "$current_cn" "${current_basedn}" ; then
             echo "INFO : Add Net Service Name $net_service in $current_basedn" 
@@ -282,12 +285,14 @@ EOI
         fi
     done < <(grep -v ^\# ${file} | join_dotora | grep . )
 done
+basedn_processed=$(printf "%s\n" "${basedn_array[@]}" | sort -u)
 echo "INFO : Status information about the loading process"
-echo "INFO : Processed files        = $files_processed"
-echo "INFO : Processed TNS entries  = $entries_processed"
-echo "INFO : Loaded TNS entries     = $entries_loaded"
-echo "INFO : Skipped TNS entries    = $entries_skipped"
-echo "INFO : Rejected TNS entries   = $entries_rejected"
+echo "INFO : Processed BaseDN...... = $basedn_processed"
+echo "INFO : Processed files....... = $files_processed"
+echo "INFO : Processed TNS entries. = $entries_processed"
+echo "INFO : Loaded TNS entries.... = $entries_loaded"
+echo "INFO : Skipped TNS entries... = $entries_skipped"
+echo "INFO : Rejected TNS entries.. = $entries_rejected"
 
 rotate_logfiles                     # purge log files based on TVDLDAP_KEEP_LOG_DAYS
 clean_quit                          # clean exit with return code 0
