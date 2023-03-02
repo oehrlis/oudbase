@@ -10,14 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- *tns_dump.sh* add process status information
-- *tns_load.sh* add process status information
-
 ### Changed
 
 ### Fixed
 
 ### Removed
+
+## [2.12.4] - 2023.03.02
+
+### Added
+
+- *tns_dump.sh* add process status information
+- *tns_load.sh* add process status information
+- *tns_test.sh* add process status information
 
 ## [2.12.3] - 2023.03.02
 

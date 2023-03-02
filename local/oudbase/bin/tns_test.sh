@@ -35,6 +35,10 @@ TVDLDAP_SCRIPT_NAME=$(basename ${BASH_SOURCE[0]})
 TVDLDAP_BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 TVDLDAP_LOG_DIR="$(dirname ${TVDLDAP_BIN_DIR})/log"
 padding='.................................................'
+entries_processed=0                         # Counter for processed entries 
+entries_ok=0                                # Counter for successful entries 
+entries_nok=0                               # Counter for failed entries 
+
 # define logfile and logging
 LOG_BASE=${LOG_BASE:-"${TVDLDAP_LOG_DIR}"} # Use script log directory as default logbase
 TIMESTAMP=$(date "+%Y.%m.%d_%H%M%S")
@@ -332,6 +336,7 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                         TNSERR=$(echo "$TNSPING_STATUS"|sed -n 's/.*\(TNS\-[0-9]*\).*/\1/p')
                         TNSERR=${TNSERR:-"timed out ${TVDLDAP_TIMEMOUT}s"}
                         echo "NOK ($TNSERR)"
+                        entries_nok=$((entries_nok+1))  # Count processed entries
                         echo "# tnsping error/timeout $TNSERR"  >>"$(dirname $LOGFILE)/$(basename $LOGFILE .log).errors.log"
                         echo "${cn}.${domain}=${NetDescString}" >>"$(dirname $LOGFILE)/$(basename $LOGFILE .log).errors.log"
                     else
@@ -344,17 +349,21 @@ EOFSQL
                             # Check return code for 0 / successfull
                             if [[ ( $? -eq 0  ) && ( $SQLPLUS_STATUS == *"ORA-01017"* || $SQLPLUS_STATUS == *"ORA-28000"* || -z "$SQLPLUS_STATUS" ) ]]; then
                                 echo "OK  (tnsping, sqlplus)"
+                                entries_ok=$((entries_ok+1))  # Count processed entries
                             else
                                 # all other case should report not OK
                                 ORAERR=$(echo "$SQLPLUS_STATUS"|sed -n 's/.*\(ORA\-[0-9]*\).*/\1/p')
                                 echo "NOK ($ORAERR)"   
+                                entries_nok=$((entries_nok+1)) 
                                 echo "# SQLPlus login error $ORAERR"    >>"$(dirname $LOGFILE)/$(basename $LOGFILE .log).errors.log"
                                 echo "${cn}.${domain}=${NetDescString}" >>"$(dirname $LOGFILE)/$(basename $LOGFILE .log).errors.log"
                             fi
                         else
                             echo "OK  (tnsping)"
+                            entries_ok=$((entries_ok+1))  # Count processed entries
                         fi
                     fi
+                    entries_processed=$((entries_processed+1))  # Count processed entries
                 done
             else
                 echo "WARN : No service found in ${basedn}"
@@ -364,6 +373,12 @@ EOFSQL
         fi
     done
 done
+
+echo "INFO : Status information about the tns test process"
+echo "INFO : Processed BaseDN...... = $BASEDN_LIST"
+echo "INFO : Tested TNS entries.... = $entries_processed"
+echo "INFO : Successful tests...... = $entries_ok"
+echo "INFO : failed tests.......... = $entries_nok"
 
 rotate_logfiles                     # purge log files based on TVDLDAP_KEEP_LOG_DAYS
 clean_quit                          # clean exit with return code 0
