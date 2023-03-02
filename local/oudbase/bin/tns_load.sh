@@ -236,7 +236,7 @@ for file in $TNSNAMES_FILES; do
         echo_debug "DEBUG: cn               => $current_cn"
         echo_debug "DEBUG: basedn           => $current_basedn"
         echo_debug "DEBUG: NetDescString    => $NetDescString"
-        basedn_array+=("$current_cn")
+        basedn_array+=("$current_basedn")
         # check if net service entry exists => skip if force = FALSE
         if ! net_service_exists "$current_cn" "${current_basedn}" ; then
             echo "INFO : Add Net Service Name $net_service in $current_basedn" 
@@ -286,6 +286,8 @@ EOI
     done < <(grep -v ^\# ${file} | join_dotora | grep . )
 done
 basedn_processed=$(printf "%s\n" "${basedn_array[@]}" | sort -u)
+basedn_processed=${basedn_processed//$'\n'/' '}
+echo "INFO :"
 echo "INFO : Status information about the loading process"
 echo "INFO : Processed BaseDN...... = $basedn_processed"
 echo "INFO : Processed files....... = $files_processed"
