@@ -93,6 +93,9 @@ function Usage() {
                         (default $DEFAULT_OUTPUT_DIR)
     -o <OUTPUT FILE>    Output file with tnsnames dump from specified Base
                         DN (default ${DEFAULT_FILE_PREFIX}_<BASEDN>_<DATE>.ora)
+    -f <FORMAT>         Format the net service names either as single line or more
+                        readable as multiline connect string. Possible values are
+                        SINGLE, INDENTED (default $TVDLDAP_DEFAULT_DUMP_FORMAT)
     -n                  Show what would be done but do not actually do it
     -F                  Force mode to overwrite existing tnsnames dump files
 
@@ -132,7 +135,7 @@ load_config                 # load configur26ation files. File list in TVDLDAP_C
 touch $TEMPFILE 2>/dev/null || clean_quit 25 $TEMPFILE
 
 # get options
-while getopts mvdb:h:p:D:w:Wy:o:T:FnE:S: CurOpt; do
+while getopts mvdb:h:p:D:w:Wy:o:T:FnE:f:S: CurOpt; do
     case ${CurOpt} in
         m) Usage 0;;
         v) TVDLDAP_VERBOSE="TRUE" ;;
@@ -146,6 +149,7 @@ while getopts mvdb:h:p:D:w:Wy:o:T:FnE:S: CurOpt; do
         y) TVDLDAP_BINDDN_PWDFILE="${OPTARG}";; 
         T) OUTPUT_DIR="${OPTARG}";;
         o) OUTPUT_FILE="${OPTARG}";;
+        f) TVDLDAP_DUMP_FORMAT="${OPTARG}";;
         F) TVDLDAP_FORCE="TRUE";;
         n) TVDLDAP_DRYRUN="TRUE";; 
         S) NETSERVICE=${OPTARG};; 
@@ -194,7 +198,8 @@ fi
 # get default values for LDAP Server
 TVDLDAP_LDAPHOST=${TVDLDAP_LDAPHOST:-$(get_ldaphost)}
 TVDLDAP_LDAPPORT=${TVDLDAP_LDAPPORT:-$(get_ldapport)}
-
+# get default values for dump format
+TVDLDAP_DUMP_FORMAT=${TVDLDAP_DUMP_FORMAT:-$TVDLDAP_DEFAULT_DUMP_FORMAT}
 # get bind parameter
 ask_bindpwd                         # ask for the bind password if TVDLDAP_BINDDN_PWDASK
                                     # is TRUE and LDAP tools are not OpenLDAP
@@ -292,7 +297,11 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                         # check for aliasedObjectName or orclNetDescString
                         if [[ "$result" == *orclNetDescString* ]]; then
                             NetDescString=$(echo ${result}|sed 's/;*$//g'|sed 's/.*orclNetDescString:\(.*\)\(;.*\|$\)/\1/')
-                            echo "${cn}.${domain}=${NetDescString}" >>${OUTPUT_DIR}/${dump_file}
+                            if [ "${TVDLDAP_DUMP_FORMAT^^}" == "INDENTED" ] ; then
+                                echo "${cn}.${domain}=${NetDescString}" | tidy_dotora >>${OUTPUT_DIR}/${dump_file}
+                            else
+                                echo "${cn}.${domain}=${NetDescString}" | join_dotora >>${OUTPUT_DIR}/${dump_file}
+                            fi
                         elif [[ "$result" == *aliasedObjectName* ]]; then
                             aliasedObjectName=$(echo ${result}|sed 's/;*$//g'|sed 's/.*aliasedObjectName:\(.*\)\(;.*\|$\)/\1/')
                             echo "# ${cn}.${domain} alias to ${aliasedObjectName}" >>${OUTPUT_DIR}/${dump_file}

@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   work.
 - add new function *join_dotora* to join service connect sting into one line
 - add new value *TVDLDAP_DUMP_FORMAT* in config template
+- add new parameter *-s FORMAT* to *tns_dump.sh*. This parameter allows to configure
+  the output format of the net service connect string. It is either *SINGLE* for
+  all in one line or *INDENTED* for a multiline net service connect string. Default
+  format is *SINGLE*.
 
 ### Fixed
 
