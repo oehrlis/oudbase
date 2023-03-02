@@ -31,6 +31,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   all in one line or *INDENTED* for a multiline net service connect string. Default
   format is *SINGLE*.
 
+### Changed
+
+- enhance error correction in *tns_functions.sh* for *ldapsearch*
+
 ### Fixed
 
 - Fix issue in *tns_load.sh* not able to load *tnsnames.ora* from *tns_dump.sh*.

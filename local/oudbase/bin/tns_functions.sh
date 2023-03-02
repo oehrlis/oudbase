@@ -389,12 +389,11 @@ function get_all_basedn() {
     TVDLDAP_LDAPHOST=${1:-$(get_ldaphost)}
     TVDLDAP_LDAPPORT=${2:-$(get_ldapport)}
     ldapsearch_options=$(ldapsearch_options)
-    ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} -b "" \
-        ${ldapsearch_options} -s base "(objectClass=*)" \
-        namingContexts| grep -i namingContexts| sed 's/namingContexts=//g' | grep -iv 'cn=changelog\|cn=OracleContext\|cn=OracleSchemaVersion' | cut -d: -f2| xargs
+    result=$(ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} -s base "(objectClass=*)" namingContexts 2>&1)
     if [ $? -ne 0 ]; then
-        clean_quit 33 "ldapsearch"
+        clean_quit 33 "ldapsearch: $result"
     fi
+    echo "${result}" | grep -i namingContexts| sed 's/namingContexts=//g' | grep -iv 'cn=changelog\|cn=OracleContext\|cn=OracleSchemaVersion' | cut -d: -f2| xargs
 }
 
 # ------------------------------------------------------------------------------
@@ -506,9 +505,9 @@ function net_service_exists() {
     
     ldapsearch_options=$(ldapsearch_options)
     if [ -n "${current_cn}" ]; then
-        result=$(ldapsearch -h ${my_ldaphost} -p ${my_ldapport} -b $current_basedn $ldapsearch_options -s sub "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" dn)
+        result=$(ldapsearch -h ${my_ldaphost} -p ${my_ldapport} -b $current_basedn $ldapsearch_options -s sub "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" dn 2>&1)
         if [ $? -ne 0 ]; then
-            clean_quit 33 "ldapsearch"
+            clean_quit 33 "ldapsearch: $result"
         fi
         if [ -z "$result" ]; then
             return 1
