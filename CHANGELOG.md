@@ -18,6 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.12.4] - 2023.03.02
 
+### Fixed
+
+- Fix layout of status output for *tns_dump.sh*, *tns_load.sh* add *tns_test.sh*
+- Fix wrong setting of variable for processed BaseDN.
+- Fix linebreaks in status output for BaseDN
+
+## [2.12.4] - 2023.03.02
+
 ### Added
 
 - *tns_dump.sh* add process status information

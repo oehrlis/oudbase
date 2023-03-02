@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.02
-# Version....: v2.12.4
+# Version....: v2.12.5
 # Purpose....: Shell script for EUS admin tool (command line)
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
@@ -18,7 +18,7 @@
 # ------------------------------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v2.12.4
+VERSION=v2.12.5
 JRE_HOME=$JAVA_HOME/jre/
 EUSMLIBDIR=$ORACLE_BASE/local/oudbase/lib
 ORACLEPKI=$ORACLE_HOME/oracle_common/modules/oracle.pki/oraclepki.jar
