@@ -5,8 +5,8 @@
 # Name.......: 10_reset_directory_manager_password.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.02.28
-# Version....: v2.12.2
+# Date.......: 2023.03.02
+# Version....: v2.12.3
 # Purpose....: Adjust cn=Directory Manager to use new password storage scheme
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase

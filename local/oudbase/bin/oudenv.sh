@@ -5,8 +5,8 @@
 # Name.......: oudenv.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.02.28
-# Version....: v2.12.2
+# Date.......: 2023.03.02
+# Version....: v2.12.3
 # Purpose....: Bash Source File to set the environment for OUD Instances
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
@@ -22,7 +22,7 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in .bash_profile or 
 # in oudenv_core.conf.
-VERSION=v2.12.2
+VERSION=v2.12.3
 
 # define some binaries for later user
 PGREP_BIN=$(command -v pgrep)                                   # get the binary for pgrep

@@ -5,8 +5,8 @@
 # Name.......: tns_dump.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.02.28
-# Version....: v2.12.2
+# Date.......: 2023.03.02
+# Version....: v2.12.3
 # Purpose....: Dump entries as tnsnames.ora
 # Notes......: --
 # Reference..: --
@@ -28,7 +28,7 @@ set -o nounset                      # exit if script try to use an uninitialised
 set -f
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v2.12.2
+VERSION=v2.12.3
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode
