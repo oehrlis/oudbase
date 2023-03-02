@@ -280,7 +280,7 @@ EOI
                 entries_skipped=$((entries_skipped+1))      # Count skipped entries
             fi
         fi
-    done < <(grep -v ^\# ${file} | grep  . | join_dotora )
+    done < <(grep -v ^\# ${file} | join_dotora | grep . )
 done
 echo "INFO : Status information about the loading process"
 echo "INFO : Processed files        = $files_processed"
