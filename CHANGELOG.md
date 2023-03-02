@@ -16,6 +16,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.12.3] - 2023.03.02
+
+### Added
+
+- add new function *tidy_dotora* to format the net service connect sting. The fuction
+  is based on [Ludovico Caldara](https://www.ludovicocaldara.net/dba/tidy_dotora/)
+  and [Jeremy Scheider](https://ardentperf.com/2008/11/28/parsing-listenerora-with-awk-and-sed/)
+  work.
+
+### Fixed
+
+- issue in *tns_dump.sh* query results for *cn* and *NetDescString* have been
+  mixed up.
+
 ## [2.12.2] - 2023.02.28
 
 ### Fixed
