@@ -280,7 +280,7 @@ EOI
                 entries_skipped=$((entries_skipped+1))      # Count skipped entries
             fi
         fi
-    done < <(cat ${file}|sed -e 's/^#\s*$/DELIM/g' -e 's/^\s*$/DELIM/g'|grep -v '^#'| sed -e 's/\s*//g' -e '/^[a-zA-Z0-9.]*=/s/^/DELIM\n/'|tr -d '\n'| sed -e 's/DELIM/\n/g' -e 's/$/\n/' |sed '/^$/d')
+    done < <(grep -v ^\# ${file} | grep  . | join_dotora )
 done
 echo "INFO : Status information about the loading process"
 echo "INFO : Processed files        = $files_processed"
