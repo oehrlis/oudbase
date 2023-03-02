@@ -25,11 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and [Jeremy Scheider](https://ardentperf.com/2008/11/28/parsing-listenerora-with-awk-and-sed/)
   work.
 - add new function *join_dotora* to join service connect sting into one line
+- add new value *TVDLDAP_DUMP_FORMAT* in config template
 
 ### Fixed
 
-- issue in *tns_dump.sh* query results for *cn* and *NetDescString* have been
-  mixed up.
+- Fix issue in *tns_load.sh* not able to load *tnsnames.ora* from *tns_dump.sh*.
+  Net service name files are now joined and cleaned up using *join_dotora*
 
 ## [2.12.2] - 2023.02.28
 
