@@ -306,6 +306,7 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                             else
                                 echo "${cn}.${domain}=${NetDescString}" | join_dotora >>${OUTPUT_DIR}/${dump_file}
                             fi
+                            entries_processed=$((entries_processed+1))  # Count processed entries
                         elif [[ "$result" == *aliasedObjectName* ]]; then
                             aliasedObjectName=$(echo ${result}|sed 's/;*$//g'|sed 's/.*aliasedObjectName:\(.*\)\(;.*\|$\)/\1/')
                             echo "# ${cn}.${domain} alias to ${aliasedObjectName}" >>${OUTPUT_DIR}/${dump_file}
@@ -316,7 +317,6 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                     echo "# No Net Service Name / Alias found in ${basedn}" >>${OUTPUT_DIR}/${dump_file}   
                 fi
                 echo >>${OUTPUT_DIR}/${dump_file}
-                entries_processed=$((entries_processed+1))  # Count processed entries
             else
                 echo "INFO : Dry run enabled, skip dump Net Service Names from $basedn to ${OUTPUT_DIR}/${dump_file}"
             fi

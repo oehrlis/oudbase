@@ -3,7 +3,7 @@ fc4772682dd0613bcd455eb4c712cc3d1d6ab5fb  ./bin/oud_functions.sh
 5bd81220f3f2e065b983fc133047aea65eca04f8  ./bin/tns_add.sh
 100919d22f7c6bda8c3a7ad9d632e014787cc13a  ./bin/setup_oud_patch.sh
 e5589df5a53074527355c72fe84a5a3db605fa0b  ./bin/oud_status.sh
-8e670085d8ce13c20befa92a139226c34ae973da  ./bin/tns_dump.sh
+74a40f4aa4eff523c83942d2d74b6eba57cd9d12  ./bin/tns_dump.sh
 a86490300a640ae2e4c70bdc647373fdd3cd0921  ./bin/setup_oud.sh
 7116017d2f48a28e211baf764d49108729f018d0  ./bin/tns_modify.sh
 957f9779374bf758dab625565e053e5672f53d6f  ./bin/tns_search.sh
