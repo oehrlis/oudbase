@@ -188,7 +188,7 @@ current_cn=$(split_net_service_cn ${NETSERVICE})
  
 # - Main -----------------------------------------------------------------------
 echo_debug "DEBUG: Configuration / Variables:"
-echo_debug "---------------------------------------------------------------------------------"
+echo_debug "DEBUG: --------------------------------------------------------------------------"
 echo_debug "DEBUG: LDAP Host............... = $TVDLDAP_LDAPHOST"
 echo_debug "DEBUG: LDAP Port............... = $TVDLDAP_LDAPPORT"
 echo_debug "DEBUG: Bind DN................. = $TVDLDAP_BINDDN"
