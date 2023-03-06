@@ -264,7 +264,7 @@ function ldapadd_command () {
 # ------------------------------------------------------------------------------
 function echo_debug () {
     if [ "${TVDLDAP_DEBUG^^}" == "TRUE" ]; then
-        echo $1
+        echo $1 1>&2
     fi
 }
 
