@@ -16,8 +16,8 @@
 #   GROUP               $(id -ng)
 #
 #   cp ${OUD_BASE}/templates/etc/oud_instance.service   ${ETC_BASE}/oud_${OUD_INSTANCE}.service
-#   sed -i "s|OUD_INSTANCE|${OUD_INSTANCE}|"            ${ETC_BASE}/oud_${OUD_INSTANCE}.service
 #   sed -i "s|OUD_INSTANCE_HOME|${OUD_INSTANCE_HOME}|"  ${ETC_BASE}/oud_${OUD_INSTANCE}.service
+#   sed -i "s|OUD_INSTANCE|${OUD_INSTANCE}|"            ${ETC_BASE}/oud_${OUD_INSTANCE}.service
 #   sed -i "s|USER|$(id -nu)|"                          ${ETC_BASE}/oud_${OUD_INSTANCE}.service
 #   sed -i "s|GROUP|$(id -ng)|"                         ${ETC_BASE}/oud_${OUD_INSTANCE}.service
 #           
@@ -26,9 +26,6 @@
 #
 #   Enable the service:
 #   sudo systemctl enable oud_${OUD_INSTANCE}.service
-#
-#   Disable and deactivate the service:
-#   sudo systemctl disable oud_${OUD_INSTANCE}.service
 #
 #   Start the service manual:
 #   sudo systemctl start oud_${OUD_INSTANCE}.service
