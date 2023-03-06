@@ -273,8 +273,8 @@ function echo_debug () {
 # Purpose....: mask secret variable
 # ------------------------------------------------------------------------------
 function echo_secret () {
-    set -f
-    if [ -n "${1}" ]; then
+    string=${1:-""}
+    if [ -n "${string}" ]; then
         echo "xxxxxxxx"
     else
         echo "undef"
