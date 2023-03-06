@@ -389,8 +389,7 @@ function get_all_basedn() {
     TVDLDAP_LDAPHOST=${1:-$(get_ldaphost)}
     TVDLDAP_LDAPPORT=${2:-$(get_ldapport)}
     ldapsearch_options=$(ldapsearch_options)
-    echo_debug "DEBUG: ldapsearch command parameter"
-    echo_debug "DEBUG: -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} -b '' -s base \"(objectClass=*)\" namingContexts"
+    echo_debug "DEBUG: get_all_basedn => ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} -b '' -s base \"(objectClass=*)\" namingContexts"
     result=$(ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} -b '' -s base "(objectClass=*)" namingContexts 2>&1)
     if [ $? -ne 0 ]; then
         clean_quit 33 "ldapsearch: $result"
@@ -507,8 +506,7 @@ function net_service_exists() {
     
     ldapsearch_options=$(ldapsearch_options)
     if [ -n "${current_cn}" ]; then
-        echo_debug "DEBUG: ldapsearch command parameter"
-        echo_debug "DEBUG: -h ${my_ldaphost} -p ${my_ldapport} -b $current_basedn $ldapsearch_options -s sub \"(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))\" dn "
+        echo_debug "DEBUG: net_service_exists => ldapsearch -h ${my_ldaphost} -p ${my_ldapport} -b $current_basedn $ldapsearch_options -s sub \"(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))\" dn "
         result=$(ldapsearch -h ${my_ldaphost} -p ${my_ldapport} -b $current_basedn $ldapsearch_options -s sub "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" dn 2>&1)
         if [ $? -ne 0 ]; then
             clean_quit 33 "ldapsearch: $result"
