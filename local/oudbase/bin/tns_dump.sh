@@ -283,11 +283,16 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                 echo "# Dump Date : $(date)" >>${OUTPUT_DIR}/${dump_file}
                 if ! alias_enabled; then
                     # run ldapsearch an write output to tempfile
+                    echo_debug "DEBUG: current ldap command => ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+                        ${current_binddn:+\"$current_binddn\"} ${current_bindpwd} \
+                        ${ldapsearch_options} -b \"$basedn\" -s sub \
+                        \"(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))\" \
+                        cn orclNetDescString aliasedObjectName"
                     ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
                         ${current_binddn:+"$current_binddn"} ${current_bindpwd} \
                         ${ldapsearch_options} -b "$basedn" -s sub \
                         "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" \
-                        cn orclNetDescString aliasedObjectName>$TEMPFILE
+                        cn orclNetDescString aliasedObjectName >$TEMPFILE
                     # check if last command did run successfully
                     if [ $? -ne 0 ]; then clean_quit 33 "ldapsearch"; fi
                 fi
@@ -296,7 +301,7 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                     echo "" >> $TEMPFILE    # add a new line to the tempfile
                     # loop over ldapsearch results
                     for result in $(grep -iv '^dn: ' $TEMPFILE | sed -n '1 {h; $ !d}; $ {x; s/\n //g; p}; /^ / {H; d}; /^ /! {x; s/\n //g; p}'| sed 's/$/;/g' | sed 's/^;$/DELIM/g' | tr -d '\n'| sed 's/DELIM/\n/g'|tr -d ' '); do
-                        echo_debug "DEBUG: ${result}"
+                        echo_debug "DEBUG: process ldap result => ${result}"
                         cn=$(echo ${result}|sed 's/;*$//g'|sed 's/.*cn:\(.*\)\(;.*\|$\)/\1/')
                         # check for aliasedObjectName or orclNetDescString
                         if [[ "$result" == *orclNetDescString* ]]; then
