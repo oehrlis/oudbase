@@ -200,7 +200,7 @@ BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
  
 # - Main ------------------------------------------------------------------------
 echo_debug "DEBUG: Configuration / Variables:"
-echo_debug "---------------------------------------------------------------------------------"
+echo_debug "DEBUG: ---------------------------------------------------------------------------------"
 echo_debug "DEBUG: LDAP Host............... = $TVDLDAP_LDAPHOST"
 echo_debug "DEBUG: LDAP Port............... = $TVDLDAP_LDAPPORT"
 echo_debug "DEBUG: Bind DN................. = $TVDLDAP_BINDDN"
@@ -253,6 +253,11 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
             domain=$(echo $basedn|sed -e 's/,dc=/\./g' -e 's/dc=//g')
             if ! alias_enabled; then
                 # run ldapsearch an write output to tempfile
+                echo_debug "DEBUG: current ldap command => ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+                    ${current_binddn:+\"$current_binddn\"} ${current_bindpwd} \
+                    ${ldapsearch_options} -b \"$basedn\" -s sub \
+                    "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" \
+                    dn"
                 ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
                     ${current_binddn:+"$current_binddn"} ${current_bindpwd} \
                     ${ldapsearch_options} -b "$basedn" -s sub \
@@ -269,7 +274,7 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                     clean_quit 40 $lines
                 fi
                 while read -r result; do        # loop over ldapsearch results
-                    echo_debug "DEBUG: ${result}"
+                    echo_debug "DEBUG: process ldap result => ${result}"
                     cn=$(echo ${result}| sed 's/^dn: //')
                     if ! dryrun_enabled; then
                         ldapdelete -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
