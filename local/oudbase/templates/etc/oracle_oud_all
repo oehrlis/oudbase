@@ -5,8 +5,8 @@
 # Name.......: oracle_oud_all
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.03.02
-# Version....: v2.12.5
+# Date.......: 2023.03.06
+# Version....: v2.12.6
 # chkconfig:   345 90 30
 # description: Init.d script to start / stop all OUD instances using oud_start_stop.sh 
 # Notes......: copy this script to /etc/init.d/oracle_oud_all

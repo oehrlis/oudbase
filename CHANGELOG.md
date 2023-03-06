@@ -16,6 +16,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [2.12.6] - 2023.03.06
+
+### Added
+
+- add *echo_secrets* to mask secret variables in debug mode
+
+### Changed
+
+- update header of *oud_instance.service* change order of documentation
+- update debug messages to use *echo_secrets*
+- update debug messages to use STDERR rather than STDOUT
+
+### Fixed
+
+- Fix issue #125
+- Fix issue #126
+
 ## [2.12.5] - 2023.03.02
 
 ### Fixed
