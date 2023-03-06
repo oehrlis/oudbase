@@ -111,7 +111,7 @@ function CleanAndQuit() {
         fi
     fi
     case ${1} in
-        0)  DoMsg "END  : of ${SCRIPT_NAME}";;
+        0)  DoMsg "END  : Successfully finish ${SCRIPT_NAME}";;
         1)  DoMsg "ERR  : Exit Code ${1}. Wrong amount of arguments. See usage for correct one.";;
         2)  DoMsg "ERR  : Exit Code ${1}. Wrong arguments (${2}). See usage for correct one.";;
         3)  DoMsg "ERR  : Exit Code ${1}. This script must not be run as root ${2}";;
