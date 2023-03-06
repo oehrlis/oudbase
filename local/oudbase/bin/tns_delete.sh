@@ -214,24 +214,23 @@ echo_debug "DEBUG: "
 
 if bulk_enabled; then
     echo_debug "DEBUG: bulk mode enabled"
-fi
-
-if ! force_enabled; then
-    parameters="-o $TVDLDAP_DUMP_FILE -T $TVDLDAP_LOG_DIR"
-    parameters=$([ "${TVDLDAP_VERBOSE^^}" == "TRUE" ]   && echo "${parameters} -v" || echo ${parameters}) 
-    parameters=$([ "${TVDLDAP_DEBUG^^}" == "TRUE" ]     && echo "${parameters} -d" || echo ${parameters}) 
-    parameters=$([ "${TVDLDAP_BINDDN_PWDASK^^}" == "TRUE" ] && echo "${parameters} -W" || echo ${parameters}) 
-    parameters=$([ "${TVDLDAP_FORCE^^}" == "TRUE" ]     && echo "${parameters} -F" || echo ${parameters}) 
-    parameters=$([ -n "${TVDLDAP_BASEDN}" ]             && echo "${parameters} -b ${TVDLDAP_BASEDN}" || echo ${parameters}) 
-    parameters=$([ -n "${TVDLDAP_LDAPHOST}" ]           && echo "${parameters} -h ${TVDLDAP_LDAPHOST}" || echo ${parameters}) 
-    parameters=$([ -n "${TVDLDAP_LDAPPORT}" ]           && echo "${parameters} -p ${TVDLDAP_LDAPPORT}" || echo ${parameters}) 
-    parameters=$([ -n "${TVDLDAP_BINDDN}" ]             && echo "${parameters} -D ${TVDLDAP_BINDDN}" || echo ${parameters})  
-    parameters=$([ -n "${TVDLDAP_BINDDN_PWD}" ]         && echo "${parameters} -w ${TVDLDAP_BINDDN_PWD}" || echo ${parameters})  
-    parameters=$([ -n "${TVDLDAP_BINDDN_PWDFILE}" ]     && echo "${parameters} -y ${TVDLDAP_BINDDN_PWDFILE}" || echo ${parameters})  
-    parameters=$([ -n "${NETSERVICE}" ]                 && echo "${parameters} -S ${NETSERVICE}" || echo ${parameters}) 
-    tns_dump.sh $parameters
-else
-    echo_debug "DEBUG: force mode enabled. Skip explcit backup."
+    if ! force_enabled; then
+        parameters="-o $TVDLDAP_DUMP_FILE -T $TVDLDAP_LOG_DIR"
+        parameters=$([ "${TVDLDAP_VERBOSE^^}" == "TRUE" ]   && echo "${parameters} -v" || echo ${parameters}) 
+        parameters=$([ "${TVDLDAP_DEBUG^^}" == "TRUE" ]     && echo "${parameters} -d" || echo ${parameters}) 
+        parameters=$([ "${TVDLDAP_BINDDN_PWDASK^^}" == "TRUE" ] && echo "${parameters} -W" || echo ${parameters}) 
+        parameters=$([ "${TVDLDAP_FORCE^^}" == "TRUE" ]     && echo "${parameters} -F" || echo ${parameters}) 
+        parameters=$([ -n "${TVDLDAP_BASEDN}" ]             && echo "${parameters} -b ${TVDLDAP_BASEDN}" || echo ${parameters}) 
+        parameters=$([ -n "${TVDLDAP_LDAPHOST}" ]           && echo "${parameters} -h ${TVDLDAP_LDAPHOST}" || echo ${parameters}) 
+        parameters=$([ -n "${TVDLDAP_LDAPPORT}" ]           && echo "${parameters} -p ${TVDLDAP_LDAPPORT}" || echo ${parameters}) 
+        parameters=$([ -n "${TVDLDAP_BINDDN}" ]             && echo "${parameters} -D ${TVDLDAP_BINDDN}" || echo ${parameters})  
+        parameters=$([ -n "${TVDLDAP_BINDDN_PWD}" ]         && echo "${parameters} -w ${TVDLDAP_BINDDN_PWD}" || echo ${parameters})  
+        parameters=$([ -n "${TVDLDAP_BINDDN_PWDFILE}" ]     && echo "${parameters} -y ${TVDLDAP_BINDDN_PWDFILE}" || echo ${parameters})  
+        parameters=$([ -n "${NETSERVICE}" ]                 && echo "${parameters} -S ${NETSERVICE}" || echo ${parameters}) 
+        tns_dump.sh $parameters
+    else
+        echo_debug "DEBUG: force mode enabled. Skip explcit backup."
+    fi
 fi
 
 for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
