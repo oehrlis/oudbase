@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.06
-# Version....: v2.12.6
+# Version....: v2.12.7
 # Purpose....: Common OUD Base functions.
 # Notes......: Has to be source in the vagrant provisioning bash scripts to load
 #              environment and default values based on vagrant.yml 
@@ -23,7 +23,7 @@
 
 # - Environment Variables ------------------------------------------------------
 # define default values 
-VERSION=v2.12.6
+VERSION=v2.12.7
 DOAPPEND=${DOAPPEND:-"TRUE"}                    # enable log file append
 VERBOSE=${VERBOSE:-"FALSE"}                     # enable verbose mode
 DEBUG=${DEBUG:-"FALSE"}                         # enable debug mode

@@ -4,7 +4,7 @@
 # File-Name..: wls_oudsm.service
 # Author.....: Stefan Oehrli, stefan.oehrli@oradba.ch
 # Date.......: 2023.03.06
-# Version....: v2.12.6
+# Version....: v2.12.7
 # Purpose....: Unit file for OUDSM domain
 # Usage......: systemctl enable wls_OUDSM.service
 # Notes......: 
