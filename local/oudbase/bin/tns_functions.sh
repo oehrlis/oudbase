@@ -269,6 +269,19 @@ function echo_debug () {
 }
 
 # ------------------------------------------------------------------------------
+# Function...: echo_secret
+# Purpose....: mask secret variable
+# ------------------------------------------------------------------------------
+function echo_secret () {
+    set -f
+    if [ -n "${1}" ]; then
+        echo "xxxxxxxx"
+    else
+        echo "undef"
+    fi
+}
+
+# ------------------------------------------------------------------------------
 # Function...: clean_quit
 # Purpose....: Clean exit for all scripts
 # ------------------------------------------------------------------------------
@@ -300,7 +313,8 @@ function clean_quit() {
         32) echo "ERROR: Exit Code ${error}. Base DN ALL not supported for ${error_value} ..." >&2;;
         33) echo "ERROR: Exit Code ${error}. Error running ${error_value} ..." >&2;;
         40) echo "ERROR: Exit Code ${error}. Multiple entries found (No. ${error_value}). Use bulk mode -B or specify the Net Service Name exactly." >&2;;
-        *)  echo "ERROR: Exit Code ${error}. But do not no realy why..." >&2;;
+        99) DoMsg "INFO : Just wanna say hallo.";;
+        ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
     esac
 
     # remove tempfiles
