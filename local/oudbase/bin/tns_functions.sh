@@ -308,6 +308,7 @@ function clean_quit() {
         24) echo "ERROR: Exit Code ${error}. Can not create skip/reject files in ${error_value} ..." >&2;;
         25) echo "ERROR: Exit Code ${error}. Can not read file password file ${error_value} ..." >&2;;
         26) echo "ERROR: Exit Code ${error}. Can not write tempfile file ${error_value} ..." >&2;;
+        27) echo "ERROR: Exit Code ${error}. Invalid password file ${error_value} ..." >&2;;
         30) echo "ERROR: Exit Code ${error}. Bind DN ${error_value} defined but no password parameter provided..." >&2;;
         31) echo "ERROR: Exit Code ${error}. Base DN ${error_value} does not exists..." >&2;;
         32) echo "ERROR: Exit Code ${error}. Base DN ALL not supported for ${error_value} ..." >&2;;
@@ -604,15 +605,20 @@ function get_bindpwd_param() {
     elif [ -n "$my_bindpwd_file" ]; then
         # check if bind password file does exists
         if [ -f "$my_bindpwd_file" ]; then
-            # set the bind password parameter for OpenLDAP
-            if [ "${TVDLDAP_LDAPTOOLS^^}" == "OPENLDAP" ]; then
-                echo "-y $my_bindpwd_file"
-            # set the bind password parameter for OUD
-            elif [ "${TVDLDAP_LDAPTOOLS^^}" == "OUD" ]; then
-                echo "-j $my_bindpwd_file"
-            # set the bind password for anything else
+            if [ $(cat "$my_bindpwd_file"|wc -l) -le 1 ]; then 
+                # set the bind password parameter for OpenLDAP
+                if [ "${TVDLDAP_LDAPTOOLS^^}" == "OPENLDAP" ]; then
+                    echo "-y $my_bindpwd_file"
+                # set the bind password parameter for OUD
+                elif [ "${TVDLDAP_LDAPTOOLS^^}" == "OUD" ]; then
+                    echo "-j $my_bindpwd_file"
+                # set the bind password for anything else
+                else
+                    echo "-w $(cat $my_bindpwd_file)"
+                fi
             else
-                echo "-w $(cat $my_bindpwd_file)"
+                # quit if the password file is not valid e.g. has more than one line
+                clean_quit 27 $my_bindpwd_file
             fi
         else
             # quit if the password file is not accessible
