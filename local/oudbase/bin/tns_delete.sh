@@ -256,7 +256,7 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                 echo_debug "DEBUG: current ldap command => ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
                     ${current_binddn:+\"$current_binddn\"} ${current_bindpwd} \
                     ${ldapsearch_options} -b \"$basedn\" -s sub \
-                    "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" \
+                    \"(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))\" \
                     dn"
                 ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
                     ${current_binddn:+"$current_binddn"} ${current_bindpwd} \
