@@ -9,9 +9,9 @@
 #   OUD_BASE        ${OUD_BASE}
 #   MAILADDRESS     your email
 #
-#   cp ${OUD_LOCAL}/talanx/template/etc/crontab.conf   ${ETC_BASE}/crontab.conf
-#   sed -i "s|OUD_BASE|${OUD_BASE}|"                   ${ETC_BASE}/crontab.conf
-#   sed -i "s|MAILADDRESS|your email|"                  ${ETC_BASE}/crontab.conf
+#   cp ${OUD_BASE}/templates/cron.d/oud.crontab ${ETC_BASE}/crontab.conf
+#   sed -i "s|OUD_BASE|${OUD_BASE}|"            ${ETC_BASE}/crontab.conf
+#   sed -i "s|MAILADDRESS|your email|"          ${ETC_BASE}/crontab.conf
 #   crontab ${ETC_BASE}/crontab.conf
 #
 # Reference..: https://github.com/oehrlis/oudbase
