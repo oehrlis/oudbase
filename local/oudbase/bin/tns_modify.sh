@@ -24,7 +24,7 @@
 set -o nounset                      # exit if script try to use an uninitialised variable
 set -o errexit                      # exit script if any statement returns a non-true return value
 set -o pipefail                     # pipefail exit after 1st piped commands failed
-
+set -o noglob                       # Disable filename expansion (globbing).
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
 VERSION=v2.12.7
