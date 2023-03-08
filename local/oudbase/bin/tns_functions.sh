@@ -311,6 +311,7 @@ function clean_quit() {
         5)  echo "ERROR: Exit Code ${error}. Missing common function file (${error_value}) to source." >&2;;
         10) echo "ERROR: Exit Code ${error}. Command ${error_value} isn't installed/available on this system..." >&2;;
         11) echo "ERROR: Exit Code ${error}. LDAP tool ${error_value} in PATH is not OpenLDAP compatible..." >&2;;
+        12) echo "ERROR: Exit Code ${error}. OUD_BASE not set or $OUD_BASE not available.";;
         20) echo "ERROR: Exit Code ${error}. File ${error_value} already exists..." >&2;;
         21) echo "ERROR: Exit Code ${error}. Directory ${error_value} is not writeable..." >&2;;
         22) echo "ERROR: Exit Code ${error}. Can not read file ${error_value} ..." >&2;;
@@ -354,6 +355,35 @@ function get_list_of_config() {
             done
         done
     done
+}
+
+# ------------------------------------------------------------------------------
+# Function...: source_oudenv
+# Purpose....: source oudbase environment if it does exists
+# ------------------------------------------------------------------------------
+function source_oudenv() {
+    # Check OUD_BASE and load if necessary
+    if [ "${OUD_BASE}" = "" ]; then
+        if [ -f "${HOME}/.OUD_BASE" ]; then
+            . "${HOME}/.OUD_BASE"
+        else
+            export OUD_BASE=${TVDLDAP_BASE}
+        fi
+    fi
+ 
+    # Check if OUD_BASE exits
+    if [ "${OUD_BASE}" = "" ] || [ ! -d "${OUD_BASE}" ]; then
+        clean_quit 12
+    fi
+
+    OUDENV=$(find $OUD_BASE -name oudenv.sh)
+    if [ -n "${OUDENV}" ]; then
+        echo_debug "DEBUG: source ${OUDENV}"
+        # Load OUD environment
+        . "${OUDENV}" SILENT
+    else
+        echo_debug "DEBUG: no oudenv.sh found to source"
+    fi
 }
 
 # ------------------------------------------------------------------------------
