@@ -22,10 +22,11 @@ DEFAULT_FILE_PREFIX="ldap_dump"
 # Define a bunch of bash option see 
 # https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
 # https://www.davidpashley.com/articles/writing-robust-shell-scripts/
-set -o nounset                      # exit if script try to use an uninitialised variable
+# set -o nounset                      # exit if script try to use an uninitialised variable
 # set -o errexit                      # exit script if any statement returns a non-true return value
 # set -o pipefail                     # pipefail exit after 1st piped commands failed
-set -f
+set -o noglob                       # Disable filename expansion (globbing).
+
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
 VERSION=v2.12.7
@@ -127,10 +128,11 @@ echo "INFO : Start ${TVDLDAP_SCRIPT_NAME} on host $(hostname) at $(date)"
 if [ -f ${TVDLDAP_BIN_DIR}/tns_functions.sh ]; then
     . ${TVDLDAP_BIN_DIR}/tns_functions.sh
 else
-    echo "ERROR: Can not find common functions ${TVDLDAP_BIN_DIR}/tns_functions.sh"
+    echo "ERROR: Can not find common functions ${TVDLDAP_BIN_DIR}/tns_functions.sh" 1>&2
     exit 5
 fi
 
+source_oudenv               # source oudenv explicitly if available
 load_config                 # load configur26ation files. File list in TVDLDAP_CONFIG_FILES
 
 # initialize tempfile for the script
