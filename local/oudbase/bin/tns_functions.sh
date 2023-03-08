@@ -263,9 +263,19 @@ function ldapadd_command () {
 # Purpose....: Echo only if TVDLDAP_DEBUG variable is true
 # ------------------------------------------------------------------------------
 function echo_debug () {
+    text=${1:-""}
     if [ "${TVDLDAP_DEBUG^^}" == "TRUE" ]; then
-        echo $1 1>&2
+        echo $text 1>&2
     fi
+}
+
+# ------------------------------------------------------------------------------
+# Function...: echo_stderr
+# Purpose....: Echo errors to STDERR
+# ------------------------------------------------------------------------------
+function echo_stderr () {
+    text=${1:-""}
+    echo $text 1>&2
 }
 
 # ------------------------------------------------------------------------------
