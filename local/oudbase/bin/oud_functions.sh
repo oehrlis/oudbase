@@ -30,6 +30,16 @@ DEBUG=${DEBUG:-"FALSE"}                         # enable debug mode
 SEND_MAIL=${SEND_MAIL:-"UNDEF"} 
 SOFTWARE=${SOFTWARE:-"${ORACLE_BASE}/software"} # local software stage folder
 SOFTWARE_REPO=${SOFTWARE_REPO:-""}              # URL to software for curl fallback
+
+# Define the color for the output 
+export TNS_INFO="\e[96m%b\e[0m" 
+export TNS_SUCCESS="\e[92m%b\e[0m" 
+export TNS_WARNING="\e[93m%b\e[0m" 
+export TNS_ERROR="\e[91m%b\e[0m" 
+
+# explisitly define a couple of default variable
+TMP_DIR=${TMP_DIR:-""}
+DEFAULT_TMP_DIR=${DEFAULT_TMP_DIR:-""}
 # - EOF Environment Variables --------------------------------------------------
 
 # - Functions ------------------------------------------------------------------
@@ -43,8 +53,10 @@ function oud_test() {
 # ------------------------------------------------------------------------------
 # Purpose....: Display Message with time stamp
 # ------------------------------------------------------------------------------
-function DoMsg()
-{
+function DoMsg() {
+    set +o nounset                      # exit if script try to use an uninitialised variable
+    set +o errexit                      # exit script if any statement returns a non-true return value
+    set +o pipefail                     # pipefail exit after 1st piped commands failed
     INPUT=${1}
     PREFIX=${INPUT%: *}                # Take everything before :
     case ${PREFIX} in                  # Define a nice time stamp for ERR, END
@@ -84,6 +96,9 @@ function DoMsg()
             shift
         done
     fi
+    set -o nounset                      # exit if script try to use an uninitialised variable
+    set -o errexit                      # exit script if any statement returns a non-true return value
+    set -o pipefail                     # pipefail exit after 1st piped commands failed
 }
 
 # ------------------------------------------------------------------------------
@@ -140,6 +155,9 @@ function CleanAndQuit() {
         70) DoMsg "ERR  : Exit Code ${1}. Error starting instances ${2}";;
         71) DoMsg "ERR  : Exit Code ${1}. Error unknown activity ${2}";;
         80) DoMsg "ERR  : Exit Code ${1}. No base software package specified. Abort installation.";;
+        90) DoMsg "ERR  : Exit Code ${1}. Received signal SIGINT / Interrupt / CTRL-C ..." >&2;;
+        91) DoMsg "ERR  : Exit Code ${1}. Received signal TERM to terminate the script ..." >&2;;
+        92) DoMsg "ERR  : Exit Code ${1}. Recived signal is SIGINT / Interrupt / CTRL-C} ..." >&2;;
         99) DoMsg "INFO : Just wanna say hallo.";;
         ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
     esac
@@ -156,6 +174,31 @@ function CleanAndQuit() {
         tail -${LOG_TAIL} ${LOGFILE} |mailx -s "$STATUS : OUD Script ${SCRIPT_NAME}" ${MAILADDRESS}
     fi
     exit ${1}
+}
+
+# ------------------------------------------------------------------------------
+# Function...: on_int
+# Purpose....: function to handle interupt by CTRL-C
+# ------------------------------------------------------------------------------
+on_int() {
+    echo
+    printf $TNS_INFO'\n' "You hit CTRL-C, are you sure ? (y/n)"
+    read answer
+    if [[ ${answer} = "y" ]]; then
+        printf $TNS_ERROR'\n' "OK, lets quit then"
+        CleanAndQuit 90
+    else
+        printf $TNS_INFO'\n' "OK, lets continue then"
+    fi
+}
+
+# ------------------------------------------------------------------------------
+# Function...: on_term
+# Purpose....: function to handle TERM signal
+# ------------------------------------------------------------------------------
+on_term() {
+  printf $TNS_ERROR'\n' "I have recived a terminal signal. Terminating script..."
+  CleanAndQuit 91
 }
 
 function running_in_docker() {
