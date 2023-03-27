@@ -34,6 +34,13 @@ TYPE="FULL"                                     # Default Backup Type
 KEEP=4                                          # Default number of Weeks to keep
 compress="--compress"                           # set --compress Flag
 OUD_ERROR=0                                     # default value for error
+
+# Define a bunch of bash option see
+# https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
+# https://www.davidpashley.com/articles/writing-robust-shell-scripts/
+set -o nounset                      # exit if script try to use an uninitialised variable
+set -o errexit                      # exit script if any statement returns a non-true return value
+set -o pipefail                     # pipefail exit after 1st piped commands failed
 # - End of Default Values ------------------------------------------------------
  
 # - Functions ------------------------------------------------------------------
@@ -122,6 +129,10 @@ while getopts hvt:k:oLi:m:f:E: arg; do
     esac
 done
 
+# explisitly define a couple of default variable
+MyBackupPath=${MyBackupPath:-""}
+MyOUD_INSTANCES=${MyOUD_INSTANCES:-""}
+BACKUP_LOGS=${MyOUD_INSTANCES:-"FALSE"}
 # log info in case we do send e-mails
 if [ "${SEND_MAIL}" = "TRUE" ] && [ -z "${MAILADDRESS}" ]; then
     DoMsg "WARN : SEND_MAIL is TRUE, but can not send e-Mail. No address specified."
