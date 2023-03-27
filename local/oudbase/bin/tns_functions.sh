@@ -84,6 +84,12 @@ export TVDLDAP_FORCE=${TVDLDAP_FORCE:-"FALSE"}
 export TVDLDAP_BULK=${TVDLDAP_BULK:-"FALSE"}
 export TVDLDAP_NETALIAS=${TVDLDAP_NETALIAS:-"FALSE"}
 export TNS_ADMIN=${TNS_ADMIN:-${TVDLDAP_ETC_DIR}}
+
+# Define the color for the output 
+export TNS_INFO="\e[96m%b\e[0m" 
+export TNS_SUCCESS="\e[92m%b\e[0m" 
+export TNS_WARNING="\e[93m%b\e[0m" 
+export TNS_ERROR="\e[91m%b\e[0m" 
 # - EOF Environment Variables --------------------------------------------------
 
 # - Functions ------------------------------------------------------------------
@@ -303,30 +309,34 @@ function clean_quit() {
     TVDLDAP_SCRIPT_NAME=${TVDLDAP_SCRIPT_NAME:-${LOCAL_SCRIPT_NAME}}
 
     case ${error} in
-        0)  echo "INFO : Successfully finish ${TVDLDAP_SCRIPT_NAME}";;
-        1)  echo "ERROR: Exit Code ${error}. Wrong amount of arguments. See usage for correct one." ;;
-        2)  echo "ERROR: Exit Code ${error}. Wrong arguments (${error_value}). See usage for correct one." >&2;;
-        3)  echo "ERROR: Exit Code ${error}. Missing mandatory argument (${error_value}). See usage ..." >&2;;
-        4)  echo "ERROR: Exit Code ${error}. Missing mandatory Bind arguments -D with -w, -W or -y. See usage ..." >&2;;
-        5)  echo "ERROR: Exit Code ${error}. Missing common function file (${error_value}) to source." >&2;;
-        10) echo "ERROR: Exit Code ${error}. Command ${error_value} isn't installed/available on this system..." >&2;;
-        11) echo "ERROR: Exit Code ${error}. LDAP tool ${error_value} in PATH is not OpenLDAP compatible..." >&2;;
-        12) echo "ERROR: Exit Code ${error}. OUD_BASE not set or $OUD_BASE not available.";;
-        20) echo "ERROR: Exit Code ${error}. File ${error_value} already exists..." >&2;;
-        21) echo "ERROR: Exit Code ${error}. Directory ${error_value} is not writeable..." >&2;;
-        22) echo "ERROR: Exit Code ${error}. Can not read file ${error_value} ..." >&2;;
-        23) echo "ERROR: Exit Code ${error}. Can not write file ${error_value} ..." >&2;;
-        24) echo "ERROR: Exit Code ${error}. Can not create skip/reject files in ${error_value} ..." >&2;;
-        25) echo "ERROR: Exit Code ${error}. Can not read file password file ${error_value} ..." >&2;;
-        26) echo "ERROR: Exit Code ${error}. Can not write tempfile file ${error_value} ..." >&2;;
-        27) echo "ERROR: Exit Code ${error}. Invalid password file ${error_value} ..." >&2;;
-        30) echo "ERROR: Exit Code ${error}. Bind DN ${error_value} defined but no password parameter provided..." >&2;;
-        31) echo "ERROR: Exit Code ${error}. Base DN ${error_value} does not exists..." >&2;;
-        32) echo "ERROR: Exit Code ${error}. Base DN ALL not supported for ${error_value} ..." >&2;;
-        33) echo "ERROR: Exit Code ${error}. Error running ${error_value} ..." >&2;;
-        40) echo "ERROR: Exit Code ${error}. Multiple entries found (No. ${error_value}). Use bulk mode -B or specify the Net Service Name exactly." >&2;;
-        99) DoMsg "INFO : Just wanna say hallo.";;
-        ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
+
+        0)  printf $TNS_SUCCESS'\n' "INFO : Successfully finish ${TVDLDAP_SCRIPT_NAME}";;
+        1)  printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Wrong amount of arguments. See usage for correct one." ;;
+        2)  printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Wrong arguments (${error_value}). See usage for correct one." >&2;;
+        3)  printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Missing mandatory argument (${error_value}). See usage ..." >&2;;
+        4)  printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Missing mandatory Bind arguments -D with -w, -W or -y. See usage ..." >&2;;
+        5)  printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Missing common function file (${error_value}) to source." >&2;;
+        10) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Command ${error_value} isn't installed/available on this system..." >&2;;
+        11) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. LDAP tool ${error_value} in PATH is not OpenLDAP compatible..." >&2;;
+        12) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. OUD_BASE not set or $OUD_BASE not available.";;
+        20) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. File ${error_value} already exists..." >&2;;
+        21) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Directory ${error_value} is not writeable..." >&2;;
+        22) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Can not read file ${error_value} ..." >&2;;
+        23) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Can not write file ${error_value} ..." >&2;;
+        24) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Can not create skip/reject files in ${error_value} ..." >&2;;
+        25) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Can not read file password file ${error_value} ..." >&2;;
+        26) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Can not write tempfile file ${error_value} ..." >&2;;
+        27) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Invalid password file ${error_value} ..." >&2;;
+        30) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Bind DN ${error_value} defined but no password parameter provided..." >&2;;
+        31) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Base DN ${error_value} does not exists..." >&2;;
+        32) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Base DN ALL not supported for ${error_value} ..." >&2;;
+        33) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Error running ${error_value} ..." >&2;;
+        40) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Multiple entries found (No. ${error_value}). Use bulk mode -B or specify the Net Service Name exactly." >&2;;
+        90) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Received signal SIGINT / Interrupt / CTRL-C ..." >&2;;
+        91) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Received signal TERM to terminate the script ..." >&2;;
+        92) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Recived signal is SIGINT / Interrupt / CTRL-C} ..." >&2;;
+        99) printf $TNS_INFO'\n'  "INFO : Just wanna say hallo.";;
+        ?)  printf $TNS_ERROR'\n' "ERROR: Exit Code ${1}. Unknown Error.";;
     esac
 
     # remove tempfiles
@@ -334,6 +344,30 @@ function clean_quit() {
     if [ -f "$TNSPING_TEMPFILE" ]; then rm $TNSPING_TEMPFILE; fi
     
     exit ${error}
+}
+
+# ------------------------------------------------------------------------------
+# Function...: on_int
+# Purpose....: function to handle interupt by CTRL-C
+# ------------------------------------------------------------------------------
+on_int() {
+  printf $TNS_ERROR'\n' "You hit CTRL-C, are you sure ? (y/n)"
+  read answer
+  if [[ ${answer} = "y" ]]; then
+    printf $TNS_ERROR'\n' "OK, lets quit then"
+    clean_quit 90
+  else
+    printf $TNS_ERROR'\n' "OK, lets continue then"
+  fi
+}
+
+# ------------------------------------------------------------------------------
+# Function...: on_term
+# Purpose....: function to handle TERM signal
+# ------------------------------------------------------------------------------
+on_term() {
+  printf $TNS_ERROR'\n' "I have recived a terminal signal. Terminating script..."
+  clean_quit 91
 }
 
 # ------------------------------------------------------------------------------
@@ -358,10 +392,10 @@ function get_list_of_config() {
 }
 
 # ------------------------------------------------------------------------------
-# Function...: source_oudenv
-# Purpose....: source oudbase environment if it does exists
+# Function...: source_env
+# Purpose....: source oudbase or base environment if it does exists
 # ------------------------------------------------------------------------------
-function source_oudenv() {
+function source_env() {
     # Check OUD_BASE and load if necessary
     if [ "${OUD_BASE}" = "" ]; then
         if [ -f "${HOME}/.OUD_BASE" ]; then
@@ -370,13 +404,37 @@ function source_oudenv() {
             export OUD_BASE=${TVDLDAP_BASE}
         fi
     fi
- 
+
+    # Check BE_HOME and load if necessary
+    if [ "${BE_HOME}" = "" ]; then
+        if [ -f "${HOME}/.BE_HOME" ]; then
+            . "${HOME}/.BE_HOME"
+        else
+            export BE_HOME=${TVDLDAP_BASE}
+        fi
+    fi
+
     # Check if OUD_BASE exits
     if [ "${OUD_BASE}" = "" ] || [ ! -d "${OUD_BASE}" ]; then
         clean_quit 12
     fi
 
+    # Check if BE_HOME exits
+    if [ "${BE_HOME}" = "" ] || [ ! -d "${BE_HOME}" ]; then
+        clean_quit 12
+    fi
+
     OUDENV=$(find $OUD_BASE -name oudenv.sh)
+    BASENV=$(find $BE_HOME -name basenv.sh)
+    
+    if [ -n "${BASENV}" ]; then
+        echo_debug "DEBUG: source ${BASENV}"
+        # Load BASE environment
+        . "${BASENV}" 
+    else
+        echo_debug "DEBUG: no basenv.sh found to source"
+    fi
+
     if [ -n "${OUDENV}" ]; then
         echo_debug "DEBUG: source ${OUDENV}"
         # Load OUD environment
@@ -384,6 +442,7 @@ function source_oudenv() {
     else
         echo_debug "DEBUG: no oudenv.sh found to source"
     fi
+
 }
 
 # ------------------------------------------------------------------------------
