@@ -26,6 +26,12 @@ OSDT_CERT=$ORACLE_HOME/oracle_common/modules/oracle.osdt/osdt_cert.jar
 OSDT_CORE=$ORACLE_HOME/oracle_common/modules/oracle.osdt/osdt_core.jar
 OJDBC8=$ORACLE_HOME/oracle_common/modules/oracle.jdbc/ojdbc8.jar
 RDBMSVER=19
+# Define a bunch of bash option see
+# https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
+# https://www.davidpashley.com/articles/writing-robust-shell-scripts/
+set -o nounset                      # exit if script try to use an uninitialised variable
+set -o errexit                      # exit script if any statement returns a non-true return value
+set -o pipefail                     # pipefail exit after 1st piped commands failed
 # - End of Default Values ------------------------------------------------------
 
 if [ -f "$ORACLE_BASE/local/oudbase/lib/eusm.jar" ] &&  [ -f "$ORACLE_BASE/local/oudbase/lib/ldapjclnt19.jar" ]; then
