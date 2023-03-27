@@ -29,6 +29,7 @@ PGREP_BIN=$(command -v pgrep)                                   # get the binary
 SHA1SUM_BIN=$(command -v sha1sum)                               # get the binary for sha1sum
 HOSTNAME_BIN=$(command -v hostname)                             # get the binary for hostname
 HOSTNAME_BIN=${HOSTNAME_BIN:-"cat /proc/sys/kernel/hostname"}   # fallback to /proc/sys/kernel/hostname
+SOURCED=${SOURCED:-0}                                           # define default value for source
 export HOST=$(${HOSTNAME_BIN})
 
 # Absolute path of script directory
@@ -119,8 +120,8 @@ function get_instance_real_home {
  # define the function parameter
     OUD_INSTANCE=${1:-${OUD_INSTANCE}}
     DIRECTORY_TYPE=${2:-${DIRECTORY_TYPE}}
-    Silent=$3
-    # get ports for OUD instance
+    Silent=${3:-""}
+    # get config for OUD instance
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
         # check if instance home does use a /OUD directory or not
         if [ -r "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/config/config.ldif" ]; then
@@ -159,7 +160,7 @@ function get_ports {
     # define the function parameter
     OUD_INSTANCE=${1:-${OUD_INSTANCE}}
     DIRECTORY_TYPE=${2:-${DIRECTORY_TYPE}}
-    Silent=$3
+    Silent=${3:-""}
     # get default ports from oudtab
     OUDTAB_PORT=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f2)
     OUDTAB_PORT_SSL=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f3)
@@ -241,7 +242,7 @@ function update_oudtab {
     OUD_INSTANCE=${1:-${OUD_INSTANCE}}
     DIRECTORY_TYPE=${2:-${DIRECTORY_TYPE}}
     START_STOP="N"
-    Silent=$3
+    Silent=${3:-""}
     # get the ports for the instance
     get_ports ${OUD_INSTANCE} ${DIRECTORY_TYPE} ${Silent}
     # get the status of the oud instance and set START_STOP if running assume up=Y, down=N, n/a=N
@@ -276,6 +277,7 @@ function oud_status {
 # ------------------------------------------------------------------------------
     STATUS=$(get_status)
     DIR_STATUS="??"
+    Silent=""
     OUD_INSTANCE_REAL_HOME=$(get_instance_real_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} ${Silent})
     if [ ${DIRECTORY_TYPE} == "OUD" ] && [ -f "${OUD_INSTANCE_REAL_HOME}/config/config.ldif" ] ; then
         DIR_STATUS="ok"
@@ -402,13 +404,13 @@ function get_oracle_home {
     # define the function parameter
     OUD_INSTANCE=${1:-${OUD_INSTANCE}}
     DIRECTORY_TYPE=${2:-${DIRECTORY_TYPE}}
-    Silent=$3
+    Silent=${3:-""}
     # get the ORACLE_HOME from the install.path currently just supported
     # for directory type OUD
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-        Silent=$1
+        OUD_INSTANCE_REAL_HOME=$(get_instance_real_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} ${OUD_INSTANCE})
         if [ -r "${OUD_INSTANCE_REAL_HOME}/install.path" ]; then
-            read ORACLE_HOME < "${OUD_INSTANCE_REAL_HOME}/install.path"
+            ORACLE_HOME=$(cat ${OUD_INSTANCE_REAL_HOME}/install.path)
             # check if our install path contains an oud at the end
             if [ $(basename ${ORACLE_HOME}) == "oud" ]; then
                 # seems we have an OUD 12 home
@@ -418,10 +420,14 @@ function get_oracle_home {
                 export ORACLE_HOME=${ORACLE_HOME}
             fi
         else
-            [ "${Silent}" == "" ] && echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
+            if [ "${Silent}" == "" ] ; then
+                echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
+            fi
         fi
         # Display the ORACLE_HOME
-        [ "${Silent}" == "" ] && echo " Oracle Home    : ${ORACLE_HOME}"
+        if [ "${Silent}" == "" ] ; then
+            echo " Oracle Home    : ${ORACLE_HOME}"
+        fi
     fi
 }
  
@@ -429,7 +435,7 @@ function get_oracle_home {
 function gen_password {
 # Purpose....: generate a password string
 # ------------------------------------------------------------------------------
-    Length=${1:-10}
+    Length=${1:-12}
 
     # make sure, that the password length is not shorter than 4 characters
     if [ ${Length} -lt 4 ]; then
@@ -438,7 +444,8 @@ function gen_password {
 
     # Auto generate a password
     if [ $(command -v pwgen) ]; then 
-        s=$(pwgen -s -1 15)
+        s=$(pwgen -s -1 $Length)
+        echo "$s"
     else 
         while true; do
             # use urandom to generate a random string
@@ -590,7 +597,8 @@ function relpath {
 # - Initialization -------------------------------------------------------------
 tty >/dev/null 2>&1
 pTTY=$?
-export SILENT=${2}
+export OUD_INSTANCE=${1:-""}
+export SILENT=${2:-""}
  
 # count number of execution / source
 export SOURCED=$((SOURCED+1))
@@ -734,15 +742,15 @@ else
 fi
  
 # use default OUD Instance if none has been specified as parameter
-if [ "${1}" = "" ]; then
+if [ "${OUD_INSTANCE}" = "" ]; then
     export OUD_INSTANCE=${OUD_DEFAULT_INSTANCE}
-elif [ "${1}" == "SILENT" ]; then
+elif [ "${OUD_INSTANCE}" == "SILENT" ]; then
     export OUD_INSTANCE=${OUD_DEFAULT_INSTANCE} 
     export SILENT="SILENT"
-elif [[ "${1}" =~ [^a-zA-Z0-9_-] ]]; then
+elif [[ "${OUD_INSTANCE}" =~ [^a-zA-Z0-9_-] ]]; then
     export OUD_INSTANCE=${OUD_DEFAULT_INSTANCE}
 else
-    export OUD_INSTANCE=${1}
+    export OUD_INSTANCE=${OUD_INSTANCE}
 fi
 # - EOF Initialization ---------------------------------------------------------
 
@@ -769,6 +777,8 @@ if [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -eq 1 ]
             OUD_INSTANCE_HOME_BIN="${OUD_INSTANCE_HOME}/OUD/bin"
         elif [ -d "${OUD_INSTANCE_HOME}/bin" ]; then
             OUD_INSTANCE_HOME_BIN="${OUD_INSTANCE_HOME}/bin"
+        else
+            OUD_INSTANCE_HOME_BIN="${OUD_INSTANCE_HOME}"
         fi   
     elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
         # if directory type is OUDSM use a different base
@@ -806,7 +816,9 @@ else # print error and keep current setting
     echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUDTAB} or ${OUD_INSTANCE_BASE}"
     echo "ERROR: Set environment to ${OUD_DEFAULT_INSTANCE}."
     export OUD_INSTANCE=${OUD_DEFAULT_INSTANCE}
+    export OUD_INSTANCE_HOME_BIN=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/bin
     RECREATE="FALSE"
+    exit 1
 fi
 
 # re-create a few stuff if necessary 
