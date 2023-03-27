@@ -35,6 +35,13 @@ COMPRESS=""                                     # set default value for compress
 SUFFIX="ldif"                                   # default suffix
 DATE_STRING=$(date '+%Y%m%d-%H%M%S')            # String used for the export files
 HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)  # Hostname
+
+# Define a bunch of bash option see
+# https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
+# https://www.davidpashley.com/articles/writing-robust-shell-scripts/
+set -o nounset                      # exit if script try to use an uninitialised variable
+set -o errexit                      # exit script if any statement returns a non-true return value
+set -o pipefail                     # pipefail exit after 1st piped commands failed
 # - End of Default Values ------------------------------------------------------
 
 # - Functions ------------------------------------------------------------------
@@ -122,6 +129,13 @@ while getopts hvdcb:m:oi:k:E:D:j:f: arg; do
         ?) Usage 2 $*;;
     esac
 done
+
+# explisitly define a couple of default variable
+MybindPasswordFile=${MybindDN:-""}
+MyExportPath=${MyExportPath:-""}
+MyOUD_INSTANCES=${MyOUD_INSTANCES:-""}
+BACKENDS=${BACKENDS:-""}
+
 # Set the default Bind DN to cn=Directory Manager if not specified
 MybindDN=${MybindDN:-"cn=Directory Manager"}
 
