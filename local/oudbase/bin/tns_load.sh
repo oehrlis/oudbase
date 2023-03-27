@@ -122,6 +122,9 @@ else
     exit 5
 fi
 
+# define signal handling
+trap on_term TERM SEGV      # handle TERM SEGV using function on_term
+trap on_int INT             # handle INT using function on_int
 load_config                 # load configuration files. File list in TVDLDAP_CONFIG_FILES
 
 # get options
