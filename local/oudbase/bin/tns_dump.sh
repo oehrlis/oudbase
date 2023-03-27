@@ -132,7 +132,10 @@ else
     exit 5
 fi
 
-source_oudenv               # source oudenv explicitly if available
+# define signal handling
+trap on_term TERM SEGV      # handle TERM SEGV using function on_term
+trap on_int INT             # handle INT using function on_int
+source_env                  # source oudbase or base environment if it does exists
 load_config                 # load configur26ation files. File list in TVDLDAP_CONFIG_FILES
 
 # initialize tempfile for the script
@@ -320,7 +323,7 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                         fi
                     done
                 else
-                    echo "WARN : No Net Service Name / Alias found in ${basedn}"
+                    printf $TNS_INFO'\n' "WARN : No Net Service Name / Alias found in ${basedn}"
                     echo "# No Net Service Name / Alias found in ${basedn}" >>${OUTPUT_DIR}/${dump_file}   
                 fi
                 echo >>${OUTPUT_DIR}/${dump_file}
@@ -328,7 +331,7 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                 echo "INFO : Dry run enabled, skip dump Net Service Names from $basedn to ${OUTPUT_DIR}/${dump_file}"
             fi
         else
-            echo "WARN : Base DN ${basedn} not found"
+            printf $TNS_INFO'\n' "WARN : Base DN ${basedn} not found"
         fi
     done
 done

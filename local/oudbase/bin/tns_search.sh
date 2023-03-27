@@ -118,6 +118,10 @@ else
     exit 5
 fi
 
+# define signal handling
+trap on_term TERM SEGV      # handle TERM SEGV using function on_term
+trap on_int INT             # handle INT using function on_int
+source_env                  # source oudbase or base environment if it does exists
 load_config                 # load configur26ation files. File list in TVDLDAP_CONFIG_FILES
 
 # initialize tempfile for the script
@@ -250,11 +254,11 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                     fi
                 done
             else
-                echo "WARN : Net Service Name / Alias ${current_cn} not found in ${basedn}"
+                printf $TNS_INFO'\n' "WARN : Net Service Name / Alias ${current_cn} not found in ${basedn}"
             fi
             echo ""
         else
-            echo "WARN : Base DN ${basedn} not found"
+            printf $TNS_INFO'\n' "WARN : Base DN ${basedn} not found"
         fi
     done
 done

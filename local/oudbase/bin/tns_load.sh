@@ -125,7 +125,8 @@ fi
 # define signal handling
 trap on_term TERM SEGV      # handle TERM SEGV using function on_term
 trap on_int INT             # handle INT using function on_int
-load_config                 # load configuration files. File list in TVDLDAP_CONFIG_FILES
+source_env                  # source oudbase or base environment if it does exists
+load_config                 # load configur26ation files. File list in TVDLDAP_CONFIG_FILES
 
 # get options
 while getopts mvdb:h:p:D:w:Wy:t:FnE: CurOpt; do
@@ -220,7 +221,7 @@ for file in $TNSNAMES_FILES; do
         NetDescString=$(echo $line| cut -d'=' -f2-)
         # check for , in service name => reject
         if [[ "${net_service}" == *","* ]]; then
-            echo "WARN : Can not handle comma in Net Service Name, reject Net Service Name ${net_service}"
+            printf $TNS_INFO'\n' "WARN : Can not handle comma in Net Service Name, reject Net Service Name ${net_service}"
             echo "# Can not handle comma in Net Service Name ${net_service}" >>"${file}_reject" || clean_quit 23 ${file}_reject
             echo "${net_service}=${NetDescString}" >>"${file}_reject"
             entries_rejected=$((entries_rejected+1))      # Count rejeced entries
@@ -229,7 +230,7 @@ for file in $TNSNAMES_FILES; do
 
         # check if base DN exists => reject
         if ! basedn_exists ${current_basedn}; then
-            echo "WARN : Base DN ${current_basedn} does not exists, reject Net Service Name ${net_service}"
+            printf $TNS_INFO'\n' "WARN : Base DN ${current_basedn} does not exists, reject Net Service Name ${net_service}"
             echo "# Base DN ${current_basedn} does not exists, reject Net Service Name ${net_service}" >>"${file}_reject"
             echo "${net_service}=${NetDescString}" >>"${file}_reject"
             entries_rejected=$((entries_rejected+1))      # Count rejeced entries
@@ -280,7 +281,7 @@ EOI
                     echo "INFO : Dry run enabled, skip modify Net Service Name $current_cn in $current_basedn"
                 fi
             else
-                echo "WARN : Net Service Name does exists in $current_basedn, skip ${net_service}"
+                printf $TNS_INFO'\n' "WARN : Net Service Name does exists in $current_basedn, skip ${net_service}"
                 echo "# Net Service Name does exists in $current_basedn, skip ${net_service}" >>"${file}_skip"
                 echo "${net_service}=${NetDescString}" >>"${file}_skip"
                 entries_skipped=$((entries_skipped+1))      # Count skipped entries

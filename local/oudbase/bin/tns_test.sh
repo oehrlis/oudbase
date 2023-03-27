@@ -139,6 +139,10 @@ else
     exit 5
 fi
 
+# define signal handling
+trap on_term TERM SEGV      # handle TERM SEGV using function on_term
+trap on_int INT             # handle INT using function on_int
+source_env                  # source oudbase or base environment if it does exists
 load_config                 # load configur26ation files. File list in TVDLDAP_CONFIG_FILES
 
 # initialize tempfile for the script
@@ -239,12 +243,12 @@ if [ -n "$TVDLDAP_SQL_USER" ]; then
         elif [ "${TVDLDAP_SQL_PWDASK^^}" == "TRUE" ]; then
             read -p "SQLPlus Password:" TVDLDAP_SQL_PWD
         else
-            echo "WARN : No password defined. Using dummy password to run SQLPlus tests."
+            printf $TNS_INFO'\n' "WARN : No password defined. Using dummy password to run SQLPlus tests."
             TVDLDAP_SQL_PWD="tiger"
         fi
     fi
 else
-    echo "WARN : Skip SQLPlus test. No user name defined." 
+    printf $TNS_INFO'\n' "WARN : Skip SQLPlus test. No user name defined." 
 fi
 
 # get base DN information
@@ -366,10 +370,10 @@ EOFSQL
                     entries_processed=$((entries_processed+1))  # Count processed entries
                 done
             else
-                echo "WARN : No service found in ${basedn}"
+                printf $TNS_INFO'\n' "WARN : No service found in ${basedn}"
             fi
         else
-            echo "WARN : Base DN ${basedn} not found"
+            printf $TNS_INFO'\n' "WARN : Base DN ${basedn} not found"
         fi
     done
 done

@@ -122,7 +122,8 @@ fi
 # define signal handling
 trap on_term TERM SEGV      # handle TERM SEGV using function on_term
 trap on_int INT             # handle INT using function on_int
-load_config                 # load configuration files. File list in TVDLDAP_CONFIG_FILES
+source_env                  # source oudbase or base environment if it does exists
+load_config                 # load configur26ation files. File list in TVDLDAP_CONFIG_FILES
 
 # get options
 while getopts mvdb:h:p:D:w:Wy:S:N:nFAE: CurOpt; do
@@ -250,7 +251,7 @@ EOI
                 echo "INFO : Dry run enabled, skip add Net Service Name $current_cn in $basedn"
             fi
         else
-            echo "WARN : Net Service Name $current_cn does not exists in $current_basedn. Enable force mode to add it."
+            printf $TNS_INFO'\n' "WARN : Net Service Name $current_cn does not exists in $current_basedn. Enable force mode to add it."
         fi
     else
         echo "INFO : Modify Net Service Name $current_cn in $current_basedn"

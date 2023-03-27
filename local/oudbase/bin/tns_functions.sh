@@ -84,7 +84,9 @@ export TVDLDAP_FORCE=${TVDLDAP_FORCE:-"FALSE"}
 export TVDLDAP_BULK=${TVDLDAP_BULK:-"FALSE"}
 export TVDLDAP_NETALIAS=${TVDLDAP_NETALIAS:-"FALSE"}
 export TNS_ADMIN=${TNS_ADMIN:-${TVDLDAP_ETC_DIR}}
-
+export OUD_BASE=${OUD_BASE:-""}
+export BE_HOME=${BE_HOME:-""}
+export HOME=${HOME:-~}
 # Define the color for the output 
 export TNS_INFO="\e[96m%b\e[0m" 
 export TNS_SUCCESS="\e[92m%b\e[0m" 
@@ -334,7 +336,7 @@ function clean_quit() {
         40) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Multiple entries found (No. ${error_value}). Use bulk mode -B or specify the Net Service Name exactly." >&2;;
         90) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Received signal SIGINT / Interrupt / CTRL-C ..." >&2;;
         91) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Received signal TERM to terminate the script ..." >&2;;
-        92) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Recived signal is SIGINT / Interrupt / CTRL-C} ..." >&2;;
+        92) printf $TNS_ERROR'\n' "ERROR: Exit Code ${error}. Received signal ..." >&2;;
         99) printf $TNS_INFO'\n'  "INFO : Just wanna say hallo.";;
         ?)  printf $TNS_ERROR'\n' "ERROR: Exit Code ${1}. Unknown Error.";;
     esac
@@ -442,7 +444,6 @@ function source_env() {
     else
         echo_debug "DEBUG: no oudenv.sh found to source"
     fi
-
 }
 
 # ------------------------------------------------------------------------------
@@ -518,8 +519,10 @@ function get_all_basedn() {
 function get_local_basedn() {
     if [ -f "$TNS_ADMIN/ldap.ora" ]; then
         grep -i "^DEFAULT_ADMIN_CONTEXT" $TNS_ADMIN/ldap.ora|sed 's/.*"\(.*\)".*/\1/'
-    else
+    elif [ -n "$TVDLDAP_BASEDN" ]; then
         echo $TVDLDAP_BASEDN
+    else
+        get_all_basedn
     fi
 }
 
