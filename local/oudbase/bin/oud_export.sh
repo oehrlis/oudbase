@@ -135,7 +135,7 @@ while getopts hvdcb:m:oi:k:E:D:j:f: arg; do
 done
 
 # explisitly define a couple of default variable
-MybindPasswordFile=${MybindDN:-""}
+MybindPasswordFile=${MybindPasswordFile:-""}
 MyExportPath=${MyExportPath:-""}
 MyOUD_INSTANCES=${MyOUD_INSTANCES:-""}
 BACKENDS=${BACKENDS:-""}
