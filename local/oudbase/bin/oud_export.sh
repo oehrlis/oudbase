@@ -47,6 +47,10 @@ set -o pipefail                     # pipefail exit after 1st piped commands fai
 # - Functions ------------------------------------------------------------------
 # source common functions from oud_functions.sh
 . ${SCRIPT_DIR}/oud_functions.sh
+
+# define signal handling
+trap on_term TERM SEGV      # handle TERM SEGV using function on_term
+trap on_int INT             # handle INT using function on_int
 # ------------------------------------------------------------------------------
 # Purpose....: Display Usage
 # ------------------------------------------------------------------------------
