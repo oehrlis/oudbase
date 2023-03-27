@@ -33,6 +33,12 @@ START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 MAILADDRESS=oud@oradba.ch
 ERROR=0
 HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)    # Hostname
+# Define a bunch of bash option see
+# https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
+# https://www.davidpashley.com/articles/writing-robust-shell-scripts/
+set -o nounset                      # exit if script try to use an uninitialised variable
+set -o errexit                      # exit script if any statement returns a non-true return value
+set -o pipefail                     # pipefail exit after 1st piped commands failed
 # - End of Default Values ------------------------------------------------------
 
 # - Functions ------------------------------------------------------------------
@@ -121,6 +127,13 @@ while getopts hvli:D:j:c:E:r arg; do
         ?) Usage 2 $*;;
     esac
 done
+
+# explisitly define a couple of default variable
+MybindPasswordFile=${MybindPasswordFile:-""}
+MyExportPath=${MyExportPath:-""}
+MyOUD_INSTANCE=${MyOUD_INSTANCE:-""}
+INSTANCE_LOG=${INSTANCE_LOG:-"FALSE"}
+REPLICATION=${REPLICATION:-"FALSE"}
 
 # set the connection handler
 OUD_CON_HANDLER=${MY_OUD_CON_HANDLER:-$OUD_CON_HANDLER}
