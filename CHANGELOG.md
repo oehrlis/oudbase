@@ -15,6 +15,12 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.0.1] - 2023.03.28
+
+### Fixed
+
+- fix minor bug in *source_env*
+
 ## [3.0.0] - 2023.03.28
 
 ### Added
