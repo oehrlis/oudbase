@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.3
+# Version....: v3.0.4
 # Usage......: 31_initialize_host3.sh
 # Purpose....: simple script to initialize replication
 # Notes......:  
@@ -52,20 +52,20 @@ echo "BASEDN            : ${BASEDN}"
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
-[ -z ${HOST} ]              && echo "- skip $(basename $0), variable HOST not set"              && exit
-[ -z ${HOST1} ]             && echo "- skip $(basename $0), variable HOST1 not set"             && exit
-[ -z ${HOST3} ]             && echo "- skip $(basename $0), variable HOST3 not set"             && exit
-[ -z ${PWD_FILE} ]          && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
-[ ! -f ${PWD_FILE} ]          && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
-[ -z ${HOST} ]              && echo "- skip $(basename $0), variable HOST not set"              && exit
-[ -z ${PORT_REP} ]          && echo "- skip $(basename $0), variable PORT_REP not set"          && exit
-[ -z ${PORT_ADMIN} ]        && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
-[ -z ${PORT_REST_ADMIN} ]   && echo "- skip $(basename $0), variable PORT_REST_ADMIN not set"   && exit
-[ -z ${PORT_REST_HTTP} ]    && echo "- skip $(basename $0), variable PORT_REST_HTTP not set"    && exit
-[ -z ${PORT_REST_HTTPS} ]   && echo "- skip $(basename $0), variable PORT_REST_HTTPS not set"   && exit
-[ -z ${DIRMAN} ]            && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
-[ -z ${REPMAN} ]            && echo "- skip $(basename $0), variable REPMAN not set"            && exit
-[ -z ${BASEDN} ]            && echo "- skip $(basename $0), variable BASEDN not set"            && exit
+[   -z "${HOST}" ]              && echo "- skip $(basename $0), variable HOST not set"              && exit
+[   -z "${HOST1}" ]             && echo "- skip $(basename $0), variable HOST1 not set"             && exit
+[   -z "${HOST3}" ]             && echo "- skip $(basename $0), variable HOST3 not set"             && exit
+[   -z "${PWD_FILE}" ]          && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ ! -f "${PWD_FILE}" ]          && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[   -z "${HOST}" ]              && echo "- skip $(basename $0), variable HOST not set"              && exit
+[   -z "${PORT_REP}" ]          && echo "- skip $(basename $0), variable PORT_REP not set"          && exit
+[   -z "${PORT_ADMIN}" ]        && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[   -z "${PORT_REST_ADMIN}" ]   && echo "- skip $(basename $0), variable PORT_REST_ADMIN not set"   && exit
+[   -z "${PORT_REST_HTTP}" ]    && echo "- skip $(basename $0), variable PORT_REST_HTTP not set"    && exit
+[   -z "${PORT_REST_HTTPS}" ]   && echo "- skip $(basename $0), variable PORT_REST_HTTPS not set"   && exit
+[   -z "${DIRMAN}" ]            && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[   -z "${REPMAN}" ]            && echo "- skip $(basename $0), variable REPMAN not set"            && exit
+[   -z "${BASEDN}" ]            && echo "- skip $(basename $0), variable BASEDN not set"            && exit
 
 # - loop through list of suffix ------------------------------------------------
 # - initialize replication -----------------------------------------------------

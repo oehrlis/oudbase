@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.3
+# Version....: v3.0.4
 # Purpose....: Script to migrate the java keystore to PKCS12
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
@@ -31,10 +31,10 @@ echo "  KEYSTOREPIN       : ${KEYSTOREPIN}"
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
-[ -z ${KEYSTOREFILE} ]    && echo "- skip $(basename $0), variable KEYSTOREFILE not set"          && exit
-[ -f ${KEYSTOREFILE} ]    && echo "- skip $(basename $0), missing password file ${KEYSTOREFILE}"  && exit
-[ -z ${KEYSTOREPIN} ]     && echo "- skip $(basename $0), variable KEYSTOREPIN not set"          && exit
-[ -f ${KEYSTOREPIN} ]     && echo "- skip $(basename $0), missing password file ${KEYSTOREPIN}"  && exit
+[   -z "${KEYSTOREFILE}" ]  && echo "- skip $(basename $0), variable KEYSTOREFILE not set"  && exit
+[ ! -f "${KEYSTOREFILE}" ]  && echo "- skip $(basename $0), missing file ${KEYSTOREFILE}"   && exit
+[   -z "${KEYSTOREPIN}" ]   && echo "- skip $(basename $0), variable KEYSTOREPIN not set"   && exit
+[ ! -f "${KEYSTOREPIN}" ]   && echo "- skip $(basename $0), missing file ${KEYSTOREPIN}"    && exit
 
 echo "- migrate keystore to PKCS12"
 $JAVA_HOME/bin/keytool -importkeystore \

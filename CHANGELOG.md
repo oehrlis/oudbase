@@ -15,6 +15,12 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.0.4] - 2023.03.28
+
+### Fixed
+
+- fix variable and file check in templates
+
 ## [3.0.3] - 2023.03.28
 
 ### Fixed

@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.3
+# Version....: v3.0.4
 # Purpose....: Script to configure the OUD proxy instance.
 # Notes......: The config file 03_config_oud_proxy.conf is executed using
 #              dsconfig in batch mode. If required, each command can 
@@ -40,12 +40,12 @@ echo ""
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
-[ -z ${PWD_FILE} ]          && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
-[ ! -f ${PWD_FILE} ]          && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
-[ -z ${HOST} ]              && echo "- skip $(basename $0), variable HOST not set"              && exit
-[ -z ${PORT_ADMIN} ]        && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
-[ -z ${DIRMAN} ]            && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
-[ -z ${BASEDN} ]            && echo "- skip $(basename $0), variable BASEDN not set"            && exit
+[   -z "${PWD_FILE}" ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ ! -f "${PWD_FILE}" ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[   -z "${HOST}" ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
+[   -z "${PORT_ADMIN}" ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[   -z "${DIRMAN}" ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[   -z "${BASEDN}" ]      && echo "- skip $(basename $0), variable BASEDN not set"            && exit
 
 echo "  Config OUD Proxy Instance"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \

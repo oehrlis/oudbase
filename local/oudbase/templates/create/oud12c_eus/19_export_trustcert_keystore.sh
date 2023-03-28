@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.3
+# Version....: v3.0.4
 # Purpose....: Script to export the java keystore to PKCS12
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
@@ -35,13 +35,13 @@ echo "  TRUSTED_CERT_FILE   : ${TRUSTED_CERT_FILE}"
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
-[ -z ${KEYSTOREFILE} ]      && echo "- skip $(basename $0), variable KEYSTOREFILE not set"              && exit
-[ -f ${KEYSTOREFILE} ]      && echo "- skip $(basename $0), missing password file ${KEYSTOREFILE}"      && exit
-[ -z ${KEYSTOREPIN} ]       && echo "- skip $(basename $0), variable KEYSTOREPIN not set"               && exit
-[ -f ${KEYSTOREPIN} ]       && echo "- skip $(basename $0), missing password file ${KEYSTOREPIN}"       && exit
-[ -z ${KEYSTORE_ALIAS} ]    && echo "- skip $(basename $0), variable KEYSTORE_ALIAS not set"            && exit
-[ -z ${TRUSTED_CERT_FILE} ] && echo "- skip $(basename $0), variable TRUSTED_CERT_FILE not set"         && exit
-[ -f ${TRUSTED_CERT_FILE} ] && echo "- skip $(basename $0), missing password file ${TRUSTED_CERT_FILE}" && exit
+[   -z "${KEYSTOREFILE}" ]      && echo "- skip $(basename $0), variable KEYSTOREFILE not set"      && exit
+[ ! -f "${KEYSTOREFILE}" ]      && echo "- skip $(basename $0), missing file ${KEYSTOREFILE}"       && exit
+[   -z "${KEYSTOREPIN}" ]       && echo "- skip $(basename $0), variable KEYSTOREPIN not set"       && exit
+[ ! -f "${KEYSTOREPIN}" ]       && echo "- skip $(basename $0), missing file ${KEYSTOREPIN}"        && exit
+[   -z "${KEYSTORE_ALIAS}" ]    && echo "- skip $(basename $0), variable KEYSTORE_ALIAS not set"    && exit
+[   -z "${TRUSTED_CERT_FILE}" ] && echo "- skip $(basename $0), variable TRUSTED_CERT_FILE not set" && exit
+[ ! -f "${TRUSTED_CERT_FILE}" ] && echo "- skip $(basename $0), missing file ${TRUSTED_CERT_FILE}"  && exit
 
 echo "- export trusted certificate"
 $JAVA_HOME/bin/keytool -export -noprompt -rfc \

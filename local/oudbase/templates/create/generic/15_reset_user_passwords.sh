@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.3
+# Version....: v3.0.4
 # Usage......: 15_reset_user_passwords.sh
 # Purpose....: Script to reset admin user passwords
 # Notes......: 
@@ -36,14 +36,14 @@ echo "DEFAULT_PASSWORD  : ${DEFAULT_PASSWORD}"
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
-[ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
-[ ! -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
-[ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
-[ -z ${PORT_ADMIN} ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
-[ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[   -z "${PWD_FILE}" ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ ! -f "${PWD_FILE}" ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[   -z "${HOST}" ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
+[   -z "${PORT_ADMIN}" ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[   -z "${DIRMAN}" ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
 
 # generate a password
-if [ -z ${DEFAULT_PASSWORD} ]; then
+if [ -z "${DEFAULT_PASSWORD}" ]; then
   if [ -f "${DEFAULT_USERS_PWD_FILE}" ]; then
     echo "- user password from default user password file (${DEFAULT_USERS_PWD_FILE})..."
     DEFAULT_PASSWORD=$(cat ${DEFAULT_USERS_PWD_FILE})

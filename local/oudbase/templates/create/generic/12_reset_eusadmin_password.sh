@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.3
+# Version....: v3.0.4
 # Usage......: 18_reset_eusadmin_password.sh
 # Purpose....: Script to reset eusadmin user password
 # Notes......: 
@@ -33,15 +33,15 @@ echo "  EUSADMIN_USERS_DN_FILE  : ${EUSADMIN_USERS_DN_FILE}"
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
-[ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
-[ ! -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
-[ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
-[ -z ${PORT} ]        && echo "- skip $(basename $0), variable PORT not set"              && exit
-[ -z ${PORT_ADMIN} ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
-[ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
-[ -z ${EUS_USER_DN} ] && echo "- skip $(basename $0), variable EUS_USER_DN not set"       && exit
-[ -z ${EUS_USER_NAME} ] && echo "- skip $(basename $0), variable EUS_USER_NAME not set"   && exit
-[ -z ${BASEDN} ]      && echo "- skip $(basename $0), variable BASEDN not set"            && exit
+[   -z "${PWD_FILE}" ]      && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ ! -f "${PWD_FILE}" ]      && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[   -z "${HOST}" ]          && echo "- skip $(basename $0), variable HOST not set"              && exit
+[   -z "${PORT}" ]          && echo "- skip $(basename $0), variable PORT not set"              && exit
+[   -z "${PORT_ADMIN}" ]    && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[   -z "${DIRMAN}" ]        && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[   -z "${EUS_USER_DN}" ]   && echo "- skip $(basename $0), variable EUS_USER_DN not set"       && exit
+[   -z "${EUS_USER_NAME}" ] && echo "- skip $(basename $0), variable EUS_USER_NAME not set"     && exit
+[   -z "${BASEDN}" ]        && echo "- skip $(basename $0), variable BASEDN not set"            && exit
 
 # reuse existing password file
 if [ -f "$EUSADMIN_USERS_PWD_FILE" ]; then

@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.3
+# Version....: v3.0.4
 # Purpose....: Script to create a couple of users and groups.
 # Notes......: BaseDN in 02_config_basedn.ldif will be updated before
 #              it is loaded using ldapmodify.
@@ -39,20 +39,20 @@ echo ""
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
-[ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
-[ ! -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
-[ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
-[ -z ${PORT_SSL} ]    && echo "- skip $(basename $0), variable PORT_SSL not set"          && exit
-[ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
-[ -z ${LDIFFILE} ]    && echo "- skip $(basename $0), variable LDIFFILE not set"          && exit
-[ -f ${LDIFFILE} ]    && echo "- skip $(basename $0), missing password file ${LDIFFILE}"  && exit
-[ -z ${BASEDN} ]      && echo "- skip $(basename $0), variable BASEDN not set"            && exit
-[ -z ${USER_OU} ]     && echo "- skip $(basename $0), variable USER_OU not set"           && exit
-[ -z ${GROUP_OU} ]    && echo "- skip $(basename $0), variable GROUP_OU not set"          && exit
+[   -z "${PWD_FILE}" ]  && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ ! -f "${PWD_FILE}" ]  && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[   -z "${HOST}" ]      && echo "- skip $(basename $0), variable HOST not set"              && exit
+[   -z "${PORT_SSL}" ]  && echo "- skip $(basename $0), variable PORT_SSL not set"          && exit
+[   -z "${DIRMAN}" ]    && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[   -z "${LDIFFILE}" ]  && echo "- skip $(basename $0), variable LDIFFILE not set"          && exit
+[ ! -f "${LDIFFILE}" ]  && echo "- skip $(basename $0), missing file ${LDIFFILE}"           && exit
+[   -z "${BASEDN}" ]    && echo "- skip $(basename $0), variable BASEDN not set"            && exit
+[   -z "${USER_OU}" ]   && echo "- skip $(basename $0), variable USER_OU not set"           && exit
+[   -z "${GROUP_OU}" ]  && echo "- skip $(basename $0), variable GROUP_OU not set"          && exit
 
 # - configure instance ---------------------------------------------------------
 # Update baseDN in LDIF file if required
-if [ -f ${LDIFFILE} ]; then
+if [ -f "${LDIFFILE}" ]; then
   cp ${LDIFFILE} ${LDIFFILE_CUSTOM}
 else
   echo "- skip $(basename $0), missing ${LDIFFILE}"

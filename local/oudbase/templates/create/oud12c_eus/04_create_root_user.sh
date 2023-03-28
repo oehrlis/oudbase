@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.3
+# Version....: v3.0.4
 # Usage......: 04_create_root_user.sh
 # Purpose....: Script für das erstellen der root User
 # Notes......: Das Script für die dsconfig Kommandos aus 04_create_root_user.conf
@@ -36,15 +36,15 @@ echo "  LDIFFILE          : ${LDIFFILE}"
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
-[ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"            && exit
-[ ! -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"    && exit
-[ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"                && exit
-[ -z ${PORT_ADMIN} ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"          && exit
-[ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"              && exit
-[ -z ${CONFIGFILE} ]  && echo "- skip $(basename $0), variable CONFIGFILE not set"          && exit
-[ -f ${CONFIGFILE} ]  && echo "- skip $(basename $0), missing password file ${CONFIGFILE}"  && exit
-[ -z ${LDIFFILE} ]    && echo "- skip $(basename $0), variable LDIFFILE not set"            && exit
-[ -f ${LDIFFILE} ]    && echo "- skip $(basename $0), missing password file ${LDIFFILE}"    && exit
+[   -z "${PWD_FILE}" ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ ! -f "${PWD_FILE}" ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[   -z "${HOST}" ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
+[   -z "${PORT_ADMIN}" ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[   -z "${DIRMAN}" ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[   -z "${CONFIGFILE}" ]  && echo "- skip $(basename $0), variable CONFIGFILE not set"        && exit
+[ ! -f "${CONFIGFILE}" ]  && echo "- skip $(basename $0), missing file ${CONFIGFILE}"         && exit
+[   -z "${LDIFFILE}" ]    && echo "- skip $(basename $0), variable LDIFFILE not set"          && exit
+[ ! -f "${LDIFFILE}" ]    && echo "- skip $(basename $0), missing file ${LDIFFILE}"           && exit
 
 # - configure instance ---------------------------------------------------------
 echo "- Add root user to OUD instance ${OUD_INSTANCE}"

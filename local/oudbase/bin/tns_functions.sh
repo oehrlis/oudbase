@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.3
+# Version....: v3.0.4
 # Purpose....: Common functions used by the TNS bash scripts.
 # Notes......: --
 # Reference..: --
@@ -42,7 +42,7 @@ TVDLDAP_DEFAULT_DUMP_FORMAT="SINGLE"
 
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v3.0.3
+VERSION=v3.0.4
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode
