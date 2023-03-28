@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.1
+# Version....: v3.0.2
 # Usage......: 20_wait_for_host2.sh
 # Purpose....: Script to wait for other host to be ready
 # Notes......:  

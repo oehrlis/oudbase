@@ -15,6 +15,12 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.0.2] - 2023.03.28
+
+### Fixed
+
+- Remove unused files from release accidentally created during build
+
 ## [3.0.1] - 2023.03.28
 
 ### Fixed
