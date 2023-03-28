@@ -15,6 +15,12 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.2.0] - 2023.03.28
+
+### Added
+
+- Add configuration variable *TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR* to define default output directory
+
 ## [3.1.0] - 2023.03.28
 
 ### Added

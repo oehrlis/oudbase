@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.1.0
+# Version....: v3.2.0
 # Purpose....: Adjust cn=Directory Manager to use new password storage scheme
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase
