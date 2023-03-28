@@ -398,8 +398,9 @@ function get_list_of_config() {
 # Purpose....: source oudbase or base environment if it does exists
 # ------------------------------------------------------------------------------
 function source_env() {
+    export HOME=${HOME:-~}
     # Check OUD_BASE and load if necessary
-    if [ "${OUD_BASE}" = "" ]; then
+    if [ -z "${OUD_BASE}" ]; then
         if [ -f "${HOME}/.OUD_BASE" ]; then
             . "${HOME}/.OUD_BASE"
         else
@@ -408,7 +409,7 @@ function source_env() {
     fi
 
     # Check BE_HOME and load if necessary
-    if [ "${BE_HOME}" = "" ]; then
+    if [ -z "${BE_HOME}" ]; then
         if [ -f "${HOME}/.BE_HOME" ]; then
             . "${HOME}/.BE_HOME"
         else
@@ -417,12 +418,12 @@ function source_env() {
     fi
 
     # Check if OUD_BASE exits
-    if [ "${OUD_BASE}" = "" ] || [ ! -d "${OUD_BASE}" ]; then
+    if [ -z "${OUD_BASE}" ] || [ ! -d "${OUD_BASE}" ]; then
         clean_quit 12
     fi
 
     # Check if BE_HOME exits
-    if [ "${BE_HOME}" = "" ] || [ ! -d "${BE_HOME}" ]; then
+    if [ -z "${BE_HOME}" ] || [ ! -d "${BE_HOME}" ]; then
         clean_quit 12
     fi
 
@@ -430,6 +431,10 @@ function source_env() {
     BASENV=$(find $BE_HOME -name basenv.sh)
     
     if [ -n "${BASENV}" ]; then
+        if [ -n "${TNS_ADMIN}" ]; then
+            echo_debug "DEBUG: explicitly unset TNS_ADMIN=$TNS_ADMIN"
+            unset TNS_ADMIN
+        fi
         echo_debug "DEBUG: source ${BASENV}"
         # Load BASE environment
         . "${BASENV}" 
