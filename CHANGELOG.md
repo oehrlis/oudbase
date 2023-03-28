@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+Latest releases are always available via [releases].
 
 ## [Unreleased] -
 
@@ -14,7 +15,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-### Removed
+## [3.0.0] - 2023.03.28
+
+### Added
+
+- add *set -o noglob* to tns tools
+- Implement issue #83 *trap / signal handline*
+- Implement issue #85 *Improve bash script stability*
+
+### Changed
+
+- Fix file header doc for crontab templates
+
+### Fixed
+
+- Fix bug issue #133 in *gen_password*.
+- Implement bug fix for issue #106 *Do not create GROUP_OU and USER_OU*
+- Implement bug fix for issue #130 *tns_dump.sh can not be executed in crontab without shell*
 
 ## [2.12.7] - 2023.03.06
 
@@ -355,16 +372,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   old backups
 
 [unreleased]: https://github.com/oehrlis/oudbase
-[1.9.5]: https://github.com/oehrlis/oudbase/releases/tag/v1.9.5
-[1.9.6]: https://github.com/oehrlis/oudbase/releases/tag/v1.9.6
-[2.0.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.0.0
-[2.1.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.1.0
-[2.1.1]: https://github.com/oehrlis/oudbase/releases/tag/v2.1.1
-[2.1.2]: https://github.com/oehrlis/oudbase/releases/tag/v2.1.2
-[2.2.1]: https://github.com/oehrlis/oudbase/releases/tag/v2.2.1
-[2.3.1]: https://github.com/oehrlis/oudbase/releases/tag/v2.3.1
-[2.4.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.4.0
-[2.5.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.5.0
-[2.6.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.6.0
-[2.7.0]: https://github.com/oehrlis/oudbase/releases/tag/v2.7.0
-[2.7.1]: https://github.com/oehrlis/oudbase/releases/tag/v2.7.1
+[releases]: https://github.com/oehrlis/oudbase/releases
