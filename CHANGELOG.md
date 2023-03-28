@@ -15,6 +15,13 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.1.0] - 2023.03.28
+
+### Added
+
+- Add configuration variable to define dump prefix *TVDLDAP_DUMP_FILE_PREFIX*
+- Add parameter to force one dump file instead of one per suffix *-O* and *TVDLDAP_ONE_DUMP_FILE*
+
 ## [3.0.4] - 2023.03.28
 
 ### Fixed

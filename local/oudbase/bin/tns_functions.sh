@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.4
+# Version....: v3.1.0
 # Purpose....: Common functions used by the TNS bash scripts.
 # Notes......: --
 # Reference..: --
@@ -31,6 +31,8 @@ TVDLDAP_DEFAULT_SQL_PWDASK="FALSE"
 TVDLDAP_DEFAULT_SQL_PWDFILE=""
 TVDLDAP_DEFAULT_LDAPTOOLS=""
 TVDLDAP_DEFAULT_DUMP_FORMAT="SINGLE"
+TVDLDAP_DEFAULT_ONE_DUMP_FILE="FALSE"
+TVDLDAP_DEFAULT_DUMP_FILE_PREFIX="ldap_dump"
 # - End of Customization -------------------------------------------------------
 
 # Define a bunch of bash option see 
@@ -42,7 +44,7 @@ TVDLDAP_DEFAULT_DUMP_FORMAT="SINGLE"
 
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v3.0.4
+VERSION=v3.1.0
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode

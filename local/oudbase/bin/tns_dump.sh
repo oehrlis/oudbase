@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.4
+# Version....: v3.1.0
 # Purpose....: Dump entries as tnsnames.ora
 # Notes......: --
 # Reference..: --
@@ -16,7 +16,7 @@
 # - Customization --------------------------------------------------------------
 # - just add/update any kind of customized environment variable here
 DEFAULT_OUTPUT_DIR=${TNS_ADMIN}
-DEFAULT_FILE_PREFIX="ldap_dump"
+TVDLDAP_DUMP_FILE_PREFIX==""
 # - End of Customization -------------------------------------------------------
 
 # Define a bunch of bash option see 
@@ -29,7 +29,7 @@ set -o noglob                       # Disable filename expansion (globbing).
 
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v3.0.4
+VERSION=v3.1.0
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode
@@ -95,7 +95,8 @@ function Usage() {
     -T <OUTPUT DIR>     Output Directory to dump the tnsnames information
                         (default $DEFAULT_OUTPUT_DIR)
     -o <OUTPUT FILE>    Output file with tnsnames dump from specified Base
-                        DN (default ${DEFAULT_FILE_PREFIX}_<BASEDN>_<DATE>.ora)
+                        DN (default ${TVDLDAP_DUMP_FILE_PREFIX}_<BASEDN>_<DATE>.ora)
+    -O                  Change the default output filename to ${TVDLDAP_DUMP_FILE_PREFIX}_<DATE>.ora
     -f <FORMAT>         Format the net service names either as single line or more
                         readable as multiline connect string. Possible values are
                         SINGLE, INDENTED (default $TVDLDAP_DEFAULT_DUMP_FORMAT)
@@ -140,9 +141,9 @@ load_config                 # load configur26ation files. File list in TVDLDAP_C
 
 # initialize tempfile for the script
 touch $TEMPFILE 2>/dev/null || clean_quit 25 $TEMPFILE
-
+TVDLDAP_DUMP_FILE_PREFIX=${TVDLDAP_DUMP_FILE_PREFIX:-$TVDLDAP_DEFAULT_DUMP_FILE_PREFIX}
 # get options
-while getopts mvdb:h:p:D:w:Wy:o:T:FnE:f:S: CurOpt; do
+while getopts mvdb:h:p:D:w:Wy:Oo:T:FnE:f:S: CurOpt; do
     case ${CurOpt} in
         m) Usage 0;;
         v) TVDLDAP_VERBOSE="TRUE" ;;
@@ -156,6 +157,7 @@ while getopts mvdb:h:p:D:w:Wy:o:T:FnE:f:S: CurOpt; do
         y) TVDLDAP_BINDDN_PWDFILE="${OPTARG}";; 
         T) OUTPUT_DIR="${OPTARG}";;
         o) OUTPUT_FILE="${OPTARG}";;
+        O) TVDLDAP_ONE_DUMP_FILE="TRUE";;
         f) TVDLDAP_DUMP_FORMAT="${OPTARG}";;
         F) TVDLDAP_FORCE="TRUE";;
         n) TVDLDAP_DRYRUN="TRUE";; 
@@ -207,6 +209,7 @@ TVDLDAP_LDAPHOST=${TVDLDAP_LDAPHOST:-$(get_ldaphost)}
 TVDLDAP_LDAPPORT=${TVDLDAP_LDAPPORT:-$(get_ldapport)}
 # get default values for dump format
 TVDLDAP_DUMP_FORMAT=${TVDLDAP_DUMP_FORMAT:-$TVDLDAP_DEFAULT_DUMP_FORMAT}
+TVDLDAP_ONE_DUMP_FILE=${TVDLDAP_ONE_DUMP_FILE:-$TVDLDAP_DEFAULT_ONE_DUMP_FILE}
 # get bind parameter
 ask_bindpwd                         # ask for the bind password if TVDLDAP_BINDDN_PWDASK
                                     # is TRUE and LDAP tools are not OpenLDAP
@@ -275,8 +278,13 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
             echo "INFO : Process base dn $basedn"
             domain=$(echo $basedn|sed -e 's/,dc=/\./g' -e 's/dc=//g')
             if [ -z "$OUTPUT_FILE" ]; then
-                dump_file="${DEFAULT_FILE_PREFIX}_${domain}_${TIMESTAMP}.ora"
-                files_processed=$((files_processed+1))  # Count processed files
+                if [ "${TVDLDAP_ONE_DUMP_FILE^^}" == "FALSE" ]; then
+                    dump_file="${TVDLDAP_DUMP_FILE_PREFIX}_${domain}_${TIMESTAMP}.ora"
+                    files_processed=$((files_processed+1))  # Count processed files
+                else
+                    dump_file="${TVDLDAP_DUMP_FILE_PREFIX}_${TIMESTAMP}.ora"
+                    files_processed=$((files_processed+1))  # Count processed files
+                fi
             else
                 dump_file=$OUTPUT_FILE
                 files_processed=1

@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.4
+# Version....: v3.1.0
 # Purpose....: Script to create the OUD instance with EUS context 
 #              using oud-setup.
 # Notes......: Will skip oud-proxy-setup if config.ldif already exists
