@@ -15,8 +15,7 @@
 # ------------------------------------------------------------------------------
 # - Customization --------------------------------------------------------------
 # - just add/update any kind of customized environment variable here
-DEFAULT_OUTPUT_DIR=${TNS_ADMIN}
-TVDLDAP_DUMP_FILE_PREFIX==""
+
 # - End of Customization -------------------------------------------------------
 
 # Define a bunch of bash option see 
@@ -36,8 +35,7 @@ TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet m
 TVDLDAP_SCRIPT_NAME=$(basename ${BASH_SOURCE[0]})
 TVDLDAP_BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 TVDLDAP_LOG_DIR="$(dirname ${TVDLDAP_BIN_DIR})/log"
-DEFAULT_OUTPUT_DIR=${DEFAULT_OUTPUT_DIR:-$TVDLDAP_LOG_DIR}
-DEFAULT_OUTPUT_DIR=${DEFAULT_OUTPUT_DIR:-$(pwd)}
+
 files_processed=0                           # Counter for processed files 
 entries_processed=0                         # Counter for processed entries 
 
@@ -93,7 +91,7 @@ function Usage() {
 
   Dump options:
     -T <OUTPUT DIR>     Output Directory to dump the tnsnames information
-                        (default $DEFAULT_OUTPUT_DIR)
+                        (default $TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR)
     -o <OUTPUT FILE>    Output file with tnsnames dump from specified Base
                         DN (default ${TVDLDAP_DUMP_FILE_PREFIX}_<BASEDN>_<DATE>.ora)
     -O                  Change the default output filename to ${TVDLDAP_DUMP_FILE_PREFIX}_<DATE>.ora
@@ -141,7 +139,10 @@ load_config                 # load configur26ation files. File list in TVDLDAP_C
 
 # initialize tempfile for the script
 touch $TEMPFILE 2>/dev/null || clean_quit 25 $TEMPFILE
-TVDLDAP_DUMP_FILE_PREFIX=${TVDLDAP_DUMP_FILE_PREFIX:-$TVDLDAP_DEFAULT_DUMP_FILE_PREFIX}
+
+TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR=${TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR:-$TVDLDAP_LOG_DIR}
+TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR=${TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR:-$(pwd)}
+
 # get options
 while getopts mvdb:h:p:D:w:Wy:Oo:T:FnE:f:S: CurOpt; do
     case ${CurOpt} in
@@ -180,8 +181,8 @@ OUTPUT_FILE=${OUTPUT_FILE:-""}
 
 # set the default value for OUTPUT_DIR
 if [ -z "$OUTPUT_FILE" ]; then
-    # use DEFAULT_OUTPUT_DIR when OUTPUT_FILE and OUTPUT_DIR not defined
-    OUTPUT_DIR=${OUTPUT_DIR:-$DEFAULT_OUTPUT_DIR}
+    # use TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR when OUTPUT_FILE and OUTPUT_DIR not defined
+    OUTPUT_DIR=${OUTPUT_DIR:-$TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR}
 else
     # use PATH of OUTPUT_FILE when OUTPUT_FILE defined and OUTPUT_DIR not defined
     OUTPUT_DIR=${OUTPUT_DIR:-$(dirname $OUTPUT_FILE)}
@@ -210,6 +211,7 @@ TVDLDAP_LDAPPORT=${TVDLDAP_LDAPPORT:-$(get_ldapport)}
 # get default values for dump format
 TVDLDAP_DUMP_FORMAT=${TVDLDAP_DUMP_FORMAT:-$TVDLDAP_DEFAULT_DUMP_FORMAT}
 TVDLDAP_ONE_DUMP_FILE=${TVDLDAP_ONE_DUMP_FILE:-$TVDLDAP_DEFAULT_ONE_DUMP_FILE}
+
 # get bind parameter
 ask_bindpwd                         # ask for the bind password if TVDLDAP_BINDDN_PWDASK
                                     # is TRUE and LDAP tools are not OpenLDAP
