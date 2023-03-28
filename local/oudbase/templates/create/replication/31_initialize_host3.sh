@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.2
+# Version....: v3.0.3
 # Usage......: 31_initialize_host3.sh
 # Purpose....: simple script to initialize replication
 # Notes......:  
@@ -56,7 +56,7 @@ echo "BASEDN            : ${BASEDN}"
 [ -z ${HOST1} ]             && echo "- skip $(basename $0), variable HOST1 not set"             && exit
 [ -z ${HOST3} ]             && echo "- skip $(basename $0), variable HOST3 not set"             && exit
 [ -z ${PWD_FILE} ]          && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
-[ -f ${PWD_FILE} ]          && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ ! -f ${PWD_FILE} ]          && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
 [ -z ${HOST} ]              && echo "- skip $(basename $0), variable HOST not set"              && exit
 [ -z ${PORT_REP} ]          && echo "- skip $(basename $0), variable PORT_REP not set"          && exit
 [ -z ${PORT_ADMIN} ]        && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit

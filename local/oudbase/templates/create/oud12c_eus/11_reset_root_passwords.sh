@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.2
+# Version....: v3.0.3
 # Usage......: 11_reset_root_passwords.sh
 # Purpose....: Script to reset admin user passwords
 # Notes......: 
@@ -36,7 +36,7 @@ echo "ROOT_USER         : ${ROOT_USERS[@]}"
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
 [ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
-[ -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ ! -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
 [ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
 [ -z ${PORT_ADMIN} ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
 [ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit

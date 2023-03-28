@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.2
+# Version....: v3.0.3
 # Purpose....: Script to configure base DN and add ou's for users and groups.
 # Notes......: BaseDN in 02_config_basedn.ldif will be updated before
 #              it is loaded using ldapmodify.
@@ -50,7 +50,7 @@ echo ""
 [ -z ${PORT_SSL} ]    && echo "- skip $(basename $0), variable PORT_SSL not set"          && exit
 [ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
 [ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
-[ -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ ! -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
 [ -z ${LDIFFILE} ]    && echo "- skip $(basename $0), variable LDIFFILE not set"          && exit
 [ -z ${CONFIGFILE} ]  && echo "- skip $(basename $0), variable CONFIGFILE not set"        && exit
 [ -z ${BASEDN} ]      && echo "- skip $(basename $0), variable BASEDN not set"            && exit

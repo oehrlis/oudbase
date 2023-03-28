@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.28
-# Version....: v3.0.2
+# Version....: v3.0.3
 # Usage......: 18_reset_eusadmin_password.sh
 # Purpose....: Script to reset eusadmin user password
 # Notes......: 
@@ -34,7 +34,7 @@ echo "  EUSADMIN_USERS_DN_FILE  : ${EUSADMIN_USERS_DN_FILE}"
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
 [ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
-[ -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ ! -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
 [ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
 [ -z ${PORT} ]        && echo "- skip $(basename $0), variable PORT not set"              && exit
 [ -z ${PORT_ADMIN} ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
