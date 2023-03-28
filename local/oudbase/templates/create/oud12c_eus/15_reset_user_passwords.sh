@@ -22,7 +22,7 @@
 . "$(dirname $0)/00_init_environment"
 
 # Get the root users
-echo "- get user from directory ------------------------------------------------------"
+echo "- get user from directory -----------------------------------------------"
 mapfile -t COMMON_USERS < <(${OUD_INSTANCE_HOME}/OUD/bin/ldapsearch --hostname ${HOST} --port $PORT_SSL --trustAll --useSSL -D "${DIRMAN}"  -j ${PWD_FILE} -b "${BASEDN}" "(objectClass=person)" dn|sed 's/^dn: //'|grep -i 'cn')
 DEFAULT_USERS_PWD_FILE=${DEFAULT_USERS_PWD_FILE:-"${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_default_user_pwd.txt"}
 
@@ -33,6 +33,14 @@ echo "PORT_ADMIN        : ${PORT_ADMIN}"
 echo "DIRMAN            : ${DIRMAN}"
 echo "PWD_FILE          : ${PWD_FILE}"
 echo "DEFAULT_PASSWORD  : ${DEFAULT_PASSWORD}"
+
+# - check prerequisites --------------------------------------------------------
+# check mandatory variables
+[ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
+[ -z ${PORT_ADMIN} ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
 
 # generate a password
 if [ -z ${DEFAULT_PASSWORD} ]; then

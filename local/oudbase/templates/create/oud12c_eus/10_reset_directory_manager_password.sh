@@ -27,6 +27,15 @@ echo "PORT_ADMIN        : ${PORT_ADMIN}"
 echo "DIRMAN            : ${DIRMAN}"
 echo "PWD_FILE          : ${PWD_FILE}"
 
+# - check prerequisites --------------------------------------------------------
+# check mandatory variables
+[ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
+[ -z ${PORT_ADMIN} ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[ -z ${BASEDN} ]      && echo "- skip $(basename $0), variable BASEDN not set"            && exit
+
 # generate a temporary password
 if [ $(command -v pwgen) ]; then 
   s=$(pwgen -s -1 15)

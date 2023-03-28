@@ -38,6 +38,15 @@ echo "  BASEDN_STRING     : ${BASEDN_STRING}"
 echo "  CONFIGFILE        : ${CONFIGFILE}"
 echo ""
 
+# - check prerequisites --------------------------------------------------------
+# check mandatory variables
+[ -z ${PWD_FILE} ]          && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ -f ${PWD_FILE} ]          && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ -z ${HOST} ]              && echo "- skip $(basename $0), variable HOST not set"              && exit
+[ -z ${PORT_ADMIN} ]        && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[ -z ${DIRMAN} ]            && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[ -z ${BASEDN} ]            && echo "- skip $(basename $0), variable BASEDN not set"            && exit
+
 echo "  Config OUD Proxy Instance"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \
   --hostname ${HOST} \

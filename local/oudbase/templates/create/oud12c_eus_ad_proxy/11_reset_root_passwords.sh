@@ -22,7 +22,7 @@
 . "$(dirname $0)/00_init_environment"
 
 # Get the root users
-echo "- get root user from directory ------------------------------------------------------"
+echo "- get root user from directory -----------------------------------------------"
 ROOT_USERS=($(${OUD_INSTANCE_HOME}/OUD/bin/ldapsearch --hostname ${HOST} --port $PORT_ADMIN --trustAll --useSSL -D "${DIRMAN}" -j $PWD_FILE -b "cn=config" "(&(objectClass=ds-cfg-root-dn-user)("'!'"(${DIRMAN})))" cn|grep -i 'cn:'|sed 's/cn: //i'))
 
 # - configure instance ---------------------------------------------------------
@@ -33,8 +33,16 @@ echo "DIRMAN            : ${DIRMAN}"
 echo "PWD_FILE          : ${PWD_FILE}"
 echo "ROOT_USER         : ${ROOT_USERS[@]}"
 
+# - check prerequisites --------------------------------------------------------
+# check mandatory variables
+[ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
+[ -z ${PORT_ADMIN} ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+
 for user in "${ROOT_USERS[@]}"; do
-  echo "- Start to process root user $user --------------------------------------------------"
+  echo "- Start to process root user $user -------------------------------------------"
   # reuse existing password file
   ROOT_USER_NAME=${user// /_}  # define the workflow name without spaces
   ROOT_USER_NAME=${ROOT_USER_NAME,,}

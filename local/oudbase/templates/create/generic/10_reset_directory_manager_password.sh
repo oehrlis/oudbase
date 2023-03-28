@@ -23,9 +23,18 @@
 # - configure instance ---------------------------------------------------------
 echo "- reset admin user password for OUD instance ${OUD_INSTANCE} using:"
 echo "HOSTNAME          : ${HOST}"
-echo "PORT_ADMIN        : ${PORT}"
+echo "PORT_ADMIN        : ${PORT_ADMIN}"
 echo "DIRMAN            : ${DIRMAN}"
 echo "PWD_FILE          : ${PWD_FILE}"
+
+# - check prerequisites --------------------------------------------------------
+# check mandatory variables
+[ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
+[ -z ${PORT_ADMIN} ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[ -z ${BASEDN} ]      && echo "- skip $(basename $0), variable BASEDN not set"            && exit
 
 # generate a temporary password
 if [ $(command -v pwgen) ]; then 
@@ -36,8 +45,8 @@ else
     s=$(cat /dev/urandom | tr -dc "A-Za-z0-9" | fold -w 15 | head -n 1)
     # check if the password meet the requirements
     if [[ ${#s} -ge 10 && "$s" == *[A-Z]* && "$s" == *[a-z]* && "$s" == *[0-9]*  ]]; then
-        echo "$s"
-        break
+      echo "$s"
+      break
     fi
   done
 fi

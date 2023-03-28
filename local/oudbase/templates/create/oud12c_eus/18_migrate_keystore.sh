@@ -29,6 +29,13 @@ echo "Migrate java keystore for OUD instance ${OUD_INSTANCE} using:"
 echo "  KEYSTOREFILE      : ${KEYSTOREFILE}"
 echo "  KEYSTOREPIN       : ${KEYSTOREPIN}"
 
+# - check prerequisites --------------------------------------------------------
+# check mandatory variables
+[ -z ${KEYSTOREFILE} ]    && echo "- skip $(basename $0), variable KEYSTOREFILE not set"          && exit
+[ -f ${KEYSTOREFILE} ]    && echo "- skip $(basename $0), missing password file ${KEYSTOREFILE}"  && exit
+[ -z ${KEYSTOREPIN} ]     && echo "- skip $(basename $0), variable KEYSTOREPIN not set"          && exit
+[ -f ${KEYSTOREPIN} ]     && echo "- skip $(basename $0), missing password file ${KEYSTOREPIN}"  && exit
+
 echo "- migrate keystore to PKCS12"
 $JAVA_HOME/bin/keytool -importkeystore \
     -srckeystore ${KEYSTOREFILE} \

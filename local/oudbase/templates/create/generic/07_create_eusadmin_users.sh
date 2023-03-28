@@ -25,10 +25,27 @@ export EUS_USER_DN=${EUS_USER_DN:-"cn=${EUS_USER_NAME},cn=oraclecontext"}
 
 # - configure instance ---------------------------------------------------------
 echo "Create EUS Admin user for OUD instance ${OUD_INSTANCE} using:"
+echo "  HOSTNAME                : ${HOST}"
+echo "  PORT_SSL                : ${PORT_SSL}"
+echo "  PORT_ADMIN              : ${PORT_ADMIN}"
+echo "  DIRMAN                  : ${DIRMAN}"
+echo "  PWD_FILE                : ${PWD_FILE}"
 echo "  BASEDN                  : ${BASEDN}"
 echo "  EUS_USER_NAME           : ${EUS_USER_NAME}"
 echo "  EUS_USER_DN             : ${EUS_USER_DN}"
 echo "  EUSADMIN_USERS_PWD_FILE : ${EUSADMIN_USERS_PWD_FILE}"
+
+# - check prerequisites --------------------------------------------------------
+# check mandatory variables
+[ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
+[ -z ${PORT} ]        && echo "- skip $(basename $0), variable PORT not set"              && exit
+[ -z ${PORT_ADMIN} ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[ -z ${EUS_USER_DN} ] && echo "- skip $(basename $0), variable EUS_USER_DN not set"       && exit
+[ -z ${EUS_USER_NAME} ] && echo "- skip $(basename $0), variable EUS_USER_NAME not set"   && exit
+[ -z ${BASEDN} ]      && echo "- skip $(basename $0), variable BASEDN not set"            && exit
 
 # reuse existing password file
 if [ -f "$EUSADMIN_USERS_PWD_FILE" ]; then
@@ -65,10 +82,12 @@ fi
 # create EUS Admin User
 echo "- create EUS admin user ${EUS_USER_DN}"
 ${OUD_INSTANCE_HOME}/OUD/bin/ldapmodify \
-  --hostname ${HOST} \
-  --port $PORT \
-  --bindDN "${DIRMAN}" \
-  --bindPasswordFile "${PWD_FILE}" <<LDIF
+    --hostname ${HOST} \
+    --port ${PORT_SSL} \
+    --useSSL \
+    --trustAll \
+    --bindDN "${DIRMAN}" \
+    --bindPasswordFile "${PWD_FILE}" <<LDIF
 dn: ${EUS_USER_DN}
 changetype: add
 objectclass: inetorgperson
@@ -91,12 +110,14 @@ uniquemember: ${EUS_USER_DN}
 LDIF
 
 # check if we do have role_eus_admins
-ROLE_DN=$(ldapsearch -h ${HOST} -p ${PORT} -D "${DIRMAN}" -j ${PWD_FILE} -b ${BASEDN} -s sub "(ou=role_eus_admins)" dn 2>/dev/null)
+ROLE_DN=$(ldapsearch -h ${HOST} -p ${PORT_SSL} --useSSL --trustAll -D "${DIRMAN}" -j ${PWD_FILE} -b ${BASEDN} -s sub "(ou=role_eus_admins)" dn 2>/dev/null)
 if [ -n "$ROLE_DN" ]; then 
     echo "- add EUS admin user ${EUS_USER_DN} to ${ROLE_DN}"
     ${OUD_INSTANCE_HOME}/OUD/bin/ldapmodify \
         --hostname ${HOST} \
-        --port $PORT \
+        --port ${PORT_SSL} \
+        --useSSL \
+        --trustAll \
         --bindDN "${DIRMAN}" \
         --bindPasswordFile "${PWD_FILE}" <<LDIF
 dn: ou=role_eus_admins,ou=groups,ou=local,${BASEDN}
@@ -118,11 +139,13 @@ ${OUD_INSTANCE_HOME}/OUD/bin/ldappasswordmodify \
 # check if we do have an AES hash
 echo "- review password attribute for ${EUS_USER_DN}"
 ${OUD_INSTANCE_HOME}/OUD/bin/ldapsearch \
-  --hostname ${HOST} \
-  --port $PORT \
-  --bindDN "${DIRMAN}" \
-  --bindPasswordFile "${PWD_FILE}" \
-  --baseDN "cn=OracleContext" "(cn=${EUS_USER_NAME})" uid userpassword
+    --hostname ${HOST} \
+    --port ${PORT_SSL} \
+    --useSSL \
+    --trustAll \
+    --bindDN "${DIRMAN}" \
+    --bindPasswordFile "${PWD_FILE}" \
+    --baseDN "cn=OracleContext" "(cn=${EUS_USER_NAME})" uid userpassword
 
 echo "- Config ACI for Context Admin"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig set-access-control-handler-prop \

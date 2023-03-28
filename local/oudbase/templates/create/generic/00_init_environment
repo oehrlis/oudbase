@@ -91,4 +91,5 @@ export DEFAULT_HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)
 export HOST=${HOST:-$DEFAULT_HOST}
 export HOST1=${HOST1:-$DEFAULT_HOST}
 export HOST2=${HOST2:-$DEFAULT_HOST}
+export HOST3=${HOST3:-$DEFAULT_HOST}
 # - End of customization -------------------------------------------------------

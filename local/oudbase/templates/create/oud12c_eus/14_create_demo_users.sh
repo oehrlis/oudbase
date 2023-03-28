@@ -37,6 +37,19 @@ echo "  LDIFFILE          : ${LDIFFILE}"
 echo "  LDIFFILE_CUSTOM   : ${LDIFFILE_CUSTOM}"
 echo ""
 
+# - check prerequisites --------------------------------------------------------
+# check mandatory variables
+[ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
+[ -z ${PORT_SSL} ]    && echo "- skip $(basename $0), variable PORT_SSL not set"          && exit
+[ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[ -z ${LDIFFILE} ]    && echo "- skip $(basename $0), variable LDIFFILE not set"          && exit
+[ -f ${LDIFFILE} ]    && echo "- skip $(basename $0), missing password file ${LDIFFILE}"  && exit
+[ -z ${BASEDN} ]      && echo "- skip $(basename $0), variable BASEDN not set"            && exit
+[ -z ${USER_OU} ]     && echo "- skip $(basename $0), variable USER_OU not set"           && exit
+[ -z ${GROUP_OU} ]    && echo "- skip $(basename $0), variable GROUP_OU not set"          && exit
+
 # - configure instance ---------------------------------------------------------
 # Update baseDN in LDIF file if required
 if [ -f ${LDIFFILE} ]; then

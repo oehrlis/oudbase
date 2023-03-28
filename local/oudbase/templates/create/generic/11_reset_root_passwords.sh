@@ -33,6 +33,14 @@ echo "DIRMAN            : ${DIRMAN}"
 echo "PWD_FILE          : ${PWD_FILE}"
 echo "ROOT_USER         : ${ROOT_USERS[@]}"
 
+# - check prerequisites --------------------------------------------------------
+# check mandatory variables
+[ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
+[ -z ${PORT_ADMIN} ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+
 for user in "${ROOT_USERS[@]}"; do
   echo "- Start to process root user $user -------------------------------------------"
   # reuse existing password file

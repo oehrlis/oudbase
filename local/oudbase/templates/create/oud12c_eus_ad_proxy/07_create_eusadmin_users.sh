@@ -19,7 +19,7 @@
 
 # - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
-export EUSADMIN_USERS_PWD_FILE=${EUSADMIN_USERS_PWD_FILE:-"${INSTANCE_INIT}/etc/${EUS_USER_NAME}_pwd.txt"}
+export EUSADMIN_USERS_PWD_FILE=${EUSADMIN_USERS_PWD_FILE:-"${OUD_INSTANCE_ADMIN}/etc/${EUS_USER_NAME}_pwd.txt"}
 export EUS_USER_NAME=${EUS_USER_NAME:-"eusadmin"}
 export EUS_USER_DN=${EUS_USER_DN:-"cn=${EUS_USER_NAME},cn=oraclecontext"}
 
@@ -34,6 +34,18 @@ echo "  BASEDN                  : ${BASEDN}"
 echo "  EUS_USER_NAME           : ${EUS_USER_NAME}"
 echo "  EUS_USER_DN             : ${EUS_USER_DN}"
 echo "  EUSADMIN_USERS_PWD_FILE : ${EUSADMIN_USERS_PWD_FILE}"
+
+# - check prerequisites --------------------------------------------------------
+# check mandatory variables
+[ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
+[ -z ${PORT} ]        && echo "- skip $(basename $0), variable PORT not set"              && exit
+[ -z ${PORT_ADMIN} ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[ -z ${EUS_USER_DN} ] && echo "- skip $(basename $0), variable EUS_USER_DN not set"       && exit
+[ -z ${EUS_USER_NAME} ] && echo "- skip $(basename $0), variable EUS_USER_NAME not set"   && exit
+[ -z ${BASEDN} ]      && echo "- skip $(basename $0), variable BASEDN not set"            && exit
 
 # reuse existing password file
 if [ -f "$EUSADMIN_USERS_PWD_FILE" ]; then

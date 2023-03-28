@@ -36,27 +36,43 @@ echo "  BASEDN            : ${BASEDN}"
 echo "  BASEDN_STRING     : ${BASEDN_STRING}"
 echo "  GROUP_OU          : ${GROUP_OU}"
 echo "  USER_OU           : ${USER_OU}"
+echo "  LOCAL_OU          : ${LOCAL_OU}"
 echo "  LDIFFILE          : ${LDIFFILE}"
 echo "  LDIFFILE_CUSTOM   : ${LDIFFILE_CUSTOM}"
 echo "  CONFIGFILE        : ${CONFIGFILE}"
 echo "  CONFIGFILE_CUSTOM : ${CONFIGFILE_CUSTOM}"
 echo ""
 
-# - configure instance ---------------------------------------------------------
+# - check prerequisites --------------------------------------------------------
+# check mandatory variables
+[ -z ${HOST} ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
+[ -z ${PORT} ]        && echo "- skip $(basename $0), variable PORT not set"              && exit
+[ -z ${PORT_SSL} ]    && echo "- skip $(basename $0), variable PORT_SSL not set"          && exit
+[ -z ${DIRMAN} ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[ -z ${PWD_FILE} ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ -f ${PWD_FILE} ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ -z ${LDIFFILE} ]    && echo "- skip $(basename $0), variable LDIFFILE not set"          && exit
+[ -z ${CONFIGFILE} ]  && echo "- skip $(basename $0), variable CONFIGFILE not set"        && exit
+[ -z ${BASEDN} ]      && echo "- skip $(basename $0), variable BASEDN not set"            && exit
+[ -z ${USER_OU} ]     && echo "- skip $(basename $0), variable USER_OU not set"           && exit
+[ -z ${GROUP_OU} ]    && echo "- skip $(basename $0), variable GROUP_OU not set"          && exit
+[ -z ${LOCAL_OU} ]    && echo "- skip $(basename $0), variable LOCAL_OU not set"          && exit
+
 # Update baseDN in LDIF file if required
 if [ -f ${LDIFFILE} ]; then
-  cp ${LDIFFILE} ${LDIFFILE_CUSTOM}
+  cp -v ${LDIFFILE} ${LDIFFILE_CUSTOM}
 else
   echo "- skip $(basename $0), missing ${LDIFFILE}"
   exit
 fi
 
 echo "- Update LDIF file to match ${BASEDN} and other variables"
-sed -i "s/BASEDN/${BASEDN}/g" ${LDIFFILE_CUSTOM}
-sed -i "s/USER_OU/${USER_OU}/g" ${LDIFFILE_CUSTOM}
+sed -i "s/BASEDN/${BASEDN}/g"     ${LDIFFILE_CUSTOM}
+sed -i "s/USER_OU/${USER_OU}/g"   ${LDIFFILE_CUSTOM}
 sed -i "s/GROUP_OU/${GROUP_OU}/g" ${LDIFFILE_CUSTOM}
 sed -i "s/LOCAL_OU/${LOCAL_OU}/g" ${LDIFFILE_CUSTOM}
 
+# - configure instance ---------------------------------------------------------
 echo "- Configure base DN for groups, people and entries"
 ${OUD_INSTANCE_HOME}/OUD/bin/ldapmodify \
   --hostname ${HOST} \
@@ -77,7 +93,7 @@ else
 fi
 
 echo "- Update batch file to match ${BASEDN} and other variables"
-sed -i "s/BASEDN/${BASEDN}/g" ${CONFIGFILE_CUSTOM}
+sed -i "s/BASEDN/${BASEDN}/g"     ${CONFIGFILE_CUSTOM}
 sed -i "s/LOCAL_OU/${LOCAL_OU}/g" ${CONFIGFILE_CUSTOM}
 
 echo "  Config OUD Proxy Instance"

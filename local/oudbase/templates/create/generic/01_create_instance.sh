@@ -35,6 +35,21 @@ echo "PORT_REST_HTTPS   : ${PORT_REST_HTTPS}"
 echo "DIRMAN            : ${DIRMAN}"
 echo "BASEDN            : ${BASEDN}"
 
+# - check prerequisites --------------------------------------------------------
+# check mandatory variables
+[ -z ${OUD_INSTANCE_HOME} ] && echo "- skip $(basename $0), variable OUD_INSTANCE_HOME not set" && exit
+[ -z ${PWD_FILE} ]          && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ -f ${PWD_FILE} ]          && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[ -z ${HOST} ]              && echo "- skip $(basename $0), variable HOST not set"              && exit
+[ -z ${PORT} ]              && echo "- skip $(basename $0), variable PORT not set"              && exit
+[ -z ${PORT_SSL} ]          && echo "- skip $(basename $0), variable PORT_SSL not set"          && exit
+[ -z ${PORT_ADMIN} ]        && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[ -z ${PORT_REST_ADMIN} ]   && echo "- skip $(basename $0), variable PORT_REST_ADMIN not set"   && exit
+[ -z ${PORT_REST_HTTP} ]    && echo "- skip $(basename $0), variable PORT_REST_HTTP not set"    && exit
+[ -z ${PORT_REST_HTTPS} ]   && echo "- skip $(basename $0), variable PORT_REST_HTTPS not set"   && exit
+[ -z ${DIRMAN} ]            && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
+[ -z ${BASEDN} ]            && echo "- skip $(basename $0), variable BASEDN not set"            && exit
+
 # check if we do have a password file
 if [ ! -f "${PWD_FILE}" ]; then
     # check if we do have a default admin password
