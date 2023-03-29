@@ -8,7 +8,7 @@
 # Date.......: 2023.03.28
 # Version....: v3.2.0
 # Usage......: 31_initialize_host1.sh
-# Purpose....: simple script to initialize replication
+# Purpose....: simple script to initialize replication on HOST1 from HOST2
 # Notes......:  
 # Reference..: 
 # License....: Apache License Version 2.0, January 2004 as shown
@@ -41,13 +41,10 @@ echo "Enable replication ${OUD_INSTANCE} using:"
 echo "HOSTNAME          : ${HOST}"
 echo "HOST1             : ${HOST1}"
 echo "HOST2             : ${HOST2}"
-echo "HOST3             : ${HOST3}"
 echo "PWD_FILE          : ${PWD_FILE}"
 echo "PORT_ADMIN        : ${PORT_ADMIN}"
 echo "PORT_REP          : ${PORT_REP}"
-echo "DIRMAN            : ${DIRMAN}"
 echo "REPMAN            : ${REPMAN}"
-echo "PWD_FILE          : ${PWD_FILE}"
 echo "BASEDN            : ${BASEDN}"
 
 # - check prerequisites --------------------------------------------------------
@@ -59,10 +56,6 @@ echo "BASEDN            : ${BASEDN}"
 [ ! -f "${PWD_FILE}" ]          && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
 [   -z "${PORT_REP}" ]          && echo "- skip $(basename $0), variable PORT_REP not set"          && exit
 [   -z "${PORT_ADMIN}" ]        && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
-[   -z "${PORT_REST_ADMIN}" ]   && echo "- skip $(basename $0), variable PORT_REST_ADMIN not set"   && exit
-[   -z "${PORT_REST_HTTP}" ]    && echo "- skip $(basename $0), variable PORT_REST_HTTP not set"    && exit
-[   -z "${PORT_REST_HTTPS}" ]   && echo "- skip $(basename $0), variable PORT_REST_HTTPS not set"   && exit
-[   -z "${DIRMAN}" ]            && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
 [   -z "${REPMAN}" ]            && echo "- skip $(basename $0), variable REPMAN not set"            && exit
 [   -z "${BASEDN}" ]            && echo "- skip $(basename $0), variable BASEDN not set"            && exit
 
