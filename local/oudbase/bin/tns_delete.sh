@@ -173,7 +173,7 @@ export NETSERVICE=${NETSERVICE:-""}
 # check for Service and Arguments
 if [ -z "$NETSERVICE" ] && [ $# -ne 0 ]; then
     if [[ "$1" =~ ^-.*  ]]; then
-        NETSERVICE=$ORACLE_SID  # default service to ORACLE_SID if Argument starting with dash 
+        NETSERVICE=${ORACLE_SID:-""}  # default service to ORACLE_SID if Argument starting with dash 
     else
         NETSERVICE=$1           # default service to Argument if not starting with dash
     fi
