@@ -86,8 +86,7 @@ function Usage() {
                         TVDLDAP_BINDDN_PWDFILE.
   
   Search options:
-    -S <NETSERVICE>     Oracle Net Service Names to search for
-                        (default \$ORACLE_SID)
+    -S <NETSERVICE>     Oracle Net Service Names to search for during dump
 
   Dump options:
     -T <OUTPUT DIR>     Output Directory to dump the tnsnames information
