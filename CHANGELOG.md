@@ -15,6 +15,26 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.3.2] - 2023.03.29
+
+### Fixed
+
+- Fix issue with wrong / missing *ORACLE_SID* on OUD environments
+
+## [3.3.1] - 2023.03.29
+
+### Added
+
+- add initialize all replication script *30_initialize_all.sh*
+
+### Fixed
+
+- fix issue where check of existing net service names does not work. Add bind
+  parameter to function *net_service_exists* and fix scripts *tns_modify.sh*,
+  *tns_add.sh* and *tns_load.sh*. If available they now check existing
+  net service names with the corresponding bind values.
+- Remove *ORACLE_SID* in *tns_dump.sh*
+
 ## [3.3.0] - 2023.03.29
 
 ### Added
