@@ -633,6 +633,8 @@ function split_net_service_cn() {
 function net_service_exists() {
     my_netservice=${1:-""}
     my_basedn=${2:-"$(get_local_basedn)"}           # get the default Base DN from ldap.ora
+    my_binddn=${3:-""}
+    my_bindpwd=${4:-""}
     my_ldaphost=$(get_ldaphost)                     # get ldap host from ldap.ora
     my_ldapport=$(get_ldapport)                     # get ldap port from ldap.ora
     current_cn=$(split_net_service_cn ${my_netservice})         # get pure Net Service Name
@@ -641,8 +643,8 @@ function net_service_exists() {
     
     ldapsearch_options=$(ldapsearch_options)
     if [ -n "${current_cn}" ]; then
-        echo_debug "DEBUG: net_service_exists => ldapsearch -h ${my_ldaphost} -p ${my_ldapport} -b $current_basedn $ldapsearch_options -s sub \"(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))\" dn "
-        result=$(ldapsearch -h ${my_ldaphost} -p ${my_ldapport} -b $current_basedn $ldapsearch_options -s sub "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" dn 2>&1)
+        echo_debug "DEBUG: net_service_exists => ldapsearch -h ${my_ldaphost} -p ${my_ldapport} ${my_binddn:+${my_binddn}} ${my_bindpwd}  -b $current_basedn $ldapsearch_options -s sub \"(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))\" dn "
+        result=$(ldapsearch -h ${my_ldaphost} -p ${my_ldapport} ${my_binddn:+${my_binddn}} ${my_bindpwd} -b $current_basedn $ldapsearch_options -s sub "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" dn 2>&1)
         if [ $? -ne 0 ]; then
             clean_quit 33 "ldapsearch: $result"
         fi

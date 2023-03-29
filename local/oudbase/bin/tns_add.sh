@@ -180,7 +180,7 @@ ask_bindpwd                         # ask for the bind password if TVDLDAP_BINDD
                                     # is TRUE and LDAP tools are not OpenLDAP
 current_binddn=$(get_binddn_param "$TVDLDAP_BINDDN" )
 current_bindpwd=$(get_bindpwd_param "$TVDLDAP_BINDDN_PWD" ${TVDLDAP_BINDDN_PWDASK} "$TVDLDAP_BINDDN_PWDFILE")
-if [ -z "$current_binddn" ] && [ -z "${current_bindpwd}" ]; then clean_quit 4; fi
+if [ -z "${current_binddn}" ] && [ -z "${current_bindpwd}" ]; then clean_quit 4; fi
 
 # get base DN information
 BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
@@ -215,7 +215,7 @@ if [ -n "${current_basedn}" ]; then BASEDN_LIST=${current_basedn}; fi
 # loop over base DN
 for basedn in ${BASEDN_LIST}; do 
     echo_debug "DEBUG: Process base dn $basedn"
-    if ! net_service_exists "$current_cn" "${basedn}" ; then
+    if ! net_service_exists "$current_cn" "${basedn}" "${current_binddn}" "${current_bindpwd}"; then
         echo "INFO : Add Net Service Name $current_cn in $basedn" 
         if ! dryrun_enabled; then
             if ! alias_enabled; then

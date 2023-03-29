@@ -69,7 +69,7 @@ function Usage() {
                         by setting TVDLDAP_LDAPHOST.
     -p <PORT>           port on LDAP server (default take from ldap.ora). Can be
                         specified by setting TVDLDAP_LDAPPORT.
-                        
+
   Bind Options:
     -D <BINDDN>         Bind DN (default ANONYMOUS). Can be specified by setting
                         TVDLDAP_BINDDN.
@@ -87,7 +87,7 @@ function Usage() {
                         Oracle Net Service Name for the alias
     -n                  Show what would be done but do not actually do it
     -F                  Force mode to add entry it it does not exists
-    
+
   Configuration file:
     The script does load configuration files to define default values as an
     alternative for command line parameter. e.g. to set a bind DN TVDLDAP_BINDDN
@@ -180,7 +180,7 @@ ask_bindpwd                         # ask for the bind password if TVDLDAP_BINDD
                                     # is TRUE and LDAP tools are not OpenLDAP
 current_binddn=$(get_binddn_param "$TVDLDAP_BINDDN" )
 current_bindpwd=$(get_bindpwd_param "$TVDLDAP_BINDDN_PWD" ${TVDLDAP_BINDDN_PWDASK} "$TVDLDAP_BINDDN_PWDFILE")
-if [ -z "$current_binddn" ] && [ -z "${current_bindpwd}" ]; then clean_quit 4; fi
+if [ -z "${current_binddn}" ] && [ -z "${current_bindpwd}" ]; then clean_quit 4; fi
 
 # get base DN information
 BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
@@ -188,11 +188,11 @@ BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
 # Split Net Service Name if full qualified e.g. with a dot
 current_basedn=$(split_net_service_basedn ${NETSERVICE})
 current_cn=$(split_net_service_cn ${NETSERVICE})
-# - EOF Initialization ----------------------------------------------------------
+# - EOF Initialization ---------------------------------------------------------
  
-# - Main ------------------------------------------------------------------------
+# - Main -----------------------------------------------------------------------
 echo_debug "DEBUG: Configuration / Variables:"
-echo_debug "---------------------------------------------------------------------------------"
+echo_debug "DEBUG: --------------------------------------------------------------------------"
 echo_debug "DEBUG: LDAP Host............... = $TVDLDAP_LDAPHOST"
 echo_debug "DEBUG: LDAP Port............... = $TVDLDAP_LDAPPORT"
 echo_debug "DEBUG: Bind DN................. = $TVDLDAP_BINDDN"
@@ -215,7 +215,7 @@ if [ -n "${current_basedn}" ]; then BASEDN_LIST=${current_basedn}; fi
 # loop over base DN
 for basedn in ${BASEDN_LIST}; do 
     echo_debug "DEBUG: Process base dn $basedn"
-    if ! net_service_exists "$current_cn" "${basedn}" ; then
+    if ! net_service_exists "$current_cn" "${basedn}" "${current_binddn}" "${current_bindpwd}"; then
         if force_enabled; then
             echo "INFO : Add Net Service Name $current_cn in $basedn" 
             if ! dryrun_enabled; then
