@@ -442,8 +442,15 @@ function source_env() {
             unset TNS_ADMIN
         fi
         echo_debug "DEBUG: source ${BASENV}"
+        set +o nounset      # disable nounset
+        set +o errexit      # disable errexit
+        set +o pipefail     # disable pipefail
         # Load BASE environment
         . "${BASENV}" 
+        set -o nounset      # exit if script try to use an uninitialised variable
+        set -o errexit      # exit script if any statement returns a non-true return value
+        set -o pipefail     # pipefail exit after 1st piped commands failed
+
     else
         echo_debug "DEBUG: no basenv.sh found to source"
     fi
