@@ -110,5 +110,5 @@ fi
 # - check status of replication ------------------------------------------------
 ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication status -h "${HOST2}" -p "${PORT_ADMIN}" \
 --adminUID "${REPMAN}" --adminPasswordFile "${PWD_FILE}" \
---trustAll --no-prompt --noPropertiesFile
+--advanced --trustAll --no-prompt --noPropertiesFile
 # - EOF ------------------------------------------------------------------------
