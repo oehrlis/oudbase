@@ -23,19 +23,20 @@
 # - configure instance ---------------------------------------------------------
 echo "Enable replication ${OUD_INSTANCE} using:"
 echo "HOSTNAME          : ${HOST}"
-echo "HOST1             : ${HOST1}"
-echo "HOST2             : ${HOST2}"
-echo "HOST3             : ${HOST3}"
 echo "PWD_FILE          : ${PWD_FILE}"
 echo "PORT_ADMIN        : ${PORT_ADMIN}"
-echo "PORT_REP          : ${PORT_REP}"
-echo "DIRMAN            : ${DIRMAN}"
 echo "REPMAN            : ${REPMAN}"
-echo "PWD_FILE          : ${PWD_FILE}"
-echo "BASEDN            : ${BASEDN}"
+
+# - check prerequisites --------------------------------------------------------
+# check mandatory variables
+[   -z "${HOST}" ]          && echo "- skip $(basename $0), variable HOST not set"              && exit
+[   -z "${PWD_FILE}" ]      && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
+[ ! -f "${PWD_FILE}" ]      && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
+[   -z "${PORT_ADMIN}" ]    && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
+[   -z "${REPMAN}" ]        && echo "- skip $(basename $0), variable REPMAN not set"            && exit
 
 # - check status of replication ------------------------------------------------
-${OUD_INSTANCE_HOME}/OUD/bin/dsreplication status -h "${HOST1}" -p "${PORT_ADMIN}" \
+${OUD_INSTANCE_HOME}/OUD/bin/dsreplication status -h "${HOST}" -p "${PORT_ADMIN}" \
 --adminUID "${REPMAN}" --adminPasswordFile "${PWD_FILE}" \
 --advanced --trustAll --no-prompt --noPropertiesFile
 # - EOF ------------------------------------------------------------------------
