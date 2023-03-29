@@ -15,6 +15,28 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.3.0] - 2023.03.29
+
+### Added
+
+- add check to *tns_delete.sh* to check if dump file does exists. If yes the PID
+  will be added to the file name.
+- add scripts to remove host from replication completely.
+- Add *advanced* flag to replication check script
+- Add a script to verify replication status
+
+### Changed
+
+- Change alias *dsrs* add the *advanced* option
+- Clean up checks for variables as well output for the replication scripts
+- minor code update for comments and redundancy
+
+### Fixed
+
+- *tns_functions.sh* was not able to load *BasEnv*. Disable nounset, errexit and
+  pipefail before source *BasEnv*
+- add default value for *TNS_ADMIN*
+
 ## [3.2.0] - 2023.03.28
 
 ### Added
