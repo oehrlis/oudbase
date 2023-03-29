@@ -200,6 +200,7 @@ if [ -z "$current_binddn" ] && [ -z "${current_bindpwd}" ]; then clean_quit 4; f
 
 # get base DN information
 BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
+
 # - EOF Initialization ----------------------------------------------------------
  
 # - Main ------------------------------------------------------------------------
@@ -219,6 +220,10 @@ echo_debug "DEBUG: "
 if bulk_enabled; then
     echo_debug "DEBUG: bulk mode enabled"
     if ! force_enabled; then
+        # check if dumpfile does not exists
+        if [ -f "$TVDLDAP_LOG_DIR/$TVDLDAP_DUMP_FILE" ]; then
+            TVDLDAP_DUMP_FILE=$(basename $TVDLDAP_DUMP_FILE .ora)_pid$$.ora
+        fi
         parameters="-o $TVDLDAP_DUMP_FILE -T $TVDLDAP_LOG_DIR"
         parameters=$([ "${TVDLDAP_VERBOSE^^}" == "TRUE" ]   && echo "${parameters} -v" || echo ${parameters}) 
         parameters=$([ "${TVDLDAP_DEBUG^^}" == "TRUE" ]     && echo "${parameters} -d" || echo ${parameters}) 
