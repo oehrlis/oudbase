@@ -21,7 +21,7 @@
 . "$(dirname $0)/00_init_environment"
 
 # - configure instance ---------------------------------------------------------
-echo "Enable replication ${OUD_INSTANCE} using:"
+echo "Check replication status ${OUD_INSTANCE} using:"
 echo "HOSTNAME          : ${HOST}"
 echo "PWD_FILE          : ${PWD_FILE}"
 echo "PORT_ADMIN        : ${PORT_ADMIN}"
