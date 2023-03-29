@@ -46,13 +46,9 @@ fi
 # - configure instance ---------------------------------------------------------
 echo "Disable replication for ${OUD_INSTANCE} on ${HOST} using:"
 echo "HOSTNAME          : ${HOST}"
-echo "HOST1             : ${HOST1}"
-echo "HOST2             : ${HOST2}"
-echo "HOST3             : ${HOST3}"
 echo "PWD_FILE          : ${PWD_FILE}"
 echo "PORT_ADMIN        : ${PORT_ADMIN}"
 echo "DIRMAN            : ${DIRMAN}"
-echo "REPMAN            : ${REPMAN}"
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
