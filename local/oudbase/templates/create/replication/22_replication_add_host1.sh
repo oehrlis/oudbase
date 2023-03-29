@@ -63,9 +63,9 @@ echo "All suffix        : ${ALL_SUFFIX}"
 [   -z "${BASEDN}" ]            && echo "- skip $(basename $0), variable BASEDN not set"            && exit
 
 # - add base DN ----------------------------------------------------------------
-echo "enable replication for suffix (${BASEDN}) from $HOST1 to $HOST2"
+echo "enable replication for suffix (${BASEDN}) from $HOST2 to $HOST1"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication enable \
---HOST2 "${HOST2}" --port1 "${PORT_ADMIN}" --bindDN1 "${DIRMAN}" --bindPasswordFile1 "${PWD_FILE}" \
+--host1 "${HOST2}" --port1 "${PORT_ADMIN}" --bindDN1 "${DIRMAN}" --bindPasswordFile1 "${PWD_FILE}" \
 --host2 "${HOST1}" --port2 "${PORT_ADMIN}" --bindDN2 "${DIRMAN}" --bindPasswordFile2 "${PWD_FILE}" \
 --replicationPort1 "${PORT_REP}" --secureReplication1 \
 --replicationPort2 "${PORT_REP}" --secureReplication2 \
@@ -86,7 +86,7 @@ if [ -n "${ALL_SUFFIX}" ]; then
     for suffix in ${ALL_SUFFIX}; do
         echo "enable replication for suffix (${suffix}) from $HOST2 to $HOST1"
         ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication enable \
-        --HOST2 "${HOST2}" --port1 "${PORT_ADMIN}" --bindDN1 "${DIRMAN}" --bindPasswordFile1 "${PWD_FILE}" \
+        --host1 "${HOST2}" --port1 "${PORT_ADMIN}" --bindDN1 "${DIRMAN}" --bindPasswordFile1 "${PWD_FILE}" \
         --host2 "${HOST1}" --port2 "${PORT_ADMIN}" --bindDN2 "${DIRMAN}" --bindPasswordFile2 "${PWD_FILE}" \
         --replicationPort1 "${PORT_REP}" --secureReplication1 \
         --replicationPort2 "${PORT_REP}" --secureReplication2 \
