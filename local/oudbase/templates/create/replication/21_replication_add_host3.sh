@@ -36,25 +36,18 @@ else
     exit
 fi
 
-# check if HOST3 is defined
-if [ -z "${HOST3}" ]; then
-    echo "HOST3 not defined"
-    exit
-fi
-
 # - configure instance ---------------------------------------------------------
 echo "Enable replication ${OUD_INSTANCE} using:"
 echo "HOSTNAME          : ${HOST}"
 echo "HOST1             : ${HOST1}"
-echo "HOST2             : ${HOST2}"
 echo "HOST3             : ${HOST3}"
 echo "PWD_FILE          : ${PWD_FILE}"
 echo "PORT_ADMIN        : ${PORT_ADMIN}"
 echo "PORT_REP          : ${PORT_REP}"
 echo "DIRMAN            : ${DIRMAN}"
 echo "REPMAN            : ${REPMAN}"
-echo "PWD_FILE          : ${PWD_FILE}"
 echo "BASEDN            : ${BASEDN}"
+echo "All suffix        : ${ALL_SUFFIX}"
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
@@ -65,16 +58,12 @@ echo "BASEDN            : ${BASEDN}"
 [ ! -f "${PWD_FILE}" ]          && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
 [   -z "${PORT_REP}" ]          && echo "- skip $(basename $0), variable PORT_REP not set"          && exit
 [   -z "${PORT_ADMIN}" ]        && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
-[   -z "${PORT_REST_ADMIN}" ]   && echo "- skip $(basename $0), variable PORT_REST_ADMIN not set"   && exit
-[   -z "${PORT_REST_HTTP}" ]    && echo "- skip $(basename $0), variable PORT_REST_HTTP not set"    && exit
-[   -z "${PORT_REST_HTTPS}" ]   && echo "- skip $(basename $0), variable PORT_REST_HTTPS not set"   && exit
 [   -z "${DIRMAN}" ]            && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
 [   -z "${REPMAN}" ]            && echo "- skip $(basename $0), variable REPMAN not set"            && exit
 [   -z "${BASEDN}" ]            && echo "- skip $(basename $0), variable BASEDN not set"            && exit
 
-# - loop through list of suffix ------------------------------------------------
-# - add suffix -----------------------------------------------------------------
-echo "enable replication for suffix (${BASEDN}) from $HOST1 to $HOST3"
+# - add base DN ----------------------------------------------------------------
+echo "enable replication for suffix (${BASEDN}) from $HOST1 to $HOST2"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsreplication enable \
 --host1 "${HOST1}" --port1 "${PORT_ADMIN}" --bindDN1 "${DIRMAN}" --bindPasswordFile1 "${PWD_FILE}" \
 --host2 "${HOST3}" --port2 "${PORT_ADMIN}" --bindDN2 "${DIRMAN}" --bindPasswordFile2 "${PWD_FILE}" \
