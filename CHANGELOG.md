@@ -15,6 +15,12 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.3.3] - 2023.03.29
+
+### Fixed
+
+- Fix a few issues in *52_remove_unavailable.sh*
+
 ## [3.3.2] - 2023.03.29
 
 ### Fixed

@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.29
-# Version....: v3.3.2
+# Version....: v3.3.3
 # Purpose....: Script to configure the EUS context in the OUD proxy instance.
 # Notes......: The config file 02_config_eus_context.conf is executed using
 #              dsconfig in batch mode. If required, each command can 

@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.29
-# Version....: v3.3.2
+# Version....: v3.3.3
 # Purpose....: Script to create a couple of users and groups.
 # Notes......: BaseDN in 02_config_basedn.ldif will be updated before
 #              it is loaded using ldapmodify.
