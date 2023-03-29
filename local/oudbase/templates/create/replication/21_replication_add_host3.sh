@@ -63,7 +63,6 @@ echo "BASEDN            : ${BASEDN}"
 [   -z "${HOST3}" ]             && echo "- skip $(basename $0), variable HOST3 not set"             && exit
 [   -z "${PWD_FILE}" ]          && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
 [ ! -f "${PWD_FILE}" ]          && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
-[   -z "${HOST}" ]              && echo "- skip $(basename $0), variable HOST not set"              && exit
 [   -z "${PORT_REP}" ]          && echo "- skip $(basename $0), variable PORT_REP not set"          && exit
 [   -z "${PORT_ADMIN}" ]        && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
 [   -z "${PORT_REST_ADMIN}" ]   && echo "- skip $(basename $0), variable PORT_REST_ADMIN not set"   && exit
