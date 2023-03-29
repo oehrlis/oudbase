@@ -33,7 +33,7 @@ TVDLDAP_DEFAULT_LDAPTOOLS=""
 TVDLDAP_DEFAULT_DUMP_FORMAT="SINGLE"
 TVDLDAP_DEFAULT_ONE_DUMP_FILE="FALSE"
 TVDLDAP_DEFAULT_DUMP_FILE_PREFIX="ldap_dump"
-TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR=${TNS_ADMIN}
+TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR=${TNS_ADMIN:-""}
 # - End of Customization -------------------------------------------------------
 
 # Define a bunch of bash option see 
