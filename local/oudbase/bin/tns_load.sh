@@ -242,7 +242,7 @@ for file in $TNSNAMES_FILES; do
         echo_debug "DEBUG: NetDescString    => $NetDescString"
         basedn_array+=("$current_basedn")
         # check if net service entry exists => skip if force = FALSE
-        if ! net_service_exists "$current_cn" "${current_basedn}" ; then
+        if ! net_service_exists "$current_cn" "${current_basedn}" "${current_binddn}" "${current_bindpwd}"; then
             echo "INFO : Add Net Service Name $net_service in $current_basedn" 
             if ! dryrun_enabled; then
                 $ldapadd_command -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
