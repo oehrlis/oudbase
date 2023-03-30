@@ -40,7 +40,7 @@ export OUD_INSTANCE=${OUD_INSTANCE:-""}
 # https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
 # https://www.davidpashley.com/articles/writing-robust-shell-scripts/
 set -o nounset                      # exit if script try to use an uninitialised variable
-set -o errexit                      # exit script if any statement returns a non-true return value
+# set -o errexit                    # exit script if any statement returns a non-true return value
 set -o pipefail                     # pipefail exit after 1st piped commands failed
 # - End of Default Values ------------------------------------------------------
 
