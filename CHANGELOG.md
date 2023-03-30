@@ -15,6 +15,12 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.4.1] - 2023.03.30
+
+### Fixed
+
+- Issue with *errexit* either disable it or catch return values
+
 ## [3.4.0] - 2023.03.30
 
 ### Added
