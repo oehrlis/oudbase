@@ -4,17 +4,15 @@ A collection of OUD create scripts and templates for different use cases. The sc
 
 ## Scripts
 
-| Templates                  | Status    | Description                                                                                        |
-| -------------------------- | --------- | -------------------------------------------------------------------------------------------------- |
-| template                   | planned   | Template script to setup a new template                                                            |
-| [generic](./generic)       | templates | Generic scripts and configuration files. Usually not 1:1 usable                                    |
-| generic_directory          | planned   | Scripts to setup a generic directory server                                                        |
-| generic_proxy              | planned   | Scripts to setup a generic proxy server                                                            |
-| [oud12c_eus](./oud12c_eus) | released  | OUD 12c directory server with Oracle Enterprise User Security (EUS) integration                    |
-| [oud12c_eus_ad_proxy](./oud12c_eus_ad_proxy) | released | OUD 12c proxy server with Oracle Enterprise User Security (EUS) and MS ActiveDirectory integration |
-| oud11g_eus                 | planned   | OUD 11g directory server with Oracle Enterprise User Security (EUS) integration                    |
-| oud11g_eus_ad_proxy        | planned   | OUD 11g proxy server with Oracle Enterprise User Security (EUS) and MS ActiveDirectory integration |
-| replication                | planned   | Setup and initialize replication                                                                   |
+| Templates                                    | Status   | Description                                                                                                |
+|----------------------------------------------|----------|------------------------------------------------------------------------------------------------------------|
+| [generic](./generic)                         | released | Scripts to setup a generic directory server. This server can be used as Oracle Net Service Names directory |
+| [misc](./misc)                               | released | Misc scripts which can be used for different type of OUD instances                                         |
+| [oud12c_eus](./oud12c_eus)                   | released | OUD 12c directory server with Oracle Enterprise User Security (EUS) integration                            |
+| [oud12c_eus_ad_proxy](./oud12c_eus_ad_proxy) | released | OUD 12c proxy server with Oracle Enterprise User Security (EUS) and MS ActiveDirectory integration         |
+| [oudsm_domain](./oudsm_domain)               | released | Create a OUDSM domain                                                                                      |
+| [replication](./replication)                 | released | Setup and initialize replication                                                                           |
+| [wls_domain](./wls_domain)                   | released | Create a WLS domain                                                                                        |
 
 ## Issues
 

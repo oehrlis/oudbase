@@ -1,13 +1,15 @@
 # OUD Base
+
 Trivadis does have the TVD-BasEnv™ to standardizes and simplifies the handling of environments for Oracle database and application server landscapes. Although the current version of TVD-BasEnv™ already support OUD and OID environments, there are sometimes situations, where you need a small and slimed down environment scripts for dedicated OUD servers. TVD-BasEnv™ is rather complex and brings a lot of nice features for Oracle Database environments with ASM, RAC, DataGuard and more stuff which is in general not required on a simple OUD server.
 
-*OUD Base* is basically just the **oudenv.sh** script, some configuration files and a bunch of aliases. The directory structure for the OUD binaries, scripts and configuration files is similar to what is use in TVD-BasEnv™ and based on OFA. It is written in bash and tested on Oracle Linux VM’s, OUD Docker container and Raspberry Pi’s with Raspbian Jessy/Stretch. It should also run on any other bash environment.
+*OUD Base* is basically just the **oudenv.sh** script, some configuration files and a bunch of aliases. The directory structure for the OUD binaries, scripts and configuration files is similar to what is use in TVD-BasEnv™ and based on OFA. It is written in bash and tested on Oracle Linux VM’s, OUD Docker container and Raspberry Pi's with Raspbian Jessy/Stretch. It should also run on any other bash environment.
 
 ## Setup
 
 Latest installation script or TAR file is available on the [releases](https://github.com/oehrlis/oudbase/releases) page.
 
 ### Automatic Setup using shell script
+
 *OUD Base* is available as TAR file or as Bash installation file *oudbase_install.sh*. Wherein *oudbase_install.sh* is a TAR file with a wrappped Bash script.
 
 ```bash
@@ -33,7 +35,7 @@ oracle@oud:~/ [oud_cdse] /u01/shared/oudbase_install.sh -h
 2017-11-13_14:28:58  INFO : Logfile : /tmp/oudbase_install.log
 ```
 
-Installation example to install **OUD base** in a OUD docker container in verbose mode. **-b** is used to specify the **ORACLE_BASE** directory where **-d** is used to specify */u01* (configured as docker volume) as **OUD_DATA** base folder to store instance data, configuration files etc. 
+Installation example to install **OUD base** in a OUD docker container in verbose mode. **-b** is used to specify the **ORACLE_BASE** directory where **-d** is used to specify */u01* (configured as docker volume) as **OUD_DATA** base folder to store instance data, configuration files etc.
 
 ```bash
 oracle@eusoud:/u01/config/ [oud_eus] ./oudbase_install.sh -v -b /u00/app/oracle -o /u00/app/oracle -d /u01
@@ -130,7 +132,7 @@ fi
 2020-03-02_21:55:14  END  : of oudbase_install.sh
 ```
 
-The only manual step after installing *OUD Base* is to adjust the *.bash_profile / .profile script*. Just source the corresponding script as described in *$OUD_BASE/local/templates/.bash_profile*. 
+The only manual step after installing *OUD Base* is to adjust the *.bash_profile / .profile script*. Just source the corresponding script as described in *$OUD_BASE/local/templates/.bash_profile*.
 
 ```bash
 # Check OUD_BASE and load if necessary
@@ -155,25 +157,25 @@ alias oudenv=". $(find $OUD_BASE -name oudenv.sh)"
 
 Extract the TAR to your favorite folder.
 
-```
+```bash
 tar -zxcd oudbase_install.tgz -C $ORACLE_BASE/local
 ```
 
 Update the oudenv_core.conf and add some mandatory parameter eg. ORACLE_BASE, OUD_BASE, OUD_DATA, OUD_INSTANCE_BASE, OUD_BACKUP_BASE, ORACLE_HOME, ORACLE_FMW_HOME, JAVA_HOME, LOG_BASE or ETC_BASE. Where ORACLE_BASE is the minimal required parameter.
 
-```
+```bash
 echo "ORACLE_BASE=$ORACLE_BASE" >> $ORACLE_BASE/local/etc/oudenv_core.conf
 ```
 
 Add a .OUD_BASE file to the user home
 
-```
+```bash
 echo echo "OUD_BASE=$OUD_BASE" >> $HOME/.OUD_BASE
 ```
 
 Update .profile or .bash_profile to source the OUD environment
 
-```
+```bash
 PROFILE=$HOME/.bash_profile
 echo "# Check OUD_BASE and load if necessary"                       >>"${PROFILE}"
 echo "if [ \"\${OUD_BASE}\" = \"\" ]; then"                         >>"${PROFILE}"
@@ -195,9 +197,10 @@ Open a new terminal to test OUDBase.
 
 ## Configuration and Architecture
 
-By default **oudbase** does work from its base folder **OUD_BASE** which is usually the same as **ORACLE_BASE**. In certain cases it make sense to separate persistent data like configuration files, log files and OUD instances. If OUD does run in a docker container it's crucial, that you OUD instance is on a separate volume. Otherwise the instance will not survive. **OUD_DATA** variable allows to specify an alternative base directory for  persistent data like OUD instance home, backups, exports as well configuration and log files. 
+By default **oudbase** does work from its base folder **OUD_BASE** which is usually the same as **ORACLE_BASE**. In certain cases it make sense to separate persistent data like configuration files, log files and OUD instances. If OUD does run in a docker container it's crucial, that you OUD instance is on a separate volume. Otherwise the instance will not survive. **OUD_DATA** variable allows to specify an alternative base directory for  persistent data like OUD instance home, backups, exports as well configuration and log files.
 
 ### Config Files
+
 The OUD Base does have the following configuration files.
 
 | File                | Description    |
@@ -289,7 +292,7 @@ Variable besides the ones mentioned above.
 
 Display status of the current OUD instance.
 
-```
+```bash
 oud@oudeng:~/ [oudtd] os
 --------------------------------------------------------------
  Instance Name      : oud_docker
@@ -305,7 +308,7 @@ oud@oudeng:~/ [oudtd] os
 
 Show runing OUD and OUDSM instances
 
-```
+```bash
 oud@uxltoud03:~/ [oudtd] u
 TYPE  INSTANCE     STATUS PORTS          INSTANCE HOME
 ----- ------------ ------ -------------- ----------------------------------
@@ -315,10 +318,12 @@ OUDSM oudsm_domain up     7001/7002      /u01/domains/oudsm_domain
 ```
 
 ## Issues
+
 Please file your bug reports, enhancement requests, questions and other support requests within [Github's issue tracker](https://help.github.com/articles/about-issues/):
 
 * [Existing issues](https://github.com/oehrlis/oudbase/issues)
 * [submit new issue](https://github.com/oehrlis/oudbase/issues/new)
 
 ## License
+
 oehrlis/docker is licensed under the GNU General Public License v3.0. You may obtain a copy of the License at <https://www.gnu.org/licenses/gpl.html>.
