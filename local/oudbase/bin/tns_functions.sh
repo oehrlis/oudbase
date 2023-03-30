@@ -358,7 +358,7 @@ function clean_quit() {
 # Function...: on_int
 # Purpose....: function to handle interupt by CTRL-C
 # ------------------------------------------------------------------------------
-on_int() {
+function on_int() {
   printf $TNS_ERROR'\n' "You hit CTRL-C, are you sure ? (y/n)"
   read answer
   if [[ ${answer} = "y" ]]; then
@@ -373,7 +373,7 @@ on_int() {
 # Function...: on_term
 # Purpose....: function to handle TERM signal
 # ------------------------------------------------------------------------------
-on_term() {
+function on_term() {
   printf $TNS_ERROR'\n' "I have recived a terminal signal. Terminating script..."
   clean_quit 91
 }
