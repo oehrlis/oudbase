@@ -206,8 +206,8 @@ for oud_inst in ${OUD_INST_LIST}; do
         if [ ${OUDSTATUS_ERROR} -eq 0 ] && [ ${FORCE} == "TRUE" ]; then
             if [ ${DIRECTORY_TYPE} == "OUD" ]; then
                 DoMsg "INFO : [$oud_inst] Instance $oud_inst forced to restart."
-                $OUD_INSTANCE_HOME/OUD/bin/stop-ds >> ${INSTANCE_LOGFILE} 2>&1 
-                $OUD_INSTANCE_HOME/OUD/bin/start-ds >> ${INSTANCE_LOGFILE} 2>&1 
+                ($OUD_INSTANCE_HOME/OUD/bin/stop-ds  || DoMsg "WARN : stop-ds returned $?")     >> ${INSTANCE_LOGFILE} 2>&1 
+                ($OUD_INSTANCE_HOME/OUD/bin/start-ds || DoMsg "WARN : start-ds returned $?")    >> ${INSTANCE_LOGFILE} 2>&1 
             elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
                 DoMsg "WARN : [$oud_inst] force not supported for OUDSM. Skip $MyActivity force for this instance."
             else
@@ -219,7 +219,7 @@ for oud_inst in ${OUD_INST_LIST}; do
         else
             # check directory type
             if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-                $OUD_INSTANCE_HOME/OUD/bin/start-ds >> ${INSTANCE_LOGFILE} 2>&1 
+                ($OUD_INSTANCE_HOME/OUD/bin/start-ds || DoMsg "WARN : start-ds returned $?") >> ${INSTANCE_LOGFILE} 2>&1 
             elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
                 # clean up old WLS lok, DAT files
                 find $OUD_INSTANCE_HOME/servers -name "*.lok" -exec rm -f {} \; 2>/dev/null
@@ -261,7 +261,7 @@ for oud_inst in ${OUD_INST_LIST}; do
         fi
     elif  [ "$MyActivity" == "STOP" ]; then 
         if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-            $OUD_INSTANCE_HOME/OUD/bin/stop-ds >> ${INSTANCE_LOGFILE} 2>&1 
+            ($OUD_INSTANCE_HOME/OUD/bin/stop-ds || DoMsg "WARN : stop-ds returned $?")>> ${INSTANCE_LOGFILE} 2>&1 
         elif [ "${DIRECTORY_TYPE}" == "OUDSM" ]; then
             nohup $OUD_INSTANCE_HOME/bin/stopWebLogic.sh >> ${INSTANCE_LOGFILE} 2>&1 &
             if [ "${WAIT}" == "TRUE" ]; then
@@ -304,8 +304,8 @@ for oud_inst in ${OUD_INST_LIST}; do
         fi
     elif  [ "$MyActivity" == "RESTART" ]; then 
         if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-            $OUD_INSTANCE_HOME/OUD/bin/stop-ds >> ${INSTANCE_LOGFILE} 2>&1 
-            $OUD_INSTANCE_HOME/OUD/bin/start-ds >> ${INSTANCE_LOGFILE} 2>&1 
+            ($OUD_INSTANCE_HOME/OUD/bin/stop-ds  || DoMsg "WARN : stop-ds returned $?")     >> ${INSTANCE_LOGFILE} 2>&1 
+            ($OUD_INSTANCE_HOME/OUD/bin/start-ds || DoMsg "WARN : start-ds returned $?")    >> ${INSTANCE_LOGFILE} 2>&1 
         elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
             DoMsg "WARN : [$oud_inst] $MyActivity not supported for OUDSM. Skip $MyActivity for this instance."
         else
