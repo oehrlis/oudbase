@@ -15,6 +15,23 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.4.0] - 2023.03.30
+
+### Added
+
+- add a first draft version of tool test scripts *test_script.sh* and *test_unit.sh*
+  These files are currently beta and not yet stable.
+
+### Changed
+
+- Update a few doc's and comments
+
+### Fixed
+
+- fix issues when run tools in a clean environment. Add default values
+- fix adhoc source of environment
+- fix issue related with nounset, errexit and pipefail
+
 ## [3.3.3] - 2023.03.29
 
 ### Fixed

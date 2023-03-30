@@ -5,8 +5,8 @@
 # Name.......: test_scripts.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.03.29
-# Version....: v3.3.3
+# Date.......: 2023.03.30
+# Version....: v3.4.0
 # Purpose....: Script to test / verify all TNS utilities
 # Notes......: --
 # Reference..: --
@@ -27,7 +27,7 @@ set -o nounset                      # exit if script try to use an uninitialised
 set -o noglob                       # Disable filename expansion (globbing).
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v3.3.3
+VERSION=v3.4.0
 ORACLE_BASE=${ORACLE_BASE:-"/u01/app/oracle"}
 TVDLDAP_BIN_DIR=$(dirname $(find ${ORACLE_BASE} -name tns_add.sh 2>/dev/null|head -1))
 # - EOF Environment Variables --------------------------------------------------
