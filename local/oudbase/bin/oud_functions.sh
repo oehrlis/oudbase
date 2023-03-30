@@ -28,6 +28,7 @@ DOAPPEND=${DOAPPEND:-"TRUE"}                    # enable log file append
 VERBOSE=${VERBOSE:-"FALSE"}                     # enable verbose mode
 DEBUG=${DEBUG:-"FALSE"}                         # enable debug mode
 SEND_MAIL=${SEND_MAIL:-"UNDEF"} 
+ORACLE_BASE=${ORACLE_BASE:-""}
 SOFTWARE=${SOFTWARE:-"${ORACLE_BASE}/software"} # local software stage folder
 SOFTWARE_REPO=${SOFTWARE_REPO:-""}              # URL to software for curl fallback
 
@@ -55,9 +56,7 @@ function oud_test() {
 # ------------------------------------------------------------------------------
 function DoMsg() {
     set +o nounset                      # exit if script try to use an uninitialised variable
-    set +o errexit                      # exit script if any statement returns a non-true return value
-    set +o pipefail                     # pipefail exit after 1st piped commands failed
-    INPUT=${1}
+    INPUT=${1:-""}
     PREFIX=${INPUT%: *}                # Take everything before :
     case ${PREFIX} in                  # Define a nice time stamp for ERR, END
         "END  ")        TIME_STAMP=$(date "+%Y-%m-%d_%H:%M:%S  ");;
@@ -97,16 +96,16 @@ function DoMsg() {
         done
     fi
     set -o nounset                      # exit if script try to use an uninitialised variable
-    set -o errexit                      # exit script if any statement returns a non-true return value
-    set -o pipefail                     # pipefail exit after 1st piped commands failed
 }
 
 # ------------------------------------------------------------------------------
 # Purpose....: Clean up before exit
 # ------------------------------------------------------------------------------
 function CleanAndQuit() {
+    error=${1:-"0"}                 # default error number
+    error_value=${2:-""}            # default error message
     STATUS="INFO"
-    if [ ${1} -gt 0 ]; then
+    if [ ${error} -gt 0 ]; then
         VERBOSE="TRUE"
         if [ "${SEND_MAIL}" != "UNDEF" ]; then
             DoMsg "DEBUG: CleanAndQuit called with error != 0 force send e-Mail"
@@ -125,41 +124,41 @@ function CleanAndQuit() {
             DoMsg "WARN : SEND_MAIL is TRUE, but can not send e-Mail. No address specified."
         fi
     fi
-    case ${1} in
+    case ${error} in
         0)  DoMsg "END  : Successfully finish ${SCRIPT_NAME}";;
-        1)  DoMsg "ERR  : Exit Code ${1}. Wrong amount of arguments. See usage for correct one.";;
-        2)  DoMsg "ERR  : Exit Code ${1}. Wrong arguments (${2}). See usage for correct one.";;
-        3)  DoMsg "ERR  : Exit Code ${1}. This script must not be run as root ${2}";;
-        5)  DoMsg "ERR  : Exit Code ${1}. OUD Instance ${2} does not exits in ${OUDTAB} or ${ORACLE_INSTANCE_BASE}";;
-        10) DoMsg "ERR  : Exit Code ${1}. OUD_BASE not set or $OUD_BASE not available.";;
-        11) DoMsg "ERR  : Exit Code ${1}. Could not touch file ${2}";;
-        12) DoMsg "ERR  : Exit Code ${1}. Can not create directory ${2}";;
-        13) DoMsg "ERR  : Exit Code ${1}. Directory ${2} is not read / writeable";;
-        14) DoMsg "ERR  : Exit Code ${1}. Directory ${2} already exists";;
-        15) DoMsg "ERR  : Exit Code ${1}. Cloud not access file ${2}";;
-        21) DoMsg "ERR  : Exit Code ${1}. Could not load \${HOME}/.OUD_BASE";;
-        30) DoMsg "ERR  : Exit Code ${1}. Some backups failed";;
-        31) DoMsg "ERR  : Exit Code ${1}. Some exports failed";;
-        32) DoMsg "ERR  : Exit Code ${1}. Error while performing exports";;
-        33) DoMsg "ERR  : Exit Code ${1}. Error while performing backups";;
-        40) DoMsg "ERR  : Exit Code ${1}. Error not defined";;
-        41) DoMsg "ERR  : Exit Code ${1}. Error ${2} running status command";;
-        42) DoMsg "ERR  : Exit Code ${1}. Error ${2} running dsreplication command";; 
-        43) DoMsg "ERR  : Exit Code ${1}. Missing bind password file";;
-        44) DoMsg "ERR  : Exit Code ${1}. unknown directory type ${2}, can not check status";;
-        50) DoMsg "ERR  : Exit Code ${1}. OUD Instance ${2} not running";;
-        51) DoMsg "ERR  : Exit Code ${1}. Connection Handler ${2} is not enabled on ${OUD_INSTANCE}";;
-        52) DoMsg "ERR  : Exit Code ${1}. Error in Replication for OUD Instance ${OUD_INSTANCE}. Check replication log ${ORACLE_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/logs for more information";;
-        53) DoMsg "ERR  : Exit Code ${1}. Error OUDSM console ${2} is not available";;
-        60) DoMsg "ERR  : Exit Code ${1}. Force mail enabled but no e-Mail adress specified";;
-        70) DoMsg "ERR  : Exit Code ${1}. Error starting instances ${2}";;
-        71) DoMsg "ERR  : Exit Code ${1}. Error unknown activity ${2}";;
-        80) DoMsg "ERR  : Exit Code ${1}. No base software package specified. Abort installation.";;
-        90) DoMsg "ERR  : Exit Code ${1}. Received signal SIGINT / Interrupt / CTRL-C ..." >&2;;
-        91) DoMsg "ERR  : Exit Code ${1}. Received signal TERM to terminate the script ..." >&2;;
-        92) DoMsg "ERR  : Exit Code ${1}. Recived signal is SIGINT / Interrupt / CTRL-C} ..." >&2;;
+        1)  DoMsg "ERR  : Exit Code ${error}. Wrong amount of arguments. See usage for correct one.";;
+        2)  DoMsg "ERR  : Exit Code ${error}. Wrong arguments (${error_value}). See usage for correct one.";;
+        3)  DoMsg "ERR  : Exit Code ${error}. This script must not be run as root ${error_value}";;
+        5)  DoMsg "ERR  : Exit Code ${error}. OUD Instance ${error_value} does not exits in ${OUDTAB} or ${ORACLE_INSTANCE_BASE}";;
+        10) DoMsg "ERR  : Exit Code ${error}. OUD_BASE not set or $OUD_BASE not available.";;
+        11) DoMsg "ERR  : Exit Code ${error}. Could not touch file ${error_value}";;
+        12) DoMsg "ERR  : Exit Code ${error}. Can not create directory ${error_value}";;
+        13) DoMsg "ERR  : Exit Code ${error}. Directory ${error_value} is not read / writeable";;
+        14) DoMsg "ERR  : Exit Code ${error}. Directory ${error_value} already exists";;
+        15) DoMsg "ERR  : Exit Code ${error}. Cloud not access file ${error_value}";;
+        21) DoMsg "ERR  : Exit Code ${error}. Could not load \${HOME}/.OUD_BASE";;
+        30) DoMsg "ERR  : Exit Code ${error}. Some backups failed";;
+        31) DoMsg "ERR  : Exit Code ${error}. Some exports failed";;
+        32) DoMsg "ERR  : Exit Code ${error}. Error while performing exports";;
+        33) DoMsg "ERR  : Exit Code ${error}. Error while performing backups";;
+        40) DoMsg "ERR  : Exit Code ${error}. Error not defined";;
+        41) DoMsg "ERR  : Exit Code ${error}. Error ${error_value} running status command";;
+        42) DoMsg "ERR  : Exit Code ${error}. Error ${error_value} running dsreplication command";; 
+        43) DoMsg "ERR  : Exit Code ${error}. Missing bind password file";;
+        44) DoMsg "ERR  : Exit Code ${error}. unknown directory type ${error_value}, can not check status";;
+        50) DoMsg "ERR  : Exit Code ${error}. OUD Instance ${error_value} not running";;
+        51) DoMsg "ERR  : Exit Code ${error}. Connection Handler ${error_value} is not enabled on ${OUD_INSTANCE}";;
+        52) DoMsg "ERR  : Exit Code ${error}. Error in Replication for OUD Instance ${OUD_INSTANCE}. Check replication log ${ORACLE_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/logs for more information";;
+        53) DoMsg "ERR  : Exit Code ${error}. Error OUDSM console ${error_value} is not available";;
+        60) DoMsg "ERR  : Exit Code ${error}. Force mail enabled but no e-Mail adress specified";;
+        70) DoMsg "ERR  : Exit Code ${error}. Error starting instances ${error_value}";;
+        71) DoMsg "ERR  : Exit Code ${error}. Error unknown activity ${error_value}";;
+        80) DoMsg "ERR  : Exit Code ${error}. No base software package specified. Abort installation.";;
+        90) DoMsg "ERR  : Exit Code ${error}. Received signal SIGINT / Interrupt / CTRL-C ..." >&2;;
+        91) DoMsg "ERR  : Exit Code ${error}. Received signal TERM to terminate the script ..." >&2;;
+        92) DoMsg "ERR  : Exit Code ${error}. Recived signal is SIGINT / Interrupt / CTRL-C} ..." >&2;;
         99) DoMsg "INFO : Just wanna say hallo.";;
-        ?)  DoMsg "ERR  : Exit Code ${1}. Unknown Error.";;
+        ?)  DoMsg "ERR  : Exit Code ${error}. Unknown Error.";;
     esac
  
     # clean up potential Temp directories
@@ -173,7 +172,7 @@ function CleanAndQuit() {
         LOG_TAIL=$(($LOG_END-$LOG_START))
         tail -${LOG_TAIL} ${LOGFILE} |mailx -s "$STATUS : OUD Script ${SCRIPT_NAME}" ${MAILADDRESS}
     fi
-    exit ${1}
+    exit ${error}
 }
 
 # ------------------------------------------------------------------------------

@@ -33,6 +33,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
 ERROR=0
 HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)  # Hostname
+export OUD_BASE=${OUD_BASE:-""}
+export HOME=${HOME:-~}
+# Define a bunch of bash option see
+# https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
+# https://www.davidpashley.com/articles/writing-robust-shell-scripts/
+set -o nounset                      # exit if script try to use an uninitialised variable
+set -o errexit                      # exit script if any statement returns a non-true return value
+set -o pipefail                     # pipefail exit after 1st piped commands failed
 # - End of Default Values ------------------------------------------------------
  
 # - Functions ------------------------------------------------------------------
@@ -42,6 +50,8 @@ HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)  # Hostname
 # Purpose....: Display Usage
 # ------------------------------------------------------------------------------
 function Usage() {
+    error=${1:-"0"}                 # default error number
+    error_value=${2:-""}            # default error message
     VERBOSE="TRUE"
     DoMsg " Usage, ${SCRIPT_NAME} [-fhvw -t <TIMEOUT> -a <START|STOP|RESTART> -i <OUD_INSTANCES>]"
     DoMsg "    -h                      Usage (this message"
@@ -53,7 +63,7 @@ function Usage() {
     DoMsg "    -i <OUD_INSTANCES>      List of OUD instances (default all market with Y in oudtab)"
     DoMsg "    Logfile : ${LOGFILE}"
     if [ ${1} -gt 0 ]; then
-        CleanAndQuit ${1} ${2}
+        CleanAndQuit ${error} ${error_value}
     else
         VERBOSE="FALSE"
         CleanAndQuit 0
@@ -122,6 +132,9 @@ done
 # get none getopt parameters
 shift $((OPTIND-1))
 Arguments=$@
+
+# explisitly define a couple of default variable
+MyOUD_INSTANCES=${MyOUD_INSTANCES:-""}
 
 if [ $# -ne 0 ]; then
 #if [ ! -z "$@" ]; then

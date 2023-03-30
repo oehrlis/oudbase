@@ -35,7 +35,8 @@ COMPRESS=""                                     # set default value for compress
 SUFFIX="ldif"                                   # default suffix
 DATE_STRING=$(date '+%Y%m%d-%H%M%S')            # String used for the export files
 HOST=$(hostname 2>/dev/null ||cat /etc/hostname ||echo $HOSTNAME)  # Hostname
-
+export OUD_BASE=${OUD_BASE:-""}
+export HOME=${HOME:-~}
 # Define a bunch of bash option see
 # https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
 # https://www.davidpashley.com/articles/writing-robust-shell-scripts/

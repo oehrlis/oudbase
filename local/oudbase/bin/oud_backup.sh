@@ -34,7 +34,8 @@ TYPE="FULL"                                     # Default Backup Type
 KEEP=4                                          # Default number of Weeks to keep
 compress="--compress"                           # set --compress Flag
 OUD_ERROR=0                                     # default value for error
-
+export OUD_BASE=${OUD_BASE:-""}
+export HOME=${HOME:-~}
 # Define a bunch of bash option see
 # https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
 # https://www.davidpashley.com/articles/writing-robust-shell-scripts/
