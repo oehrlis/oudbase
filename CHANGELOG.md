@@ -15,6 +15,16 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.4.2] - 2023.03.31
+
+### Changed
+
+- update build to generate a tvdldap.tgz file
+
+### Fixed
+
+- Issue with *errexit* either disable it or catch return values
+
 ## [3.4.1] - 2023.03.30
 
 ### Fixed

@@ -67,15 +67,36 @@ echo "Create sha hash values for all files"
 find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" ! -iname "*.log" ! -iname "oudbase_install.sh" ! -iname "oudbase_install.tgz" \) \
   -print0 | xargs -0 shasum >${SCRIPT_DIR}/../local/oudbase/doc/.oudbase.sha
 
+grep -Ev './templates/etc/oud|./templates/create|./bin/oud|./bin/setup|./etc/oud|./templates/logrotate.d|./templates/cron.d|./templates/etc/o|./templates/etc/i|./templates/etc/w|./templates/etc/h' cp ${SCRIPT_DIR}/../local/oudbase/doc/.oudbase.sha
+ >${SCRIPT_DIR}/../local/oudbase/doc/.tvdldap.sha
+
 # Tar all together
 echo "Put all together in a tar"
 tar --verbose -zcvf ${SCRIPT_DIR}/oudbase_install.tgz \
     --exclude=bin/oudbase_install.sh \
     --exclude=log/*.log \
+    --exclude=doc/.tvdldap.sha \
     --exclude='.DS_Store' \
     --exclude='._*'  \
     bin/ doc/ etc/ templates/
 
+# create tns utility tar file
+echo "Put all tns utilities together in a tar"
+tar --verbose -zcvf ${SCRIPT_DIR}/tvdldap_install.tgz \
+    --exclude=bin/*oud* \
+    --exclude=etc/*oud* \
+    --exclude=log/*.log \
+    --exclude=doc/.oudbase.sha \
+    --exclude='.DS_Store' \
+    --exclude=templates/create \
+    --exclude=templates/cron.d \
+    --exclude=templates/logrotate.d \
+    --exclude=templates/etc/*oud* \
+    --exclude=templates/etc/housekeeping.conf \
+    --exclude=templates/etc/install.rsp \
+    --exclude=templates/etc/oraInst.loc \
+    --exclude='._*'  \
+    bin/ doc/ etc/ templates/
 # build this nice executable shell script with a TAR payload
 echo "Create this fancy shell with a tar payload"
 

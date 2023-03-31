@@ -1,0 +1,32 @@
+# -----------------------------------------------------------------------
+# Trivadis AG, Business Development & Support (BDS)
+# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
+# -----------------------------------------------------------------------
+# Name.......: 14_add_local_user.ldif
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Editor.....: Stefan Oehrli
+# Date.......: 2023.03.31
+# Usage......: ldapmodify -h $(hostname) -p ${PORT} -D "cn=Directory Manager" \
+#              -w PASSWORD -c -f 17_add_local_user.ldif
+# Purpose....: LDIF File to configure local user
+# Notes......: 
+# Reference..: 
+# License...: Licensed under the Universal Permissive License v 1.0 as 
+#             shown at http://oss.oracle.com/licenses/upl.
+# -----------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes
+# -----------------------------------------------------------------------
+# add technical / functional users
+dn: cn=oudmon,ou=users,LOCAL_OU,BASEDN
+objectClass: inetOrgPerson
+objectClass: person
+objectClass: organizationalPerson
+objectClass: top
+cn: oudmon
+sn: Monitoring
+displayName: Monitoring Functional (oudmon)
+givenName: Monitoring
+title: Functional User
+
+# - EOF ---------------------------------------------------------------------
