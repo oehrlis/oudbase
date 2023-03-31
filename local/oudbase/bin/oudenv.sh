@@ -105,7 +105,8 @@ export OUDSM_DOMAIN_BASE=${OUDSM_DOMAIN_BASE:-"${OUD_DATA}/${DEFAULT_OUDSM_DOMAI
 export ORACLE_HOME=${ORACLE_HOME:-"${ORACLE_BASE}/${DEFAULT_PRODUCT_BASE_NAME}/${DEFAULT_ORACLE_HOME_NAME}"}
 export ORACLE_FMW_HOME=${ORACLE_FMW_HOME:-"${ORACLE_BASE}/${DEFAULT_PRODUCT_BASE_NAME}/${DEFAULT_ORACLE_FMW_HOME_NAME}"}
 export JAVA_HOME=${JAVA_HOME:-"${ORACLE_BASE}/${DEFAULT_PRODUCT_BASE_NAME}/java"}
- 
+export OUD_INSTANCE_HOME_BIN=${OUD_INSTANCE_HOME_BIN:-"${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/bin"}
+
 # set directory type
 DEFAULT_DIRECTORY_TYPE="OUD"
 export DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
@@ -153,6 +154,44 @@ function get_instance_real_home {
     fi
     echo "${OUD_INSTANCE_REAL_HOME}"
 }
+
+# ------------------------------------------------------------------------------
+# Function...: update_path
+# Purpose....: multipurpose function to manipulate PATH variable
+# Usage......: 
+#   update_path /new/directory              Prepend the directory to the beginning of PATH variable
+#   update_path /new/directory after        Append the directory to the end of PATH variable
+#   update_path /new/directory remove       Removes the directory from PATH variable
+#   update_path                             Removes any dublicates from PATH variable
+# ------------------------------------------------------------------------------
+function update_path () {
+    directory=${1:-""}
+    task=${2:-""}
+    case ":${PATH}:" in
+        *:"$directory":*)
+            if [ "$task" = "remove" ]; then
+                # remove directory from PATH
+                PATH=:$PATH:
+                PATH=${PATH//:$directory:/:}
+                PATH=${PATH#:}; PATH=${PATH%:}
+            fi;;
+        *)
+            if [ -d "$directory" ]; then
+                if [ "$task" = "after" ] ; then
+                    # append directory to PATH
+                    PATH=$PATH:$directory
+                else
+                    # prepend directory to PATH
+                    PATH=$directory:$PATH
+                fi
+            fi
+    esac
+    # make sure PATH values are in any case unique
+    PATH=$(echo -n $PATH | awk -v RS=: '!($0 in a) {a[$0]; printf("%s%s", length(a) > 1 ? ":" : "", $0)}')
+    # remove any leading / trailing :
+    PATH=${PATH#:}; PATH=${PATH%:}
+}
+
 # ------------------------------------------------------------------------------
 function get_ports {
 # Purpose....: get the corresponding PORTS from OUD Instance
@@ -291,25 +330,25 @@ function oud_status {
     get_oracle_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} silent # read oracle home from OUD install.path file
     # display the instance status
     echo "--------------------------------------------------------------"
-    echo " Instance Name      : ${OUD_INSTANCE-n/a}"
-    echo " Instance Home ($DIR_STATUS) : ${OUD_INSTANCE_HOME-n/a}"
-    echo " Oracle Home        : ${ORACLE_HOME-n/a}"
-    echo " Instance Status    : ${STATUS-n/a}"
+    echo " Instance Name      : ${OUD_INSTANCE:-n/a}"
+    echo " Instance Home ($DIR_STATUS) : ${OUD_INSTANCE_HOME:-n/a}"
+    echo " Oracle Home        : ${ORACLE_HOME:-n/a}"
+    echo " Instance Status    : ${STATUS:-n/a}"
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-        echo " LDAP Port          : ${PORT-n/a}"
-        echo " LDAPS Port         : ${PORT_SSL-n/a}"
-        echo " Admin Port         : ${PORT_ADMIN-n/a}"
-        echo " Replication Port   : ${PORT_REP-n/a}"
-        echo " REST Admin Port    : ${PORT_REST_ADMIN-n/a}"
-        echo " REST http Port     : ${PORT_REST_HTTP-n/a}"
-        echo " REST https Port    : ${PORT_REST_HTTPS-n/a}"
+        echo " LDAP Port          : ${PORT:-n/a}"
+        echo " LDAPS Port         : ${PORT_SSL:-n/a}"
+        echo " Admin Port         : ${PORT_ADMIN:-n/a}"
+        echo " Replication Port   : ${PORT_REP:-n/a}"
+        echo " REST Admin Port    : ${PORT_REST_ADMIN:-n/a}"
+        echo " REST http Port     : ${PORT_REST_HTTP:-n/a}"
+        echo " REST https Port    : ${PORT_REST_HTTPS:-n/a}"
     elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
-        echo " LDAP Port          : ${PORT-n/a}"
-        echo " LDAPS Port         : ${PORT_SSL-n/a}"
+        echo " LDAP Port          : ${PORT:-n/a}"
+        echo " LDAPS Port         : ${PORT_SSL:-n/a}"
     elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
         echo " Console            : http://${HOST}:$PORT/oudsm"
-        echo " HTTP               : ${PORT-n/a}"
-        echo " HTTPS              : ${PORT_SSL-n/a}"
+        echo " HTTP               : ${PORT:-n/a}"
+        echo " HTTPS              : ${PORT_SSL:-n/a}"
     fi
     echo "--------------------------------------------------------------"
 }
@@ -466,32 +505,32 @@ function oud_help {
     echo "--- OUD Instances -----------------------------------------------------"
     echo ""
     echo "--- ENV Variables -----------------------------------------------------"
-    echo "  ORACLE_BASE         = ${ORACLE_BASE-n/a}"
-    echo "  OUD_BASE            = ${OUD_BASE-n/a}"
-    echo "  LOG_BASE            = ${LOG_BASE-n/a}"
-    echo "  ETC_BASE            = ${ETC_BASE-n/a}"
-    echo "  ETC_CORE            = ${ETC_CORE-n/a}"
-    echo "  JAVA_HOME           = ${JAVA_HOME-n/a}"
-    echo "  ORACLE_HOME         = ${ORACLE_HOME-n/a}"
+    echo "  ORACLE_BASE         = ${ORACLE_BASE:-n/a}"
+    echo "  OUD_BASE            = ${OUD_BASE:-n/a}"
+    echo "  LOG_BASE            = ${LOG_BASE:-n/a}"
+    echo "  ETC_BASE            = ${ETC_BASE:-n/a}"
+    echo "  ETC_CORE            = ${ETC_CORE:-n/a}"
+    echo "  JAVA_HOME           = ${JAVA_HOME:-n/a}"
+    echo "  ORACLE_HOME         = ${ORACLE_HOME:-n/a}"
 
-    echo "  DIRECTORY_TYPE      = ${DIRECTORY_TYPE-n/a}"
+    echo "  DIRECTORY_TYPE      = ${DIRECTORY_TYPE:-n/a}"
     if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-        echo "  OUD_INSTANCE        = ${OUD_INSTANCE-n/a}"
-        echo "  OUD_INSTANCE_BASE   = ${OUD_INSTANCE_BASE-n/a}"
-        echo "  OUD_INSTANCE_HOME   = ${OUD_INSTANCE_HOME-n/a}"
-        echo "  OUD_INSTANCE_ADMIN  = ${OUD_INSTANCE_ADMIN-n/a}"
-        echo "  PORT                = ${PORT-n/a}"
-        echo "  PORT_ADMIN          = ${PORT_ADMIN-n/a}"
-        echo "  PORT_REP            = ${PORT_REP-n/a}"
-        echo "  PORT_SSL            = ${PORT_SSL-n/a}"
-        echo "  PORT_REST_HTTP      = ${PORT_REST_HTTP-n/a}"
-        echo "  PORT_REST_HTTP      = ${PORT_REST_HTTP-n/a}"
+        echo "  OUD_INSTANCE        = ${OUD_INSTANCE:-n/a}"
+        echo "  OUD_INSTANCE_BASE   = ${OUD_INSTANCE_BASE:-n/a}"
+        echo "  OUD_INSTANCE_HOME   = ${OUD_INSTANCE_HOME:-n/a}"
+        echo "  OUD_INSTANCE_ADMIN  = ${OUD_INSTANCE_ADMIN:-n/a}"
+        echo "  PORT                = ${PORT:-n/a}"
+        echo "  PORT_ADMIN          = ${PORT_ADMIN:-n/a}"
+        echo "  PORT_REP            = ${PORT_REP:-n/a}"
+        echo "  PORT_SSL            = ${PORT_SSL:-n/a}"
+        echo "  PORT_REST_HTTP      = ${PORT_REST_HTTP:-n/a}"
+        echo "  PORT_REST_HTTP      = ${PORT_REST_HTTP:-n/a}"
     elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
-        echo "  OUD_INSTANCE        = ${OUD_INSTANCE-n/a}"
-        echo "  ORACLE_FMW_HOME     = ${ORACLE_FMW_HOME-'n/a'}"
-        echo "  OUDSM_DOMAIN_BASE   = ${OUDSM_DOMAIN_BASE-n/a}"
-        echo "  PORT                = ${PORT-n/a}"
-        echo "  PORT_SSL            = ${PORT_SSL-n/a}"
+        echo "  OUD_INSTANCE        = ${OUD_INSTANCE:-n/a}"
+        echo "  ORACLE_FMW_HOME     = ${ORACLE_FMW_HOME:-'n/a'}"
+        echo "  OUDSM_DOMAIN_BASE   = ${OUDSM_DOMAIN_BASE:-n/a}"
+        echo "  PORT                = ${PORT:-n/a}"
+        echo "  PORT_SSL            = ${PORT_SSL:-n/a}"
     fi
     echo ""
     # get default aliases from oudenv.conf
@@ -844,12 +883,15 @@ if [ "${RECREATE}" = "TRUE" ]; then
 fi
 
 # set the new PATH
+update_path ${JAVA_HOME}/bin
+update_path ${ORACLE_HOME}
+update_path ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}
 if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-    export PATH=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME_BIN}:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
+    update_path ${OUD_INSTANCE_HOME_BIN:-"${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/bin"}
 elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
-    export PATH=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
+    update_path ${OUD_INSTANCE_HOME}/bin
 elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
-    export PATH=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}:${OUD_INSTANCE_HOME}/OUD/bin:${ORACLE_HOME}:${JAVA_HOME}/bin:${PATH}
+    update_path ${OUD_INSTANCE_HOME}/OUD/bin
 fi
 
 # start to source stuff from ETC_CORE
