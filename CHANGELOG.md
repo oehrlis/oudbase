@@ -15,6 +15,13 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.4.3] - 2023.03.31
+
+### Fixed
+
+- Issue with *nounset* either disable it or catch return values
+- Fix issue with chsum file for tvdldap.tgz
+
 ## [3.4.2] - 2023.03.31
 
 ### Changed

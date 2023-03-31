@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.03.31
-# Version....: v3.4.2
+# Version....: v3.4.3
 # Usage......: 21_replication_add_host1.sh
 # Purpose....: simple script to add and initialize replication
 # Notes......:  
