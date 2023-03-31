@@ -67,8 +67,21 @@ echo "Create sha hash values for all files"
 find . -type f \( ! -iname ".DS_Store" ! -iname ".oudbase.sha" ! -iname "*.log" ! -iname "oudbase_install.sh" ! -iname "oudbase_install.tgz" \) \
   -print0 | xargs -0 shasum >${SCRIPT_DIR}/../local/oudbase/doc/.oudbase.sha
 
-grep -Ev './templates/etc/oud|./templates/create|./bin/oud|./bin/setup|./etc/oud|./templates/logrotate.d|./templates/cron.d|./templates/etc/o|./templates/etc/i|./templates/etc/w|./templates/etc/h' cp ${SCRIPT_DIR}/../local/oudbase/doc/.oudbase.sha
- >${SCRIPT_DIR}/../local/oudbase/doc/.tvdldap.sha
+cp ${SCRIPT_DIR}/../local/oudbase/doc/.oudbase.sha ${SCRIPT_DIR}/../local/oudbase/doc/.tvdldap.sha
+# clean up .oudbase.sha
+sed -i "\|./doc/.tvdldap.sha|d" ${SCRIPT_DIR}/../local/oudbase/doc/.oudbase.sha
+
+# clean up .tvdldap.sha
+sed -i "\|./templates/etc/o|d" ${SCRIPT_DIR}/../local/oudbase/doc/.tvdldap.sha
+sed -i "\|./templates/create|d" ${SCRIPT_DIR}/../local/oudbase/doc/.tvdldap.sha
+sed -i "\|./bin/oud|d" ${SCRIPT_DIR}/../local/oudbase/doc/.tvdldap.sha
+sed -i "\|./bin/setup|d" ${SCRIPT_DIR}/../local/oudbase/doc/.tvdldap.sha
+sed -i "\|./etc/oud|d" ${SCRIPT_DIR}/../local/oudbase/doc/.tvdldap.sha
+sed -i "\|./templates/logrotate.d|d" ${SCRIPT_DIR}/../local/oudbase/doc/.tvdldap.sha
+sed -i "\|./templates/cron.d|d" ${SCRIPT_DIR}/../local/oudbase/doc/.tvdldap.sha
+sed -i "\|./templates/etc/i|d" ${SCRIPT_DIR}/../local/oudbase/doc/.tvdldap.sha
+sed -i "\|./templates/etc/w|d" ${SCRIPT_DIR}/../local/oudbase/doc/.tvdldap.sha
+sed -i "\|./templates/etc/h|d" ${SCRIPT_DIR}/../local/oudbase/doc/.tvdldap.sha
 
 # Tar all together
 echo "Put all together in a tar"
