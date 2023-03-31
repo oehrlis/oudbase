@@ -95,7 +95,6 @@ function DoMsg() {
             shift
         done
     fi
-    set -o nounset                      # exit if script try to use an uninitialised variable
 }
 
 # ------------------------------------------------------------------------------
