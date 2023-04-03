@@ -15,6 +15,13 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.4.5] - 2023.04.03
+
+### Fixed
+
+- Fix issue with undefined variable in *oudenv.sh* and wrong order
+- change mode of *test_scripts.sh* to 755
+
 ## [3.4.4] - 2023.04.03
 
 ### Fixed

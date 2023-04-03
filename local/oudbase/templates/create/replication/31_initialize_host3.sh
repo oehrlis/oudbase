@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.04.03
-# Version....: v3.4.4
+# Version....: v3.4.5
 # Usage......: 31_initialize_host3.sh
 # Purpose....: simple script to initialize replication on HOST3 from HOST1
 # Notes......:  
