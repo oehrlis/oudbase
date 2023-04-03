@@ -52,22 +52,22 @@ for i in $SUFFIXES; do
     echo "${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY0 -b $i -N <Net String>"
     ${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY0 -b "$i" -N "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.1.1.12)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=TDB02.trivadislabs.com)))"
 done
-echo "${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY.${SUFFIX} -N <Net String>"
+echo "${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY1.${SUFFIX} -N <Net String>"
 ${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY.${SUFFIX} -N "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.1.1.12)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=TDB02.trivadislabs.com)))"
 
-echo "${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY.${SUFFIX} -N <Net String>"
+echo "${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY1.${SUFFIX} -N <Net String>"
 ${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY.${SUFFIX} -N "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.1.1.12)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=TDB02.trivadislabs.com)))"
 
-echo "${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY.${SUFFIX} -N <Net String> -F"
+echo "${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY1.${SUFFIX} -N <Net String> -F"
 ${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY.${SUFFIX} -N "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.1.1.12)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=TDB02.trivadislabs.com)))" -F
 
 echo "${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY2 -b ALL -N <Net String> -F"
 ${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY2 -b ALL -N "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.1.1.12)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=TDB02.trivadislabs.com)))" -F
 
-echo "${TVDLDAP_BIN_DIR}/tns_modify.sh -S DUMMY1.${SUFFIX} -N <Net String>"
+echo "${TVDLDAP_BIN_DIR}/tns_modify.sh -S DUMMY3.${SUFFIX} -N <Net String>"
 ${TVDLDAP_BIN_DIR}/tns_modify.sh -S DUMMY1.${SUFFIX} -N "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.1.1.12)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=TDB02.trivadislabs.com)))"
 
-echo "${TVDLDAP_BIN_DIR}/tns_modify.sh -S DUMMY1.${SUFFIX} -N <Net String> -F"
+echo "${TVDLDAP_BIN_DIR}/tns_modify.sh -S DUMMY3.${SUFFIX} -N <Net String> -F"
 ${TVDLDAP_BIN_DIR}/tns_modify.sh -S DUMMY1.${SUFFIX} -N "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.1.1.12)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=TDB02.trivadislabs.com)))" -F
 
 echo "${TVDLDAP_BIN_DIR}/tns_search.sh -S DUMMY* -b ${SUFFIX}"
