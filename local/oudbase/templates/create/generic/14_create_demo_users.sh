@@ -5,8 +5,8 @@
 # Name.......: 14_create_demo_users.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.03.31
-# Version....: v3.4.3
+# Date.......: 2023.04.03
+# Version....: v3.4.4
 # Purpose....: Script to create a couple of users and groups.
 # Notes......: BaseDN in 02_config_basedn.ldif will be updated before
 #              it is loaded using ldapmodify.

@@ -5,8 +5,8 @@
 # Name.......: setup_oud.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.03.31
-# Version....: v3.4.3
+# Date.......: 2023.04.03
+# Version....: v3.4.4
 # Purpose....: generic script to install Oracle Unified Directory binaries.
 # Notes......: Script would like to be executed as oracle :-).
 # Reference..: --
@@ -32,7 +32,7 @@ DEFAULT_OUD_ONEOFF_PKGS=""
 # - End of Customization -------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v3.4.3
+VERSION=v3.4.4
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"

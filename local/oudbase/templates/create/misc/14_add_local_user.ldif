@@ -5,7 +5,7 @@
 # Name.......: 14_add_local_user.ldif
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.03.31
+# Date.......: 2023.04.03
 # Usage......: ldapmodify -h $(hostname) -p ${PORT} -D "cn=Directory Manager" \
 #              -w PASSWORD -c -f 17_add_local_user.ldif
 # Purpose....: LDIF File to configure local user

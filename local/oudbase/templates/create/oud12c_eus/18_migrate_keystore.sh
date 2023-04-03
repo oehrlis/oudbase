@@ -5,8 +5,8 @@
 # Name.......: 18_migrate_keystore.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.03.31
-# Version....: v3.4.3
+# Date.......: 2023.04.03
+# Version....: v3.4.4
 # Purpose....: Script to migrate the java keystore to PKCS12
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase

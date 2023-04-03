@@ -15,6 +15,16 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.4.4] - 2023.04.03
+
+### Fixed
+
+- Fix issue with undefined variable in *oudenv.sh*
+- Handle error when *oud_backup.sh* is executed on a system without OUD instance,
+  e.g. when no instances are defined / found.
+- Handle error when *oud_export.sh* is executed on a system without OUD instance,
+  e.g. when no instances are defined / found.
+
 ## [3.4.3] - 2023.03.31
 
 ### Fixed

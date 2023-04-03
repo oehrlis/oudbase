@@ -5,8 +5,8 @@
 # Name.......: 03_config_NET_realm.ldif
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.03.31
-# Version....: v3.4.3
+# Date.......: 2023.04.03
+# Version....: v3.4.4
 # Purpose....: NET realm configuration for the user and group search base
 # Notes......: The LDIF file is loaded by the script 03_config_NET_realm.sh 
 #              If necessary it can also be imported manually.

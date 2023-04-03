@@ -5,8 +5,8 @@
 # Name.......: tns_dump.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.03.31
-# Version....: v3.4.3
+# Date.......: 2023.04.03
+# Version....: v3.4.4
 # Purpose....: Dump entries as tnsnames.ora
 # Notes......: --
 # Reference..: --
@@ -28,7 +28,7 @@ set -o noglob                       # Disable filename expansion (globbing).
 
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v3.4.3
+VERSION=v3.4.4
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode
