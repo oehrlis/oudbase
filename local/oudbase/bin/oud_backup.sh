@@ -167,7 +167,14 @@ fi
  
 # remove newline in OUD_INST_LIST
 OUD_INST_LIST=$(echo ${OUD_INST_LIST}|tr '\n' ' ')
-DoMsg "INFO : Initiate backup for OUD instances ${OUD_INST_LIST}"
+
+# check if we do have a list of OUD instances to backup
+if [ -z "${OUD_INST_LIST// /}" ]; then
+    DoMsg "WARN : No OUD instance defined/found"
+    CleanAndQuit 54
+else
+    DoMsg "INFO : Initiate backup for OUD instances ${OUD_INST_LIST}"
+fi
  
 # define backup type incremental
 if [ "${TYPE^^}" = "INCREMENTAL" ]; then

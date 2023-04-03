@@ -182,8 +182,15 @@ fi
  
 # remove newline in OUD_INST_LIST
 OUD_INST_LIST=$(echo ${OUD_INST_LIST}|tr '\n' ' ')
-DoMsg "INFO : Initiate export for OUD instances ${OUD_INST_LIST}"
- 
+
+# check if we do have a list of OUD instances to backup
+if [ -z "${OUD_INST_LIST// /}" ]; then
+    DoMsg "WARN : No OUD instance defined/found"
+    CleanAndQuit 54
+else
+    DoMsg "INFO : Initiate export for OUD instances ${OUD_INST_LIST}"
+fi
+
 # Loop over OUD Instances
 for oud_inst in ${OUD_INST_LIST}; do
     # Load OUD environment
