@@ -717,7 +717,9 @@ fi
 if [ -f "${OUDTAB}" ] && [ $(grep -c -E $ORATAB_PATTERN "${OUDTAB}") -gt 0 ]; then
     # create a OUD Instance list based on oudtab and remove newlines|
     export OUD_INST_LIST=$(grep -E $ORATAB_PATTERN "${OUDTAB}"|cut -f1 -d:|tr '\n' ' ')
+    OUD_INST_LIST=${OUD_INST_LIST:-""}
     export REAL_OUD_INST_LIST=$(grep -E $ORATAB_PATTERN_OUD "${OUDTAB}"|cut -f1 -d:|tr '\n' ' ')
+    OUD_INST_LIST=${REAL_OUD_INST_LIST:-""}
 else
     echo "WARN : oudtab (${OUDTAB}) does not exist or is empty. Create a new one."
     echo "${OUDTAB_COMMENT}" >"${OUDTAB}"
@@ -882,6 +884,11 @@ if [ "${RECREATE}" = "TRUE" ]; then
     fi
 fi
 
+# set a few default values for undefined variables
+OUD_INSTANCE_HOME=${OUD_INSTANCE_HOME:-${OUD_INSTANCE_BASE}/${OUD_INSTANCE}}
+OUD_INST_LIST=${OUD_INST_LIST:-""}
+OUD_INST_LIST=${REAL_OUD_INST_LIST:-""}
+OUD_INSTANCE_ADMIN=${OUD_INSTANCE_ADMIN:-${OUD_ADMIN_BASE}/${OUD_INSTANCE}}
 # set the new PATH
 update_path ${JAVA_HOME}/bin
 update_path ${ORACLE_HOME}
@@ -893,7 +900,6 @@ elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
 elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
     update_path ${OUD_INSTANCE_HOME}/OUD/bin
 fi
-
 # start to source stuff from ETC_CORE
 # source oudenv.conf file from core etc directory if it exits
 if [ -f "${ETC_CORE}/oudenv.conf" ]; then
