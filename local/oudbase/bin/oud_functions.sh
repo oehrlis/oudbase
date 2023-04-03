@@ -149,6 +149,7 @@ function CleanAndQuit() {
         51) DoMsg "ERR  : Exit Code ${error}. Connection Handler ${error_value} is not enabled on ${OUD_INSTANCE}";;
         52) DoMsg "ERR  : Exit Code ${error}. Error in Replication for OUD Instance ${OUD_INSTANCE}. Check replication log ${ORACLE_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/logs for more information";;
         53) DoMsg "ERR  : Exit Code ${error}. Error OUDSM console ${error_value} is not available";;
+        54) DoMsg "ERR  : Exit Code ${error}. Can not proceed, no OUD instance defined/found";;
         60) DoMsg "ERR  : Exit Code ${error}. Force mail enabled but no e-Mail adress specified";;
         70) DoMsg "ERR  : Exit Code ${error}. Error starting instances ${error_value}";;
         71) DoMsg "ERR  : Exit Code ${error}. Error unknown activity ${error_value}";;
