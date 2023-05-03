@@ -5,8 +5,8 @@
 # Name.......: 01_create_eus_proxy_instance.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.04.03
-# Version....: v3.4.5
+# Date.......: 2023.05.03
+# Version....: v3.4.6
 # Purpose....: Script to create the OUD instance with EUS context 
 #              using oud-proxy-setup.
 # Notes......: Will skip oud-proxy-setup if config.ldif already exists

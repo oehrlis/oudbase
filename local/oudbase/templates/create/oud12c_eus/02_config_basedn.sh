@@ -5,8 +5,8 @@
 # Name.......: 02_config_basedn.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.04.03
-# Version....: v3.4.5
+# Date.......: 2023.05.03
+# Version....: v3.4.6
 # Purpose....: Script to configure base DN and add ou's for users and groups.
 # Notes......: BaseDN in 02_config_basedn.ldif will be updated before
 #              it is loaded using ldapmodify.

@@ -5,8 +5,8 @@
 # Name.......: 31_initialize_host2.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.04.03
-# Version....: v3.4.5
+# Date.......: 2023.05.03
+# Version....: v3.4.6
 # Usage......: 31_initialize_host2.sh
 # Purpose....: simple script to initialize replication on HOST2 from HOST1
 # Notes......:  

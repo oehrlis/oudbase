@@ -5,8 +5,8 @@
 # Name.......: 15_reset_user_passwords.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.04.03
-# Version....: v3.4.5
+# Date.......: 2023.05.03
+# Version....: v3.4.6
 # Usage......: 15_reset_user_passwords.sh
 # Purpose....: Script to reset admin user passwords
 # Notes......: 
