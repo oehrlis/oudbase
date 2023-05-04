@@ -135,7 +135,7 @@ elif [[ ${PAYLOAD_BASE64} -ne 0 ]]; then
              bin/oudbase_install.sh >${SCRIPT_DIR}/oudbase_install.sh
     # set the payload pointer
     echo "__TAR_PAYLOAD__" >>${SCRIPT_DIR}/oudbase_install.sh
-    cat ${SCRIPT_DIR}/oudbase_install.tgz |base64 - >>${SCRIPT_DIR}/oudbase_install.sh
+    cat ${SCRIPT_DIR}/oudbase_install.tgz |openssl base64 >>${SCRIPT_DIR}/oudbase_install.sh
 fi
 
 # clean up
