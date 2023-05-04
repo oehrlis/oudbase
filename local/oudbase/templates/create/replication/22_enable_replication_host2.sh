@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.05.04
-# Version....: v3.4.7
+# Version....: v3.4.8
 # Usage......: 22_enable_replication_host2.sh
 # Purpose....: simple script to enable and initialize replication
 # Notes......:  

@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.05.04
-# Version....: v3.4.7
+# Version....: v3.4.8
 # Purpose....: Wrapper Script for oud_start_stop.sh to start/stop OUD Instances 
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
@@ -18,7 +18,7 @@
 # ------------------------------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v3.4.7
+VERSION=v3.4.8
 SCRIPT_NAME=$(basename $0)
 export OUDBASE_BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 # - End of Default Values ------------------------------------------------------

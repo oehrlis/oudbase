@@ -6,7 +6,7 @@
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.05.04
-# Version....: v3.4.7
+# Version....: v3.4.8
 # Purpose....: Bash Script to get the instance status as retun code
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
@@ -23,7 +23,7 @@ export OUD_CON_HANDLER=${OUD_CON_HANDLER:-"LDAP LDAPS"}
 # - End of Customization -------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v3.4.7
+VERSION=v3.4.8
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 SCRIPT_NAME=$(basename $0)
