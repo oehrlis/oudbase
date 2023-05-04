@@ -489,6 +489,15 @@ if [ -f "${ETC_BASE}/oudtab.new" ]; then
     fi
 fi
 
+# clean upd oudenv.conf
+if [ -f "${ETC_BASE}/oudenv.conf.new" ]; then
+    if [ $(diff -b -I '^#' -I '^ #'  ${ETC_BASE}/oudenv.conf.new ${ETC_BASE}/oudenv.conf|wc -l) -eq 0]; then
+        mv ${ETC_BASE}/oudenv.conf.new ${ETC_BASE}/oudenv.conf
+    else
+        echo "INFO : New configuration file please check changes manually using diff"
+    fi
+fi
+
 # move config files
 if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
     for i in ${CONFIG_FILES}; do
