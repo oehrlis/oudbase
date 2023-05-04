@@ -15,6 +15,13 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.4.7] - 2023.05.04
+
+### Fixed
+
+- Repair broken build / package issue with *base64* encoding
+- change encoding to OpenSSL based e.g. `openssl base64`
+
 ## [3.4.6] - 2023.05.03
 
 ### Changed
