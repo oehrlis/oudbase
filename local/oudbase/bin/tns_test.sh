@@ -5,8 +5,8 @@
 # Name.......: tns_test.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.05.03
-# Version....: v3.4.6
+# Date.......: 2023.05.04
+# Version....: v3.4.7
 # Purpose....: Test LDAP entries using tnsping and sqlplus
 # Notes......: --
 # Reference..: --
@@ -27,7 +27,7 @@ set -o nounset                      # exit if script try to use an uninitialised
 set -o noglob                       # Disable filename expansion (globbing).
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v3.4.6
+VERSION=v3.4.7
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode

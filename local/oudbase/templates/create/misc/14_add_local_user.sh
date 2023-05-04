@@ -6,7 +6,7 @@
 # Name.......: 14_add_local_user.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.05.03
+# Date.......: 2023.05.04
 # Usage......: 14_add_local_user.sh
 # Purpose....: Script to add local users
 # Notes......: Script does load the LDIF file 14_add_local_user.ldif. 

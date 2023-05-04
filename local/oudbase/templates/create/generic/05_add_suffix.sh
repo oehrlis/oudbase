@@ -5,8 +5,8 @@
 # Name.......: 05_add_suffix.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.05.03
-# Version....: v3.4.6
+# Date.......: 2023.05.04
+# Version....: v3.4.7
 # Usage......: 05_add_suffix.sh
 # Purpose....: Simple script to add the different NET suffixes
 # Notes......: 
