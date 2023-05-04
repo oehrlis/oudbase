@@ -495,6 +495,7 @@ if [ -f "${ETC_BASE}/oudenv.conf.new" ]; then
         mv ${ETC_BASE}/oudenv.conf.new ${ETC_BASE}/oudenv.conf
     else
         echo "INFO : New configuration file please check changes manually using diff"
+        echo "INFO : ${ETC_BASE}/oudenv.conf.new ${ETC_BASE}/oudenv.conf"
     fi
 fi
 
