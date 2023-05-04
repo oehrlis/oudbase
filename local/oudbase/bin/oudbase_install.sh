@@ -491,7 +491,7 @@ fi
 
 # clean upd oudenv.conf
 if [ -f "${ETC_BASE}/oudenv.conf.new" ]; then
-    if [ $(diff -b -I '^#' -I '^ #'  ${ETC_BASE}/oudenv.conf.new ${ETC_BASE}/oudenv.conf|wc -l) -eq 0]; then
+    if [ $(diff -b -I '^#' -I '^ #'  ${ETC_BASE}/oudenv.conf.new ${ETC_BASE}/oudenv.conf|wc -l) -eq 0 ]; then
         mv ${ETC_BASE}/oudenv.conf.new ${ETC_BASE}/oudenv.conf
     else
         echo "INFO : New configuration file please check changes manually using diff"
