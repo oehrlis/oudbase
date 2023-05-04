@@ -13,5 +13,5 @@ d9c394afe23479867892a8d72573e9f86f41d345  ./templates/etc/tvdldap_custom.templat
 367c2fc153d42d0c84465075dafa9de49f96625c  ./templates/.bash_profile
 7df059597099bb7dcf25d2a9aedfaf4465f72d8d  ./doc/LICENSE
 45ffc752966288668d9a9f1aef8440c1dec26e22  ./doc/README.md
-b97199b12a372d11c967e618435ac3d229f9987f  ./doc/.tvdldap.sha
+2f61499a6eff3f001fd3eedf10597da0a7ab79da  ./doc/.tvdldap.sha
 9110f55c744d14171ff5d41b639635f4cdb61133  ./doc/.version
