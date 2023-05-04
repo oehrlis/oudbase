@@ -15,6 +15,14 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.4.8] - 2023.05.04
+
+### Fixed
+
+- update installation script to update *oudenv.conf* with *oudenv.conf.new* if
+  just the comment is different. If the file itself differs a info message during
+  installation inform about additional manual steps. e.g. use diff to check the file.
+
 ## [3.4.7] - 2023.05.04
 
 ### Fixed
