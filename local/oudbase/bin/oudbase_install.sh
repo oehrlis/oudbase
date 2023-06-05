@@ -585,7 +585,8 @@ if [ "${APPEND_PROFILE}" = "TRUE" ]; then
     echo "if [ -z \"\$PS1\" ]; then"                                    >>"${PROFILE}"
     echo "    . \${OUD_BASE}/bin/oudenv.sh SILENT"                      >>"${PROFILE}"
     echo "else"                                                         >>"${PROFILE}"
-    echo "    . \${OUD_BASE}/bin/oudenv.sh"                             >>"${PROFILE}"
+    echo "    . \${OUD_BASE}/bin/oudenv.sh SILENT"                      >>"${PROFILE}"
+    echo "    oud_up"                                                   >>"${PROFILE}"
     echo "fi"                                                           >>"${PROFILE}"
 else
     DoMsg "INFO : Please manual adjust your .bash_profile to load / source your OUD Environment"
@@ -606,7 +607,8 @@ else
     DoMsg "if [ -z \"\$PS1\" ]; then"
     DoMsg "    . \${OUD_BASE}/bin/oudenv.sh SILENT"
     DoMsg "else"
-    DoMsg "    . \${OUD_BASE}/bin/oudenv.sh"
+    echo "    . \${OUD_BASE}/bin/oudenv.sh SILENT"
+    echo "    oud_up"
     DoMsg "fi"
 fi
 

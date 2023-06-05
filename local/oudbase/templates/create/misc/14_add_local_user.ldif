@@ -1,9 +1,8 @@
-# -----------------------------------------------------------------------
-# Trivadis AG, Business Development & Support (BDS)
-# Saegereistrasse 29, 8152 Glattbrugg, Switzerland
-# -----------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# OraDBA - Oracle Database Infrastructur and Security, 5630 Muri, Switzerland
+# ------------------------------------------------------------------------------
 # Name.......: 14_add_local_user.ldif
-# Author.....: Stefan Oehrli (oes) stefan.oehrli@trivadis.com
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.05.04
 # Usage......: ldapmodify -h $(hostname) -p ${PORT} -D "cn=Directory Manager" \

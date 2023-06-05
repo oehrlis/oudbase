@@ -7,7 +7,7 @@ version: 1
 # Editor.....: Stefan Oehrli
 # Date.......: 2023.05.04
 # Version....: v3.4.8
-# Purpose....: Trivadis LAB LDIF file for regular LDAP
+# Purpose....: LAB LDIF file for regular LDAP
 # Notes......: 
 # Reference..: --
 # License....: Apache License Version 2.0, January 2004 as shown
