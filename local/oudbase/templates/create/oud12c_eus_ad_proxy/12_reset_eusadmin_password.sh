@@ -5,8 +5,8 @@
 # Name.......: 18_reset_eusadmin_password.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.05.04
-# Version....: v3.4.8
+# Date.......: 2024.02.28
+# Version....: v3.4.9
 # Usage......: 18_reset_eusadmin_password.sh
 # Purpose....: Script to reset eusadmin user password
 # Notes......: 

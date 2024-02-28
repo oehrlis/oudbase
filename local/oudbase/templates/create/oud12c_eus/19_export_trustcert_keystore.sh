@@ -5,8 +5,8 @@
 # Name.......: 10_export_trustcert_keystore.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.05.04
-# Version....: v3.4.8
+# Date.......: 2024.02.28
+# Version....: v3.4.9
 # Purpose....: Script to export the java keystore to PKCS12
 # Notes......: --
 # Reference..: https://github.com/oehrlis/oudbase

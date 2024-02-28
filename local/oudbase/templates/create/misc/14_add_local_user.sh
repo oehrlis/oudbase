@@ -5,7 +5,7 @@
 # Name.......: 14_add_local_user.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.05.04
+# Date.......: 2024.02.28
 # Usage......: 14_add_local_user.sh
 # Purpose....: Script to add local users
 # Notes......: Script does load the LDIF file 14_add_local_user.ldif. 

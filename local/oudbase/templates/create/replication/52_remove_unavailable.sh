@@ -5,8 +5,8 @@
 # Name.......: 52_remove_unavailable.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.05.04
-# Version....: v3.4.8
+# Date.......: 2024.02.28
+# Version....: v3.4.9
 # Usage......: 52_remove_unavailable.sh
 # Purpose....: Script to remove unavailable replication hosts
 # Notes......:  

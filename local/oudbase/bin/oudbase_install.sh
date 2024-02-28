@@ -5,8 +5,8 @@
 # Name.......: oudbase_install.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.05.04
-# Version....: v3.4.8
+# Date.......: 2024.02.28
+# Version....: v3.4.9
 # Purpose....: This script is used as base install script for the OUD 
 #              Environment
 # Notes......: --
@@ -23,7 +23,7 @@ export LOG_BASE=${LOG_BASE-"/tmp"}
 # - End of Customization -------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v3.4.8
+VERSION=v3.4.9
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="TRUE"                                  # enable verbose mode
 SCRIPT_NAME="$(basename ${BASH_SOURCE[0]})"     # Basename of the script

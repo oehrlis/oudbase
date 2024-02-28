@@ -5,8 +5,8 @@ version: 1
 # Name.......: 14_create_demo_users.ldif 
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2023.05.04
-# Version....: v3.4.8
+# Date.......: 2024.02.28
+# Version....: v3.4.9
 # Purpose....: LAB LDIF file for regular LDAP
 # Notes......: 
 # Reference..: --

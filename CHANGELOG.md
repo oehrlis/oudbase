@@ -15,6 +15,12 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.4.9] - 2024.02.28
+
+### Changed
+
+- Update default Patch IDs to Oracle January Critical Patch Advisory
+
 ## [3.4.8] - 2023.05.04
 
 ### Fixed
