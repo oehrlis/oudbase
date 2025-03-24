@@ -5,8 +5,8 @@
 # Name.......: 51_remove_hostX.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2024.02.28
-# Version....: v3.4.9
+# Date.......: 2025.03.24
+# Version....: v3.5.0
 # Usage......: 51_remove_hostX.sh
 # Purpose....: Simple script to remove replication on a host, where the value of
 #              the host is derived from the script name. e.g. 51_remove_host3.sh

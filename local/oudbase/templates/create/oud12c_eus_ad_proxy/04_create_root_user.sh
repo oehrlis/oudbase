@@ -5,8 +5,8 @@
 # Name.......: 04_create_root_user.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2024.02.28
-# Version....: v3.4.9
+# Date.......: 2025.03.24
+# Version....: v3.5.0
 # Usage......: 04_create_root_user.sh
 # Purpose....: Script für das erstellen der root User
 # Notes......: Das Script für die dsconfig Kommandos aus 04_create_root_user.conf

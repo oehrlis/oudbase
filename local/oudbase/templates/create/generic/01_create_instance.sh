@@ -5,8 +5,8 @@
 # Name.......: 01_create_instance.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2024.02.28
-# Version....: v3.4.9
+# Date.......: 2025.03.24
+# Version....: v3.5.0
 # Purpose....: Script to create the OUD instance with EUS context 
 #              using oud-setup.
 # Notes......: Will skip oud-proxy-setup if config.ldif already exists

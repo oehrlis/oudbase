@@ -5,8 +5,8 @@
 # Name.......: setup_oud_instance
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2024.02.28
-# Version....: v3.4.9
+# Date.......: 2025.03.24
+# Version....: v3.5.0
 # Usage......: setup_oud_instance
 # Purpose....: Script to create the OUD instance
 # Notes......: The script will go execute all 0?_*.sh and 1?_*.sh files
