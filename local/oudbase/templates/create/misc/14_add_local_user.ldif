@@ -4,7 +4,7 @@
 # Name.......: 14_add_local_user.ldif
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.03.24
+# Date.......: 2025.05.28
 # Usage......: ldapmodify -h $(hostname) -p ${PORT} -D "cn=Directory Manager" \
 #              -w PASSWORD -c -f 17_add_local_user.ldif
 # Purpose....: LDIF File to configure local user

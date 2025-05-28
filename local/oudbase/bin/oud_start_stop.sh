@@ -5,8 +5,8 @@
 # Name.......: oud_start_stop.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.03.24
-# Version....: v3.5.0
+# Date.......: 2025.05.28
+# Version....: v3.6.0
 # Purpose....: Bash Script to start/stop OUD Instances 
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
@@ -21,7 +21,7 @@
 # - End of Customization -------------------------------------------------------
  
 # - Default Values ------------------------------------------------------
-VERSION=v3.5.0
+VERSION=v3.6.0
 DOAPPEND="TRUE"                                 # enable log file append
 VERBOSE="FALSE"                                 # enable verbose mode
 FORCE="FALSE"                                   # enable force restart

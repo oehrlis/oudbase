@@ -5,8 +5,8 @@
 # Name.......: oud_functions.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.03.24
-# Version....: v3.5.0
+# Date.......: 2025.05.28
+# Version....: v3.6.0
 # Purpose....: Common OUD Base functions.
 # Notes......: Has to be source in the vagrant provisioning bash scripts to load
 #              environment and default values based on vagrant.yml 
@@ -23,7 +23,7 @@
 
 # - Environment Variables ------------------------------------------------------
 # define default values 
-VERSION=v3.5.0
+VERSION=v3.6.0
 DOAPPEND=${DOAPPEND:-"TRUE"}                    # enable log file append
 VERBOSE=${VERBOSE:-"FALSE"}                     # enable verbose mode
 DEBUG=${DEBUG:-"FALSE"}                         # enable debug mode

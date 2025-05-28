@@ -15,6 +15,17 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.6.0] - 2025.05.28
+
+### Changed
+
+- add the latest update and patch ids
+
+### Fixed
+
+- fix no wrap option in ldapsearch_options for OUD *ldapasearch*
+- Set *OUD_LOCAL* based on *OUD_BASE*
+
 ## [3.5.0] - 2025.03.24
 
 ### Changed

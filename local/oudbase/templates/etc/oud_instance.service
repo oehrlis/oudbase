@@ -3,8 +3,8 @@
 # ------------------------------------------------------------------------------
 # File-Name..: oud_instance.service
 # Author.....: Stefan Oehrli, stefan.oehrli@oradba.ch
-# Date.......: 2025.03.24
-# Version....: v3.5.0
+# Date.......: 2025.05.28
+# Version....: v3.6.0
 # Purpose....: This is a template file for a systemd unit file for Oracle Unified 
 #              Directory instance. Adjust user, group, service name directory
 #              path before using it.
