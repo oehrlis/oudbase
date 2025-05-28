@@ -5,8 +5,8 @@
 # Name.......: oudenv.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.03.24
-# Version....: v3.5.0
+# Date.......: 2025.05.28
+# Version....: v3.6.0
 # Purpose....: Bash Source File to set the environment for OUD Instances
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
@@ -22,7 +22,7 @@
 # externally. In principle, these variables should not be changed at this 
 # point. The customization should be done externally in .bash_profile or 
 # in oudenv_core.conf.
-VERSION=v3.5.0
+VERSION=v3.6.0
 
 # define some binaries for later user
 PGREP_BIN=$(command -v pgrep)                                   # get the binary for pgrep
@@ -81,7 +81,7 @@ DEFAULT_ORACLE_BASE=${OUDENV_SCRIPT_DIR%%/${DEFAULT_OUD_LOCAL_BASE_NAME}/${DEFAU
 # default ORACLE_BASE or OUD_BASE
 export ORACLE_BASE=${ORACLE_BASE:-${DEFAULT_ORACLE_BASE}}
 export OUD_BASE=${OUD_BASE:-"${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/${DEFAULT_OUD_BASE_NAME}"}
-export OUD_LOCAL=${OUD_LOCAL:-"${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}"}
+export OUD_LOCAL=${OUD_LOCAL:-"$( dirname ${$OUD_BASE})"}
  
 # set the ETC_CORE to the oud base directory
 export ETC_CORE=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
