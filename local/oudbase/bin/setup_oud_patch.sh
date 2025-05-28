@@ -5,8 +5,8 @@
 # Name.......: setup_oud_patch.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.03.24
-# Version....: v3.5.0
+# Date.......: 2025.05.28
+# Version....: v3.6.0
 # Purpose....: Script to patch Oracle Unified Directory binaries
 # Notes......: - Script would like to be executed as oracle :-)
 #              - If the required software is not in /opt/stage, an attempt is
@@ -25,10 +25,10 @@
 DEFAULT_FMW_BASE_PKG="fmw_12.2.1.4.0_infrastructure_Disk1_1of1.zip"
 DEFAULT_OUD_BASE_PKG="p30188352_122140_Generic.zip"
 DEFAULT_OUD_PATCH_PKG="p37129794_122140_Generic.zip"
-DEFAULT_FMW_PATCH_PKG="p37453807_122140_Generic.zip"
-DEFAULT_OUD_OPATCH_PKG="p28186730_1394218_Generic.zip"
+DEFAULT_FMW_PATCH_PKG="p37714186_122140_Generic.zip"
+DEFAULT_OUD_OPATCH_PKG="p28186730_1394219_Generic.zip"
 DEFAULT_OUI_PATCH_PKG=""
-DEFAULT_COHERENCE_PATCH_PKG="p37351860_122140_Generic.zip"
+DEFAULT_COHERENCE_PATCH_PKG="p37658278_122140_Generic.zip"
 DEFAULT_OUD_ONEOFF_PKGS=""
 
 # ORACLE_HOME_NAME="oud12.2.1.4.0"                    # Name of the Oracle Home directory
@@ -36,7 +36,7 @@ DEFAULT_OUD_ONEOFF_PKGS=""
 # - End of Customization -------------------------------------------------------
 
 # - Default Values ------------------------------------------------------
-VERSION=v3.5.0
+VERSION=v3.6.0
 SCRIPT_NAME=$(basename $0)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
 START_HEADER="START: Start of ${SCRIPT_NAME} (Version ${VERSION}) with $*"
