@@ -5,8 +5,8 @@
 # Name.......: tns_functions.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.03.24
-# Version....: v3.5.0
+# Date.......: 2025.05.28
+# Version....: v3.6.0
 # Purpose....: Common functions used by the TNS bash scripts.
 # Notes......: --
 # Reference..: --
@@ -45,7 +45,7 @@ TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR=${TNS_ADMIN:-""}
 
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v3.5.0
+VERSION=v3.6.0
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode
@@ -214,7 +214,7 @@ function ldapsearch_options () {
     if [ "${TVDLDAP_LDAPTOOLS^^}" == "OPENLDAP" ]; then
         echo "-x -o ldif-wrap=no -LLL"
     elif [ "${TVDLDAP_LDAPTOOLS^^}" == "OUD" ]; then
-        echo "-o 'ldif-wrap=no'"
+        echo "-T -o 'ldif-wrap=no'"
     elif [ "${TVDLDAP_LDAPTOOLS^^}" == "DB" ]; then
         echo "-L"
     else
