@@ -81,8 +81,8 @@ DEFAULT_ORACLE_BASE=${OUDENV_SCRIPT_DIR%%/${DEFAULT_OUD_LOCAL_BASE_NAME}/${DEFAU
 # default ORACLE_BASE or OUD_BASE
 export ORACLE_BASE=${ORACLE_BASE:-${DEFAULT_ORACLE_BASE}}
 export OUD_BASE=${OUD_BASE:-"${ORACLE_BASE}/${DEFAULT_OUD_LOCAL_BASE_NAME}/${DEFAULT_OUD_BASE_NAME}"}
-export OUD_LOCAL=${OUD_LOCAL:-"$( dirname ${$OUD_BASE})"}
- 
+export OUD_LOCAL=${OUD_LOCAL:-"$(dirname "${OUD_BASE}")"}
+
 # set the ETC_CORE to the oud base directory
 export ETC_CORE=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
  
@@ -767,8 +767,11 @@ else
 fi
  
 # if not defined set default instance to first of OUD_INST_LIST
-export OUD_DEFAULT_INSTANCE=${OUD_DEFAULT_INSTANCE:-$(echo "$OUD_INST_LIST"|cut -f1 -d' ')}
-export OUD_DEFAULT_INSTANCE=${OUD_DEFAULT_INSTANCE:-"n/a"}
+if [ -n "$(echo "$OUD_INST_LIST"|cut -f1 -d' ')" ] ; then
+    OUD_DEFAULT_INSTANCE=$(echo "$OUD_INST_LIST"|cut -f1 -d' ')
+else
+    OUD_DEFAULT_INSTANCE="n/a"
+fi
  
 # set the last OUD instance to ...
 if [ "${OUD_INSTANCE}" = "" ]; then
