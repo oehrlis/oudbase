@@ -5,8 +5,8 @@
 # Name.......: 20_wait_for_host2.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.05.28
-# Version....: v3.6.0
+# Date.......: 2025.06.30
+# Version....: v3.6.1
 # Usage......: 20_wait_for_host2.sh
 # Purpose....: Script to wait for other host to be ready
 # Notes......:  

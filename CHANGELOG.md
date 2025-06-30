@@ -15,6 +15,13 @@ Latest releases are always available via [releases].
 
 ### Fixed
 
+## [3.6.1] - 2025.06.30
+
+### Fixed
+
+- change default value for OUD_INSTANCE
+- Fix issue with OUD_LOCAL
+
 ## [3.6.0] - 2025.05.28
 
 ### Changed

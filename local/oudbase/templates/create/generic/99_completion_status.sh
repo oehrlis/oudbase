@@ -5,8 +5,8 @@
 # Name.......: 99_completion_status.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.05.28
-# Version....: v3.6.0
+# Date.......: 2025.06.30
+# Version....: v3.6.1
 # Usage......: 99_completion_status.sh
 # Purpose....: simple touch completion status
 # Notes......:  

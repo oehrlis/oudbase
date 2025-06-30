@@ -5,8 +5,8 @@
 # Name.......: 41_verify_replication.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.05.28
-# Version....: v3.6.0
+# Date.......: 2025.06.30
+# Version....: v3.6.1
 # Usage......: 41_verify_replication.sh
 # Purpose....: simple script to verify replication status
 # Notes......:  

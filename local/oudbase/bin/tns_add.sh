@@ -5,8 +5,8 @@
 # Name.......: tns_add.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.05.28
-# Version....: v3.6.0
+# Date.......: 2025.06.30
+# Version....: v3.6.1
 # Purpose....: Add a tns entry
 # Notes......: --
 # Reference..: --
@@ -27,7 +27,7 @@ set -o pipefail                     # pipefail exit after 1st piped commands fai
 set -o noglob                       # Disable filename expansion (globbing).
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
-VERSION=v3.6.0
+VERSION=v3.6.1
 TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
 TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
 TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode

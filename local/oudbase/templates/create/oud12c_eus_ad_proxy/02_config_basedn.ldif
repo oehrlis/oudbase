@@ -5,8 +5,8 @@
 # Name.......: 02_config_basedn.ldif
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.05.28
-# Version....: v3.6.0
+# Date.......: 2025.06.30
+# Version....: v3.6.1
 # Purpose....: Configure base DN and add ou's for users and groups
 # Notes......: The LDIF file is loaded by the script 02_config_basedn.sh 
 #              If necessary it can also be imported manually.
