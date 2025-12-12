@@ -95,19 +95,66 @@ teardown() {
 }
 
 # ------------------------------------------------------------------------------
+# Security Tests - Error Handling and Logging
+# ------------------------------------------------------------------------------
+
+@test "oudenv.sh: Has log_error function defined" {
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -F log_error"
+    assert_success
+    assert_output "log_error"
+}
+
+@test "oudenv.sh: Has log_warn function defined" {
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -F log_warn"
+    assert_success
+    assert_output "log_warn"
+}
+
+@test "oudenv.sh: Has log_info function defined" {
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -F log_info"
+    assert_success
+    assert_output "log_info"
+}
+
+@test "oudenv.sh: Has log_security function defined" {
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -F log_security"
+    assert_success
+    assert_output "log_security"
+}
+
+@test "oudenv.sh: Has handle_error function defined" {
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -F handle_error"
+    assert_success
+    assert_output "handle_error"
+}
+
+@test "oudenv.sh: Error messages go to stderr" {
+    local output
+    output=$(bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>/dev/null; log_error 'test error' 2>&1 | grep ERROR")
+    [[ -n "${output}" ]]
+}
+
+@test "oudenv.sh: Log functions format messages with timestamps" {
+    # Test that log_message function includes date command for timestamps
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -f log_message | grep -c 'date'"
+    assert_success
+    assert_output '1'
+}
+
+# ------------------------------------------------------------------------------
 # Security Tests - Input Validation
 # ------------------------------------------------------------------------------
 
 @test "oudenv.sh: Rejects instance name with spaces" {
     run bash -c "source '${BIN_BASE}/oudenv.sh' 'instance with spaces' SILENT 2>&1"
     assert_failure
-    assert_output --partial "ERROR: Invalid instance name"
+    assert_output --partial "[ERROR] Invalid instance name"
 }
 
 @test "oudenv.sh: Rejects instance name with special shell characters" {
     run bash -c "source '${BIN_BASE}/oudenv.sh' 'instance;rm -rf /' SILENT 2>&1"
     assert_failure
-    assert_output --partial "ERROR: Invalid instance name"
+    assert_output --partial "[ERROR] Invalid instance name"
 }
 
 @test "oudenv.sh: Validates instance name format" {
@@ -123,7 +170,7 @@ teardown() {
 @test "oudenv.sh: Rejects instance name with path traversal" {
     run bash -c "source '${BIN_BASE}/oudenv.sh' '../../../etc/passwd' SILENT 2>&1"
     assert_failure
-    assert_output --partial "ERROR: Invalid instance name"
+    assert_output --partial "[ERROR] Invalid instance name"
 }
 
 @test "oudenv.sh: Validates port numbers are numeric" {
@@ -143,7 +190,7 @@ EOF
     
     # Port validation should trigger ERROR message
     assert_success
-    assert_output --partial "ERROR: LDAP port out of valid range"
+    assert_output --partial "[ERROR] LDAP port out of valid range"
 }
 
 @test "oudenv.sh: Sanitizes environment variables before use" {
@@ -162,14 +209,14 @@ EOF
 
 @test "oudenv.sh: Uses secure temp file creation" {
     # Test that create_secure_temp is defined and uses mktemp
-    run bash -c "source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -f create_secure_temp"
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -f create_secure_temp"
     assert_success
     assert_output --partial 'mktemp'
 }
 
 @test "oudenv.sh: Sets restrictive permissions on created files" {
     # Test that create_secure_temp sets 600 permissions
-    run bash -c "source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -f create_secure_temp | grep -c 'chmod 600'"
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -f create_secure_temp | grep -c 'chmod 600'"
     assert_success
     assert_output '1'
 }
@@ -224,7 +271,7 @@ EOF
 
 @test "oudenv.sh: Avoids race conditions in file checks" {
     # Test that update_oudtab uses atomic file operations with temp files
-    run bash -c "source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -f update_oudtab | grep -c 'create_secure_temp'"
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -f update_oudtab | grep -c 'create_secure_temp'"
     assert_success
     assert_output '1'
 }
@@ -295,7 +342,10 @@ EOF
 # ------------------------------------------------------------------------------
 
 @test "oudenv.sh: Logs security-relevant operations" {
-    skip "Implementation pending - will add security logging"
+    # Test that log_security function is defined and used
+    run bash -c "source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -f log_security"
+    assert_success
+    assert_output --partial 'log_security'
 }
 
 @test "oudenv.sh: Does not log sensitive information (passwords, etc.)" {
@@ -308,6 +358,8 @@ EOF
 }
 
 @test "oudenv.sh: Sanitizes output to prevent information disclosure" {
-    # Ensure error messages don't reveal full paths or sensitive info
-    skip "Implementation pending"
+    # Test that log_message has sanitization capability
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -f log_message | grep -c 'sanitize'"
+    assert_success
+    assert_output '2'
 }

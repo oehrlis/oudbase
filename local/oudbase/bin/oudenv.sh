@@ -86,10 +86,9 @@ export OUD_LOCAL=${OUD_LOCAL:-"$(dirname "${OUD_BASE}")"}
 # set the ETC_CORE to the oud base directory
 export ETC_CORE=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
  
-# source the core oudenv customization
-if [ -f "${ETC_CORE}/${OUD_CORE_CONFIG}" ]; then
-    safe_source "${ETC_CORE}/${OUD_CORE_CONFIG}" "core oudenv configuration" false
-fi
+# source the core oudenv customization (after functions are defined below)
+# Note: safe_source function is defined in the functions section
+# This is deferred until after function definitions
 
 # define location for OUD data
 export OUD_DATA=${OUD_DATA:-"${ORACLE_BASE}"}
@@ -114,6 +113,108 @@ export DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
 # - Functions ------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
+# Logging and Error Handling Functions
+# ------------------------------------------------------------------------------
+
+# Log file location (optional - if set, logs to file; otherwise stderr only)
+LOG_FILE=${LOG_FILE:-""}
+LOG_LEVEL=${LOG_LEVEL:-"INFO"}  # DEBUG, INFO, WARN, ERROR
+
+function log_message() {
+    # Purpose: Centralized logging function with level support
+    # Usage: log_message LEVEL "message" [sanitize_flag]
+    local level="${1:-INFO}"
+    local message="${2:-}"
+    local sanitize="${3:-false}"
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    
+    # Sanitize sensitive information if requested
+    if [[ "${sanitize}" == "true" ]]; then
+        # Remove common password patterns
+        message=$(echo "${message}" | sed -E 's/(password|passwd|pwd|secret|token)=[^[:space:]]*/\1=***REDACTED***/gi')
+        message=$(echo "${message}" | sed -E 's/(bindpw|bind_pw|admin_pw)[[:space:]]*=[[:space:]]*[^[:space:]]*/\1=***REDACTED***/gi')
+    fi
+    
+    # Format log message
+    local log_entry="[${timestamp}] [${level}] ${message}"
+    
+    # Output based on level
+    case "${level}" in
+        ERROR)
+            echo "${log_entry}" >&2
+            [[ -n "${LOG_FILE}" ]] && echo "${log_entry}" >> "${LOG_FILE}"
+            ;;
+        WARN)
+            echo "${log_entry}" >&2
+            [[ -n "${LOG_FILE}" ]] && echo "${log_entry}" >> "${LOG_FILE}"
+            ;;
+        INFO)
+            [[ "${LOG_LEVEL}" =~ ^(DEBUG|INFO)$ ]] && echo "${log_entry}"
+            [[ -n "${LOG_FILE}" ]] && echo "${log_entry}" >> "${LOG_FILE}"
+            ;;
+        DEBUG)
+            [[ "${LOG_LEVEL}" == "DEBUG" ]] && echo "${log_entry}"
+            [[ -n "${LOG_FILE}" ]] && echo "${log_entry}" >> "${LOG_FILE}"
+            ;;
+    esac
+}
+
+function log_error() {
+    # Purpose: Log error message
+    # Usage: log_error "error message" [sanitize_flag]
+    log_message "ERROR" "$1" "${2:-false}"
+}
+
+function log_warn() {
+    # Purpose: Log warning message
+    # Usage: log_warn "warning message" [sanitize_flag]
+    log_message "WARN" "$1" "${2:-false}"
+}
+
+function log_info() {
+    # Purpose: Log info message
+    # Usage: log_info "info message" [sanitize_flag]
+    log_message "INFO" "$1" "${2:-false}"
+}
+
+function log_debug() {
+    # Purpose: Log debug message
+    # Usage: log_debug "debug message"
+    log_message "DEBUG" "$1" false
+}
+
+function log_security() {
+    # Purpose: Log security-relevant operations
+    # Usage: log_security "security event description"
+    local message="[SECURITY] $1"
+    log_message "INFO" "${message}" false
+    
+    # Optionally write to separate security log
+    if [[ -n "${SECURITY_LOG_FILE:-}" ]]; then
+        local timestamp
+        timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+        echo "[${timestamp}] ${message}" >> "${SECURITY_LOG_FILE}"
+    fi
+}
+
+function handle_error() {
+    # Purpose: Centralized error handling with exit option
+    # Usage: handle_error exit_code "error message" [exit_flag]
+    local exit_code="${1:-1}"
+    local message="${2:-Unknown error}"
+    local should_exit="${3:-false}"
+    
+    log_error "${message}"
+    
+    if [[ "${should_exit}" == "true" ]]; then
+        exit "${exit_code}"
+    fi
+    
+    return "${exit_code}"
+}
+
+# ------------------------------------------------------------------------------
 # Input Validation and Sanitization Functions
 # ------------------------------------------------------------------------------
 
@@ -126,33 +227,33 @@ function validate_instance_name() {
     
     # Check if empty
     if [[ -z "${name}" ]]; then
-        echo "ERROR: Instance name cannot be empty" >&2
+        log_error "Instance name cannot be empty"
         return 1
     fi
     
     # Allow only alphanumeric, underscore, hyphen
     if [[ ! "${name}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
-        echo "ERROR: Invalid instance name '${name}'" >&2
-        echo "ERROR: Only alphanumeric characters, underscore, and hyphen are allowed" >&2
+        log_error "Invalid instance name '${name}'"
+        log_error "Only alphanumeric characters, underscore, and hyphen are allowed"
         return 1
     fi
     
     # Check length (max 255 chars for filesystem compatibility)
     if [[ ${#name} -gt 255 ]]; then
-        echo "ERROR: Instance name too long: ${#name} characters (max 255)" >&2
+        log_error "Instance name too long: ${#name} characters (max 255)"
         return 1
     fi
     
     # Prevent path traversal patterns
     if [[ "${name}" == *".."* ]] || [[ "${name}" == *"/"* ]]; then
-        echo "ERROR: Instance name contains invalid path characters" >&2
+        log_error "Instance name contains invalid path characters"
         return 1
     fi
     
     # Prevent reserved names
     case "${name}" in
         "." | ".." | "~" | "SILENT" | "silent")
-            echo "ERROR: Instance name '${name}' is reserved" >&2
+            log_error "Instance name '${name}' is reserved"
             return 1
             ;;
     esac
@@ -177,7 +278,7 @@ function validate_port() {
     
     # Check if numeric (no letters, special chars)
     if [[ ! "${port}" =~ ^[0-9]+$ ]]; then
-        echo "ERROR: ${port_name} must be numeric: '${port}'" >&2
+        log_error "${port_name} must be numeric: '${port}'"
         return 1
     fi
     
@@ -186,7 +287,7 @@ function validate_port() {
     
     # Check range (1-65535 for TCP/UDP ports)
     if (( port < 1 || port > 65535 )); then
-        echo "ERROR: ${port_name} out of valid range (1-65535): ${port}" >&2
+        log_error "${port_name} out of valid range (1-65535): ${port}"
         return 1
     fi
     
@@ -208,25 +309,25 @@ function sanitize_path() {
     
     # Check if empty
     if [[ -z "${path}" ]]; then
-        echo "ERROR: ${path_name} cannot be empty" >&2
+        log_error "${path_name} cannot be empty"
         return 1
     fi
     
     # Check for dangerous patterns
     if [[ "${path}" == *".."* ]]; then
-        echo "ERROR: ${path_name} contains path traversal sequence '..'" >&2
+        log_error "${path_name} contains path traversal sequence '..'"
         return 1
     fi
     
     # Check for null bytes (path injection)
     if [[ "${path}" == *$'\0'* ]]; then
-        echo "ERROR: ${path_name} contains null bytes" >&2
+        log_error "${path_name} contains null bytes"
         return 1
     fi
     
     # Check existence if required
     if [[ "${must_exist}" == "true" ]] && [[ ! -e "${path}" ]]; then
-        echo "ERROR: ${path_name} does not exist: ${path}" >&2
+        log_error "${path_name} does not exist: ${path}"
         return 1
     fi
     
@@ -246,7 +347,7 @@ function validate_directory_type() {
     
     # Check if empty
     if [[ -z "${dir_type}" ]]; then
-        echo "ERROR: Directory type cannot be empty" >&2
+        log_error "Directory type cannot be empty"
         return 1
     fi
     
@@ -257,8 +358,8 @@ function validate_directory_type() {
             return 0
             ;;
         *)
-            echo "ERROR: Invalid directory type '${dir_type}'" >&2
-            echo "ERROR: Allowed types: OUD, OUDSM, ODSEE" >&2
+            log_error "Invalid directory type '${dir_type}'"
+            log_error "Allowed types: OUD, OUDSM, ODSEE"
             return 1
             ;;
     esac
@@ -281,19 +382,19 @@ function sanitize_env_var() {
     
     # Check for shell metacharacters
     if [[ "${var_value}" =~ [\$\`\;\&\|\<\>] ]]; then
-        echo "ERROR: ${var_name} contains dangerous shell metacharacters" >&2
+        log_error "${var_name} contains dangerous shell metacharacters"
         return 1
     fi
     
     # Check for command substitution attempts
     if [[ "${var_value}" == *'$('* ]] || [[ "${var_value}" == *'`'* ]]; then
-        echo "ERROR: ${var_name} contains command substitution" >&2
+        log_error "${var_name} contains command substitution"
         return 1
     fi
     
     # Check for newlines (can break parsing)
     if [[ "${var_value}" == *$'\n'* ]]; then
-        echo "ERROR: ${var_name} contains newline characters" >&2
+        log_error "${var_name} contains newline characters"
         return 1
     fi
     
@@ -321,7 +422,7 @@ function safe_source() {
     # Check if file exists
     if [[ ! -e "${file}" ]]; then
         if [[ "${required}" == "true" ]]; then
-            echo "ERROR: Required ${file_desc} does not exist: ${file}" >&2
+            log_error "Required ${file_desc} does not exist: ${file}"
             return 1
         else
             return 0  # Optional file missing is OK
@@ -330,20 +431,20 @@ function safe_source() {
     
     # Check if it's a regular file (not symlink, device, etc.)
     if [[ ! -f "${file}" ]]; then
-        echo "ERROR: ${file_desc} is not a regular file: ${file}" >&2
+        log_error "${file_desc} is not a regular file: ${file}"
         return 1
     fi
     
     # Check if it's a symlink (security risk)
     if [[ -L "${file}" ]]; then
-        echo "ERROR: ${file_desc} is a symbolic link: ${file}" >&2
-        echo "ERROR: Sourcing symlinks is not allowed for security reasons" >&2
+        log_error "${file_desc} is a symbolic link: ${file}"
+        log_error "Sourcing symlinks is not allowed for security reasons"
         return 1
     fi
     
     # Check if readable
     if [[ ! -r "${file}" ]]; then
-        echo "ERROR: ${file_desc} is not readable: ${file}" >&2
+        log_error "${file_desc} is not readable: ${file}"
         return 1
     fi
     
@@ -355,7 +456,7 @@ function safe_source() {
         file_size=$(stat -c%s "${file}" 2>/dev/null || echo 0)
     fi
     if (( file_size > 1048576 )); then
-        echo "ERROR: ${file_desc} is too large (>1MB): ${file}" >&2
+        log_error "${file_desc} is too large (>1MB): ${file}"
         return 1
     fi
     
@@ -367,11 +468,12 @@ function safe_source() {
         perms=$(stat -c%a "${file}" 2>/dev/null)
     fi
     if [[ "${perms: -1}" == "2" ]] || [[ "${perms: -1}" == "6" ]]; then
-        echo "ERROR: ${file_desc} is world-writable: ${file}" >&2
+        log_error "${file_desc} is world-writable: ${file}"
         return 1
     fi
     
-    # All checks passed - source the file
+    # All checks passed - log and source the file
+    log_security "Sourcing ${file_desc}: ${file}"
     # shellcheck disable=SC1090
     . "${file}"
 }
@@ -391,13 +493,13 @@ function create_secure_dir() {
     if [[ -e "${dir}" ]]; then
         # Exists - verify it's actually a directory
         if [[ ! -d "${dir}" ]]; then
-            echo "ERROR: ${dir_desc} exists but is not a directory: ${dir}" >&2
+            log_error "${dir_desc} exists but is not a directory: ${dir}"
             return 1
         fi
         
         # Check if it's a symlink
         if [[ -L "${dir}" ]]; then
-            echo "ERROR: ${dir_desc} is a symbolic link: ${dir}" >&2
+            log_error "${dir_desc} is a symbolic link: ${dir}"
             return 1
         fi
         
@@ -406,7 +508,7 @@ function create_secure_dir() {
     
     # Create directory with safe permissions
     mkdir -p "${dir}" || {
-        echo "ERROR: Cannot create ${dir_desc}: ${dir}" >&2
+        log_error "Cannot create ${dir_desc}: ${dir}"
         return 1
     }
     
@@ -428,14 +530,14 @@ function create_secure_temp() {
     
     # Create temp file with random name
     temp_file=$(mktemp -t "${prefix}.XXXXXXXXXX") || {
-        echo "ERROR: Cannot create temporary file" >&2
+        log_error "Cannot create temporary file"
         return 1
     }
     
     # Set restrictive permissions (owner read/write only)
     chmod 600 "${temp_file}" || {
         rm -f "${temp_file}"
-        echo "ERROR: Cannot set permissions on temp file" >&2
+        log_error "Cannot set permissions on temp file"
         return 1
     }
     
@@ -467,21 +569,21 @@ function get_instance_real_home {
         elif [ -r "${ORACLE_FMW_HOME}/${OUD_INSTANCE}/config/config.ldif" ]; then
             OUD_INSTANCE_REAL_HOME="${ORACLE_FMW_HOME}/${OUD_INSTANCE}"
         else
-            [ "${Silent}" == "" ] && echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set OUD_INSTANCE_REAL_HOME."
+            [ "${Silent}" == "" ] && log_warn "Can not determin config.ldif from OUD Instance. Please explicitly set OUD_INSTANCE_REAL_HOME."
             return 1
         fi
     elif [ "${DIRECTORY_TYPE}" == "OUDSM" ]; then
         if [ -r "${OUDSM_DOMAIN_BASE}/${OUD_INSTANCE}/config/config.xml" ]; then
             OUD_INSTANCE_REAL_HOME="${OUDSM_DOMAIN_BASE}/${OUD_INSTANCE}"
         else
-            [ "${Silent}" == "" ] && echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set OUD_INSTANCE_REAL_HOME."
+            [ "${Silent}" == "" ] && log_warn "Can not determin config.ldif from OUD Instance. Please explicitly set OUD_INSTANCE_REAL_HOME."
             return 1
         fi
     elif [ "${DIRECTORY_TYPE}" == "ODSEE" ]; then
         if [ -r "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/config/dse.ldif" ]; then
             OUD_INSTANCE_REAL_HOME="${OUD_INSTANCE_BASE}/${OUD_INSTANCE}"
         else
-            [ "${Silent}" == "" ] && echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set OUD_INSTANCE_REAL_HOME."
+            [ "${Silent}" == "" ] && log_warn "Can not determin config.ldif from OUD Instance. Please explicitly set OUD_INSTANCE_REAL_HOME."
             return 1
         fi
     fi
@@ -542,25 +644,25 @@ function get_ports {
     # Validate and normalize ports from oudtab
     if [[ -n "${OUDTAB_PORT}" ]]; then
         OUDTAB_PORT=$(validate_port "${OUDTAB_PORT}" "LDAP port") || {
-            [ "${Silent}" == "" ] && echo "WARN : Invalid LDAP port in oudtab, using default" >&2
+            [ "${Silent}" == "" ] && log_warn "Invalid LDAP port in oudtab, using default" >&2
             OUDTAB_PORT="${DEFAULT_PORT}"
         }
     fi
     if [[ -n "${OUDTAB_PORT_SSL}" ]]; then
         OUDTAB_PORT_SSL=$(validate_port "${OUDTAB_PORT_SSL}" "LDAPS port") || {
-            [ "${Silent}" == "" ] && echo "WARN : Invalid LDAPS port in oudtab, using default" >&2
+            [ "${Silent}" == "" ] && log_warn "Invalid LDAPS port in oudtab, using default" >&2
             OUDTAB_PORT_SSL="${DEFAULT_PORT_SSL}"
         }
     fi
     if [[ -n "${OUDTAB_PORT_ADMIN}" ]]; then
         OUDTAB_PORT_ADMIN=$(validate_port "${OUDTAB_PORT_ADMIN}" "Admin port") || {
-            [ "${Silent}" == "" ] && echo "WARN : Invalid Admin port in oudtab, using default" >&2
+            [ "${Silent}" == "" ] && log_warn "Invalid Admin port in oudtab, using default" >&2
             OUDTAB_PORT_ADMIN="${DEFAULT_PORT_ADMIN}"
         }
     fi
     if [[ -n "${OUDTAB_PORT_REP}" ]]; then
         OUDTAB_PORT_REP=$(validate_port "${OUDTAB_PORT_REP}" "Replication port") || {
-            [ "${Silent}" == "" ] && echo "WARN : Invalid Replication port in oudtab, using default" >&2
+            [ "${Silent}" == "" ] && log_warn "Invalid Replication port in oudtab, using default" >&2
             OUDTAB_PORT_REP="${DEFAULT_PORT_REP}"
         }
     fi
@@ -579,7 +681,7 @@ function get_ports {
         if [ -r "${OUD_INSTANCE_REAL_HOME}/config/config.ldif" ]; then
             CONFIG="${OUD_INSTANCE_REAL_HOME}/config/config.ldif"
         else
-            [ "${Silent}" == "" ] && echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set your PORTS."
+            [ "${Silent}" == "" ] && log_warn "Can not determin config.ldif from OUD Instance. Please explicitly set your PORTS."
             return 1
         fi
 
@@ -674,11 +776,11 @@ function update_oudtab {
             # if not define set it based on up/down
             START_STOP=${START_STOP:-"$(get_status "${OUD_INSTANCE}"|sed 's/up/Y/'|sed 's/down/N/'|sed 's/n\/a/N/')"}
             # update the OUDTAB entry
-            [ "${Silent}" == "" ] && echo "INFO : update ${OUD_INSTANCE} in ${OUDTAB} adjust flag Y/N"
+            [ "${Silent}" == "" ] && log_info "update ${OUD_INSTANCE} in ${OUDTAB} adjust flag Y/N"
             sed "/${OUD_INSTANCE}/c\\${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}:${START_STOP}" "${OUDTAB}" > "${temp_file}"
         else
             # add a new OUDTAB entry
-            [ "${Silent}" == "" ] && echo "INFO : add ${OUD_INSTANCE} to ${OUDTAB} adjust flag Y/N"
+            [ "${Silent}" == "" ] && log_info "add ${OUD_INSTANCE} to ${OUDTAB} adjust flag Y/N"
             cat "${OUDTAB}" > "${temp_file}"
             echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}:${START_STOP}" >> "${temp_file}"
         fi
@@ -686,9 +788,9 @@ function update_oudtab {
         mv -f "${temp_file}" "${OUDTAB}"
     else
         # recreate the OUDTAB and add a new entry
-        echo "WARN : oudtab (${OUDTAB}) does not exist or is empty. Create a new one.."
+        log_warn "oudtab (${OUDTAB}) does not exist or is empty. Create a new one.."
         echo "${OUDTAB_COMMENT}" > "${temp_file}"
-        [ "${Silent}" == "" ] && echo "INFO : add ${OUD_INSTANCE} to ${OUDTAB} adjust flag Y/N"
+        [ "${Silent}" == "" ] && log_info "add ${OUD_INSTANCE} to ${OUDTAB} adjust flag Y/N"
         echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}:${START_STOP}" >> "${temp_file}"
         # Atomically create the file
         mv -f "${temp_file}" "${OUDTAB}"
@@ -845,7 +947,7 @@ function get_oracle_home {
             fi
         else
             if [ "${Silent}" == "" ] ; then
-                echo "WARN : Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
+                log_warn "Can not determin ORACLE_HOME from OUD Instance. Please explicitly set ORACLE_HOME"
             fi
         fi
         # Display the ORACLE_HOME
@@ -972,13 +1074,13 @@ function relpath {
     TargetDirectory=$2
  
     if [ "${BaseDirectory}" == "" ]; then
-        echo "WARN : BaseDirectory in relpath is empty."
+        log_warn "BaseDirectory in relpath is empty."
         caller
         return 1
     fi
    
     if [ "${TargetDirectory}" == "" ]; then
-        echo "WARN : TargetDirectory in relpath is empty."
+        log_warn "TargetDirectory in relpath is empty."
         caller
         return 1
     fi
@@ -1019,6 +1121,12 @@ function relpath {
 # - EOF Functions --------------------------------------------------------------
 
 # - Initialization -------------------------------------------------------------
+
+# Now source the core oudenv customization (after functions are defined)
+if [ -f "${ETC_CORE}/${OUD_CORE_CONFIG}" ]; then
+    safe_source "${ETC_CORE}/${OUD_CORE_CONFIG}" "core oudenv configuration" false
+fi
+
 tty >/dev/null 2>&1
 pTTY=$?
 
@@ -1026,6 +1134,7 @@ pTTY=$?
 if [ -n "$1" ] && [ "$1" != "SILENT" ] && [ "$1" != "silent" ]; then
     # Validate instance name before setting
     validate_instance_name "$1" || return 1
+    log_security "Setting OUD instance to: $1"
     export OUD_INSTANCE="$1"
 else
     export OUD_INSTANCE=${1:-""}
@@ -1052,7 +1161,7 @@ fi
  
 # Check if JAVA_HOME is defined
 if [ "${JAVA_HOME}" == "" ]; then
-    echo "WARN : JAVA_HOME is not set or could not be determined automatically"
+    log_warn "JAVA_HOME is not set or could not be determined automatically"
 fi
  
 # store PATH on first execution otherwise reset it
@@ -1091,7 +1200,7 @@ if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
         if [ ! -f "${ETC_BASE}/${i}" ]; then
             if [ -f "${ETC_CORE}/${i}" ] && [ ! -L "${ETC_CORE}/${i}" ]; then
                 # take the file from the $ETC_CORE folder
-                echo "INFO : move config file ${i} from \$ETC_CORE"
+                log_info "move config file ${i} from \$ETC_CORE"
                 # Check destination is not a symlink before moving
                 if [ -e "${ETC_BASE}/${i}" ] && [ -L "${ETC_BASE}/${i}" ]; then
                     echo "ERROR: Destination ${ETC_BASE}/${i} is a symlink, refusing to overwrite"
@@ -1099,7 +1208,7 @@ if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
                 fi
                 mv "${ETC_CORE}/${i}" "${ETC_BASE}"
             elif [ ! -f "${ETC_CORE}/${i}" ]; then
-                echo "INFO : copy config file ${i} from template folder ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}"
+                log_info "copy config file ${i} from template folder ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}"
                 # Validate source template is not a symlink
                 local template_file="${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}/${i}"
                 if [ -L "${template_file}" ]; then
@@ -1115,7 +1224,7 @@ if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
             fi
             # recreate softlinks for some config files
             if [ "${i}" == "oudenv.conf" ] || [ "${i}" == "oudtab" ]; then
-                echo "INFO : re-create softlink for ${i} "
+                log_info "re-create softlink for ${i} "
                 # Verify source exists and is not a symlink before creating symlink
                 if [ ! -f "${ETC_BASE}/${i}" ] || [ -L "${ETC_BASE}/${i}" ]; then
                     echo "ERROR: Source ${ETC_BASE}/${i} does not exist or is a symlink"
@@ -1135,7 +1244,7 @@ if [ -f "${OUDTAB}" ] && [ $(grep -c -E $ORATAB_PATTERN "${OUDTAB}") -gt 0 ]; th
     export OUD_INST_LIST=$(grep -E $ORATAB_PATTERN "${OUDTAB}"|cut -f1 -d:|tr '\n' ' ')
     export REAL_OUD_INST_LIST=$(grep -E $ORATAB_PATTERN_OUD "${OUDTAB}"|cut -f1 -d:|tr '\n' ' ')
 else
-    echo "WARN : oudtab (${OUDTAB}) does not exist or is empty. Create a new one."
+    log_warn "oudtab (${OUDTAB}) does not exist or is empty. Create a new one."
     echo "${OUDTAB_COMMENT}" >"${OUDTAB}"
     unset OUD_INST_LIST
     # create a OUD Instance Liste based on OUD instance base
@@ -1229,7 +1338,7 @@ if [ $(grep -E "${ORATAB_PATTERN}" "${OUDTAB}"| grep -iwc "${OUD_INSTANCE}") -eq
     
     # Validate directory type
     DIRECTORY_TYPE=$(validate_directory_type "${DIRECTORY_TYPE}") || {
-        echo "ERROR: Invalid directory type in oudtab for instance ${OUD_INSTANCE}" >&2
+        log_error "Invalid directory type in oudtab for instance ${OUD_INSTANCE}"
         return 1
     }
 
@@ -1265,16 +1374,16 @@ elif [ -d "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}" ]; then
     # fallback to OUD_INSTANCE_BASE Instance directory
     export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
     export OUD_INSTANCE_ADMIN=${OUD_ADMIN_BASE}/${OUD_INSTANCE}
-    echo "WARN : Set Instance based on ${OUD_INSTANCE_HOME}"
+    log_warn "Set Instance based on ${OUD_INSTANCE_HOME}"
     get_oracle_home "${OUD_INSTANCE}" "${DIRECTORY_TYPE}" silent # get oracle home from OUD instance
     get_ports "${OUD_INSTANCE}" "${DIRECTORY_TYPE}" silent # get ports from OUD config
     echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}">>${OUDTAB}
-    echo "WARN : Add ${OUD_INSTANCE} to ${OUDTAB} please review ports"
+    log_warn "Add ${OUD_INSTANCE} to ${OUDTAB} please review ports"
 elif [ $(grep -E "${ORATAB_PATTERN}" "${OUDTAB}"| grep -iwc "${OUD_INSTANCE}") -gt 1 ]; then
     echo "ERROR: Found multiple entries for ${OUD_INSTANCE} in ${OUDTAB} please fix manualy"
     RECREATE="FALSE"
 elif [ "${OUD_INSTANCE}" == "n/a" ]; then
-    echo "WARN : No OUD Instance yet available or defined."
+    log_warn "No OUD Instance yet available or defined."
     RECREATE="FALSE"
 else # print error and keep current setting
     echo "ERROR: OUD Instance ${OUD_INSTANCE} does not exits in ${OUDTAB} or ${OUD_INSTANCE_BASE}"
