@@ -45,7 +45,7 @@ oudbase/
 **Modified Files:**
 - ✅ [scripts/build.sh](scripts/build.sh) - Updated all paths from `local/oudbase/` to `src/`
 - ✅ [.gitignore](.gitignore) - Added new ignore rules for deprecated directories
-- ✅ [setup_bats.sh](setup_bats.sh) - Updated test paths
+- ✅ [scripts/setup_bats.sh](scripts/setup_bats.sh) - Moved to scripts/ and updated test paths
 - ✅ [test/bats/common.bash](test/bats/common.bash) - Updated PROJECT_ROOT and source paths
 - ✅ [test/bats/test_oudenv_security.bats](test/bats/test_oudenv_security.bats) - Updated helper paths
 - ✅ [test/bats/test_oudenv_stability.bats](test/bats/test_oudenv_stability.bats) - Updated helper paths
@@ -209,7 +209,7 @@ Changes:
 Updated:
 - scripts/build.sh - All paths updated to src/
 - .gitignore - Ignore deprecated directories and test/work/
-- setup_bats.sh - Updated test paths
+- scripts/setup_bats.sh - Moved to scripts/ and updated test paths
 - test/bats/common.bash - Updated PROJECT_ROOT paths
 - test/bats/*.bats - Updated helper paths
 
