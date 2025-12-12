@@ -18,6 +18,8 @@
 # - just add/update any kind of customized environment variable here
 TVDLDAP_DEFAULT_LDAPHOST="localhost"
 TVDLDAP_DEFAULT_LDAPPORT=389
+TVDLDAP_DEFAULT_LDAPSPORT=636
+TVDLDAP_DEFAULT_LDAPS="FALSE"
 TVDLDAP_DEFAULT_KEEP_LOG_DAYS=5
 TVDLDAP_DEFAULT_BASEDN=""
 TVDLDAP_DEFAULT_BINDDN=""
@@ -66,6 +68,7 @@ padding='............................'
 
 # define bind DN environment variables
 export TVDLDAP_LDAPTOOLS=${TVDLDAP_LDAPTOOLS:-$TVDLDAP_DEFAULT_LDAPTOOLS}
+export TVDLDAP_LDAPS=${TVDLDAP_LDAPS:-$TVDLDAP_DEFAULT_LDAPS}
 export TVDLDAP_BASEDN=${TVDLDAP_BASEDN:-$TVDLDAP_DEFAULT_BASEDN}
 export TVDLDAP_BINDDN=${TVDLDAP_BINDDN:-$TVDLDAP_DEFAULT_BINDDN}
 export TVDLDAP_BINDDN_PWDASK=${TVDLDAP_BINDDN_PWDASK:-$TVDLDAP_DEFAULT_BINDDN_PWDASK}
@@ -269,6 +272,24 @@ function ldapadd_command () {
         else
             echo "ldapadd"
         fi
+    fi
+}
+
+# ------------------------------------------------------------------------------
+# Function...: ldaps_options
+# Purpose....: Wrapper function to get LDAPS SSL options for the
+#              different LDAP tool implementations (OUD only for now)
+# ------------------------------------------------------------------------------
+function ldaps_options () {
+    if [ "${TVDLDAP_LDAPS^^}" == "TRUE" ]; then
+        if [ "${TVDLDAP_LDAPTOOLS^^}" == "OUD" ]; then
+            echo "-Z -X"
+        else
+            # LDAPS not supported for OpenLDAP and DB tools yet
+            echo ""
+        fi
+    else
+        echo ""
     fi
 }
 
