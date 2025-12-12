@@ -136,9 +136,9 @@ MyOUD_INSTANCES=${MyOUD_INSTANCES:-""}
 if [ $# -ne 0 ]; then
 	#if [ ! -z "$@" ]; then
 	DoMsg "INFO : Fallback to legacy parameter"
-	MyActivity=$(echo $@ | cut -d' ' -f1)
+	MyActivity=$(echo "$@" | cut -d' ' -f1)
 	shift
-	MyOUD_INSTANCES=$@
+	MyOUD_INSTANCES="$*"
 fi
 
 # Normalize activity

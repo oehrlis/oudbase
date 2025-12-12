@@ -1220,7 +1220,7 @@ if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
 			elif [ ! -f "${ETC_CORE}/${i}" ]; then
 				log_info "copy config file ${i} from template folder ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}"
 				# Validate source template is not a symlink
-				local template_file="${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}/${i}"
+				template_file="${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}/${i}"
 				if [ -L "${template_file}" ]; then
 					echo "ERROR: Template file ${template_file} is a symlink, refusing to copy"
 					return 1
