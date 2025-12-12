@@ -30,7 +30,7 @@ SHA1SUM_BIN=$(command -v sha1sum)                               # get the binary
 HOSTNAME_BIN=$(command -v hostname)                             # get the binary for hostname
 HOSTNAME_BIN=${HOSTNAME_BIN:-"cat /proc/sys/kernel/hostname"}   # fallback to /proc/sys/kernel/hostname
 SOURCED=${SOURCED:-0}                                           # define default value for source
-export HOST=$(${HOSTNAME_BIN})
+export HOST=$("${HOSTNAME_BIN}")
 
 # Absolute path of script directory
 OUDENV_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
@@ -114,6 +114,196 @@ export DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
 # - Functions ------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
+# Input Validation and Sanitization Functions
+# ------------------------------------------------------------------------------
+
+function validate_instance_name() {
+# Purpose....: Validate OUD instance name to prevent security issues
+# Parameters.: $1 - Instance name to validate
+# Returns....: 0 on success, 1 on failure
+# ------------------------------------------------------------------------------
+    local name="$1"
+    
+    # Check if empty
+    if [[ -z "${name}" ]]; then
+        echo "ERROR: Instance name cannot be empty" >&2
+        return 1
+    fi
+    
+    # Allow only alphanumeric, underscore, hyphen
+    if [[ ! "${name}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+        echo "ERROR: Invalid instance name '${name}'" >&2
+        echo "ERROR: Only alphanumeric characters, underscore, and hyphen are allowed" >&2
+        return 1
+    fi
+    
+    # Check length (max 255 chars for filesystem compatibility)
+    if [[ ${#name} -gt 255 ]]; then
+        echo "ERROR: Instance name too long: ${#name} characters (max 255)" >&2
+        return 1
+    fi
+    
+    # Prevent path traversal patterns
+    if [[ "${name}" == *".."* ]] || [[ "${name}" == *"/"* ]]; then
+        echo "ERROR: Instance name contains invalid path characters" >&2
+        return 1
+    fi
+    
+    # Prevent reserved names
+    case "${name}" in
+        "." | ".." | "~" | "SILENT" | "silent")
+            echo "ERROR: Instance name '${name}' is reserved" >&2
+            return 1
+            ;;
+    esac
+    
+    return 0
+}
+
+function validate_port() {
+# Purpose....: Validate and normalize port numbers
+# Parameters.: $1 - Port number to validate
+#              $2 - Port name/description (optional)
+# Returns....: Normalized port number on success, empty on failure
+# ------------------------------------------------------------------------------
+    local port="$1"
+    local port_name="${2:-Port}"
+    
+    # Check if empty (some ports are optional)
+    if [[ -z "${port}" ]]; then
+        echo ""
+        return 0  # Empty is OK for optional ports
+    fi
+    
+    # Check if numeric (no letters, special chars)
+    if [[ ! "${port}" =~ ^[0-9]+$ ]]; then
+        echo "ERROR: ${port_name} must be numeric: '${port}'" >&2
+        return 1
+    fi
+    
+    # Remove leading zeros to prevent octal interpretation and normalize
+    port=$((10#${port}))
+    
+    # Check range (1-65535 for TCP/UDP ports)
+    if (( port < 1 || port > 65535 )); then
+        echo "ERROR: ${port_name} out of valid range (1-65535): ${port}" >&2
+        return 1
+    fi
+    
+    # Return normalized port (without leading zeros)
+    echo "${port}"
+    return 0
+}
+
+function sanitize_path() {
+# Purpose....: Sanitize and validate file system paths
+# Parameters.: $1 - Path to sanitize
+#              $2 - Path name/description (optional)
+#              $3 - Must exist flag: "true" or "false" (optional, default: false)
+# Returns....: Sanitized absolute path on success
+# ------------------------------------------------------------------------------
+    local path="$1"
+    local path_name="${2:-Path}"
+    local must_exist="${3:-false}"
+    
+    # Check if empty
+    if [[ -z "${path}" ]]; then
+        echo "ERROR: ${path_name} cannot be empty" >&2
+        return 1
+    fi
+    
+    # Check for dangerous patterns
+    if [[ "${path}" == *".."* ]]; then
+        echo "ERROR: ${path_name} contains path traversal sequence '..'" >&2
+        return 1
+    fi
+    
+    # Check for null bytes (path injection)
+    if [[ "${path}" == *$'\0'* ]]; then
+        echo "ERROR: ${path_name} contains null bytes" >&2
+        return 1
+    fi
+    
+    # Check existence if required
+    if [[ "${must_exist}" == "true" ]] && [[ ! -e "${path}" ]]; then
+        echo "ERROR: ${path_name} does not exist: ${path}" >&2
+        return 1
+    fi
+    
+    # Normalize path (remove trailing slashes)
+    path="${path%/}"
+    
+    echo "${path}"
+    return 0
+}
+
+function validate_directory_type() {
+# Purpose....: Validate directory type value
+# Parameters.: $1 - Directory type to validate
+# Returns....: Validated directory type on success
+# ------------------------------------------------------------------------------
+    local dir_type="$1"
+    
+    # Check if empty
+    if [[ -z "${dir_type}" ]]; then
+        echo "ERROR: Directory type cannot be empty" >&2
+        return 1
+    fi
+    
+    # Validate against allowed types
+    case "${dir_type}" in
+        "OUD"|"OUDSM"|"ODSEE")
+            echo "${dir_type}"
+            return 0
+            ;;
+        *)
+            echo "ERROR: Invalid directory type '${dir_type}'" >&2
+            echo "ERROR: Allowed types: OUD, OUDSM, ODSEE" >&2
+            return 1
+            ;;
+    esac
+}
+
+function sanitize_env_var() {
+# Purpose....: Sanitize environment variable values
+# Parameters.: $1 - Variable value to sanitize
+#              $2 - Variable name/description (optional)
+# Returns....: Sanitized value on success
+# ------------------------------------------------------------------------------
+    local var_value="$1"
+    local var_name="${2:-Variable}"
+    
+    # Allow empty values
+    if [[ -z "${var_value}" ]]; then
+        echo ""
+        return 0
+    fi
+    
+    # Check for shell metacharacters
+    if [[ "${var_value}" =~ [\$\`\;\&\|\<\>] ]]; then
+        echo "ERROR: ${var_name} contains dangerous shell metacharacters" >&2
+        return 1
+    fi
+    
+    # Check for command substitution attempts
+    if [[ "${var_value}" == *'$('* ]] || [[ "${var_value}" == *'`'* ]]; then
+        echo "ERROR: ${var_name} contains command substitution" >&2
+        return 1
+    fi
+    
+    # Check for newlines (can break parsing)
+    if [[ "${var_value}" == *$'\n'* ]]; then
+        echo "ERROR: ${var_name} contains newline characters" >&2
+        return 1
+    fi
+    
+    echo "${var_value}"
+    return 0
+}
+
+# - EOF Input Validation Functions ---------------------------------------------
+
+# ------------------------------------------------------------------------------
 function get_instance_real_home {
 # Purpose....: get the corresponding PORTS from OUD Instance
 # ------------------------------------------------------------------------------
@@ -136,14 +326,14 @@ function get_instance_real_home {
             [ "${Silent}" == "" ] && echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set OUD_INSTANCE_REAL_HOME."
             return 1
         fi
-    elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+    elif [ "${DIRECTORY_TYPE}" == "OUDSM" ]; then
         if [ -r "${OUDSM_DOMAIN_BASE}/${OUD_INSTANCE}/config/config.xml" ]; then
             OUD_INSTANCE_REAL_HOME="${OUDSM_DOMAIN_BASE}/${OUD_INSTANCE}"
         else
             [ "${Silent}" == "" ] && echo "WARN : Can not determin config.ldif from OUD Instance. Please explicitly set OUD_INSTANCE_REAL_HOME."
             return 1
         fi
-    elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
+    elif [ "${DIRECTORY_TYPE}" == "ODSEE" ]; then
         if [ -r "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/config/dse.ldif" ]; then
             OUD_INSTANCE_REAL_HOME="${OUD_INSTANCE_BASE}/${OUD_INSTANCE}"
         else
@@ -167,21 +357,21 @@ function update_path () {
     directory=${1:-""}
     task=${2:-""}
     case ":${PATH}:" in
-        *:"$directory":*)
-            if [ "$task" = "remove" ]; then
+        *:"${directory}":*)
+            if [ "${task}" = "remove" ]; then
                 # remove directory from PATH
-                PATH=:$PATH:
-                PATH=${PATH//:$directory:/:}
+                PATH=:${PATH}:
+                PATH=${PATH//:${directory}:/:}
                 PATH=${PATH#:}; PATH=${PATH%:}
             fi;;
         *)
-            if [ -d "$directory" ]; then
-                if [ "$task" = "after" ] ; then
+            if [ -d "${directory}" ]; then
+                if [ "${task}" = "after" ] ; then
                     # append directory to PATH
-                    PATH=$PATH:$directory
+                    PATH=${PATH}:${directory}
                 else
                     # prepend directory to PATH
-                    PATH=$directory:$PATH
+                    PATH=${directory}:${PATH}
                 fi
             fi
     esac
@@ -204,6 +394,33 @@ function get_ports {
     OUDTAB_PORT_SSL=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f3)
     OUDTAB_PORT_ADMIN=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f4)
     OUDTAB_PORT_REP=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f5)
+    
+    # Validate and normalize ports from oudtab
+    if [[ -n "${OUDTAB_PORT}" ]]; then
+        OUDTAB_PORT=$(validate_port "${OUDTAB_PORT}" "LDAP port") || {
+            [ "${Silent}" == "" ] && echo "WARN : Invalid LDAP port in oudtab, using default" >&2
+            OUDTAB_PORT="${DEFAULT_PORT}"
+        }
+    fi
+    if [[ -n "${OUDTAB_PORT_SSL}" ]]; then
+        OUDTAB_PORT_SSL=$(validate_port "${OUDTAB_PORT_SSL}" "LDAPS port") || {
+            [ "${Silent}" == "" ] && echo "WARN : Invalid LDAPS port in oudtab, using default" >&2
+            OUDTAB_PORT_SSL="${DEFAULT_PORT_SSL}"
+        }
+    fi
+    if [[ -n "${OUDTAB_PORT_ADMIN}" ]]; then
+        OUDTAB_PORT_ADMIN=$(validate_port "${OUDTAB_PORT_ADMIN}" "Admin port") || {
+            [ "${Silent}" == "" ] && echo "WARN : Invalid Admin port in oudtab, using default" >&2
+            OUDTAB_PORT_ADMIN="${DEFAULT_PORT_ADMIN}"
+        }
+    fi
+    if [[ -n "${OUDTAB_PORT_REP}" ]]; then
+        OUDTAB_PORT_REP=$(validate_port "${OUDTAB_PORT_REP}" "Replication port") || {
+            [ "${Silent}" == "" ] && echo "WARN : Invalid Replication port in oudtab, using default" >&2
+            OUDTAB_PORT_REP="${DEFAULT_PORT_REP}"
+        }
+    fi
+    
     DEFAULT_PORT=${OUDTAB_PORT:-${DEFAULT_PORT}}
     DEFAULT_PORT_SSL=${OUDTAB_PORT_SSL:-${DEFAULT_PORT_SSL}}
     DEFAULT_PORT_ADMIN=${OUDTAB_PORT_ADMIN:-${DEFAULT_PORT_ADMIN}}
@@ -223,13 +440,22 @@ function get_ports {
         fi
 
         # read ports from config file
-        PORT_ADMIN=$(sed -n '/ds-cfg-ldap-administration-connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2)
-        PORT_REST_ADMIN=$(sed -n '/ds-cfg-http-administration-connector/,/^$/p' $CONFIG|grep -i ds-cfg-listen-port|cut -d' ' -f2|head -1)
-        PORT=$(sed -n '/ds-cfg-ldap-connection-handler/,/^$/p' $CONFIG|sed -n '/ds-cfg-use-ssl: false/,/^$/p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
-        PORT_SSL=$(sed -n '/ds-cfg-ldap-connection-handler/,/^$/p' $CONFIG|sed -n '/ds-cfg-use-ssl: true/,/^$/p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
-        PORT_REP=$(grep -i ds-cfg-replication-port $CONFIG|cut -d' ' -f2)
-        PORT_REST_HTTP=$(sed -n '/ds-cfg-http-connection-handler/,/^$/p' $CONFIG|sed -n '/ds-cfg-use-ssl: true/,/^$/!p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
-        PORT_REST_HTTPS=$(sed -n '/ds-cfg-http-connection-handler/,/^$/p' $CONFIG|sed -n '/ds-cfg-use-ssl: true/,/^$/p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+        PORT_ADMIN=$(sed -n '/ds-cfg-ldap-administration-connector/,/^$/p' "${CONFIG}"|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+        PORT_REST_ADMIN=$(sed -n '/ds-cfg-http-administration-connector/,/^$/p' "${CONFIG}"|grep -i ds-cfg-listen-port|cut -d' ' -f2|head -1)
+        PORT=$(sed -n '/ds-cfg-ldap-connection-handler/,/^$/p' "${CONFIG}"|sed -n '/ds-cfg-use-ssl: false/,/^$/p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+        PORT_SSL=$(sed -n '/ds-cfg-ldap-connection-handler/,/^$/p' "${CONFIG}"|sed -n '/ds-cfg-use-ssl: true/,/^$/p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+        PORT_REP=$(grep -i ds-cfg-replication-port "${CONFIG}"|cut -d' ' -f2)
+        PORT_REST_HTTP=$(sed -n '/ds-cfg-http-connection-handler/,/^$/p' "${CONFIG}"|sed -n '/ds-cfg-use-ssl: true/,/^$/!p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+        PORT_REST_HTTPS=$(sed -n '/ds-cfg-http-connection-handler/,/^$/p' "${CONFIG}"|sed -n '/ds-cfg-use-ssl: true/,/^$/p'|grep -i ds-cfg-listen-port|cut -d' ' -f2)
+ 
+        # Validate and normalize ports read from config
+        PORT=$(validate_port "${PORT}" "LDAP port") || PORT="$DEFAULT_PORT"
+        PORT_SSL=$(validate_port "${PORT_SSL}" "LDAPS port") || PORT_SSL="$DEFAULT_PORT_SSL"
+        PORT_ADMIN=$(validate_port "${PORT_ADMIN}" "Admin port") || PORT_ADMIN="$DEFAULT_PORT_ADMIN"
+        PORT_REP=$(validate_port "${PORT_REP}" "Replication port") || PORT_REP="$DEFAULT_PORT_REP"
+        PORT_REST_ADMIN=$(validate_port "${PORT_REST_ADMIN}" "REST Admin port") || PORT_REST_ADMIN="$DEFAULT_PORT_REST_ADMIN"
+        PORT_REST_HTTP=$(validate_port "${PORT_REST_HTTP}" "REST HTTP port") || PORT_REST_HTTP="$DEFAULT_PORT_REST_HTTP"
+        PORT_REST_HTTPS=$(validate_port "${PORT_REST_HTTPS}" "REST HTTPS port") || PORT_REST_HTTPS="$DEFAULT_PORT_REST_HTTPS"
  
         # export the port variables and set default values with not specified
         export PORT=${PORT:-$DEFAULT_PORT}
@@ -240,7 +466,7 @@ function get_ports {
         export PORT_REST_HTTP=${PORT_REST_HTTP:-$DEFAULT_PORT_REST_HTTP}
         export PORT_REST_HTTPS=${PORT_REST_HTTPS:-$DEFAULT_PORT_REST_HTTPS}
     # get ports for OUDSM domain
-    elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+    elif [ "${DIRECTORY_TYPE}" == "OUDSM" ]; then
         # currently just use the default values for OUDSM 
         # export the port variables and set default values with not specified
         export PORT=$DEFAULT_PORT
@@ -248,7 +474,7 @@ function get_ports {
         export PORT_ADMIN=""
         export PORT_REP=""
     # get ports for ODSEE domain
-    elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
+    elif [ "${DIRECTORY_TYPE}" == "ODSEE" ]; then
         # currently just use the default values for ODSEE 
         # export the port variables and set default values with not specified
         export PORT=${DEFAULT_PORT:-"7001"}
@@ -261,13 +487,13 @@ function get_ports {
         echo "--------------------------------------------------------------"
         echo " Instance Name   : ${OUD_INSTANCE}"
         echo " Directory Type  : ${DIRECTORY_TYPE}"
-        echo " LDAP Port       : $PORT"
-        echo " LDAPS Port      : $PORT_SSL"
-        echo " Admin Port      : $PORT_ADMIN"
-        echo " Replication Port: $PORT_REP"
-        echo " REST Admin Port : $PORT_REST_ADMIN"
-        echo " REST http Port  : $PORT_REST_HTTP"
-        echo " REST https Port : $PORT_REST_HTTPS"
+        echo " LDAP Port       : ${PORT}"
+        echo " LDAPS Port      : ${PORT_SSL}"
+        echo " Admin Port      : ${PORT_ADMIN}"
+        echo " Replication Port: ${PORT_REP}"
+        echo " REST Admin Port : ${PORT_REST_ADMIN}"
+        echo " REST http Port  : ${PORT_REST_HTTP}"
+        echo " REST https Port : ${PORT_REST_HTTPS}"
         echo "--------------------------------------------------------------"
     fi
 }
@@ -291,21 +517,21 @@ function update_oudtab {
             # get start/stop flag from existing oudtab assume up=Y, down=N, n/a=N
             START_STOP=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE} |head -1|cut -d: -f7)
             # if not define set it based on up/down
-            START_STOP=${START_STOP:-"$(get_status ${OUD_INSTANCE}|sed 's/up/Y/'|sed 's/down/N/'|sed 's/n\/a/N/')"}
+            START_STOP=${START_STOP:-"$(get_status "${OUD_INSTANCE}"|sed 's/up/Y/'|sed 's/down/N/'|sed 's/n\/a/N/')"}
             # update the OUDTAB entry
             [ "${Silent}" == "" ] && echo "INFO : update ${OUD_INSTANCE} in ${OUDTAB} adjust flag Y/N"
-            sed -i "/${OUD_INSTANCE}/c\\${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP:$DIRECTORY_TYPE:$START_STOP" "${OUDTAB}"
+            sed -i "/${OUD_INSTANCE}/c\\${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}:${START_STOP}" "${OUDTAB}"
         else
             # add a new OUDTAB entry
             [ "${Silent}" == "" ] && echo "INFO : add ${OUD_INSTANCE} to ${OUDTAB} adjust flag Y/N"
-            echo "${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP:$DIRECTORY_TYPE:$START_STOP" >>"${OUDTAB}"
+            echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}:${START_STOP}" >>"${OUDTAB}"
         fi
     else
         # recreate the OUDTAB and add a new entry
         echo "WARN : oudtab (${OUDTAB}) does not exist or is empty. Create a new one.."
         echo "${OUDTAB_COMMENT}" >"${OUDTAB}"
         [ "${Silent}" == "" ] && echo "INFO : add ${OUD_INSTANCE} to ${OUDTAB} adjust flag Y/N"
-        echo "${OUD_INSTANCE}:$PORT:$PORT_SSL:$PORT_ADMIN:$PORT_REP:$DIRECTORY_TYPE:$START_STOP" >>"${OUDTAB}"
+        echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}:${START_STOP}" >>"${OUDTAB}"
     fi
 }
 
@@ -316,24 +542,24 @@ function oud_status {
     STATUS=$(get_status)
     DIR_STATUS="??"
     Silent=""
-    OUD_INSTANCE_REAL_HOME=$(get_instance_real_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} ${Silent})
-    if [ ${DIRECTORY_TYPE} == "OUD" ] && [ -f "${OUD_INSTANCE_REAL_HOME}/config/config.ldif" ] ; then
+    OUD_INSTANCE_REAL_HOME=$(get_instance_real_home "${OUD_INSTANCE}" "${DIRECTORY_TYPE}" "${Silent}")
+    if [ "${DIRECTORY_TYPE}" == "OUD" ] && [ -f "${OUD_INSTANCE_REAL_HOME}/config/config.ldif" ] ; then
         DIR_STATUS="ok"
-    elif [ ${DIRECTORY_TYPE} == "ODSEE" ] && [ -f "${OUD_INSTANCE_REAL_HOME}/config/dse.ldif" ]; then
+    elif [ "${DIRECTORY_TYPE}" == "ODSEE" ] && [ -f "${OUD_INSTANCE_REAL_HOME}/config/dse.ldif" ]; then
         DIR_STATUS="ok"
-    elif [ ${DIRECTORY_TYPE} == "OUDSM" ] && [ -f "${OUD_INSTANCE_REAL_HOME}/config/config.xml" ]; then
+    elif [ "${DIRECTORY_TYPE}" == "OUDSM" ] && [ -f "${OUD_INSTANCE_REAL_HOME}/config/config.xml" ]; then
         DIR_STATUS="ok"
     fi
 
-    get_ports ${OUD_INSTANCE} ${DIRECTORY_TYPE} silent       # read ports from OUD config file
-    get_oracle_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} silent # read oracle home from OUD install.path file
+    get_ports "${OUD_INSTANCE}" "${DIRECTORY_TYPE}" silent       # read ports from OUD config file
+    get_oracle_home "${OUD_INSTANCE}" "${DIRECTORY_TYPE}" silent # read oracle home from OUD install.path file
     # display the instance status
     echo "--------------------------------------------------------------"
     echo " Instance Name      : ${OUD_INSTANCE:-n/a}"
     echo " Instance Home ($DIR_STATUS) : ${OUD_INSTANCE_HOME:-n/a}"
     echo " Oracle Home        : ${ORACLE_HOME:-n/a}"
     echo " Instance Status    : ${STATUS:-n/a}"
-    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+    if [ "${DIRECTORY_TYPE}" == "OUD" ]; then
         echo " LDAP Port          : ${PORT:-n/a}"
         echo " LDAPS Port         : ${PORT_SSL:-n/a}"
         echo " Admin Port         : ${PORT_ADMIN:-n/a}"
@@ -341,11 +567,11 @@ function oud_status {
         echo " REST Admin Port    : ${PORT_REST_ADMIN:-n/a}"
         echo " REST http Port     : ${PORT_REST_HTTP:-n/a}"
         echo " REST https Port    : ${PORT_REST_HTTPS:-n/a}"
-    elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
+    elif [ "${DIRECTORY_TYPE}" == "ODSEE" ]; then
         echo " LDAP Port          : ${PORT:-n/a}"
         echo " LDAPS Port         : ${PORT_SSL:-n/a}"
-    elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
-        echo " Console            : http://${HOST}:$PORT/oudsm"
+    elif [ "${DIRECTORY_TYPE}" == "OUDSM" ]; then
+        echo " Console            : http://${HOST}:${PORT}/oudsm"
         echo " HTTP               : ${PORT:-n/a}"
         echo " HTTPS              : ${PORT_SSL:-n/a}"
     fi
@@ -361,20 +587,20 @@ function oud_up {
     # loop through OUD instance list
     for i in ${OUD_INST_LIST}; do
         # get the values from OUDTAB
-        PORT_ADMIN=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${i} |head -1|cut -d: -f4)
-        PORT=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${i} |head -1|cut -d: -f2)
-        PORT_SSL=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${i} |head -1|cut -d: -f3)
-        DIRECTORY_TYPE=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${i} |head -1|cut -d: -f6)
+        PORT_ADMIN=$(grep -E "${ORATAB_PATTERN}" "${OUDTAB}"|grep -i "${i}" |head -1|cut -d: -f4)
+        PORT=$(grep -E "${ORATAB_PATTERN}" "${OUDTAB}"|grep -i "${i}" |head -1|cut -d: -f2)
+        PORT_SSL=$(grep -E "${ORATAB_PATTERN}" "${OUDTAB}"|grep -i "${i}" |head -1|cut -d: -f3)
+        DIRECTORY_TYPE=$(grep -E "${ORATAB_PATTERN}" "${OUDTAB}"|grep -i "${i}" |head -1|cut -d: -f6)
         DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
         # get the instance status (up/down/n/a)
-        STATUS=$(get_status ${i})
-        if [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
-            INSTANCE_HOME="${OUDSM_DOMAIN_BASE}/$i"
+        STATUS=$(get_status "${i}")
+        if [ "${DIRECTORY_TYPE}" == "OUDSM" ]; then
+            INSTANCE_HOME="${OUDSM_DOMAIN_BASE}/${i}"
         else
-            INSTANCE_HOME="${OUD_INSTANCE_BASE}/$i"
+            INSTANCE_HOME="${OUD_INSTANCE_BASE}/${i}"
         fi
-        printf '%-5s %-12s %-6s %-14s %-s\n' ${DIRECTORY_TYPE} ${i} ${STATUS} \
-            "$(join_by / ${PORT} ${PORT_SSL} ${PORT_ADMIN})" "${INSTANCE_HOME}"
+        printf '%-5s %-12s %-6s %-14s %-s\n' "${DIRECTORY_TYPE}" "${i}" "${STATUS}" \
+            "$(join_by / "${PORT}" "${PORT_SSL}" "${PORT_ADMIN}")" "${INSTANCE_HOME}"
     done
     echo ""
 }
@@ -384,9 +610,9 @@ function proc_grep {
 # Purpose....: simulate pgrep to get the OUD / OUDSM process status
 # ------------------------------------------------------------------------------
     GrepString=${1}
-    if [ -n "$GrepString" ]; then
-        GrepString=$(echo ${GrepString}|sed 's/\(.\)/[\1]/1')
-        find /proc -maxdepth 2 -type f -regex ".*/[0-9]*/cmdline" -exec grep -iH -o -a -e ${GrepString} {} \;| tr "\0" " "
+    if [ -n "${GrepString}" ]; then
+        GrepString=$(echo "${GrepString}"|sed 's/\(.\)/[\1]/1')
+        find /proc -maxdepth 2 -type f -regex ".*/[0-9]*/cmdline" -exec grep -iH -o -a -e "${GrepString}" {} \;| tr "\0" " "
     else
         echo 0
     fi
@@ -397,15 +623,15 @@ function oud_pgrep {
 # Purpose....: simulate pgrep to get the OUD / OUDSM process status
 # ------------------------------------------------------------------------------
     GrepString=${1}
-    if [ -n "$GrepString" ]; then
-        GrepString=$(echo ${GrepString}|sed 's/\(.\)/[\1]/1')
-        for i in $(find /proc -maxdepth 2 -type f -regex ".*/[0-9]*/cmdline" -exec grep -il -o -a -e ${GrepString} {} \;); do
+    if [ -n "${GrepString}" ]; then
+        GrepString=$(echo "${GrepString}"|sed 's/\(.\)/[\1]/1')
+        for i in $(find /proc -maxdepth 2 -type f -regex ".*/[0-9]*/cmdline" -exec grep -il -o -a -e "${GrepString}" {} \;); do
             pid=$(echo "${i//[^0-9]/}")
-            ppid=$(grep -i ppid /proc/${pid}/status|cut -d: -f2| xargs)
-            user=$(grep $(cat /proc/${pid}/loginuid)  /etc/passwd | cut -f1 -d:)
+            ppid=$(grep -i ppid "/proc/${pid}/status"|cut -d: -f2| xargs)
+            user=$(grep "$(cat "/proc/${pid}/loginuid")"  /etc/passwd | cut -f1 -d:)
             user=${user:-"undef"}
-            cmdline=$(cat ${i})
-            printf '%-5s %-12s %-10s %-s\n' $user $pid  $ppid $cmdline
+            cmdline=$(cat "${i}")
+            printf '%-5s %-12s %-10s %-s\n' "${user}" "${pid}"  "${ppid}" "${cmdline}"
         done
     else
         echo 0
@@ -417,18 +643,18 @@ function get_status {
 # Purpose....: get the current instance / process status
 # -----------------------------------------------------------------------
     InstanceName=${1:-${OUD_INSTANCE}}
-    [ "${InstanceName}" == 'n/a' ] && DirectoryType=${InstanceName}
+    [ "${InstanceName}" == 'n/a' ] && DirectoryType="${InstanceName}"
     # check if the instance is in the oud tab
-    if [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${InstanceName}) -eq 1 ]; then
+    if [ $(grep -E "${ORATAB_PATTERN}" "${OUDTAB}"| grep -iwc "${InstanceName}") -eq 1 ]; then
         # get the directory type from OUDTAB
-        DirectoryType=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${InstanceName}|head -1|cut -d: -f6)
+        DirectoryType=$(grep -E "${ORATAB_PATTERN}" "${OUDTAB}"|grep -i "${InstanceName}"|head -1|cut -d: -f6)
         PGREP=${PGREP_BIN:-"proc_grep"}         # define the pgrep command, fall back to proc_grep
         PGREP_PARAMETER=${PGREP_BIN:+"-f"}      # set pgrep parameter -f if using pgrep
-        case ${DirectoryType} in
+        case "${DirectoryType}" in
             # check the process for each directory type
-            "OUD")      echo $(if [ $(${PGREP} $PGREP_PARAMETER "org.opends.server.core.DirectoryServer.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
-            "ODSEE")    echo $(if [ $(${PGREP} $PGREP_PARAMETER "ns-slapd.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
-            "OUDSM")    echo $(if [ $(${PGREP} $PGREP_PARAMETER "wlserver.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+            "OUD")      echo $(if [ $("${PGREP}" ${PGREP_PARAMETER} "org.opends.server.core.DirectoryServer.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+            "ODSEE")    echo $(if [ $("${PGREP}" ${PGREP_PARAMETER} "ns-slapd.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
+            "OUDSM")    echo $(if [ $("${PGREP}" ${PGREP_PARAMETER} "wlserver.*${InstanceName}"|wc -l) -gt 0 ]; then echo 'up'; else echo 'down'; fi);;
             *)          echo "n/a";;
         esac
     else
@@ -445,14 +671,14 @@ function get_oracle_home {
     Silent=${3:-""}
     # get the ORACLE_HOME from the install.path currently just supported
     # for directory type OUD
-    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-        OUD_INSTANCE_REAL_HOME=$(get_instance_real_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} ${OUD_INSTANCE})
+    if [ "${DIRECTORY_TYPE}" == "OUD" ]; then
+        OUD_INSTANCE_REAL_HOME=$(get_instance_real_home "${OUD_INSTANCE}" "${DIRECTORY_TYPE}" "${OUD_INSTANCE}")
         if [ -r "${OUD_INSTANCE_REAL_HOME}/install.path" ]; then
-            ORACLE_HOME=$(cat ${OUD_INSTANCE_REAL_HOME}/install.path)
+            ORACLE_HOME=$(cat "${OUD_INSTANCE_REAL_HOME}/install.path")
             # check if our install path contains an oud at the end
-            if [ $(basename ${ORACLE_HOME}) == "oud" ]; then
+            if [ "$(basename "${ORACLE_HOME}")" == "oud" ]; then
                 # seems we have an OUD 12 home
-                export ORACLE_HOME=$(dirname ${ORACLE_HOME})
+                export ORACLE_HOME=$(dirname "${ORACLE_HOME}")
             else
                 # seems we have an OUD 11 home
                 export ORACLE_HOME=${ORACLE_HOME}
@@ -539,12 +765,12 @@ function oud_help {
         IFS=$'\n'
         for line in $(sed -n '/DEF_ALIASES/,/EOF DEF_ALIASES/p;/EOF DEF_ALIASES/q' ${ETC_BASE}/oudenv.conf); do
             # If the line starts with alias then echo the line
-            if [[ $line == alias*  ]] ; then
-                ALIAS=$(echo $line|sed -r 's/^.*\s(.*)=('"'"'|").*/\1/' )
-                COMMENT=$(echo $line|sed -r 's/^.*(#(.*)$|(('"'"')|"))$/\2/')
+            if [[ ${line} == alias*  ]] ; then
+                ALIAS=$(echo "${line}"|sed -r 's/^.*\s(.*)=('"'"'|"  ).*/\1/' )
+                COMMENT=$(echo "${line}"|sed -r 's/^.*(#(.*)$|(('"'"')|  ))$/\2/')
                 COMMENT=${COMMENT:-"n/a"}
                 printf "  %-10s %-s\n" \
-                    ${ALIAS} \
+                    "${ALIAS}" \
                     "${COMMENT}"
                 fi
         done
@@ -556,12 +782,12 @@ function oud_help {
         echo "--- Custom Aliases from \${ETC_BASE}/oudenv_custom.conf --------------"
         while read -r line; do
         # If the line starts with alias then echo the line
-        if [[ $line == alias*  ]] ; then
-            ALIAS=$(echo $line|sed -r 's/^.*\s(.*)=('"'"'|").*/\1/' )
-            COMMENT=$(echo $line|sed -r 's/^.*(#(.*)$|(('"'"')|"))$/\2/')
+        if [[ ${line} == alias*  ]] ; then
+            ALIAS=$(echo "${line}"|sed -r 's/^.*\s(.*)=('"'"'|"  ).*/\1/' )
+            COMMENT=$(echo "${line}"|sed -r 's/^.*(#(.*)$|(('"'"')|  ))$/\2/')
             COMMENT=${COMMENT:-"n/a"}
             printf "  %-10s %-s\n" \
-                ${ALIAS} \
+                "${ALIAS}" \
                 "${COMMENT}"
         fi
         # read the custom config file to parse/display the comments
@@ -600,42 +826,50 @@ function relpath {
     CommonPart=$BaseDirectory # for now
     Result="" # for now
  
-    while [[ "${TargetDirectory#$CommonPart}" == "${TargetDirectory}" ]]; do
+    while [[ "${TargetDirectory#${CommonPart}}" == "${TargetDirectory}" ]]; do
         # no match, means that candidate common part is not correct
         # go up one level (reduce common part)
-        CommonPart="$(dirname $CommonPart)"
+        CommonPart="$(dirname "${CommonPart}")"
         # and record that we went back, with correct / handling
-        if [[ -z $Result ]]; then
+        if [[ -z "${Result}" ]]; then
             Result=".."
         else
-            Result="../$Result"
+            Result="../${Result}"
         fi
     done
  
-    if [[ $CommonPart == "/" ]]; then
+    if [[ "${CommonPart}" == "/" ]]; then
         # special case for root (no common path)
-        Result="$Result/"
+        Result="${Result}/"
     fi
  
     # since we now have identified the common part,
     # compute the non-common part
-    ForwardPart="${TargetDirectory#$CommonPart}"
+    ForwardPart="${TargetDirectory#${CommonPart}}"
  
     # and now stick all parts together
-    if [[ -n $Result ]] && [[ -n $ForwardPart ]]; then
-        Result="$Result$ForwardPart"
-    elif [[ -n $ForwardPart ]]; then
+    if [[ -n "${Result}" ]] && [[ -n "${ForwardPart}" ]]; then
+        Result="${Result}${ForwardPart}"
+    elif [[ -n "${ForwardPart}" ]]; then
         # extra slash removal
         Result="${ForwardPart:1}"
     fi
-    echo "$Result"
+    echo "${Result}"
 }
 # - EOF Functions --------------------------------------------------------------
 
 # - Initialization -------------------------------------------------------------
 tty >/dev/null 2>&1
 pTTY=$?
-export OUD_INSTANCE=${1:-""}
+
+# Validate and set OUD_INSTANCE parameter
+if [ -n "$1" ] && [ "$1" != "SILENT" ] && [ "$1" != "silent" ]; then
+    # Validate instance name before setting
+    validate_instance_name "$1" || return 1
+    export OUD_INSTANCE="$1"
+else
+    export OUD_INSTANCE=${1:-""}
+fi
 export SILENT=${2:-""}
  
 # count number of execution / source
@@ -662,12 +896,12 @@ if [ "${JAVA_HOME}" == "" ]; then
 fi
  
 # store PATH on first execution otherwise reset it
-if [ ${SOURCED} -le 1 ]; then
-    export OUDSAVED_PATH=${PATH}
+if [ "${SOURCED}" -le 1 ]; then
+    export OUDSAVED_PATH="${PATH}"
 else
-    if [ ${OUDSAVED_PATH} ]; then
+    if [ "${OUDSAVED_PATH}" ]; then
         # reset PATH to inital PATH
-        export PATH=${OUDSAVED_PATH}
+        export PATH="${OUDSAVED_PATH}"
     fi
 fi
  
@@ -688,7 +922,7 @@ fi
 
 # recreate missing directories
 for i in ${OUD_ADMIN_BASE} ${OUD_BACKUP_BASE} ${OUD_INSTANCE_BASE} ${ETC_BASE} ${LOG_BASE}; do
-    mkdir -p ${i}
+    mkdir -p "${i}"
 done
 
 # adjust config files in ETC_BASE if different than ETC_CORE
@@ -698,15 +932,15 @@ if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
             if [ -f "${ETC_CORE}/${i}" ] && [ ! -L "${ETC_CORE}/${i}" ]; then
                 # take the file from the $ETC_CORE folder
                 echo "INFO : move config file ${i} from \$ETC_CORE"
-                mv ${ETC_CORE}/${i} ${ETC_BASE}
+                mv "${ETC_CORE}/${i}" "${ETC_BASE}"
             elif [ ! -f "${ETC_CORE}/${i}" ]; then
                 echo "INFO : copy config file ${i} from template folder ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}"
-                cp ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}/${i} ${ETC_BASE}
+                cp "${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}/${i}" "${ETC_BASE}"
             fi
             # recreate softlinks for some config files
             if [ "${i}" == "oudenv.conf" ] || [ "${i}" == "oudtab" ]; then
                 echo "INFO : re-create softlink for ${i} "
-                ln -s -v ${ETC_BASE}/${i} ${ETC_CORE}/${i}
+                ln -s -v "${ETC_BASE}/${i}" "${ETC_CORE}/${i}"
             fi
         fi
     done
@@ -727,48 +961,48 @@ else
                 ${ORACLE_FMW_HOME}/*/OUD/config/config.ldif \
                 ${ORACLE_FMW_HOME}/*/config/config.ldif ; do
         # if the config.ldif file exists use it to get instance name
-        if [ -f $i ] && [ ! "${i}" == "${ORACLE_FMW_HOME}/oud/config/config.ldif" ]; then
+        if [ -f "${i}" ] && [ ! "${i}" == "${ORACLE_FMW_HOME}/oud/config/config.ldif" ]; then
             # remove leading OUD instance path
-            i=${i##"$OUD_INSTANCE_BASE/"}
+            i=${i##"${OUD_INSTANCE_BASE}/"}
             # remove trailing OUD* and config*
             i=${i%%/O*.ldif}
             i=${i%%/config*.ldif}
             # add oudtab entry
-            update_oudtab $i OUD silent
-            export OUD_INST_LIST+="$(echo $i) "
+            update_oudtab "${i}" OUD silent
+            export OUD_INST_LIST+="$(echo "${i}") "
         fi
     done
     # create a list of ODSEE instance on OUD instance base
     for i in ${OUD_INSTANCE_BASE}/*/config/dse.ldif; do
         # if the dse.ldif file exists use it to get instance name
-        if [ -f $i ]; then
+        if [ -f "${i}" ]; then
             # remove leading OUD instance path
-            i=${i##"$OUD_INSTANCE_BASE/"}
+            i=${i##"${OUD_INSTANCE_BASE}/"}
             # remove trailing OUD* and config*
             i=${i%%/config*.ldif}
             # add oudtab entry
-            update_oudtab $i ODSEE silent
-            export OUD_INST_LIST+="$(echo $i) "
+            update_oudtab "${i}" ODSEE silent
+            export OUD_INST_LIST+="$(echo "${i}") "
         fi
     done
     # check for OUDSM Instances
     for i in ${OUDSM_DOMAIN_BASE}/*/config/config.xml; do
         # if the config.xml file exists use it to get domain name
-        if [ -f $i ]; then
+        if [ -f "${i}" ]; then
             # remove leading OUD instance path
-            i=${i##"$OUDSM_DOMAIN_BASE/"}
+            i=${i##"${OUDSM_DOMAIN_BASE}/"}
             # remove trailing OUD* and config*
             i=${i%%/config*.xml}
             #add oudtab entry
-            update_oudtab $i OUDSM silent
-            export OUD_INST_LIST+="$(echo $i) "
+            update_oudtab "${i}" OUDSM silent
+            export OUD_INST_LIST+="$(echo "${i}") "
         fi
     done
 fi
  
 # if not defined set default instance to first of OUD_INST_LIST
-if [ -n "$(echo "$OUD_INST_LIST"|cut -f1 -d' ')" ] ; then
-    OUD_DEFAULT_INSTANCE=$(echo "$OUD_INST_LIST"|cut -f1 -d' ')
+if [ -n "$(echo "${OUD_INST_LIST}"|cut -f1 -d' ')" ] ; then
+    OUD_DEFAULT_INSTANCE=$(echo "${OUD_INST_LIST}"|cut -f1 -d' ')
 else
     OUD_DEFAULT_INSTANCE="n/a"
 fi
@@ -798,20 +1032,26 @@ fi
 # - Main -----------------------------------------------------------------------
  
 # Load OUD config from oudtab
-if [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -eq 1 ]; then
+if [ $(grep -E "${ORATAB_PATTERN}" "${OUDTAB}"| grep -iwc "${OUD_INSTANCE}") -eq 1 ]; then
     # set new environment based on oudtab values
-    OUD_CONF_STR=$(grep -E ${ORATAB_PATTERN} "${OUDTAB}"|grep -i ${OUD_INSTANCE}|head -1)
-    OUD_INSTANCE=$(echo ${OUD_CONF_STR}|cut -d: -f1)
-    PORT=$(echo ${OUD_CONF_STR}|cut -d: -f2)
-    PORT_SSL=$(echo ${OUD_CONF_STR}|cut -d: -f3)
-    PORT_ADMIN=$(echo ${OUD_CONF_STR}|cut -d: -f4)
-    PORT_REP=$(echo ${OUD_CONF_STR}|cut -d: -f5)
-    DIRECTORY_TYPE=$(echo ${OUD_CONF_STR}|cut -d: -f6)
+    OUD_CONF_STR=$(grep -E "${ORATAB_PATTERN}" "${OUDTAB}"|grep -i "${OUD_INSTANCE}"|head -1)
+    OUD_INSTANCE=$(echo "${OUD_CONF_STR}"|cut -d: -f1)
+    PORT=$(echo "${OUD_CONF_STR}"|cut -d: -f2)
+    PORT_SSL=$(echo "${OUD_CONF_STR}"|cut -d: -f3)
+    PORT_ADMIN=$(echo "${OUD_CONF_STR}"|cut -d: -f4)
+    PORT_REP=$(echo "${OUD_CONF_STR}"|cut -d: -f5)
+    DIRECTORY_TYPE=$(echo "${OUD_CONF_STR}"|cut -d: -f6)
     # make sure that we define a directory type even if it is missing in OUDTAB
     DIRECTORY_TYPE=${DIRECTORY_TYPE:-"${DEFAULT_DIRECTORY_TYPE}"}
+    
+    # Validate directory type
+    DIRECTORY_TYPE=$(validate_directory_type "${DIRECTORY_TYPE}") || {
+        echo "ERROR: Invalid directory type in oudtab for instance ${OUD_INSTANCE}" >&2
+        return 1
+    }
 
     # set the instance home based on directory type
-    if [ ${DIRECTORY_TYPE} == "OUD" ]; then
+    if [ "${DIRECTORY_TYPE}" == "OUD" ]; then
         OUD_INSTANCE_HOME="${OUD_INSTANCE_BASE}/${OUD_INSTANCE}"
         # check which bin folder is availabe eg. workaround OUD folder issue
         if [ -d "${OUD_INSTANCE_HOME}/OUD/bin" ]; then
@@ -821,7 +1061,7 @@ if [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -eq 1 ]
         else
             OUD_INSTANCE_HOME_BIN="${OUD_INSTANCE_HOME}"
         fi   
-    elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
+    elif [ "${DIRECTORY_TYPE}" == "OUDSM" ]; then
         # if directory type is OUDSM use a different base
         OUD_INSTANCE_HOME="${OUDSM_DOMAIN_BASE}/${OUD_INSTANCE}"
     else
@@ -831,7 +1071,7 @@ if [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -eq 1 ]
     export OUD_INSTANCE_ADMIN=${OUD_ADMIN_BASE}/${OUD_INSTANCE}
 
     # get the Oracle home based on OUD instance home
-    get_oracle_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} silent # get oracle home from OUD instance
+    get_oracle_home "${OUD_INSTANCE}" "${DIRECTORY_TYPE}" silent # get oracle home from OUD instance
     export INSTANCE_NAME=$(relpath "${ORACLE_HOME}" "${OUD_INSTANCE_HOME}")
     export PORT
     export PORT_SSL
@@ -843,11 +1083,11 @@ elif [ -d "${OUD_INSTANCE_BASE}/${OUD_INSTANCE}" ]; then
     export OUD_INSTANCE_HOME=${OUD_INSTANCE_BASE}/${OUD_INSTANCE}
     export OUD_INSTANCE_ADMIN=${OUD_ADMIN_BASE}/${OUD_INSTANCE}
     echo "WARN : Set Instance based on ${OUD_INSTANCE_HOME}"
-    get_oracle_home ${OUD_INSTANCE} ${DIRECTORY_TYPE} silent # get oracle home from OUD instance
-    get_ports ${OUD_INSTANCE} ${DIRECTORY_TYPE} silent # get ports from OUD config
+    get_oracle_home "${OUD_INSTANCE}" "${DIRECTORY_TYPE}" silent # get oracle home from OUD instance
+    get_ports "${OUD_INSTANCE}" "${DIRECTORY_TYPE}" silent # get ports from OUD config
     echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}">>${OUDTAB}
     echo "WARN : Add ${OUD_INSTANCE} to ${OUDTAB} please review ports"
-elif [ $(grep -E ${ORATAB_PATTERN} "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -gt 1 ]; then
+elif [ $(grep -E "${ORATAB_PATTERN}" "${OUDTAB}"| grep -iwc "${OUD_INSTANCE}") -gt 1 ]; then
     echo "ERROR: Found multiple entries for ${OUD_INSTANCE} in ${OUDTAB} please fix manualy"
     RECREATE="FALSE"
 elif [ "${OUD_INSTANCE}" == "n/a" ]; then
@@ -891,15 +1131,15 @@ OUD_INST_LIST=${OUD_INST_LIST:-""}
 REAL_OUD_INST_LIST=${REAL_OUD_INST_LIST:-""}
 OUD_INSTANCE_ADMIN=${OUD_INSTANCE_ADMIN:-${OUD_ADMIN_BASE}/${OUD_INSTANCE}}
 # set the new PATH
-update_path ${JAVA_HOME}/bin
-update_path ${ORACLE_HOME}
-update_path ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}
-if [ ${DIRECTORY_TYPE} == "OUD" ]; then
-    update_path ${OUD_INSTANCE_HOME_BIN:-"${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/bin"}
-elif [ ${DIRECTORY_TYPE} == "OUDSM" ]; then
-    update_path ${OUD_INSTANCE_HOME}/bin
-elif [ ${DIRECTORY_TYPE} == "ODSEE" ]; then
-    update_path ${OUD_INSTANCE_HOME}/OUD/bin
+update_path "${JAVA_HOME}/bin"
+update_path "${ORACLE_HOME}"
+update_path "${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_BIN_NAME}"
+if [ "${DIRECTORY_TYPE}" == "OUD" ]; then
+    update_path "${OUD_INSTANCE_HOME_BIN:-${OUD_INSTANCE_BASE}/${OUD_INSTANCE}/OUD/bin}"
+elif [ "${DIRECTORY_TYPE}" == "OUDSM" ]; then
+    update_path "${OUD_INSTANCE_HOME}/bin"
+elif [ "${DIRECTORY_TYPE}" == "ODSEE" ]; then
+    update_path "${OUD_INSTANCE_HOME}/OUD/bin"
 fi
 # start to source stuff from ETC_CORE
 # source oudenv.conf file from core etc directory if it exits
@@ -941,7 +1181,7 @@ if [ -f "${ETC_BASE}/oud.${OUD_INSTANCE}.conf" ]; then
     . "${ETC_BASE}/oud.${OUD_INSTANCE}.conf"
 fi
 
-if [ ${pTTY} -eq 0 ] && [ "${SILENT}" = "" ] && [ ! "${OUD_INSTANCE}" == 'n/a' ]; then
+if [ "${pTTY}" -eq 0 ] && [ "${SILENT}" = "" ] && [ ! "${OUD_INSTANCE}" == 'n/a' ]; then
     echo "Source environment for ${DIRECTORY_TYPE} Instance ${OUD_INSTANCE}"
     oud_status
 fi
