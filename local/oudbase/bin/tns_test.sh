@@ -80,6 +80,8 @@ function Usage() {
                         by setting TVDLDAP_LDAPHOST.
     -p <PORT>           port on LDAP server (default take from ldap.ora). Can be
                         specified by setting TVDLDAP_LDAPPORT.
+    -s                  Use LDAPS (SSL/TLS) with trustall option (OUD only). Can be
+                        specified by setting TVDLDAP_LDAPS.
     -t <DURATION>       Specific a timeout for the test commands using core utility
                         timeout. DURATION is a number with an optional suffix: 's'
                         for seconds (the default), 'm' for minutes, 'h' for
@@ -150,7 +152,7 @@ touch $TEMPFILE 2>/dev/null || clean_quit 25 $TEMPFILE
 touch $TNSPING_TEMPFILE 2>/dev/null || clean_quit 25 $TNSPING_TEMPFILE
 
 # get options
-while getopts mvdb:h:p:D:w:Wy:E:t:U:c:CZ:S: CurOpt; do
+while getopts mvdb:h:p:sD:w:Wy:E:t:U:c:CZ:S: CurOpt; do
     case ${CurOpt} in
         m) Usage 0;;
         v) TVDLDAP_VERBOSE="TRUE" ;;
@@ -158,6 +160,7 @@ while getopts mvdb:h:p:D:w:Wy:E:t:U:c:CZ:S: CurOpt; do
         b) TVDLDAP_BASEDN="${OPTARG}";;
         h) TVDLDAP_LDAPHOST=${OPTARG};;
         p) TVDLDAP_LDAPPORT=${OPTARG};;
+        s) TVDLDAP_LDAPS="TRUE";;
         D) TVDLDAP_BINDDN="${OPTARG}";; 
         w) TVDLDAP_BINDDN_PWD="${OPTARG}";; 
         W) TVDLDAP_BINDDN_PWDASK="TRUE";; 
@@ -180,6 +183,7 @@ dump_runtime_config     # dump current tool specific environment in debug mode
 
 # get the ldapsearch options based on available tools
 ldapsearch_options=$(ldapsearch_options)
+ldaps_options=$(ldaps_options)
 
 # check if we do have a tnsping
 if ! command_exists tnsping; then
@@ -260,6 +264,7 @@ echo_debug "DEBUG: Configuration / Variables:"
 echo_debug "---------------------------------------------------------------------------------"
 echo_debug "DEBUG: LDAP Host............... = $TVDLDAP_LDAPHOST"
 echo_debug "DEBUG: LDAP Port............... = $TVDLDAP_LDAPPORT"
+echo_debug "DEBUG: LDAPS / SSL............. = $TVDLDAP_LDAPS"
 echo_debug "DEBUG: Bind DN................. = $TVDLDAP_BINDDN"
 echo_debug "DEBUG: Bind PWD................ = $(echo_secret $TVDLDAP_BINDDN_PWD)"
 echo_debug "DEBUG: Bind PWD File........... = $TVDLDAP_BINDDN_PWDFILE"
@@ -267,6 +272,7 @@ echo_debug "DEBUG: Bind parameter.......... = $current_binddn $(echo_secret $cur
 echo_debug "DEBUG: Base DN................. = $BASEDN_LIST"
 echo_debug "DEBUG: Net Service Names....... = $NETSERVICE"
 echo_debug "DEBUG: ldapsearch options...... = $ldapsearch_options"
+echo_debug "DEBUG: ldaps options........... = $ldaps_options"
 echo_debug "DEBUG: Command Timeout......... = $TVDLDAP_TIMEMOUT"
 echo_debug "DEBUG: SQL Test User........... = $TVDLDAP_SQL_USER"
 echo_debug "DEBUG: SQL Test PWD............ = $TVDLDAP_SQL_PWD"
@@ -302,6 +308,7 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
             if ! alias_enabled; then
                 # run ldapsearch an write output to tempfile
                 ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+                    ${ldaps_options} \
                     ${current_binddn:+"$current_binddn"} ${current_bindpwd} \
                     ${ldapsearch_options} -b "$basedn" -s sub \
                     "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" \
