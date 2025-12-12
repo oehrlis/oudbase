@@ -1,0 +1,52 @@
+#!/bin/sh
+# ------------------------------------------------------------------------------
+# OraDBA - Oracle Database Infrastructur and Security, 5630 Muri, Switzerland
+# ------------------------------------------------------------------------------
+# Name.......: oracle_oud_all
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
+# Editor.....: Stefan Oehrli
+# Date.......: 2025.12.12
+# Version....: v4.0.0
+# chkconfig:   345 90 30
+# description: Init.d script to start / stop all OUD instances using oud_start_stop.sh 
+# Notes......: copy this script to /etc/init.d/oracle_oud_all
+#              activate it with: /sbin/chkconfig -add oracle_oud_all
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes
+# ------------------------------------------------------------------------------
+# - Customization --------------------------------------------------------------
+
+export OUD_USER="oracle"
+# - End of Customization -------------------------------------------------------
+ 
+# - Default Values -------------------------------------------------------------
+# Set the path to the Oracle Unified Directory instance to manage
+. $(eval echo ~${OUD_USER}/.OUD_BASE)
+# - End of Default Values ------------------------------------------------------
+ 
+# Determine what action should be performed on the server
+case "${1}" in
+start)
+    /bin/su - ${OUD_USER} -- "${OUD_BASE}/bin/oud_start_stop.sh" -a start
+    exit ${?}
+    ;;
+stop)
+    /bin/su - ${OUD_USER} -- "${OUD_BASE}/bin/oud_start_stop.sh" -a stop
+    exit ${?}
+    ;;
+restart)
+    /bin/su - ${OUD_USER} -- "${OUD_BASE}/bin/oud_start_stop.sh" -a stop
+    /bin/su - ${OUD_USER} -- "${OUD_BASE}/bin/oud_start_stop.sh" -a start 
+    exit ${?}
+    ;;
+*)
+    echo "Usage:  $0 { start | stop | restart }"
+    exit 1
+    ;;
+esac
+
+# - EOF ------------------------------------------------------------------------

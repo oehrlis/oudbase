@@ -1,0 +1,67 @@
+# ------------------------------------------------------------------------------
+# OraDBA - Oracle Database Infrastructur and Security, 5630 Muri, Switzerland
+# ------------------------------------------------------------------------------
+# File-Name..: oud_instance.service
+# Author.....: Stefan Oehrli, stefan.oehrli@oradba.ch
+# Date.......: 2025.12.12
+# Version....: v4.0.0
+# Purpose....: This is a template file for a systemd unit file for Oracle Unified 
+#              Directory instance. Adjust user, group, service name directory
+#              path before using it.
+# Usage......: systemctl enable oud.service
+# Notes......: Copy the template file and replace the following placeholder:
+#   OUD_INSTANCE        ${OUD_INSTANCE}
+#   OUD_INSTANCE_HOME   ${OUD_INSTANCE_HOME}
+#   USER                $(id -nu)
+#   GROUP               $(id -ng)
+#
+#   cp ${OUD_BASE}/templates/etc/oud_instance.service   ${ETC_BASE}/oud_${OUD_INSTANCE}.service
+#   sed -i "s|OUD_INSTANCE_HOME|${OUD_INSTANCE_HOME}|"  ${ETC_BASE}/oud_${OUD_INSTANCE}.service
+#   sed -i "s|OUD_INSTANCE|${OUD_INSTANCE}|"            ${ETC_BASE}/oud_${OUD_INSTANCE}.service
+#   sed -i "s|USER|$(id -nu)|"                          ${ETC_BASE}/oud_${OUD_INSTANCE}.service
+#   sed -i "s|GROUP|$(id -ng)|"                         ${ETC_BASE}/oud_${OUD_INSTANCE}.service
+#           
+#   Install the script:
+#   sudo cp ${ETC_BASE}/oud_${OUD_INSTANCE}.service /usr/lib/systemd/system/
+#
+#   Enable the service:
+#   sudo systemctl enable oud_${OUD_INSTANCE}.service
+#
+#   Start the service manual:
+#   sudo systemctl start oud_${OUD_INSTANCE}.service
+#
+#   Stop the service manual:
+#   sudo systemctl stop oud_${OUD_INSTANCE}.service
+#
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes
+# ------------------------------------------------------------------------------
+
+[Unit]
+Description=OUD Instance OUD_INSTANCE
+Wants=network.target
+After=network.target
+ 
+[Service]
+Type=forking
+User=USER
+Group=GROUP
+WorkingDirectory=OUD_INSTANCE_HOME/OUD
+PIDFile=OUD_INSTANCE_HOME/OUD/logs/server.pid
+ExecStart=OUD_INSTANCE_HOME/OUD/bin/start-ds --quiet
+ExecStop=OUD_INSTANCE_HOME/OUD/bin/stop-ds --quiet
+ExecReload=OUD_INSTANCE_HOME/OUD/bin/stop-ds --restart --quiet
+RestartSec=42s
+Restart=on-failure
+SuccessExitStatus=143 SIGTERM
+TimeoutSec=300
+StandardOutput=syslog+console
+StandardError=syslog+console
+
+[Install]
+WantedBy=multi-user.target
+# - EOF ------------------------------------------------------------------------

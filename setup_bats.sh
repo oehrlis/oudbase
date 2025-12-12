@@ -17,8 +17,8 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TEST_DIR="${SCRIPT_DIR}/tests"
-HELPER_DIR="${TEST_DIR}/test_helper"
+TEST_DIR="${SCRIPT_DIR}/test"
+HELPER_DIR="${TEST_DIR}/helpers/test_helper"
 
 echo "==> Setting up BATS testing framework..."
 
@@ -85,9 +85,9 @@ echo ""
 echo "==> BATS setup complete!"
 echo ""
 echo "To run tests:"
-echo "  bats tests/*.bats                    # Run all tests"
-echo "  bats tests/test_oudenv_security.bats # Run security tests"
-echo "  bats tests/test_oudenv_stability.bats # Run stability tests"
+echo "  bats test/bats/*.bats                    # Run all tests"
+echo "  bats test/bats/test_oudenv_security.bats # Run security tests"
+echo "  bats test/bats/test_oudenv_stability.bats # Run stability tests"
 echo ""
 echo "Note: Most tests are marked as 'skip' until implementation is complete."
 echo "      As you implement fixes, update the tests to remove the 'skip' statements."

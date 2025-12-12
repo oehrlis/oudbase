@@ -1,0 +1,67 @@
+#!/bin/bash
+# ------------------------------------------------------------------------------
+# OraDBA - Oracle Database Infrastructur and Security, 5630 Muri, Switzerland
+# ------------------------------------------------------------------------------
+# Name.......: 03_config_NET_realm.ldif
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
+# Editor.....: Stefan Oehrli
+# Date.......: 2025.12.12
+# Version....: v4.0.0
+# Purpose....: NET realm configuration for the user and group search base
+# Notes......: The LDIF file is loaded by the script 03_config_NET_realm.sh 
+#              If necessary it can also be imported manually.
+#
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: GPL-3.0+
+# ------------------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes
+# ------------------------------------------------------------------------------
+
+#version: 1
+# Update common EUS Configuration
+# DN: cn=OracleDBSecurityAdmins,cn=OracleContext,BASEDN
+# changetype: modify
+# add: uniquemember
+# uniquemember: cn=role_eus_admins,ou=groups,ou=internal,BASEDN
+# uniquemember: cn=role_oud_admins,ou=groups,ou=internal,BASEDN
+
+# dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+# changetype: modify
+# replace: orclCommonUserSearchBase
+# orclCommonUserSearchBase: ou=people,BASEDN
+
+# dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+# changetype: modify
+# replace: orclCommonUserCreateBase
+# orclCommonUserCreateBase: ou=people,BASEDN
+
+# dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+# changetype: modify
+# replace: orclCommonDefaultUserCreateBase
+# orclCommonDefaultUserCreateBase: ou=people,BASEDN
+
+# dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+# changetype: modify
+# replace: orclCommonGroupCreateBase
+# orclCommonGroupCreateBase: ou=groups,BASEDN
+
+# dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+# changetype: modify
+# replace: orclCommonDefaultGroupCreateBase
+# orclCommonDefaultGroupCreateBase: ou=groups,BASEDN
+
+# dn: cn=Common,cn=Products,cn=OracleContext,BASEDN
+# changetype: modify
+# replace: orclCommonGroupSearchBase
+# orclCommonGroupSearchBase: ou=groups,BASEDN
+
+dn: BASEDN
+changetype: modify
+add: aci
+aci: (target = "ldap:///BASEDN")(targetattr = "* || +")(targetscope = "onelevel") (version 3.0; acl "Authenticated users base tree"; allow (search,read) userdn = "ldap:///all";)
+aci: (target = "ldap:///BASEDN")(targetattr = "* || +")(targetscope = "base") (version 3.0; acl "Anonymous read access to subtree"; allow (read,search) userdn = "ldap:///anyone";)
+aci: (target = "ldap:///BASEDN")(targetattr = "* || +")(targetscope = "subtree") (version 3.0; acl "All full write access"; allow (compare,search,add,write,read,delete) groupdn = "ldap:///cn=role_oud_admins,ou=GROUP_OU,LOCAL_OU,ROOTDN";)
+aci: (target = "ldap:///BASEDN")(targetattr = "* || +")(targetscope = "subtree") (version 3.0; acl "All full read access"; allow (read,search) groupdn = "ldap:///cn=group_all_ro,ou=GROUP_OU,LOCAL_OU,ROOTDN";)
+
+# - EOF ------------------------------------------------------------------------

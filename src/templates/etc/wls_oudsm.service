@@ -1,0 +1,58 @@
+# ------------------------------------------------------------------------------
+# OraDBA - Oracle Database Infrastructur and Security, 5630 Muri, Switzerland
+# ------------------------------------------------------------------------------
+# File-Name..: wls_oudsm.service
+# Author.....: Stefan Oehrli, stefan.oehrli@oradba.ch
+# Date.......: 2025.12.12
+# Version....: v4.0.0
+# Purpose....: Unit file for OUDSM domain
+# Usage......: systemctl enable wls_OUDSM.service
+# Notes......: 
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+#           This is a template file for a systemd service for Oracle Unified 
+#           Directory Server Manager (OUDSM). Adjust user, group and 
+#           directory path before using it.
+#
+#           Install the script:
+#           sudo cp wls_oudsm.service /usr/lib/systemd/system/
+#
+#           Enable the service:
+#           sudo systemctl enable wls_oudsm.service
+#
+#           Disable and deactivate the service:
+#           sudo systemctl disable wls_oudsm.service
+#
+#           Start the service manual:
+#           sudo systemctl start wls_oudsm.service
+#
+#           Stop the service manual:
+#           sudo systemctl stop wls_oudsm.service
+#
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes
+# ------------------------------------------------------------------------------
+
+[Unit]
+Description=WLS OUDSM Instance
+Wants=network.target
+After=network.target
+ 
+[Service]
+Type=simple
+User=oud
+Group=oud
+WorkingDirectory=OUDSM_DOMAIN_HOME
+ExecStart=OUDSM_DOMAIN_HOME/startWebLogic.sh
+ExecStop=OUDSM_DOMAIN_HOME/bin/stopWebLogic.sh
+TimeoutSec=300
+StandardOutput=syslog+console
+StandardError=syslog+console
+ 
+[Install]
+WantedBy=multi-user.target
+# - EOF ------------------------------------------------------------------------
