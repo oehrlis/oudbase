@@ -61,14 +61,14 @@ jobs:
           cd dist && sha256sum *.tar.gz > "checksums.txt"
 
       - name: Import GPG key
-        if: ${{ secrets.GPG_PRIVATE_KEY != '' }}
+        if: secrets.GPG_PRIVATE_KEY != ''
         env:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          echo "${{ secre.tar.gz dist/checksums.txt; do
-            [ -f "$f" ] && Sign artifacts
-          for f in dist/*; do
-            gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" -o "$f.sig" --detach-sign "$f"
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+          # Sign artifacts
+          for f in dist/*.tar.gz dist/checksums.txt; do
+            [ -f "$f" ] && gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" -o "$f.sig" --detach-sign "$f"
           done
 
       - name: Create GitHub Release
