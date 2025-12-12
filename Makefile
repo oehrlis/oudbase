@@ -40,7 +40,7 @@ SHELL := /bin/bash
 DISTDIR ?= dist
 PREFIX ?= /tmp/u00
 VERSION ?= $(shell git describe --tags --always --dirty)
-BATS_VERSION ?= v2.1.2
+BATS_VERSION ?= v1.11.0
 
 # Discover shell files under the repository
 SH_GLOBS := $(shell git ls-files '*.sh' 'src/bin/*' 'scripts/*.sh' 'test/bats/*.bash' 2> /dev/null || true)
@@ -98,12 +98,15 @@ test: test-unit
 
 # Ensure bats is available; install locally if missing
 install-bats:
-	@command -v bats >/dev/null 2>&1 && { echo "bats already installed: $$(command -v bats)"; exit 0; }
-	@echo "Installing bats-core ($(BATS_VERSION)) into $(HOME)/.local..."
-	@git clone --depth 1 --branch $(BATS_VERSION) https://github.com/bats-core/bats-core.git /tmp/bats-core-$$USER-$$RANDOM
-	@/tmp/bats-core-$$USER-$$RANDOM/install.sh $(HOME)/.local
-	@echo 'export PATH="$(HOME)/.local/bin:$$PATH"' >> $(HOME)/.profile || true
-	@echo "bats installed at $(HOME)/.local/bin/bats"
+	@if command -v bats >/dev/null 2>&1; then \
+	  echo "bats already installed: $$(command -v bats)"; \
+	else \
+	  echo "Installing bats-core ($(BATS_VERSION)) into $(HOME)/.local..."; \
+	  git clone --depth 1 --branch $(BATS_VERSION) https://github.com/bats-core/bats-core.git /tmp/bats-core-$$$$; \
+	  cd /tmp/bats-core-$$$$ && ./install.sh $(HOME)/.local; \
+	  echo 'export PATH="$(HOME)/.local/bin:$$PATH"' >> $(HOME)/.profile || true; \
+	  echo "bats installed at $(HOME)/.local/bin/bats"; \
+	fi
 
 test-unit: install-bats
 	@if [ -d test/bats ]; then \
