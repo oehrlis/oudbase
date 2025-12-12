@@ -75,6 +75,8 @@ function Usage() {
                         by setting TVDLDAP_LDAPHOST.
     -p <PORT>           port on LDAP server (default take from ldap.ora). Can be
                         specified by setting TVDLDAP_LDAPPORT.
+    -s                  Use LDAPS (SSL/TLS) with trustall option (OUD only). Can be
+                        specified by setting TVDLDAP_LDAPS.
 
   Bind Options:
     -D <BINDDN>         Bind DN (default ANONYMOUS). Can be specified by setting
@@ -143,7 +145,7 @@ TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR=${TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR:-$TVDLDAP_LOG_
 TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR=${TVDLDAP_DEFAULT_DUMP_OUTPUT_DIR:-$(pwd)}
 
 # get options
-while getopts mvdb:h:p:D:w:Wy:Oo:T:FnE:f:S: CurOpt; do
+while getopts mvdb:h:p:sD:w:Wy:Oo:T:FnE:f:S: CurOpt; do
     case ${CurOpt} in
         m) Usage 0;;
         v) TVDLDAP_VERBOSE="TRUE" ;;
@@ -151,6 +153,7 @@ while getopts mvdb:h:p:D:w:Wy:Oo:T:FnE:f:S: CurOpt; do
         b) TVDLDAP_BASEDN="${OPTARG}";;
         h) TVDLDAP_LDAPHOST=${OPTARG};;
         p) TVDLDAP_LDAPPORT=${OPTARG};;
+        s) TVDLDAP_LDAPS="TRUE";;
         D) TVDLDAP_BINDDN="${OPTARG}";; 
         w) TVDLDAP_BINDDN_PWD="${OPTARG}";; 
         W) TVDLDAP_BINDDN_PWDASK="TRUE";; 
@@ -174,6 +177,7 @@ dump_runtime_config     # dump current tool specific environment in debug mode
 
 # get the ldapsearch options based on available tools
 ldapsearch_options=$(ldapsearch_options)
+ldaps_options=$(ldaps_options)
 
 # Default value for OUTPUT_FILE is null
 OUTPUT_FILE=${OUTPUT_FILE:-""}
@@ -242,6 +246,7 @@ echo_debug "DEBUG: Configuration / Variables:"
 echo_debug "---------------------------------------------------------------------------------"
 echo_debug "DEBUG: LDAP Host............... = $TVDLDAP_LDAPHOST"
 echo_debug "DEBUG: LDAP Port............... = $TVDLDAP_LDAPPORT"
+echo_debug "DEBUG: LDAPS / SSL............. = $TVDLDAP_LDAPS"
 echo_debug "DEBUG: Bind DN................. = $TVDLDAP_BINDDN"
 echo_debug "DEBUG: Bind PWD................ = $(echo_secret $TVDLDAP_BINDDN_PWD)"
 echo_debug "DEBUG: Bind PWD File........... = $TVDLDAP_BINDDN_PWDFILE"
@@ -251,6 +256,7 @@ echo_debug "DEBUG: Net Service Names....... = $NETSERVICE"
 echo_debug "DEBUG: Output directory........ = $OUTPUT_DIR"
 echo_debug "DEBUG: Output file............. = $OUTPUT_FILE"
 echo_debug "DEBUG: ldapsearch options...... = $ldapsearch_options"
+echo_debug "DEBUG: ldaps options........... = $ldaps_options"
 echo_debug "DEBUG: "
 
 for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
@@ -298,11 +304,12 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                 if ! alias_enabled; then
                     # run ldapsearch an write output to tempfile
                     echo_debug "DEBUG: current ldap command => ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
-                        ${current_binddn:+\"$current_binddn\"} ${current_bindpwd} \
+                        ${ldaps_options} ${current_binddn:+\"$current_binddn\"} ${current_bindpwd} \
                         ${ldapsearch_options} -b \"$basedn\" -s sub \
                         \"(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))\" \
                         cn orclNetDescString aliasedObjectName"
                     ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+                        ${ldaps_options} \
                         ${current_binddn:+"$current_binddn"} ${current_bindpwd} \
                         ${ldapsearch_options} -b "$basedn" -s sub \
                         "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" \
