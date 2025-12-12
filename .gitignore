@@ -4,10 +4,27 @@
 **/*.tar.gz
 **/*.tgz
 
-# ignore build stuff
-build/oudbase_install.sh
-build/oudbase_install.tgz
-build/gh-md-toc
+# ignore build artifacts
+scripts/oudbase_install.sh
+scripts/oudbase_install.tgz
+scripts/tvdldap_install.tgz
+scripts/gh-md-toc
+scripts/passwords.txt
+
+# ignore deprecated build directory
+build/
+
+# ignore deprecated local directory
+local/
+
+# ignore deprecated tests directory
+tests/
+
+# ignore empty on-demand directories
+admin/
+backup/
+instances/
+images/
 
 # ignore mac OS resource forks
 **/*.DS_Store
@@ -15,8 +32,8 @@ build/gh-md-toc
 .idea/
 
 # ignore oracle lib's
-local/oudbase/lib/eusm.jar
-local/oudbase/lib/ldapjclnt19.jar
+src/lib/eusm.jar
+src/lib/ldapjclnt19.jar
 
 # Eclipse stuff
 /.pydevproject
@@ -26,5 +43,7 @@ local/oudbase/lib/ldapjclnt19.jar
 /org.python.pydev.PyDevBuilder.launch
 /.externalToolBuilders/
 doc/oudbase.code-workspace
-local/oudbase/log/oud_export.log
-build/passwords.txt
+src/log/oud_export.log
+
+# Test work directory
+test/work/
