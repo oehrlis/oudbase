@@ -88,7 +88,7 @@ export ETC_CORE=${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}
  
 # source the core oudenv customization
 if [ -f "${ETC_CORE}/${OUD_CORE_CONFIG}" ]; then
-    . "${ETC_CORE}/${OUD_CORE_CONFIG}"
+    safe_source "${ETC_CORE}/${OUD_CORE_CONFIG}" "core oudenv configuration" false
 fi
 
 # define location for OUD data
@@ -304,6 +304,150 @@ function sanitize_env_var() {
 # - EOF Input Validation Functions ---------------------------------------------
 
 # ------------------------------------------------------------------------------
+# Secure File Operations Functions
+# ------------------------------------------------------------------------------
+
+function safe_source() {
+# Purpose....: Safely source configuration files with security checks
+# Parameters.: $1 - File path to source
+#              $2 - File description (optional)
+#              $3 - Required flag: "true" or "false" (optional, default: false)
+# Returns....: 0 on success, 1 on failure
+# ------------------------------------------------------------------------------
+    local file="$1"
+    local file_desc="${2:-Configuration file}"
+    local required="${3:-false}"
+    
+    # Check if file exists
+    if [[ ! -e "${file}" ]]; then
+        if [[ "${required}" == "true" ]]; then
+            echo "ERROR: Required ${file_desc} does not exist: ${file}" >&2
+            return 1
+        else
+            return 0  # Optional file missing is OK
+        fi
+    fi
+    
+    # Check if it's a regular file (not symlink, device, etc.)
+    if [[ ! -f "${file}" ]]; then
+        echo "ERROR: ${file_desc} is not a regular file: ${file}" >&2
+        return 1
+    fi
+    
+    # Check if it's a symlink (security risk)
+    if [[ -L "${file}" ]]; then
+        echo "ERROR: ${file_desc} is a symbolic link: ${file}" >&2
+        echo "ERROR: Sourcing symlinks is not allowed for security reasons" >&2
+        return 1
+    fi
+    
+    # Check if readable
+    if [[ ! -r "${file}" ]]; then
+        echo "ERROR: ${file_desc} is not readable: ${file}" >&2
+        return 1
+    fi
+    
+    # Check file size (prevent sourcing huge files - 1MB limit)
+    local file_size
+    if [[ "$(uname)" == "Darwin" ]]; then
+        file_size=$(stat -f%z "${file}" 2>/dev/null || echo 0)
+    else
+        file_size=$(stat -c%s "${file}" 2>/dev/null || echo 0)
+    fi
+    if (( file_size > 1048576 )); then
+        echo "ERROR: ${file_desc} is too large (>1MB): ${file}" >&2
+        return 1
+    fi
+    
+    # Check for world-writable (security risk)
+    local perms
+    if [[ "$(uname)" == "Darwin" ]]; then
+        perms=$(stat -f%p "${file}" 2>/dev/null)
+    else
+        perms=$(stat -c%a "${file}" 2>/dev/null)
+    fi
+    if [[ "${perms: -1}" == "2" ]] || [[ "${perms: -1}" == "6" ]]; then
+        echo "ERROR: ${file_desc} is world-writable: ${file}" >&2
+        return 1
+    fi
+    
+    # All checks passed - source the file
+    # shellcheck disable=SC1090
+    . "${file}"
+}
+
+function create_secure_dir() {
+# Purpose....: Create directory with secure permissions
+# Parameters.: $1 - Directory path
+#              $2 - Permissions (optional, default: 0755)
+#              $3 - Directory description (optional)
+# Returns....: 0 on success, 1 on failure
+# ------------------------------------------------------------------------------
+    local dir="$1"
+    local perms="${2:-0755}"
+    local dir_desc="${3:-Directory}"
+    
+    # Check if already exists
+    if [[ -e "${dir}" ]]; then
+        # Exists - verify it's actually a directory
+        if [[ ! -d "${dir}" ]]; then
+            echo "ERROR: ${dir_desc} exists but is not a directory: ${dir}" >&2
+            return 1
+        fi
+        
+        # Check if it's a symlink
+        if [[ -L "${dir}" ]]; then
+            echo "ERROR: ${dir_desc} is a symbolic link: ${dir}" >&2
+            return 1
+        fi
+        
+        return 0  # Already exists and is valid
+    fi
+    
+    # Create directory with safe permissions
+    mkdir -p "${dir}" || {
+        echo "ERROR: Cannot create ${dir_desc}: ${dir}" >&2
+        return 1
+    }
+    
+    # Set explicit permissions
+    chmod "${perms}" "${dir}" || {
+        echo "WARN: Cannot set permissions ${perms} on ${dir_desc}: ${dir}" >&2
+    }
+    
+    return 0
+}
+
+function create_secure_temp() {
+# Purpose....: Create secure temporary file with random name
+# Parameters.: $1 - Prefix for temp file (optional, default: oudenv)
+# Returns....: Path to temp file on success
+# ------------------------------------------------------------------------------
+    local prefix="${1:-oudenv}"
+    local temp_file
+    
+    # Create temp file with random name
+    temp_file=$(mktemp -t "${prefix}.XXXXXXXXXX") || {
+        echo "ERROR: Cannot create temporary file" >&2
+        return 1
+    }
+    
+    # Set restrictive permissions (owner read/write only)
+    chmod 600 "${temp_file}" || {
+        rm -f "${temp_file}"
+        echo "ERROR: Cannot set permissions on temp file" >&2
+        return 1
+    }
+    
+    # Register cleanup trap
+    trap "rm -f '${temp_file}'" EXIT INT TERM
+    
+    echo "${temp_file}"
+}
+
+# - EOF Secure File Operations Functions ---------------------------------------
+
+# ------------------------------------------------------------------------------
 function get_instance_real_home {
 # Purpose....: get the corresponding PORTS from OUD Instance
 # ------------------------------------------------------------------------------
@@ -511,7 +655,18 @@ function update_oudtab {
     get_ports ${OUD_INSTANCE} ${DIRECTORY_TYPE} ${Silent}
     # get the status of the oud instance and set START_STOP if running assume up=Y, down=N, n/a=N
     START_STOP=$(get_status ${OUD_INSTANCE}|sed 's/up/Y/'|sed 's/down/N/'|sed 's/n\/a/N/')
+    # Use atomic file update with temporary file to prevent TOCTOU races
+    local temp_file
+    temp_file=$(create_secure_temp "oudtab") || return 1
+    
     if [ -f "${OUDTAB}" ]; then
+        # Verify OUDTAB is not a symlink
+        if [ -L "${OUDTAB}" ]; then
+            echo "ERROR: ${OUDTAB} is a symlink, refusing to update"
+            rm -f "${temp_file}"
+            return 1
+        fi
+        
         # OUDTAB does exists so let's update / add an entry
         if [ $(grep -E $ORATAB_PATTERN "${OUDTAB}"| grep -iwc ${OUD_INSTANCE}) -eq 1 ]; then
             # get start/stop flag from existing oudtab assume up=Y, down=N, n/a=N
@@ -520,18 +675,23 @@ function update_oudtab {
             START_STOP=${START_STOP:-"$(get_status "${OUD_INSTANCE}"|sed 's/up/Y/'|sed 's/down/N/'|sed 's/n\/a/N/')"}
             # update the OUDTAB entry
             [ "${Silent}" == "" ] && echo "INFO : update ${OUD_INSTANCE} in ${OUDTAB} adjust flag Y/N"
-            sed -i "/${OUD_INSTANCE}/c\\${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}:${START_STOP}" "${OUDTAB}"
+            sed "/${OUD_INSTANCE}/c\\${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}:${START_STOP}" "${OUDTAB}" > "${temp_file}"
         else
             # add a new OUDTAB entry
             [ "${Silent}" == "" ] && echo "INFO : add ${OUD_INSTANCE} to ${OUDTAB} adjust flag Y/N"
-            echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}:${START_STOP}" >>"${OUDTAB}"
+            cat "${OUDTAB}" > "${temp_file}"
+            echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}:${START_STOP}" >> "${temp_file}"
         fi
+        # Atomically replace the original file
+        mv -f "${temp_file}" "${OUDTAB}"
     else
         # recreate the OUDTAB and add a new entry
         echo "WARN : oudtab (${OUDTAB}) does not exist or is empty. Create a new one.."
-        echo "${OUDTAB_COMMENT}" >"${OUDTAB}"
+        echo "${OUDTAB_COMMENT}" > "${temp_file}"
         [ "${Silent}" == "" ] && echo "INFO : add ${OUD_INSTANCE} to ${OUDTAB} adjust flag Y/N"
-        echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}:${START_STOP}" >>"${OUDTAB}"
+        echo "${OUD_INSTANCE}:${PORT}:${PORT_SSL}:${PORT_ADMIN}:${PORT_REP}:${DIRECTORY_TYPE}:${START_STOP}" >> "${temp_file}"
+        # Atomically create the file
+        mv -f "${temp_file}" "${OUDTAB}"
     fi
 }
 
@@ -922,7 +1082,7 @@ fi
 
 # recreate missing directories
 for i in ${OUD_ADMIN_BASE} ${OUD_BACKUP_BASE} ${OUD_INSTANCE_BASE} ${ETC_BASE} ${LOG_BASE}; do
-    mkdir -p "${i}"
+    create_secure_dir "${i}" "0755" "base directory"
 done
 
 # adjust config files in ETC_BASE if different than ETC_CORE
@@ -932,14 +1092,37 @@ if [ "${ETC_BASE}" != "${ETC_CORE}" ]; then
             if [ -f "${ETC_CORE}/${i}" ] && [ ! -L "${ETC_CORE}/${i}" ]; then
                 # take the file from the $ETC_CORE folder
                 echo "INFO : move config file ${i} from \$ETC_CORE"
+                # Check destination is not a symlink before moving
+                if [ -e "${ETC_BASE}/${i}" ] && [ -L "${ETC_BASE}/${i}" ]; then
+                    echo "ERROR: Destination ${ETC_BASE}/${i} is a symlink, refusing to overwrite"
+                    return 1
+                fi
                 mv "${ETC_CORE}/${i}" "${ETC_BASE}"
             elif [ ! -f "${ETC_CORE}/${i}" ]; then
                 echo "INFO : copy config file ${i} from template folder ${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}"
-                cp "${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}/${i}" "${ETC_BASE}"
+                # Validate source template is not a symlink
+                local template_file="${OUD_BASE}/${DEFAULT_OUD_LOCAL_BASE_TEMPLATES_NAME}/${DEFAULT_OUD_LOCAL_BASE_ETC_NAME}/${i}"
+                if [ -L "${template_file}" ]; then
+                    echo "ERROR: Template file ${template_file} is a symlink, refusing to copy"
+                    return 1
+                fi
+                # Check destination is not a symlink before copying
+                if [ -e "${ETC_BASE}/${i}" ] && [ -L "${ETC_BASE}/${i}" ]; then
+                    echo "ERROR: Destination ${ETC_BASE}/${i} is a symlink, refusing to overwrite"
+                    return 1
+                fi
+                cp "${template_file}" "${ETC_BASE}"
             fi
             # recreate softlinks for some config files
             if [ "${i}" == "oudenv.conf" ] || [ "${i}" == "oudtab" ]; then
                 echo "INFO : re-create softlink for ${i} "
+                # Verify source exists and is not a symlink before creating symlink
+                if [ ! -f "${ETC_BASE}/${i}" ] || [ -L "${ETC_BASE}/${i}" ]; then
+                    echo "ERROR: Source ${ETC_BASE}/${i} does not exist or is a symlink"
+                    return 1
+                fi
+                # Remove existing symlink if present
+                [ -L "${ETC_CORE}/${i}" ] && rm -f "${ETC_CORE}/${i}"
                 ln -s -v "${ETC_BASE}/${i}" "${ETC_CORE}/${i}"
             fi
         fi
@@ -1106,10 +1289,10 @@ fi
 if [ "${RECREATE}" = "TRUE" ]; then
     # re-create instance admin directory
     if [ ! -d "${OUD_INSTANCE_ADMIN}" ]; then
-        mkdir -p "${OUD_INSTANCE_ADMIN}"        >/dev/null 2>&1
-        mkdir -p "${OUD_INSTANCE_ADMIN}/create" >/dev/null 2>&1
-        mkdir -p "${OUD_INSTANCE_ADMIN}/log"    >/dev/null 2>&1
-        mkdir -p "${OUD_INSTANCE_ADMIN}/etc"    >/dev/null 2>&1
+        create_secure_dir "${OUD_INSTANCE_ADMIN}"        "0755" "instance admin directory"
+        create_secure_dir "${OUD_INSTANCE_ADMIN}/create" "0755" "instance admin create directory"
+        create_secure_dir "${OUD_INSTANCE_ADMIN}/log"    "0755" "instance admin log directory"
+        create_secure_dir "${OUD_INSTANCE_ADMIN}/etc"    "0750" "instance admin etc directory"
     fi
 
     # re-create instance admin directory
@@ -1144,20 +1327,16 @@ fi
 # start to source stuff from ETC_CORE
 # source oudenv.conf file from core etc directory if it exits
 if [ -f "${ETC_CORE}/oudenv.conf" ]; then
-    . "${ETC_CORE}/oudenv.conf"
+    safe_source "${ETC_CORE}/oudenv.conf" "core oudenv configuration" false
 fi
 # source oud._DEFAULT_.conf from core etc directory if it exits
 if [ -f "${ETC_CORE}/oud._DEFAULT_.conf" ]; then
-    . "${ETC_CORE}/oud._DEFAULT_.conf"
+    safe_source "${ETC_CORE}/oud._DEFAULT_.conf" "default OUD configuration" false
 fi
  
 # start to source stuff from ETC_BASE
 # source oudenv.conf file to set environment variables and aliases
-if [ -f "${ETC_BASE}/oudenv.conf" ]; then
-    . "${ETC_BASE}/oudenv.conf"
-else
-    echo "WARN : Could not source ${ETC_BASE}/oudenv.conf"
-fi
+safe_source "${ETC_BASE}/oudenv.conf" "base oudenv configuration" true
  
 # set the password file variable based on ETC_BASE
 if [ -f "${OUD_INSTANCE_ADMIN}/etc/${OUD_INSTANCE}_pwd.txt" ]; then
@@ -1168,17 +1347,17 @@ fi
 
 # source custom config file
 if [ -f "${ETC_BASE}/oudenv_custom.conf" ]; then
-    . "${ETC_BASE}/oudenv_custom.conf"
+    safe_source "${ETC_BASE}/oudenv_custom.conf" "custom oudenv configuration" false
 fi 
 
 # source oud._DEFAULT_.conf if exists
 if [ -f "${ETC_BASE}/oud._DEFAULT_.conf" ]; then
-    . "${ETC_BASE}/oud._DEFAULT_.conf"
+    safe_source "${ETC_BASE}/oud._DEFAULT_.conf" "default OUD instance configuration" false
 fi
 
 # source oud.<OUD_INSTANCE>.conf if exists
 if [ -f "${ETC_BASE}/oud.${OUD_INSTANCE}.conf" ]; then
-    . "${ETC_BASE}/oud.${OUD_INSTANCE}.conf"
+    safe_source "${ETC_BASE}/oud.${OUD_INSTANCE}.conf" "instance configuration for ${OUD_INSTANCE}" false
 fi
 
 if [ "${pTTY}" -eq 0 ] && [ "${SILENT}" = "" ] && [ ! "${OUD_INSTANCE}" == 'n/a' ]; then

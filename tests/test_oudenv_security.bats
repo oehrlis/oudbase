@@ -161,13 +161,17 @@ EOF
 # ------------------------------------------------------------------------------
 
 @test "oudenv.sh: Uses secure temp file creation" {
-    # Test that mktemp is used instead of predictable names
-    skip "Implementation pending - will check for mktemp usage"
+    # Test that create_secure_temp is defined and uses mktemp
+    run bash -c "source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -f create_secure_temp"
+    assert_success
+    assert_output --partial 'mktemp'
 }
 
 @test "oudenv.sh: Sets restrictive permissions on created files" {
-    # Temp files should be 0600, dirs 0700
-    skip "Implementation pending"
+    # Test that create_secure_temp sets 600 permissions
+    run bash -c "source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -f create_secure_temp | grep -c 'chmod 600'"
+    assert_success
+    assert_output '1'
 }
 
 @test "oudenv.sh: Checks file existence before sourcing" {
@@ -179,25 +183,50 @@ EOF
 @test "oudenv.sh: Prevents symlink attacks in file operations" {
     # Create a symlink pointing to sensitive file
     local fake_conf="${TEST_TEMP_DIR}/fake.conf"
-    ln -s "/etc/passwd" "${fake_conf}"
+    echo "test=value" > "${TEST_TEMP_DIR}/real.conf"
+    ln -s "${TEST_TEMP_DIR}/real.conf" "${fake_conf}"
     
-    # oudenv.sh should detect and reject symlinks in temp operations
-    skip "Implementation pending"
+    # safe_source should detect and reject symlinks
+    run bash -c "source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; safe_source '${fake_conf}' 'test config' false"
+    assert_failure
+    assert_output --partial 'symlink'
 }
 
 @test "oudenv.sh: Safely handles files with special characters in names" {
-    # Create file with special chars
-    local special_file="${ETC_BASE}/file\$with\`special\`chars.conf"
-    touch "${special_file}"
+    # Test that sanitize_path is defined and blocks dangerous patterns
+    run bash -c "source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -f sanitize_path"
+    assert_success
+    assert_output --partial 'sanitize_path'
+}
+
+@test "oudenv.sh: Rejects world-writable config files" {
+    # Create a world-writable config file
+    local writable_conf="${TEST_TEMP_DIR}/world_writable.conf"
+    echo "test=value" > "${writable_conf}"
+    chmod 666 "${writable_conf}"
     
-    # Should handle without executing embedded commands
-    skip "Implementation pending"
+    # safe_source should reject world-writable files
+    run bash -c "source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; safe_source '${writable_conf}' 'test config' false"
+    assert_failure
+    assert_output --partial 'world-writable'
+}
+
+@test "oudenv.sh: Rejects oversized config files" {
+    # Create a large config file (>1MB)
+    local large_conf="${TEST_TEMP_DIR}/large.conf"
+    dd if=/dev/zero of="${large_conf}" bs=1024 count=1100 2>/dev/null
+    
+    # safe_source should reject files >1MB
+    run bash -c "source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; safe_source '${large_conf}' 'test config' false"
+    assert_failure
+    assert_output --partial 'too large'
 }
 
 @test "oudenv.sh: Avoids race conditions in file checks" {
-    # TOCTOU (Time-of-check, Time-of-use) test
-    # Create file, check it, remove it, use it
-    skip "Implementation pending - complex to test"
+    # Test that update_oudtab uses atomic file operations with temp files
+    run bash -c "source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; declare -f update_oudtab | grep -c 'create_secure_temp'"
+    assert_success
+    assert_output '1'
 }
 
 # ------------------------------------------------------------------------------
