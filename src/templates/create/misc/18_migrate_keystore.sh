@@ -21,7 +21,7 @@
 . "$(dirname $0)/00_init_environment"
 
 # set default values for keystore if not specified
-export KEYSTOREFILE=${KEYSTOREFILE:-"${OUD_INSTANCE_HOME}/OUD/config/keystore"} 
+export KEYSTOREFILE=${KEYSTOREFILE:-"${OUD_INSTANCE_HOME}/OUD/config/keystore"}
 export KEYSTOREPIN=${KEYSTOREPIN:-"${OUD_INSTANCE_HOME}/OUD/config/keystore.pin"}
 
 # - configure instance ---------------------------------------------------------
@@ -31,17 +31,17 @@ echo "  KEYSTOREPIN       : ${KEYSTOREPIN}"
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
-[   -z "${KEYSTOREFILE}" ]  && echo "- skip $(basename $0), variable KEYSTOREFILE not set"  && exit
-[ ! -f "${KEYSTOREFILE}" ]  && echo "- skip $(basename $0), missing file ${KEYSTOREFILE}"   && exit
-[   -z "${KEYSTOREPIN}" ]   && echo "- skip $(basename $0), variable KEYSTOREPIN not set"   && exit
-[ ! -f "${KEYSTOREPIN}" ]   && echo "- skip $(basename $0), missing file ${KEYSTOREPIN}"    && exit
+[ -z "${KEYSTOREFILE}" ] && echo "- skip $(basename $0), variable KEYSTOREFILE not set" && exit
+[ ! -f "${KEYSTOREFILE}" ] && echo "- skip $(basename $0), missing file ${KEYSTOREFILE}" && exit
+[ -z "${KEYSTOREPIN}" ] && echo "- skip $(basename $0), variable KEYSTOREPIN not set" && exit
+[ ! -f "${KEYSTOREPIN}" ] && echo "- skip $(basename $0), missing file ${KEYSTOREPIN}" && exit
 
 echo "- migrate keystore to PKCS12"
 $JAVA_HOME/bin/keytool -importkeystore \
-    -srckeystore ${KEYSTOREFILE} \
-    -srcstorepass $(cat ${KEYSTOREPIN}) \
-    -destkeystore ${KEYSTOREFILE} \
-    -deststorepass $(cat ${KEYSTOREPIN}) \
-    -deststoretype pkcs12
+	-srckeystore ${KEYSTOREFILE} \
+	-srcstorepass $(cat ${KEYSTOREPIN}) \
+	-destkeystore ${KEYSTOREFILE} \
+	-deststorepass $(cat ${KEYSTOREPIN}) \
+	-deststoretype pkcs12
 
 # - EOF ------------------------------------------------------------------------

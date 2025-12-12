@@ -9,7 +9,7 @@
 # Version....: v4.0.0
 # Purpose....: Script to configure the EUS context in the OUD proxy instance.
 # Notes......: The config file 02_config_eus_context.conf is executed using
-#              dsconfig in batch mode. If required, each command can 
+#              dsconfig in batch mode. If required, each command can
 #              also be executed individually.
 #
 #              dsconfig -h ${HOSTNAME} -p $PORT_ADMIN \
@@ -26,7 +26,7 @@
 
 # - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
-CONFIGFILE="$(dirname $0)/$(basename $0 .sh).conf"      # config file based on script name
+CONFIGFILE="$(dirname $0)/$(basename $0 .sh).conf" # config file based on script name
 CONFIGFILE_CUSTOM="$(dirname $0)/$(basename $0 .sh)_${BASEDN_STRING}"
 # - configure instance ---------------------------------------------------------
 echo "Configure OUD proxy instance ${OUD_INSTANCE} using:"
@@ -42,24 +42,24 @@ echo "  AD_PDC_PASSWORD   : ${AD_PDC_PASSWORD}"
 LOCAL_AD_PDC_PASSWORD=""
 # check if we do have a password file
 if [ -f "${AD_PDC_PASSWORD_FILE}" ]; then
-  # set the local password variable pased on password file
-  LOCAL_AD_PDC_PASSWORD=$(cat ${AD_PDC_PASSWORD_FILE})
+	# set the local password variable pased on password file
+	LOCAL_AD_PDC_PASSWORD=$(cat ${AD_PDC_PASSWORD_FILE})
 else
-  # set the local password variable pased on password variable 
-  # or to defalt if variable is empty
-  LOCAL_AD_PDC_PASSWORD=${AD_PDC_PASSWORD:-"default"}
+	# set the local password variable pased on password variable
+	# or to defalt if variable is empty
+	LOCAL_AD_PDC_PASSWORD=${AD_PDC_PASSWORD:-"default"}
 fi
 
 # Update baseDN in LDIF file if required
 if [ -f ${CONFIGFILE} ]; then
-  cp ${CONFIGFILE} ${CONFIGFILE_CUSTOM}
+	cp ${CONFIGFILE} ${CONFIGFILE_CUSTOM}
 else
-  echo "- skip $(basename $0), missing ${CONFIGFILE}"
-  exit
+	echo "- skip $(basename $0), missing ${CONFIGFILE}"
+	exit
 fi
 
 echo "- Update batch file to match ${BASEDN} and other variables"
-echo "Update conf files to match AD" 
+echo "Update conf files to match AD"
 sed -i "s/AD_PDC_HOST/${AD_PDC_HOST}/g" ${CONFIGFILE_CUSTOM}
 sed -i "s/AD_PDC_PORT/${AD_PDC_PORT}/g" ${CONFIGFILE_CUSTOM}
 sed -i "s/AD_PDC_USER/${AD_PDC_USER}/g" ${CONFIGFILE_CUSTOM}
@@ -68,14 +68,14 @@ sed -i "s/BASEDN/${BASEDN}/g" ${CONFIGFILE_CUSTOM}
 
 echo "  Configure EUS context in OUD Proxy Instance"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \
-  --hostname ${HOST} \
-  --port ${PORT_ADMIN} \
-  --bindDN "${DIRMAN}" \
-  --bindPasswordFile "${PWD_FILE}" \
-  --no-prompt \
-  --verbose \
-  --verbose \
-  --trustAll \
-  --batchFilePath "${CONFIGFILE_CUSTOM}"
+	--hostname ${HOST} \
+	--port ${PORT_ADMIN} \
+	--bindDN "${DIRMAN}" \
+	--bindPasswordFile "${PWD_FILE}" \
+	--no-prompt \
+	--verbose \
+	--verbose \
+	--trustAll \
+	--batchFilePath "${CONFIGFILE_CUSTOM}"
 
 # - EOF ------------------------------------------------------------------------

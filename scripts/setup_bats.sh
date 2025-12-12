@@ -23,35 +23,35 @@ HELPER_DIR="${TEST_DIR}/helpers/test_helper"
 echo "==> Setting up BATS testing framework..."
 
 # Check if BATS is installed
-if ! command -v bats &> /dev/null; then
-    echo "==> BATS not found. Installing..."
-    
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS
-        if command -v brew &> /dev/null; then
-            echo "==> Installing BATS via Homebrew..."
-            brew install bats-core
-        else
-            echo "ERROR: Homebrew not found. Please install Homebrew first:"
-            echo "  /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
-            exit 1
-        fi
-    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        # Linux
-        echo "==> Installing BATS from source..."
-        TMP_DIR=$(mktemp -d)
-        cd "${TMP_DIR}"
-        git clone https://github.com/bats-core/bats-core.git
-        cd bats-core
-        sudo ./install.sh /usr/local
-        cd "${SCRIPT_DIR}"
-        rm -rf "${TMP_DIR}"
-    else
-        echo "ERROR: Unsupported operating system: $OSTYPE"
-        exit 1
-    fi
+if ! command -v bats &>/dev/null; then
+	echo "==> BATS not found. Installing..."
+
+	if [[ "$OSTYPE" == "darwin"* ]]; then
+		# macOS
+		if command -v brew &>/dev/null; then
+			echo "==> Installing BATS via Homebrew..."
+			brew install bats-core
+		else
+			echo "ERROR: Homebrew not found. Please install Homebrew first:"
+			echo "  /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+			exit 1
+		fi
+	elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+		# Linux
+		echo "==> Installing BATS from source..."
+		TMP_DIR=$(mktemp -d)
+		cd "${TMP_DIR}"
+		git clone https://github.com/bats-core/bats-core.git
+		cd bats-core
+		sudo ./install.sh /usr/local
+		cd "${SCRIPT_DIR}"
+		rm -rf "${TMP_DIR}"
+	else
+		echo "ERROR: Unsupported operating system: $OSTYPE"
+		exit 1
+	fi
 else
-    echo "==> BATS already installed: $(bats --version)"
+	echo "==> BATS already installed: $(bats --version)"
 fi
 
 # Create test helper directory
@@ -59,26 +59,26 @@ mkdir -p "${HELPER_DIR}"
 
 # Install bats-support
 if [[ ! -d "${HELPER_DIR}/bats-support" ]]; then
-    echo "==> Installing bats-support..."
-    git clone https://github.com/bats-core/bats-support.git "${HELPER_DIR}/bats-support"
+	echo "==> Installing bats-support..."
+	git clone https://github.com/bats-core/bats-support.git "${HELPER_DIR}/bats-support"
 else
-    echo "==> bats-support already installed"
+	echo "==> bats-support already installed"
 fi
 
 # Install bats-assert
 if [[ ! -d "${HELPER_DIR}/bats-assert" ]]; then
-    echo "==> Installing bats-assert..."
-    git clone https://github.com/bats-core/bats-assert.git "${HELPER_DIR}/bats-assert"
+	echo "==> Installing bats-assert..."
+	git clone https://github.com/bats-core/bats-assert.git "${HELPER_DIR}/bats-assert"
 else
-    echo "==> bats-assert already installed"
+	echo "==> bats-assert already installed"
 fi
 
 # Install bats-file
 if [[ ! -d "${HELPER_DIR}/bats-file" ]]; then
-    echo "==> Installing bats-file..."
-    git clone https://github.com/bats-core/bats-file.git "${HELPER_DIR}/bats-file"
+	echo "==> Installing bats-file..."
+	git clone https://github.com/bats-core/bats-file.git "${HELPER_DIR}/bats-file"
 else
-    echo "==> bats-file already installed"
+	echo "==> bats-file already installed"
 fi
 
 echo ""

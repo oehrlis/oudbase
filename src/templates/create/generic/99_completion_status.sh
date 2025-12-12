@@ -9,8 +9,8 @@
 # Version....: v4.0.0
 # Usage......: 99_completion_status.sh
 # Purpose....: simple touch completion status
-# Notes......:  
-# Reference..: 
+# Notes......:
+# Reference..:
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
 # ------------------------------------------------------------------------------
@@ -35,8 +35,8 @@ echo "STATUS_FILE       : ${STATUS_FILE}"
 mkdir -p ${COMMON_DIR}
 # check if HOST variable is defined
 if [ -d "${COMMON_DIR}" ]; then
-    echo "INFO: create status file ${COMMON_DIR}/${STATUS_FILE}"
-    touch ${COMMON_DIR}/${STATUS_FILE}
+	echo "INFO: create status file ${COMMON_DIR}/${STATUS_FILE}"
+	touch ${COMMON_DIR}/${STATUS_FILE}
 fi
 # - touch file when setup finished ---------------------------------------------
 

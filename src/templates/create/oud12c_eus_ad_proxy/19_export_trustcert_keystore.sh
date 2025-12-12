@@ -21,7 +21,7 @@
 . "$(dirname $0)/00_init_environment"
 
 # set default values for keystore if not specified
-export KEYSTOREFILE=${KEYSTOREFILE:-"${OUD_INSTANCE_HOME}/OUD/config/keystore"} 
+export KEYSTOREFILE=${KEYSTOREFILE:-"${OUD_INSTANCE_HOME}/OUD/config/keystore"}
 export KEYSTOREPIN=${KEYSTOREPIN:-"${OUD_INSTANCE_HOME}/OUD/config/keystore.pin"}
 export KEYSTORE_ALIAS=${KEYSTORE_ALIAS:-"server-cert"}
 export TRUSTED_CERT_FILE=${TRUSTED_CERT_FILE:-"${OUD_INSTANCE_ADMIN}/etc/oud_trusted_cert.txt"}
@@ -35,18 +35,18 @@ echo "  TRUSTED_CERT_FILE   : ${TRUSTED_CERT_FILE}"
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
-[   -z "${KEYSTOREFILE}" ]      && echo "- skip $(basename $0), variable KEYSTOREFILE not set"      && exit
-[ ! -f "${KEYSTOREFILE}" ]      && echo "- skip $(basename $0), missing file ${KEYSTOREFILE}"       && exit
-[   -z "${KEYSTOREPIN}" ]       && echo "- skip $(basename $0), variable KEYSTOREPIN not set"       && exit
-[ ! -f "${KEYSTOREPIN}" ]       && echo "- skip $(basename $0), missing file ${KEYSTOREPIN}"        && exit
-[   -z "${KEYSTORE_ALIAS}" ]    && echo "- skip $(basename $0), variable KEYSTORE_ALIAS not set"    && exit
-[   -z "${TRUSTED_CERT_FILE}" ] && echo "- skip $(basename $0), variable TRUSTED_CERT_FILE not set" && exit
-[ ! -f "${TRUSTED_CERT_FILE}" ] && echo "- skip $(basename $0), missing file ${TRUSTED_CERT_FILE}"  && exit
+[ -z "${KEYSTOREFILE}" ] && echo "- skip $(basename $0), variable KEYSTOREFILE not set" && exit
+[ ! -f "${KEYSTOREFILE}" ] && echo "- skip $(basename $0), missing file ${KEYSTOREFILE}" && exit
+[ -z "${KEYSTOREPIN}" ] && echo "- skip $(basename $0), variable KEYSTOREPIN not set" && exit
+[ ! -f "${KEYSTOREPIN}" ] && echo "- skip $(basename $0), missing file ${KEYSTOREPIN}" && exit
+[ -z "${KEYSTORE_ALIAS}" ] && echo "- skip $(basename $0), variable KEYSTORE_ALIAS not set" && exit
+[ -z "${TRUSTED_CERT_FILE}" ] && echo "- skip $(basename $0), variable TRUSTED_CERT_FILE not set" && exit
+[ ! -f "${TRUSTED_CERT_FILE}" ] && echo "- skip $(basename $0), missing file ${TRUSTED_CERT_FILE}" && exit
 
 echo "- export trusted certificate"
 $JAVA_HOME/bin/keytool -export -noprompt -rfc \
-    -alias ${KEYSTORE_ALIAS} \
-    -keystore ${KEYSTOREFILE} \
-    -storepass $(cat ${KEYSTOREPIN}) \
-    -file ${TRUSTED_CERT_FILE}
+	-alias ${KEYSTORE_ALIAS} \
+	-keystore ${KEYSTOREFILE} \
+	-storepass $(cat ${KEYSTOREPIN}) \
+	-file ${TRUSTED_CERT_FILE}
 # - EOF ------------------------------------------------------------------------

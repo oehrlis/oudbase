@@ -18,18 +18,18 @@
 
 # - End of Customization -------------------------------------------------------
 
-# Define a bunch of bash option see 
+# Define a bunch of bash option see
 # https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
 # https://www.davidpashley.com/articles/writing-robust-shell-scripts/
-set -o nounset                      # exit if script try to use an uninitialised variable
+set -o nounset # exit if script try to use an uninitialised variable
 # set -o errexit                      # exit script if any statement returns a non-true return value
 # set -o pipefail                     # pipefail exit after 1st piped commands failed
-set -o noglob                       # Disable filename expansion (globbing).
+set -o noglob # Disable filename expansion (globbing).
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
 VERSION=v4.0.0
 ORACLE_BASE=${ORACLE_BASE:-"/u01/app/oracle"}
-TVDLDAP_BIN_DIR=$(dirname $(find ${ORACLE_BASE} -name tns_add.sh 2>/dev/null|head -1))
+TVDLDAP_BIN_DIR=$(dirname $(find ${ORACLE_BASE} -name tns_add.sh 2>/dev/null | head -1))
 # - EOF Environment Variables --------------------------------------------------
 
 # - Functions ------------------------------------------------------------------
@@ -39,18 +39,18 @@ TVDLDAP_BIN_DIR=$(dirname $(find ${ORACLE_BASE} -name tns_add.sh 2>/dev/null|hea
 . ${TVDLDAP_BIN_DIR}/tns_functions.sh
 source_env
 SUFFIXES=${SUFFIXES:-$(get_all_basedn)}
-SUFFIX=${SUFFIX:-$(get_local_basedn|cut -d' ' -f1|sed -e 's/,dc=/\./g' -e 's/^dc=//')}
+SUFFIX=${SUFFIX:-$(get_local_basedn | cut -d' ' -f1 | sed -e 's/,dc=/\./g' -e 's/^dc=//')}
 # - EOF Initialization ---------------------------------------------------------
- 
+
 # - Main -----------------------------------------------------------------------
 echo "SUFFIX            : ${SUFFIX}"
 echo "SUFFIXES          : ${SUFFIXES}"
 echo "ORACLE_BASE       : ${ORACLE_BASE}"
 echo "TVDLDAP_BIN_DIR   : ${TVDLDAP_BIN_DIR}"
 for i in $SUFFIXES; do
-    echo "add $i"
-    echo "${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY0 -b $i -N <Net String>"
-    ${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY0 -b "$i" -N "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.1.1.12)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=TDB02.trivadislabs.com)))"
+	echo "add $i"
+	echo "${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY0 -b $i -N <Net String>"
+	${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY0 -b "$i" -N "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.1.1.12)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=TDB02.trivadislabs.com)))"
 done
 echo "${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY1.${SUFFIX} -N <Net String>"
 ${TVDLDAP_BIN_DIR}/tns_add.sh -S DUMMY.${SUFFIX} -N "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.1.1.12)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=TDB02.trivadislabs.com)))"

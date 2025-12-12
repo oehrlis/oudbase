@@ -9,7 +9,7 @@
 # Version....: v4.0.0
 # Purpose....: Script to configure the OUD proxy instance.
 # Notes......: The config file 03_config_oud_proxy.conf is executed using
-#              dsconfig in batch mode. If required, each command can 
+#              dsconfig in batch mode. If required, each command can
 #              also be executed individually.
 #
 #              dsconfig -h ${HOSTNAME} -p $PORT_ADMIN \
@@ -26,7 +26,7 @@
 
 # - load instance environment --------------------------------------------------
 . "$(dirname $0)/00_init_environment"
-CONFIGFILE="$(dirname $0)/$(basename $0 .sh).conf"      # config file based on script name
+CONFIGFILE="$(dirname $0)/$(basename $0 .sh).conf" # config file based on script name
 # - configure instance ---------------------------------------------------------
 echo "Configure OUD instance ${OUD_INSTANCE} using:"
 echo "  HOSTNAME          : ${HOST}"
@@ -40,21 +40,21 @@ echo ""
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
-[   -z "${PWD_FILE}" ]    && echo "- skip $(basename $0), variable PWD_FILE not set"          && exit
-[ ! -f "${PWD_FILE}" ]    && echo "- skip $(basename $0), missing password file ${PWD_FILE}"  && exit
-[   -z "${HOST}" ]        && echo "- skip $(basename $0), variable HOST not set"              && exit
-[   -z "${PORT_ADMIN}" ]  && echo "- skip $(basename $0), variable PORT_ADMIN not set"        && exit
-[   -z "${DIRMAN}" ]      && echo "- skip $(basename $0), variable DIRMAN not set"            && exit
-[   -z "${BASEDN}" ]      && echo "- skip $(basename $0), variable BASEDN not set"            && exit
+[ -z "${PWD_FILE}" ] && echo "- skip $(basename $0), variable PWD_FILE not set" && exit
+[ ! -f "${PWD_FILE}" ] && echo "- skip $(basename $0), missing password file ${PWD_FILE}" && exit
+[ -z "${HOST}" ] && echo "- skip $(basename $0), variable HOST not set" && exit
+[ -z "${PORT_ADMIN}" ] && echo "- skip $(basename $0), variable PORT_ADMIN not set" && exit
+[ -z "${DIRMAN}" ] && echo "- skip $(basename $0), variable DIRMAN not set" && exit
+[ -z "${BASEDN}" ] && echo "- skip $(basename $0), variable BASEDN not set" && exit
 
 echo "  Config OUD Proxy Instance"
 ${OUD_INSTANCE_HOME}/OUD/bin/dsconfig \
-  --hostname ${HOST} \
-  --port ${PORT_ADMIN} \
-  --bindDN "${DIRMAN}" \
-  --bindPasswordFile "${PWD_FILE}" \
-  --no-prompt \
-  --verbose \
-  --trustAll \
-  --batchFilePath "${CONFIGFILE}"
+	--hostname ${HOST} \
+	--port ${PORT_ADMIN} \
+	--bindDN "${DIRMAN}" \
+	--bindPasswordFile "${PWD_FILE}" \
+	--no-prompt \
+	--verbose \
+	--trustAll \
+	--batchFilePath "${CONFIGFILE}"
 # - EOF ------------------------------------------------------------------------

@@ -7,7 +7,7 @@
 # Editor.....: Stefan Oehrli
 # Date.......: 2025.12.12
 # Version....: v4.0.0
-# Purpose....: Wrapper Script for oud_start_stop.sh to start/stop OUD Instances 
+# Purpose....: Wrapper Script for oud_start_stop.sh to start/stop OUD Instances
 # Notes......: This script is mainly used for environment without TVD-Basenv
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: Apache License Version 2.0, January 2004 as shown
@@ -20,7 +20,10 @@
 # - Default Values ------------------------------------------------------
 VERSION=v4.0.0
 SCRIPT_NAME=$(basename $0)
-export OUDBASE_BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" ; pwd -P)"
+export OUDBASE_BIN="$(
+	cd "$(dirname "${BASH_SOURCE[0]}")"
+	pwd -P
+)"
 # - End of Default Values ------------------------------------------------------
 
 # - Main -----------------------------------------------------------------------

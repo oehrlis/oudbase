@@ -9,8 +9,8 @@
 # Version....: v4.0.0
 # Usage......: 20_wait_for_host2.sh
 # Purpose....: Script to wait for other host to be ready
-# Notes......:  
-# Reference..: 
+# Notes......:
+# Reference..:
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
 # ------------------------------------------------------------------------------
@@ -25,16 +25,16 @@ SCRIPTFILE="$(dirname $0)/$(basename $0)"
 SCRIPT_BASE="$(dirname $SCRIPTFILE)"
 
 # extract the host* from the script name and convert it to upper case
-HOSTVAR=$(echo ${SCRIPTFILE}| sed -n 's/.*\(host[0-9]\).*/\1/p' | tr '[:lower:]' '[:upper:]')
+HOSTVAR=$(echo ${SCRIPTFILE} | sed -n 's/.*\(host[0-9]\).*/\1/p' | tr '[:lower:]' '[:upper:]')
 RUN_ON_HOST=${!HOSTVAR}
 
 echo "Run host identified as $HOSTVAR=${RUN_ON_HOST}"
 
 # check if current host does match RUN_NOT_ON_HOST
-if [ "${HOST}" == "${RUN_ON_HOST}" ]; then 
-    echo "Run stuff on host ${RUN_ON_HOST}"
+if [ "${HOST}" == "${RUN_ON_HOST}" ]; then
+	echo "Run stuff on host ${RUN_ON_HOST}"
 else
-    echo "Skip script $(basename $SCRIPTFILE) on host ${HOST}"
+	echo "Skip script $(basename $SCRIPTFILE) on host ${HOST}"
 fi
 
 # - EOF ------------------------------------------------------------------------

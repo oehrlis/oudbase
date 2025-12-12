@@ -18,21 +18,21 @@
 
 # - End of Customization -------------------------------------------------------
 
-# Define a bunch of bash option see 
+# Define a bunch of bash option see
 # https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
 # https://www.davidpashley.com/articles/writing-robust-shell-scripts/
-set -o nounset                      # exit if script try to use an uninitialised variable
-set -o errexit                      # exit script if any statement returns a non-true return value
-set -o pipefail                     # pipefail exit after 1st piped commands failed
-set -o noglob                       # Disable filename expansion (globbing).
+set -o nounset  # exit if script try to use an uninitialised variable
+set -o errexit  # exit script if any statement returns a non-true return value
+set -o pipefail # pipefail exit after 1st piped commands failed
+set -o noglob   # Disable filename expansion (globbing).
 # - Environment Variables ------------------------------------------------------
 # define generic environment variables
 VERSION=v4.0.0
-TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"}                     # enable verbose mode
-TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}                         # enable debug mode
-TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}                         # enable quiet mode
+TVDLDAP_VERBOSE=${TVDLDAP_VERBOSE:-"FALSE"} # enable verbose mode
+TVDLDAP_DEBUG=${TVDLDAP_DEBUG:-"FALSE"}     # enable debug mode
+TVDLDAP_QUIET=${TVDLDAP_QUIET:-"FALSE"}     # enable quiet mode
 TVDLDAP_SCRIPT_NAME=$(basename ${BASH_SOURCE[0]})
-TVDLDAP_BIN_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+TVDLDAP_BIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 TVDLDAP_LOG_DIR="$(dirname ${TVDLDAP_BIN_DIR})/log"
 
 # define logfile and logging
@@ -47,11 +47,11 @@ readonly LOGFILE="$LOG_BASE/$(basename $TVDLDAP_SCRIPT_NAME .sh)_$TIMESTAMP.log"
 # Purpose....: Display Usage and exit script
 # ------------------------------------------------------------------------------
 function Usage() {
-    
-    # define default values for function arguments
-    error=${1:-"0"}                 # default error number
-    error_value=${2:-""}            # default error message
-    cat << EOI
+
+	# define default values for function arguments
+	error=${1:-"0"}      # default error number
+	error_value=${2:-""} # default error message
+	cat <<EOI
 
   Usage: ${TVDLDAP_SCRIPT_NAME} [options] [bind options] [add options]
 
@@ -96,70 +96,70 @@ function Usage() {
     LDAP hostname TVDLDAP_LDAPHOST, etc. The configuration files are loaded in
     the following order:
 
-$((get_list_of_config && echo "Command line parameter")|cat -b)
+$(get_list_of_config && echo "Command line parameter" | cat -b)
 
   Logfile : ${LOGFILE}
 
 EOI
-    dump_runtime_config     # dump current tool specific environment in debug mode
-    clean_quit ${error} ${error_value}
+	dump_runtime_config # dump current tool specific environment in debug mode
+	clean_quit ${error} ${error_value}
 }
 # - EOF Functions --------------------------------------------------------------
 
 # - Initialization -------------------------------------------------------------
 # initialize logfile
 touch $LOGFILE 2>/dev/null
-exec &> >(tee -a "$LOGFILE") # Open standard out at `$LOG_FILE` for write.  
-exec 2>&1  
+exec &> >(tee -a "$LOGFILE") # Open standard out at `$LOG_FILE` for write.
+exec 2>&1
 echo "INFO : Start ${TVDLDAP_SCRIPT_NAME} on host $(hostname) at $(date)"
 
 # source common variables and functions from tns_functions.sh
 if [ -f ${TVDLDAP_BIN_DIR}/tns_functions.sh ]; then
-    . ${TVDLDAP_BIN_DIR}/tns_functions.sh
+	. ${TVDLDAP_BIN_DIR}/tns_functions.sh
 else
-    echo "ERROR: Can not find common functions ${TVDLDAP_BIN_DIR}/tns_functions.sh"
-    exit 5
+	echo "ERROR: Can not find common functions ${TVDLDAP_BIN_DIR}/tns_functions.sh"
+	exit 5
 fi
 
 # define signal handling
-trap on_term TERM SEGV      # handle TERM SEGV using function on_term
-trap on_int INT             # handle INT using function on_int
-source_env                  # source oudbase or base environment if it does exists
-load_config                 # load configur26ation files. File list in TVDLDAP_CONFIG_FILES
+trap on_term TERM SEGV # handle TERM SEGV using function on_term
+trap on_int INT        # handle INT using function on_int
+source_env             # source oudbase or base environment if it does exists
+load_config            # load configur26ation files. File list in TVDLDAP_CONFIG_FILES
 
 # get options
 while getopts mvdb:h:p:sD:w:Wy:S:N:nFAE: CurOpt; do
-    case ${CurOpt} in
-        m) Usage 0;;
-        v) TVDLDAP_VERBOSE="TRUE" ;;
-        d) TVDLDAP_DEBUG="TRUE" ;;
-        b) TVDLDAP_BASEDN="${OPTARG}";;
-        h) TVDLDAP_LDAPHOST=${OPTARG};;
-        p) TVDLDAP_LDAPPORT=${OPTARG};;
-        s) TVDLDAP_LDAPS="TRUE";;
-        D) TVDLDAP_BINDDN="${OPTARG}";; 
-        w) TVDLDAP_BINDDN_PWD="${OPTARG}";; 
-        W) TVDLDAP_BINDDN_PWDASK="TRUE";; 
-        y) TVDLDAP_BINDDN_PWDFILE="${OPTARG}";; 
-        F) TVDLDAP_FORCE="TRUE";; 
-        n) TVDLDAP_DRYRUN="TRUE";; 
-        A) TVDLDAP_NETALIAS="TRUE";; 
-        S) NETSERVICE=${OPTARG};;
-        N) NETDESCSTRING="${OPTARG}";;
-        E) clean_quit "${OPTARG}";;
-        *) Usage 2 $*;;
-    esac
+	case ${CurOpt} in
+	m) Usage 0 ;;
+	v) TVDLDAP_VERBOSE="TRUE" ;;
+	d) TVDLDAP_DEBUG="TRUE" ;;
+	b) TVDLDAP_BASEDN="${OPTARG}" ;;
+	h) TVDLDAP_LDAPHOST=${OPTARG} ;;
+	p) TVDLDAP_LDAPPORT=${OPTARG} ;;
+	s) TVDLDAP_LDAPS="TRUE" ;;
+	D) TVDLDAP_BINDDN="${OPTARG}" ;;
+	w) TVDLDAP_BINDDN_PWD="${OPTARG}" ;;
+	W) TVDLDAP_BINDDN_PWDASK="TRUE" ;;
+	y) TVDLDAP_BINDDN_PWDFILE="${OPTARG}" ;;
+	F) TVDLDAP_FORCE="TRUE" ;;
+	n) TVDLDAP_DRYRUN="TRUE" ;;
+	A) TVDLDAP_NETALIAS="TRUE" ;;
+	S) NETSERVICE=${OPTARG} ;;
+	N) NETDESCSTRING="${OPTARG}" ;;
+	E) clean_quit "${OPTARG}" ;;
+	*) Usage 2 $* ;;
+	esac
 done
 
 # display usage and exit if parameter is null
 if [ $# -eq 0 ]; then
-   Usage 1
+	Usage 1
 fi
 
-check_tools             # check if we do have the required LDAP tools available
-check_ldap_tools        # check what kind of LDAP tools we do have e.g. 
-                        # OpenLDAP, Oracle DB or Oracle Unified Directory
-dump_runtime_config     # dump current tool specific environment in debug mode
+check_tools      # check if we do have the required LDAP tools available
+check_ldap_tools # check what kind of LDAP tools we do have e.g.
+# OpenLDAP, Oracle DB or Oracle Unified Directory
+dump_runtime_config # dump current tool specific environment in debug mode
 
 # get the ldapmodify and ldapadd options based on available tools
 ldapmodify_options=$(ldapmodify_options)
@@ -180,9 +180,9 @@ TVDLDAP_LDAPHOST=${TVDLDAP_LDAPHOST:-$(get_ldaphost)}
 TVDLDAP_LDAPPORT=${TVDLDAP_LDAPPORT:-$(get_ldapport)}
 
 # get bind parameter
-ask_bindpwd                         # ask for the bind password if TVDLDAP_BINDDN_PWDASK
-                                    # is TRUE and LDAP tools are not OpenLDAP
-current_binddn=$(get_binddn_param "$TVDLDAP_BINDDN" )
+ask_bindpwd # ask for the bind password if TVDLDAP_BINDDN_PWDASK
+# is TRUE and LDAP tools are not OpenLDAP
+current_binddn=$(get_binddn_param "$TVDLDAP_BINDDN")
 current_bindpwd=$(get_bindpwd_param "$TVDLDAP_BINDDN_PWD" ${TVDLDAP_BINDDN_PWDASK} "$TVDLDAP_BINDDN_PWDFILE")
 if [ -z "${current_binddn}" ] && [ -z "${current_bindpwd}" ]; then clean_quit 4; fi
 
@@ -193,7 +193,7 @@ BASEDN_LIST=$(get_basedn "$TVDLDAP_BASEDN")
 current_basedn=$(split_net_service_basedn ${NETSERVICE})
 current_cn=$(split_net_service_cn ${NETSERVICE})
 # - EOF Initialization ---------------------------------------------------------
- 
+
 # - Main -----------------------------------------------------------------------
 echo_debug "DEBUG: Configuration / Variables:"
 echo_debug "DEBUG: --------------------------------------------------------------------------"
@@ -219,83 +219,83 @@ echo_debug "DEBUG: "
 if [ -n "${current_basedn}" ]; then BASEDN_LIST=${current_basedn}; fi
 
 # loop over base DN
-for basedn in ${BASEDN_LIST}; do 
-    echo_debug "DEBUG: Process base dn $basedn"
-    if ! net_service_exists "$current_cn" "${basedn}" "${current_binddn}" "${current_bindpwd}"; then
-        echo "INFO : Add Net Service Name $current_cn in $basedn" 
-        if ! dryrun_enabled; then
-            if ! alias_enabled; then
-                $ldapadd_command -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
-                    ${ldaps_options} \
-                    ${current_binddn:+"$current_binddn"} \
-                    ${current_bindpwd} ${ldapadd_options} <<-EOI
-dn: cn=$current_cn,cn=OracleContext,$basedn
-objectclass: top
-objectclass: orclNetService
-cn: $current_cn
-orclNetDescString: $NETDESCSTRING
+for basedn in ${BASEDN_LIST}; do
+	echo_debug "DEBUG: Process base dn $basedn"
+	if ! net_service_exists "$current_cn" "${basedn}" "${current_binddn}" "${current_bindpwd}"; then
+		echo "INFO : Add Net Service Name $current_cn in $basedn"
+		if ! dryrun_enabled; then
+			if ! alias_enabled; then
+				$ldapadd_command -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+					${ldaps_options} \
+					${current_binddn:+"$current_binddn"} \
+					${current_bindpwd} ${ldapadd_options} <<-EOI
+						dn: cn=$current_cn,cn=OracleContext,$basedn
+						objectclass: top
+						objectclass: orclNetService
+						cn: $current_cn
+						orclNetDescString: $NETDESCSTRING
 
-EOI
-            else
-                aliasedObjectName=$(split_net_service_cn ${NETDESCSTRING})
-                $ldapadd_command -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
-                    ${ldaps_options} \
-                    ${current_binddn:+"$current_binddn"} \
-                    ${current_bindpwd} ${ldapadd_options} <<-EOI
-dn: cn=$current_cn,cn=OracleContext,$basedn
-aliasedObjectName: cn=$aliasedObjectName,cn=OracleContext,$basedn
-objectClass: alias
-objectClass: top
-objectClass: orclNetServiceAlias
-cn: $current_cn
+					EOI
+			else
+				aliasedObjectName=$(split_net_service_cn ${NETDESCSTRING})
+				$ldapadd_command -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+					${ldaps_options} \
+					${current_binddn:+"$current_binddn"} \
+					${current_bindpwd} ${ldapadd_options} <<-EOI
+						dn: cn=$current_cn,cn=OracleContext,$basedn
+						aliasedObjectName: cn=$aliasedObjectName,cn=OracleContext,$basedn
+						objectClass: alias
+						objectClass: top
+						objectClass: orclNetServiceAlias
+						cn: $current_cn
 
-EOI
-            fi
+					EOI
+			fi
 
-            # check if last command did run successfully
-            if [ $? -ne 0 ]; then clean_quit 33 "$ldapadd_command"; fi
-        else
-            echo "INFO : Dry run enabled, skip add Net Service Name $current_cn in $basedn"
-        fi
-    else
-        if force_enabled; then
-            echo "INFO : Modify Net Service Name $current_cn in $current_basedn"
-            if ! dryrun_enabled; then
-                if ! alias_enabled; then
-                    ldapmodify -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
-                        ${ldaps_options} \
-                        ${current_binddn:+"$current_binddn"} \
-                        ${current_bindpwd} ${ldapmodify_options} <<-EOI
-dn: cn=$current_cn,cn=OracleContext,$current_basedn
-changetype: modify
-replace: orclNetDescString
-orclNetDescString: $NETDESCSTRING
+			# check if last command did run successfully
+			if [ $? -ne 0 ]; then clean_quit 33 "$ldapadd_command"; fi
+		else
+			echo "INFO : Dry run enabled, skip add Net Service Name $current_cn in $basedn"
+		fi
+	else
+		if force_enabled; then
+			echo "INFO : Modify Net Service Name $current_cn in $current_basedn"
+			if ! dryrun_enabled; then
+				if ! alias_enabled; then
+					ldapmodify -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+						${ldaps_options} \
+						${current_binddn:+"$current_binddn"} \
+						${current_bindpwd} ${ldapmodify_options} <<-EOI
+							dn: cn=$current_cn,cn=OracleContext,$current_basedn
+							changetype: modify
+							replace: orclNetDescString
+							orclNetDescString: $NETDESCSTRING
 
-EOI
-                else
-                    aliasedObjectName=$(split_net_service_cn ${NETDESCSTRING})
-                    ldapmodify -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
-                        ${ldaps_options} \
-                        ${current_binddn:+"$current_binddn"} \
-                        ${current_bindpwd} ${ldapmodify_options} <<-EOI
-dn: cn=$current_cn,cn=OracleContext,$current_basedn
-changetype: modify
-replace: aliasedObjectName
-aliasedObjectName: cn=$aliasedObjectName,cn=OracleContext,$basedn
+						EOI
+				else
+					aliasedObjectName=$(split_net_service_cn ${NETDESCSTRING})
+					ldapmodify -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+						${ldaps_options} \
+						${current_binddn:+"$current_binddn"} \
+						${current_bindpwd} ${ldapmodify_options} <<-EOI
+							dn: cn=$current_cn,cn=OracleContext,$current_basedn
+							changetype: modify
+							replace: aliasedObjectName
+							aliasedObjectName: cn=$aliasedObjectName,cn=OracleContext,$basedn
 
-EOI
-                fi
-                # check if last command did run successfully
-                if [ $? -ne 0 ]; then clean_quit 33 "ldapmodify"; fi
-            else
-                echo "INFO : Dry run enabled, skip modify Net Service Name $current_cn in $basedn"
-            fi
-        else
-            printf $TNS_INFO'\n' "WARN : Net Service Name $current_cn does exists in $current_basedn. Enable force mode to modify it."
-        fi
-    fi
+						EOI
+				fi
+				# check if last command did run successfully
+				if [ $? -ne 0 ]; then clean_quit 33 "ldapmodify"; fi
+			else
+				echo "INFO : Dry run enabled, skip modify Net Service Name $current_cn in $basedn"
+			fi
+		else
+			printf $TNS_INFO'\n' "WARN : Net Service Name $current_cn does exists in $current_basedn. Enable force mode to modify it."
+		fi
+	fi
 done
 
-rotate_logfiles                     # purge log files based on TVDLDAP_KEEP_LOG_DAYS
-clean_quit                          # clean exit with return code 0
+rotate_logfiles # purge log files based on TVDLDAP_KEEP_LOG_DAYS
+clean_quit      # clean exit with return code 0
 # --- EOF ----------------------------------------------------------------------

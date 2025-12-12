@@ -29,19 +29,18 @@ RDBMSVER=19
 # Define a bunch of bash option see
 # https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html
 # https://www.davidpashley.com/articles/writing-robust-shell-scripts/
-set -o nounset                      # exit if script try to use an uninitialised variable
-set -o errexit                      # exit script if any statement returns a non-true return value
-set -o pipefail                     # pipefail exit after 1st piped commands failed
+set -o nounset  # exit if script try to use an uninitialised variable
+set -o errexit  # exit script if any statement returns a non-true return value
+set -o pipefail # pipefail exit after 1st piped commands failed
 # - End of Default Values ------------------------------------------------------
 
-if [ -f "$ORACLE_BASE/local/oudbase/lib/eusm.jar" ] &&  [ -f "$ORACLE_BASE/local/oudbase/lib/ldapjclnt19.jar" ]; then
-    $JRE_HOME/bin/java -classpath $ORACLEPKI:$OSDT_CERT:$OSDT_CORE:$JRE_HOME/lib/rt.jar:$OJDBC8:$EUSMLIBDIR/eusm.jar:$EUSMLIBDIR/ldapjclnt$RDBMSVER.jar oracle.security.eus.util.ESMdriver "$@"
+if [ -f "$ORACLE_BASE/local/oudbase/lib/eusm.jar" ] && [ -f "$ORACLE_BASE/local/oudbase/lib/ldapjclnt19.jar" ]; then
+	$JRE_HOME/bin/java -classpath $ORACLEPKI:$OSDT_CERT:$OSDT_CORE:$JRE_HOME/lib/rt.jar:$OJDBC8:$EUSMLIBDIR/eusm.jar:$EUSMLIBDIR/ldapjclnt$RDBMSVER.jar oracle.security.eus.util.ESMdriver "$@"
 else
-    echo "ERROR : Can not find $ORACLE_BASE/local/oudbase/lib/eusm.jar or $ORACLE_BASE/local/oudbase/lib/ldapjclnt19.jar"
-    echo "        Make sure to copy this two java classes from an Oracle 19c installation"
-    echo "        cp $ORACLE_HOME/rdbms/jlib/eusm.jar ."
-    echo "        cp $ORACLE_HOME/jlib/ldapjclnt19.jar ."
+	echo "ERROR : Can not find $ORACLE_BASE/local/oudbase/lib/eusm.jar or $ORACLE_BASE/local/oudbase/lib/ldapjclnt19.jar"
+	echo "        Make sure to copy this two java classes from an Oracle 19c installation"
+	echo "        cp $ORACLE_HOME/rdbms/jlib/eusm.jar ."
+	echo "        cp $ORACLE_HOME/jlib/ldapjclnt19.jar ."
 fi
-
 
 # - EOF ------------------------------------------------------------------------

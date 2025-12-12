@@ -7,9 +7,9 @@
 # Editor.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Date.......: 2025.12.12
 # Version....: v4.0.0
-# Purpose....: Script to create an empty weblogic domain 
-#              with template Basic WebLogic Server Domain  
-# Notes......: 
+# Purpose....: Script to create an empty weblogic domain
+#              with template Basic WebLogic Server Domain
+# Notes......:
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
@@ -40,10 +40,8 @@ echo "MACHINE_NAME      : ${MACHINE_NAME}"
 echo "LISTEN_PORT       : ${LISTEN_PORT}"
 echo "NM_PORT           : ${NM_PORT}"
 
-
 WLS_PASSWORD=$(cat ${PWD_FILE})
 CREATE_SCRIPT_PY=/tmp/create_domain_$$.py
-
 
 sed -e '
 s@###DOMAIN_NAME###@${DOMAIN_NAME}@g
@@ -55,7 +53,7 @@ s@###WLS_PASSWORD###@${WLS_PASSWORD}@g
 s@###NM_PORT###@${NM_PORT}@g
 s@###MACHINE_NAME###@${MACHINE_NAME}@g
 s@###LISTEN_PORT###@${LISTEN_PORT}@g
-' create_domain.py.template > ${CREATE_SCRIPT_PY}
+' create_domain.py.template >${CREATE_SCRIPT_PY}
 
 ${WLS_HOME}/oracle_common/common/bin/wlst.sh ${CREATE_SCRIPT_PY}
 
