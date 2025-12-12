@@ -86,7 +86,7 @@ ${OUD_INSTANCE_HOME}/OUD/bin/ldappasswordmodify \
 	--hostname ${HOST} \
 	--port $PORT_ADMIN --trustAll --useSSL \
 	-D "${DIRMAN}" -j $PWD_FILE \
-	--authzID "$(cat ${EUSADMIN_USERS_DN_FILE})" --newPassword ${ADMIN_PASSWORD} 2>&1 >/dev/null
+	--authzID "$(cat ${EUSADMIN_USERS_DN_FILE})" --newPassword ${ADMIN_PASSWORD} >/dev/null 2>&1
 if [ $? -eq 0 ]; then
 	echo "OK"
 else

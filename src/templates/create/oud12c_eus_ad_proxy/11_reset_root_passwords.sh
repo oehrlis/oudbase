@@ -31,7 +31,7 @@ echo "HOSTNAME          : ${HOST}"
 echo "PORT_ADMIN        : ${PORT_ADMIN}"
 echo "DIRMAN            : ${DIRMAN}"
 echo "PWD_FILE          : ${PWD_FILE}"
-echo "ROOT_USER         : ${ROOT_USERS[@]}"
+echo "ROOT_USER         : ${ROOT_USERS[*]}"
 
 # - check prerequisites --------------------------------------------------------
 # check mandatory variables
@@ -82,7 +82,7 @@ for user in "${ROOT_USERS[@]}"; do
 		--hostname ${HOST} \
 		--port $PORT_ADMIN --trustAll --useSSL \
 		-D "${DIRMAN}" -j $PWD_FILE \
-		--authzID "cn=${user},cn=Root DNs,cn=config" --newPassword ${ADMIN_PASSWORD} 2>&1 >/dev/null
+		--authzID "cn=${user},cn=Root DNs,cn=config" --newPassword ${ADMIN_PASSWORD} >/dev/null 2>&1
 	if [ $? -eq 0 ]; then
 		echo "OK"
 	else

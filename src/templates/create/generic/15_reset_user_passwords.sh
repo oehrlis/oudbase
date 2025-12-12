@@ -79,7 +79,7 @@ for user in "${COMMON_USERS[@]}"; do
 		--hostname ${HOST} \
 		--port $PORT_ADMIN --trustAll --useSSL \
 		-D "${DIRMAN}" -j $PWD_FILE \
-		--authzID "${user}" --newPassword ${DEFAULT_PASSWORD} 2>&1 >/dev/null
+		--authzID "${user}" --newPassword ${DEFAULT_PASSWORD} >/dev/null 2>&1
 	if [ $? -eq 0 ]; then
 		echo "OK"
 	else
