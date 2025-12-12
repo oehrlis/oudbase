@@ -38,6 +38,7 @@ jobs:
           shfmt --version
       - name: Run shfmt (check)
         run: |
+          export PATH="$PATH:$HOME/go/bin"
           # adjust globs to match your scripts
           set -o pipefail
           files=$(git ls-files '*.sh' 'src/bin/*' 'scripts/*.sh' 'test/bats/*.bash' || true)
