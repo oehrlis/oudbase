@@ -60,16 +60,20 @@ jobs:
           VERSION="${GITHUB_REF##*/}"
           cd dist && sha256sum *.tar.gz > "checksums.txt"
 
-      - name: Import GPG key
-        if: ${{ secrets.GPG_PRIVATE_KEY != '' }}
+      - name: Import GPG key and sign artifacts
         env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
-          # Sign artifacts
-          for f in dist/*.tar.gz dist/checksums.txt; do
-            [ -f "$f" ] && gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" -o "$f.sig" --detach-sign "$f"
-          done
+          if [ -n "$GPG_PRIVATE_KEY" ]; then
+            echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+            # Sign artifacts
+            for f in dist/*.tar.gz dist/checksums.txt; do
+              [ -f "$f" ] && gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" -o "$f.sig" --detach-sign "$f"
+            done
+          else
+            echo "GPG_PRIVATE_KEY not set, skipping artifact signing"
+          fi
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
