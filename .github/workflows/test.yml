@@ -7,7 +7,7 @@
 # Date.......: 2025.12.12
 # Version....: v4.0.0
 # Purpose....: Unit tests (BATS) and quick integration checks
-# Notes......: Triggered on pull_request and push to main/dev
+# Notes......: Triggered on pull_request and push to master/dev
 # Reference..: https://github.com/oehrlis/oudbase
 # License....: Apache License Version 2.0, January 2004 as shown
 #              at http://www.apache.org/licenses/
@@ -19,7 +19,7 @@ on:
   pull_request:
   push:
     branches:
-      - main
+      - master
       - dev
 
 jobs:
