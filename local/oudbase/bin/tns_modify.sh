@@ -69,6 +69,8 @@ function Usage() {
                         by setting TVDLDAP_LDAPHOST.
     -p <PORT>           port on LDAP server (default take from ldap.ora). Can be
                         specified by setting TVDLDAP_LDAPPORT.
+    -s                  Use LDAPS (SSL/TLS) with trustall option (OUD only). Can be
+                        specified by setting TVDLDAP_LDAPS.
 
   Bind Options:
     -D <BINDDN>         Bind DN (default ANONYMOUS). Can be specified by setting
@@ -126,7 +128,7 @@ source_env                  # source oudbase or base environment if it does exis
 load_config                 # load configur26ation files. File list in TVDLDAP_CONFIG_FILES
 
 # get options
-while getopts mvdb:h:p:D:w:Wy:S:N:nFAE: CurOpt; do
+while getopts mvdb:h:p:sD:w:Wy:S:N:nFAE: CurOpt; do
     case ${CurOpt} in
         m) Usage 0;;
         v) TVDLDAP_VERBOSE="TRUE" ;;
@@ -134,6 +136,7 @@ while getopts mvdb:h:p:D:w:Wy:S:N:nFAE: CurOpt; do
         b) TVDLDAP_BASEDN="${OPTARG}";;
         h) TVDLDAP_LDAPHOST=${OPTARG};;
         p) TVDLDAP_LDAPPORT=${OPTARG};;
+        s) TVDLDAP_LDAPS="TRUE";;
         D) TVDLDAP_BINDDN="${OPTARG}";; 
         w) TVDLDAP_BINDDN_PWD="${OPTARG}";; 
         W) TVDLDAP_BINDDN_PWDASK="TRUE";; 
@@ -162,6 +165,7 @@ dump_runtime_config     # dump current tool specific environment in debug mode
 ldapmodify_options=$(ldapmodify_options)
 ldapadd_command=$(ldapadd_command)
 ldapadd_options=$(ldapadd_options)
+ldaps_options=$(ldaps_options)
 
 # Default values
 export NETSERVICE=${NETSERVICE:-""}
@@ -195,6 +199,7 @@ echo_debug "DEBUG: Configuration / Variables:"
 echo_debug "DEBUG: --------------------------------------------------------------------------"
 echo_debug "DEBUG: LDAP Host............... = $TVDLDAP_LDAPHOST"
 echo_debug "DEBUG: LDAP Port............... = $TVDLDAP_LDAPPORT"
+echo_debug "DEBUG: LDAPS / SSL............. = $TVDLDAP_LDAPS"
 echo_debug "DEBUG: Bind DN................. = $TVDLDAP_BINDDN"
 echo_debug "DEBUG: Bind PWD................ = $(echo_secret $TVDLDAP_BINDDN_PWD)"
 echo_debug "DEBUG: Bind PWD File........... = $TVDLDAP_BINDDN_PWDFILE"
@@ -207,6 +212,7 @@ echo_debug "DEBUG: Net Service Description. = $NETDESCSTRING"
 echo_debug "DEBUG: Net Service Alias....... = $TVDLDAP_NETALIAS"
 echo_debug "DEBUG: ldapmodify options...... = $ldapmodify_options"
 echo_debug "DEBUG: ldapadd options......... = $ldapadd_options"
+echo_debug "DEBUG: ldaps options........... = $ldaps_options"
 echo_debug "DEBUG: "
 
 # Set BASEDN_LIST to current Base DN from Net Service Name
@@ -221,6 +227,7 @@ for basedn in ${BASEDN_LIST}; do
             if ! dryrun_enabled; then
                 if ! alias_enabled; then
                     $ldapadd_command -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+                        ${ldaps_options} \
                         ${current_binddn:+"$current_binddn"} \
                         ${current_bindpwd} ${ldapadd_options} <<-EOI
 dn: cn=$current_cn,cn=OracleContext,$basedn
@@ -233,6 +240,7 @@ EOI
                 else
                     aliasedObjectName=$(split_net_service_cn ${NETDESCSTRING})
                     $ldapadd_command -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+                        ${ldaps_options} \
                         ${current_binddn:+"$current_binddn"} \
                         ${current_bindpwd} ${ldapadd_options} <<-EOI
 dn: cn=$current_cn,cn=OracleContext,$basedn
@@ -258,6 +266,7 @@ EOI
         if ! dryrun_enabled; then
             if ! alias_enabled; then
                 ldapmodify -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+                    ${ldaps_options} \
                     ${current_binddn:+"$current_binddn"} \
                     ${current_bindpwd} ${ldapmodify_options} <<-EOI
 dn: cn=$current_cn,cn=OracleContext,$current_basedn
@@ -269,6 +278,7 @@ EOI
             else
                 aliasedObjectName=$(split_net_service_cn ${NETDESCSTRING})
                 ldapmodify -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+                    ${ldaps_options} \
                     ${current_binddn:+"$current_binddn"} \
                     ${current_bindpwd} ${ldapmodify_options} <<-EOI
 dn: cn=$current_cn,cn=OracleContext,$current_basedn
