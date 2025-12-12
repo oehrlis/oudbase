@@ -29,13 +29,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Guard .gitmodules/submodules
+        shell: bash
+        run: |
+          if [ -f .gitmodules ]; then
+            git submodule sync --recursive || true
+          fi
       - name: Install shfmt
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y golang-go
-          GO111MODULE=on go install mvdan.cc/sh/v3/cmd/shfmt@latest
-          export PATH="$PATH:$HOME/go/bin"
-          shfmt --version
+          mkdir -p "$HOME/bin"
+          SHFMT_VERSION=3.7.0
+          curl -sSLf "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_linux_amd64" -o "$HOME/bin/shfmt"
+          chmod +x "$HOME/bin/shfmt"
+          echo "$HOME/bin" >> $GITHUB_PATH
       - name: Run shfmt (check)
         run: |
           export PATH="$PATH:$HOME/go/bin"
