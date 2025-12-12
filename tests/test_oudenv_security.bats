@@ -193,6 +193,113 @@ EOF
     assert_output --partial "[ERROR] LDAP port out of valid range"
 }
 
+@test "oudenv.sh: Validates all port types from oudtab" {
+    # Create oudtab with all port types
+    cat > "${ETC_BASE}/oudtab" <<EOF
+oud_test:1389:1636:4444:8989:OUD:Y
+EOF
+    
+    create_mock_oud_instance "oud_test"
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'oud_test' SILENT 2>&1; echo \$PORT:\$PORT_SSL:\$PORT_ADMIN:\$PORT_REP"
+    
+    # All ports should be validated and set
+    assert_success
+    assert_output --partial "1389:1636:4444:8989"
+}
+
+@test "oudenv.sh: Handles ports with leading zeros correctly" {
+    # Create oudtab with leading zeros (should be normalized)
+    cat > "${ETC_BASE}/oudtab" <<EOF
+oud_test:01389:01636:04444:08989:OUD:Y
+EOF
+    
+    create_mock_oud_instance "oud_test"
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'oud_test' SILENT 2>&1; echo \$PORT"
+    
+    # Port should be normalized (leading zero removed)
+    assert_success
+    assert_output --partial "1389"
+}
+
+@test "oudenv.sh: Falls back to default on invalid port" {
+    # Create oudtab with one invalid port
+    cat > "${ETC_BASE}/oudtab" <<EOF
+oud_test:70000:1636:4444:8989:OUD:Y
+EOF
+    
+    create_mock_oud_instance "oud_test"
+    run bash -c "source '${BIN_BASE}/oudenv.sh' 'oud_test' 2>&1"
+    
+    # Should show error message for out of range port
+    assert_success
+    assert_output --partial "[ERROR] LDAP port out of valid range"
+}
+
+@test "oudenv.sh: Validates ports from config.ldif" {
+    # Create instance with config.ldif
+    local instance_dir=$(create_mock_oud_instance "oud_test")
+    
+    # Update config.ldif with specific port configuration
+    cat > "${instance_dir}/OUD/config/config.ldif" <<EOF
+dn: cn=LDAP Connection Handler,cn=Connection Handlers,cn=config
+ds-cfg-listen-port: 1389
+ds-cfg-use-ssl: false
+
+dn: cn=LDAPS Connection Handler,cn=Connection Handlers,cn=config
+ds-cfg-listen-port: 1636
+ds-cfg-use-ssl: true
+
+dn: cn=Administration Connector,cn=config
+ds-cfg-listen-port: 4444
+
+ds-cfg-replication-port: 8989
+EOF
+    
+    cat > "${ETC_BASE}/oudtab" <<EOF
+oud_test:1389:1636:4444:8989:OUD:Y
+EOF
+    
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'oud_test' SILENT 2>&1; echo \$PORT:\$PORT_SSL:\$PORT_ADMIN:\$PORT_REP"
+    
+    # Ports from config.ldif should be validated and used
+    assert_success
+    assert_output --partial "1389:1636:4444:8989"
+}
+
+@test "oudenv.sh: Rejects negative port numbers" {
+    # Test validate_port function directly with negative port
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; validate_port '-1' 'Test port'"
+    
+    # Should fail validation
+    assert_failure
+}
+
+@test "oudenv.sh: Rejects port number zero" {
+    # Test validate_port function directly with port 0
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; validate_port '0' 'Test port'"
+    
+    # Should fail validation (ports start at 1)
+    assert_failure
+}
+
+@test "oudenv.sh: Accepts maximum valid port 65535" {
+    # Test validate_port function with max valid port
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; validate_port '65535' 'Test port'"
+    
+    # Should succeed
+    assert_success
+    assert_output "65535"
+}
+
+@test "oudenv.sh: Handles empty ports gracefully" {
+    # Empty ports are optional - should not fail
+    run bash -c "LOG_LEVEL=ERROR source '${BIN_BASE}/oudenv.sh' 'SILENT' SILENT 2>&1; validate_port '' 'Optional port'"
+    
+    # Should succeed with empty output (optional port)
+    assert_success
+    assert_output ""
+}
+
 @test "oudenv.sh: Sanitizes environment variables before use" {
     export OUD_BASE="/tmp/test\$(rm -rf /)"
     
