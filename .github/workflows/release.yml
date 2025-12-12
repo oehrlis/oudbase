@@ -61,7 +61,7 @@ jobs:
           cd dist && sha256sum *.tar.gz > "checksums.txt"
 
       - name: Import GPG key
-        if: secrets.GPG_PRIVATE_KEY
+        if: ${{ secrets.GPG_PRIVATE_KEY != '' }}
         env:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
