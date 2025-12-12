@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📚 Documentation
+    url: https://github.com/oehrlis/oudbase/blob/master/README.md
+    about: Read the oudbase documentation
+  - name: 💬 Discussions
+    url: https://github.com/oehrlis/oudbase/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/oehrlis/oudbase/security/advisories/new
+    about: Report security vulnerabilities privately

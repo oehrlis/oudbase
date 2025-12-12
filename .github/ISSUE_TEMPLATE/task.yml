@@ -1,0 +1,272 @@
+name: 📋 Task
+description: Track work items, improvements, or refactoring tasks
+title: "[Task]: "
+labels: ["task", "needs-triage"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template for tracking work items, improvements, refactoring, or maintenance tasks.
+
+  - type: textarea
+    id: task-description
+    attributes:
+      label: Task Description
+      description: A clear description of what needs to be done
+      placeholder: Describe the task...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: task-type
+    attributes:
+      label: Task Type
+      description: What type of task is this?
+      options:
+        - Refactoring
+        - Code improvement
+        - Documentation
+        - Testing
+        - Performance optimization
+        - Security improvement
+        - Technical debt
+        - Maintenance
+        - Configuration
+        - CI/CD
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      description: Which component(s) will this task modify?
+      multiple: true
+      options:
+        - oudenv.sh
+        - TNS tools (tns_*.sh)
+        - OUD scripts (oud_*.sh)
+        - OUDSM/WLS scripts
+        - Configuration files
+        - Templates
+        - Tests (BATS)
+        - Documentation
+        - Build system
+        - CI/CD
+        - Multiple components
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this task?
+      options:
+        - Critical (Urgent, blocking other work)
+        - High (Important, should be done soon)
+        - Medium (Normal priority)
+        - Low (Nice to have, can wait)
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this task needed? What problem does it solve?
+      placeholder: |
+        Explain the motivation behind this task.
+        What benefits will it provide?
+        Are there any blockers or issues it resolves?
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation-plan
+    attributes:
+      label: Implementation Plan
+      description: Detailed plan for how to complete this task
+      placeholder: |
+        1. Step one
+        2. Step two
+        3. Step three
+        
+        Include specific functions, files, or approaches.
+    validations:
+      required: true
+
+  - type: textarea
+    id: files-to-modify
+    attributes:
+      label: Files to Modify
+      description: List the files that will be changed
+      placeholder: |
+        - local/oudbase/bin/oudenv.sh
+        - local/oudbase/bin/tns_functions.sh
+        - tests/test_oudenv_security.bats
+        - docs/README.md
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: code-example
+    attributes:
+      label: Code Examples
+      description: Provide code snippets or examples if applicable
+      placeholder: |
+        # Current code:
+        function old_function() {
+            # existing implementation
+        }
+        
+        # New code:
+        function new_function() {
+            # improved implementation
+        }
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: testing-approach
+    attributes:
+      label: Testing Approach
+      description: How will this task be tested?
+      placeholder: |
+        - Add BATS unit tests for new functions
+        - Manual testing with test instances
+        - Verify backward compatibility
+        - Test edge cases
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Define what "done" looks like
+      placeholder: |
+        - [ ] Code changes implemented
+        - [ ] Unit tests added and passing
+        - [ ] Documentation updated
+        - [ ] No regressions in existing functionality
+        - [ ] Code review completed
+      value: |
+        - [ ] Implementation complete
+        - [ ] Tests passing
+        - [ ] Documentation updated
+        - [ ] Code reviewed
+    validations:
+      required: true
+
+  - type: dropdown
+    id: breaking-changes
+    attributes:
+      label: Breaking Changes
+      description: Will this task introduce breaking changes?
+      options:
+        - "No breaking changes"
+        - "Minor breaking changes (documented)"
+        - "Major breaking changes"
+        - "Not applicable"
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: List any dependencies or blockers
+      placeholder: |
+        - Depends on: Issue #123
+        - Blocks: Issue #456
+        - Related to: PR #789
+        - Requires: BATS testing framework
+    validations:
+      required: false
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks and Considerations
+      description: What risks or considerations should be noted?
+      placeholder: |
+        - Potential impact on existing configurations
+        - Requires careful testing with various OUD versions
+        - May affect performance
+        - Security implications
+    validations:
+      required: false
+
+  - type: dropdown
+    id: estimated-effort
+    attributes:
+      label: Estimated Effort
+      description: Rough estimate of effort required
+      options:
+        - XS (< 2 hours)
+        - S (2-4 hours)
+        - M (4-8 hours)
+        - L (1-2 days)
+        - XL (3-5 days)
+        - XXL (> 1 week)
+        - Unknown
+    validations:
+      required: false
+
+  - type: textarea
+    id: subtasks
+    attributes:
+      label: Subtasks
+      description: Break down the task into smaller subtasks if applicable
+      placeholder: |
+        - [ ] Subtask 1: Research and design
+        - [ ] Subtask 2: Implement core functionality
+        - [ ] Subtask 3: Add tests
+        - [ ] Subtask 4: Update documentation
+        - [ ] Subtask 5: Code review and refinement
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: documentation-updates
+    attributes:
+      label: Documentation Updates Required
+      description: What documentation needs to be created or updated?
+      placeholder: |
+        - README.md
+        - IMPLEMENTATION_GUIDE.md
+        - Inline code comments
+        - Usage examples
+        - API documentation
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-notes
+    attributes:
+      label: Additional Notes
+      description: Any other relevant information
+      placeholder: Add any other context, references, or notes...
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please verify the following before submitting
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I have provided a clear implementation plan
+          required: true
+        - label: I have defined acceptance criteria
+          required: true
+        - label: I have considered backward compatibility
+          required: false
