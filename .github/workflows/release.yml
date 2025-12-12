@@ -1,0 +1,65 @@
+# Release pipeline: build, full test matrix, sign, create GitHub Release
+# Trigger: tag push (semantic version tags like v1.2.3)
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tagged commit
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up environment
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y tar gzip gnupg curl
+
+      - name: Lint and full test matrix
+        run: |
+          ./scripts/lint.sh
+          make test
+          # Optionally run slow integration/e2e tests here or in a separate job
+
+      - name: Build release artifact
+        run: |
+          VERSION="${GITHUB_REF##*/}"
+          mkdir -p dist
+          ./packaging/build.sh --version "${VERSION}" --output "dist/oudbase-${VERSION}.tar.gz"
+
+      - name: Generate SBOM (optional)
+        run: |
+          if command -v syft >/dev/null 2>&1; then
+            syft dist/oudbase-${VERSION}.tar.gz -o cyclonedx-json > "dist/oudbase-${VERSION}-sbom.json" || true
+          else
+            echo "syft not installed; skipping SBOM"
+          fi
+
+      - name: Create checksums
+        run: |
+          sha256sum dist/* > "dist/oudbase-${VERSION}-checksums.txt"
+
+      - name: Import GPG key
+        if: ${{ secrets.GPG_PRIVATE_KEY != '' }}
+        env:
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+          # Sign artifacts
+          for f in dist/*; do
+            gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" -o "$f.sig" --detach-sign "$f"
+          done
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          artifacts: dist/*.tar.gz,dist/*.sig,dist/*checksums.txt,dist/*sbom.json
+
+      # Note: For production signing, consider using OIDC and short-lived keys or a dedicated signing service.

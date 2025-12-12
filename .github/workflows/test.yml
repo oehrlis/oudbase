@@ -1,0 +1,41 @@
+# Unit tests (bats) and quick integration checks
+# Trigger: pull_request and push to main/dev
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  bats-unit:
+    name: BATS Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ca-certificates curl git
+          # Install bats-core
+          BATS_VERSION="v2.1.2"
+          git clone --depth 1 --branch ${BATS_VERSION} https://github.com/bats-core/bats-core.git /tmp/bats-core
+          sudo /tmp/bats-core/install.sh /usr/local
+
+      - name: Run unit tests (tests/unit)
+        working-directory: ${{ github.workspace }}
+        run: |
+          if [ -d tests/unit ]; then
+            bats -T tests/unit || (echo "Unit tests failed" && exit 1)
+          else
+            echo "No unit tests found"
+          fi
+
+      - name: Upload test logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bats-unit-logs
+          path: tests/unit || .

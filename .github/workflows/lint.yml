@@ -1,0 +1,55 @@
+# Lint and format checks (fast feedback on PRs)
+# Trigger: pull_request, push (optional)
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  shfmt-check:
+    name: shfmt --check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install shfmt
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y golang-go
+          GO111MODULE=on go install mvdan.cc/sh/v3/cmd/shfmt@latest
+          export PATH="$PATH:$HOME/go/bin"
+          shfmt --version
+      - name: Run shfmt (check)
+        run: |
+          # adjust globs to match your scripts
+          set -o pipefail
+          files=$(git ls-files '*.sh' 'bin/*' 'src/**/*.sh' || true)
+          if [ -z "$files" ]; then
+            echo "No shell files found"
+            exit 0
+          fi
+          echo "$files" | xargs shfmt -d || (echo "Run shfmt -w to fix" && exit 1)
+
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    needs: shfmt-check
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y shellcheck
+          shellcheck --version
+      - name: Run shellcheck
+        run: |
+          files=$(git ls-files '*.sh' 'bin/*' 'src/**/*.sh' || true)
+          if [ -z "$files" ]; then
+            echo "No shell files found"
+            exit 0
+          fi
+          # run shellcheck in parallel-ish
+          echo "$files" | xargs -n1 shellcheck -x || (echo "shellcheck issues found" && exit 1)
