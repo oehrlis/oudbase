@@ -1,5 +1,20 @@
-# Release pipeline: build, full test matrix, sign, create GitHub Release
-# Trigger: tag push (semantic version tags like v1.2.3)
+# ------------------------------------------------------------------------------
+# OraDBA - Oracle Database Infrastructure and Security, 5630 Muri, Switzerland
+# ------------------------------------------------------------------------------
+# Name.......: release.yml
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
+# Editor.....: Stefan Oehrli
+# Date.......: 2025.12.12
+# Version....: v4.0.0
+# Purpose....: Release pipeline - build, test, sign, create GitHub Release
+# Notes......: Triggered on tag push (semantic version tags like v1.2.3)
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes
+# ------------------------------------------------------------------------------
 on:
   push:
     tags:
@@ -22,18 +37,18 @@ jobs:
 
       - name: Lint and full test matrix
         run: |
-          ./scripts/lint.sh
+          make lint
           make test
           # Optionally run slow integration/e2e tests here or in a separate job
 
       - name: Build release artifact
         run: |
           VERSION="${GITHUB_REF##*/}"
-          mkdir -p dist
-          ./packaging/build.sh --version "${VERSION}" --output "dist/oudbase-${VERSION}.tar.gz"
+          make build VERSION="${VERSION}"
 
       - name: Generate SBOM (optional)
         run: |
+          VERSION="${GITHUB_REF##*/}"
           if command -v syft >/dev/null 2>&1; then
             syft dist/oudbase-${VERSION}.tar.gz -o cyclonedx-json > "dist/oudbase-${VERSION}-sbom.json" || true
           else
@@ -42,15 +57,16 @@ jobs:
 
       - name: Create checksums
         run: |
-          sha256sum dist/* > "dist/oudbase-${VERSION}-checksums.txt"
+          VERSION="${GITHUB_REF##*/}"
+          cd dist && sha256sum *.tar.gz > "checksums.txt"
 
       - name: Import GPG key
         if: ${{ secrets.GPG_PRIVATE_KEY != '' }}
         env:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
-          # Sign artifacts
+          echo "${{ secre.tar.gz dist/checksums.txt; do
+            [ -f "$f" ] && Sign artifacts
           for f in dist/*; do
             gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" -o "$f.sig" --detach-sign "$f"
           done

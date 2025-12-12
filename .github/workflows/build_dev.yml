@@ -1,5 +1,20 @@
-# Build dev artifact and run brief integration smoke tests
-# Trigger: push to dev branch
+# ------------------------------------------------------------------------------
+# OraDBA - Oracle Database Infrastructure and Security, 5630 Muri, Switzerland
+# ------------------------------------------------------------------------------
+# Name.......: build_dev.yml
+# Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
+# Editor.....: Stefan Oehrli
+# Date.......: 2025.12.12
+# Version....: v4.0.0
+# Purpose....: Build dev artifact and run integration smoke tests
+# Notes......: Triggered on push to dev branch
+# Reference..: https://github.com/oehrlis/oudbase
+# License....: Apache License Version 2.0, January 2004 as shown
+#              at http://www.apache.org/licenses/
+# ------------------------------------------------------------------------------
+# Modified...:
+# see git revision history with git log for more information on changes
+# ------------------------------------------------------------------------------
 on:
   push:
     branches:
@@ -19,23 +34,20 @@ jobs:
           sudo apt-get install -y tar gzip coreutils
 
       - name: Run lint and unit tests
-        uses: ./.github/actions/run-lint-and-tests
-        # If you don't have a composite action, replace with explicit steps:
-        # run: |
-        #   ./scripts/lint.sh
-        #   make test
+        run: |
+          make lint
+          make test
 
       - name: Build artifact
         run: |
           VERSION="${GITHUB_REF##*/}-dev-${GITHUB_SHA::7}"
-          mkdir -p dist
-          ./packaging/build.sh --output "dist/oudbase-${VERSION}.tar.gz"
+          make build VERSION="${VERSION}"
         env:
           CI_COMMIT_SHA: ${{ github.sha }}
 
       - name: Run integration smoke tests (install to /tmp/u00 prefix)
         run: |
-          ./packaging/installer/oudbase_install.sh --source dist/*.tar.gz --prefix /tmp/u00 || (echo "Smoke tests failed" && exit 1)
+          ./scripts/oudbase_install.sh -b /tmp/u00 -o /tmp/u00 || (echo "Smoke tests failed" && exit 1)
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
