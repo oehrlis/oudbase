@@ -76,6 +76,8 @@ function Usage() {
                         by setting TVDLDAP_LDAPHOST.
     -p <PORT>           port on LDAP server (default take from ldap.ora). Can be
                         specified by setting TVDLDAP_LDAPPORT.
+    -s                  Use LDAPS (SSL/TLS) with trustall option (OUD only). Can be
+                        specified by setting TVDLDAP_LDAPS.
 
   Bind Options:
     -D <BINDDN>         Bind DN (default ANONYMOUS). Can be specified by setting
@@ -133,7 +135,7 @@ load_config                 # load configur26ation files. File list in TVDLDAP_C
 touch $TEMPFILE 2>/dev/null || clean_quit 25 $TEMPFILE
 
 # get options
-while getopts mvdb:h:p:D:w:Wy:S:nFBE: CurOpt; do
+while getopts mvdb:h:p:sD:w:Wy:S:nFBE: CurOpt; do
     case ${CurOpt} in
         m) Usage 0;;
         v) TVDLDAP_VERBOSE="TRUE" ;;
@@ -141,6 +143,7 @@ while getopts mvdb:h:p:D:w:Wy:S:nFBE: CurOpt; do
         b) TVDLDAP_BASEDN="${OPTARG}";;
         h) TVDLDAP_LDAPHOST=${OPTARG};;
         p) TVDLDAP_LDAPPORT=${OPTARG};;
+        s) TVDLDAP_LDAPS="TRUE";;
         D) TVDLDAP_BINDDN="${OPTARG}";; 
         w) TVDLDAP_BINDDN_PWD="${OPTARG}";; 
         W) TVDLDAP_BINDDN_PWDASK="TRUE";; 
@@ -166,6 +169,7 @@ dump_runtime_config     # dump current tool specific environment in debug mode
 
 # get the ldapsearch options based on available tools
 ldapsearch_options=$(ldapsearch_options)
+ldaps_options=$(ldaps_options)
 
 # Default values
 export NETSERVICE=${NETSERVICE:-""}
@@ -208,6 +212,7 @@ echo_debug "DEBUG: Configuration / Variables:"
 echo_debug "DEBUG: ---------------------------------------------------------------------------------"
 echo_debug "DEBUG: LDAP Host............... = $TVDLDAP_LDAPHOST"
 echo_debug "DEBUG: LDAP Port............... = $TVDLDAP_LDAPPORT"
+echo_debug "DEBUG: LDAPS / SSL............. = $TVDLDAP_LDAPS"
 echo_debug "DEBUG: Bind DN................. = $TVDLDAP_BINDDN"
 echo_debug "DEBUG: Bind PWD................ = $(echo_secret $TVDLDAP_BINDDN_PWD)"
 echo_debug "DEBUG: Bind PWD File........... = $TVDLDAP_BINDDN_PWDFILE"
@@ -215,6 +220,7 @@ echo_debug "DEBUG: Bind parameter.......... = $current_binddn $(echo_secret $cur
 echo_debug "DEBUG: Base DN................. = $BASEDN_LIST"
 echo_debug "DEBUG: Net Service Names....... = $NETSERVICE"
 echo_debug "DEBUG: ldapsearch options...... = $ldapsearch_options"
+echo_debug "DEBUG: ldaps options........... = $ldaps_options"
 echo_debug "DEBUG: "
 
 if bulk_enabled; then
@@ -262,11 +268,12 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
             if ! alias_enabled; then
                 # run ldapsearch an write output to tempfile
                 echo_debug "DEBUG: current ldap command => ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
-                    ${current_binddn:+\"$current_binddn\"} ${current_bindpwd} \
+                    ${ldaps_options} ${current_binddn:+\"$current_binddn\"} ${current_bindpwd} \
                     ${ldapsearch_options} -b \"$basedn\" -s sub \
                     \"(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))\" \
                     dn"
                 ldapsearch -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+                    ${ldaps_options} \
                     ${current_binddn:+"$current_binddn"} ${current_bindpwd} \
                     ${ldapsearch_options} -b "$basedn" -s sub \
                     "(&(cn=${current_cn})(|(objectClass=orclNetService)(objectClass=orclService)(objectClass=orclNetServiceAlias)))" \
@@ -286,6 +293,7 @@ for service in $(echo $NETSERVICE | tr "," "\n"); do  # loop over service
                     cn=$(echo ${result}| sed 's/^dn: //')
                     if ! dryrun_enabled; then
                         ldapdelete -h ${TVDLDAP_LDAPHOST} -p ${TVDLDAP_LDAPPORT} \
+                            ${ldaps_options} \
                             ${current_binddn:+"$current_binddn"} ${current_bindpwd} \
                             "$cn"
                     
