@@ -5,7 +5,7 @@
 # Name.......: oud_backup.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.12.12
+# Date.......: 2025.12.15
 # Version....: v4.0.0
 # Purpose....: Bash Script to backup all running OUD Instances
 # Notes......: This script is mainly used for environment without TVD-Basenv

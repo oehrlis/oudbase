@@ -5,7 +5,7 @@
 # Name.......: 07_create_eusadmin_users.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.12.12
+# Date.......: 2025.12.15
 # Version....: v4.0.0
 # Purpose....: Script to create EUS Context Admin according to MOS Note 1996363.1.
 # Notes......: --

@@ -131,7 +131,7 @@ $(DISTDIR)/oudbase-$(VERSION).tar.gz:
 	@echo "Building artifact for version $(VERSION)..."
 	@mkdir -p $(DISTDIR)
 	@if [ -x scripts/build.sh ]; then \
-	  cd scripts && ./build.sh && cp *.tgz ../$(DISTDIR)/oudbase-$(VERSION).tar.gz; \
+	  scripts/build.sh && cp $(DISTDIR)/oudbase_install.tgz $(DISTDIR)/oudbase-$(VERSION).tar.gz; \
 	else \
 	  echo "scripts/build.sh not found or not executable. Please add a build script."; \
 	  exit 1; \

@@ -4,7 +4,7 @@
 # Name.......: 05_config_eus_realm.ldif
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.12.12
+# Date.......: 2025.12.15
 # Version....: v4.0.0
 # Purpose....: EUS realm configuration for the user and group search base
 # Notes......: The LDIF file is loaded by the script 03_config_eus_realm.sh 

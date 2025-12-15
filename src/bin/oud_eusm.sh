@@ -5,7 +5,7 @@
 # Name.......: oud_eusm.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.12.12
+# Date.......: 2025.12.15
 # Version....: v4.0.0
 # Purpose....: Shell script for EUS admin tool (command line)
 # Notes......: This script is mainly used for environment without TVD-Basenv

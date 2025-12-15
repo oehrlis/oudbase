@@ -5,7 +5,7 @@
 # Name.......: oud_start_stop_all
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.12.12
+# Date.......: 2025.12.15
 # Version....: v4.0.0
 # Purpose....: Wrapper Script for oud_start_stop.sh to start/stop OUD Instances
 # Notes......: This script is mainly used for environment without TVD-Basenv

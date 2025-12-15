@@ -88,9 +88,12 @@ sed -i "\|./templates/etc/i|d" "${SCRIPT_DIR}"/../src/doc/.tvdldap.sha
 sed -i "\|./templates/etc/w|d" "${SCRIPT_DIR}"/../src/doc/.tvdldap.sha
 sed -i "\|./templates/etc/h|d" "${SCRIPT_DIR}"/../src/doc/.tvdldap.sha
 
+# Create output directory
+mkdir -p "${SCRIPT_DIR}"/../dist
+
 # Tar all together
 echo "Put all together in a tar"
-tar --verbose -zcvf "${SCRIPT_DIR}"/oudbase_install.tgz \
+tar --verbose -zcvf "${SCRIPT_DIR}"/../dist/oudbase_install.tgz \
 	--exclude=bin/oudbase_install.sh \
 	--exclude=log/*.log \
 	--exclude=doc/.tvdldap.sha \
@@ -100,7 +103,7 @@ tar --verbose -zcvf "${SCRIPT_DIR}"/oudbase_install.tgz \
 
 # create tns utility tar file
 echo "Put all tns utilities together in a tar"
-tar --verbose -zcvf "${SCRIPT_DIR}"/tvdldap_install.tgz \
+tar --verbose -zcvf "${SCRIPT_DIR}"/../dist/tvdldap_install.tgz \
 	--exclude=bin/*oud* \
 	--exclude=etc/*oud* \
 	--exclude=log/*.log \
@@ -118,7 +121,7 @@ tar --verbose -zcvf "${SCRIPT_DIR}"/tvdldap_install.tgz \
 # build this nice executable shell script with a TAR payload
 echo "Create this fancy shell with a tar payload"
 
-cat bin/oudbase_install.sh >"${SCRIPT_DIR}"/oudbase_install.sh
+cat bin/oudbase_install.sh >"${SCRIPT_DIR}"/../dist/oudbase_install.sh
 
 # Append the payload
 if [[ ${PAYLOAD_BINARY} -ne 0 ]]; then
@@ -127,25 +130,25 @@ if [[ ${PAYLOAD_BINARY} -ne 0 ]]; then
 	sed \
 		-e 's/^PAYLOAD_BASE64=./PAYLOAD_BASE64=0/' \
 		-e 's/^PAYLOAD_BINARY=./PAYLOAD_BINARY=1/' \
-		bin/oudbase_install.sh >"${SCRIPT_DIR}"/oudbase_install.sh
+		bin/oudbase_install.sh >"${SCRIPT_DIR}"/../dist/oudbase_install.sh
 	# set the payload pointer
-	echo "__TAR_PAYLOAD__" >>"${SCRIPT_DIR}"/oudbase_install.sh
-	cat "${SCRIPT_DIR}"/oudbase_install.tgz >>"${SCRIPT_DIR}"/oudbase_install.sh
+	echo "__TAR_PAYLOAD__" >>"${SCRIPT_DIR}"/../dist/oudbase_install.sh
+	cat "${SCRIPT_DIR}"/../dist/oudbase_install.tgz >>"${SCRIPT_DIR}"/../dist/oudbase_install.sh
 elif [[ ${PAYLOAD_BASE64} -ne 0 ]]; then
 	echo "Add base64 payload"
 	# first get the install script
 	sed \
 		-e 's/^PAYLOAD_BASE64=./PAYLOAD_BASE64=1/' \
 		-e 's/^PAYLOAD_BINARY=./PAYLOAD_BINARY=0/' \
-		bin/oudbase_install.sh >"${SCRIPT_DIR}"/oudbase_install.sh
+		bin/oudbase_install.sh >"${SCRIPT_DIR}"/../dist/oudbase_install.sh
 	# set the payload pointer
-	echo "__TAR_PAYLOAD__" >>"${SCRIPT_DIR}"/oudbase_install.sh
-	openssl base64 <"${SCRIPT_DIR}"/oudbase_install.tgz >>"${SCRIPT_DIR}"/oudbase_install.sh
+	echo "__TAR_PAYLOAD__" >>"${SCRIPT_DIR}"/../dist/oudbase_install.sh
+	openssl base64 <"${SCRIPT_DIR}"/../dist/oudbase_install.tgz >>"${SCRIPT_DIR}"/../dist/oudbase_install.sh
 fi
 
 # clean up
 echo "Clean up...."
 rm "${SCRIPT_DIR}"/../src/doc/README.md
 rm "${SCRIPT_DIR}"/../src/doc/LICENSE
-chmod 755 "${SCRIPT_DIR}"/oudbase_install.sh
+chmod 755 "${SCRIPT_DIR}"/../dist/oudbase_install.sh
 # - EOF ------------------------------------------------------------------------

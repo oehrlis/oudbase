@@ -5,7 +5,7 @@
 # Name.......: oud_functions.sh
 # Author.....: Stefan Oehrli (oes) stefan.oehrli@oradba.ch
 # Editor.....: Stefan Oehrli
-# Date.......: 2025.12.12
+# Date.......: 2025.12.15
 # Version....: v4.0.0
 # Purpose....: Common OUD Base functions.
 # Notes......: Has to be source in the vagrant provisioning bash scripts to load
