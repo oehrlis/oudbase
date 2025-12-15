@@ -1,50 +1,29 @@
 name: 🐛 Bug Report
 description: Report a bug or unexpected behavior in oudbase
 title: "[Bug]: "
-labels: ["bug", "needs-triage"]
+labels: ["bug"]
 assignees: []
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thank you for taking the time to report a bug! Please fill out the form below to help us understand and resolve the issue.
-
   - type: textarea
     id: description
     attributes:
       label: Bug Description
-      description: A clear and concise description of what the bug is.
-      placeholder: Describe the bug...
+      description: Describe the bug and what you expected to happen
+      placeholder: What's wrong and what should happen instead?
     validations:
       required: true
 
   - type: dropdown
     id: component
     attributes:
-      label: Affected Component
-      description: Which part of oudbase is affected?
+      label: Component
+      description: Which component is affected?
       options:
-        - oudenv.sh (Environment setup)
-        - TNS tools (tns_*.sh)
-        - OUD backup/restore
-        - OUD start/stop scripts
-        - OUDSM/WLS scripts
-        - Configuration files
-        - Documentation
+        - oudenv.sh
+        - TNS tools
+        - OUD scripts
+        - Templates
         - Other
-    validations:
-      required: true
-
-  - type: dropdown
-    id: severity
-    attributes:
-      label: Severity
-      description: How severe is this bug?
-      options:
-        - Critical (System crash, data loss, security vulnerability)
-        - High (Major functionality broken, no workaround)
-        - Medium (Functionality impaired, workaround available)
-        - Low (Minor issue, cosmetic problem)
     validations:
       required: true
 
@@ -52,43 +31,22 @@ body:
     id: steps-to-reproduce
     attributes:
       label: Steps to Reproduce
-      description: Detailed steps to reproduce the bug
+      description: How can we reproduce this issue?
       placeholder: |
         1. Run command '...'
-        2. Set environment variable '...'
-        3. Execute script '...'
-        4. See error
+        2. See error
       value: |
         1. 
         2. 
-        3. 
-    validations:
-      required: true
-
-  - type: textarea
-    id: expected-behavior
-    attributes:
-      label: Expected Behavior
-      description: What did you expect to happen?
-      placeholder: Describe the expected behavior...
-    validations:
-      required: true
-
-  - type: textarea
-    id: actual-behavior
-    attributes:
-      label: Actual Behavior
-      description: What actually happened?
-      placeholder: Describe what actually happened...
     validations:
       required: true
 
   - type: textarea
     id: error-output
     attributes:
-      label: Error Messages/Logs
-      description: Please paste any relevant error messages or log output
-      placeholder: Paste error messages or logs here...
+      label: Error Output
+      description: Paste any error messages or logs
+      placeholder: Error messages or logs...
       render: shell
     validations:
       required: false
@@ -96,57 +54,16 @@ body:
   - type: textarea
     id: environment
     attributes:
-      label: Environment Details
-      description: Please provide information about your environment
+      label: Environment
+      description: Basic environment information
       placeholder: |
-        - OS: [e.g., Oracle Linux 8.5, Ubuntu 20.04]
-        - Shell: [e.g., bash 5.1.8]
-        - OUD Version: [e.g., 12.2.1.4.0]
-        - oudbase Version: [e.g., 3.4.5 or commit hash]
-        - Installation method: [e.g., manual, Docker]
+        - OS: Oracle Linux 8
+        - OUD Version: 12.2.1.4.0
+        - oudbase Version: v3.4.5
       value: |
         - OS: 
-        - Shell: 
         - OUD Version: 
         - oudbase Version: 
-        - Installation method: 
-    validations:
-      required: true
-
-  - type: textarea
-    id: configuration
-    attributes:
-      label: Configuration Files
-      description: Please share relevant parts of your configuration (remove sensitive data)
-      placeholder: |
-        # oudenv.conf
-        export ORACLE_BASE=/u01/app/oracle
-        export OUD_BASE=/u01/oudbase
-        
-        # oudtab entry
-        oud_prod:1389:1636:4444:8989:OUD:Y
-      render: shell
-    validations:
-      required: false
-
-  - type: textarea
-    id: workaround
-    attributes:
-      label: Workaround (if any)
-      description: Have you found a temporary workaround?
-      placeholder: Describe any workaround you've found...
-    validations:
-      required: false
-
-  - type: dropdown
-    id: security-impact
-    attributes:
-      label: Security Impact
-      description: Does this bug have security implications?
-      options:
-        - "No security impact"
-        - "Potential security concern"
-        - "Confirmed security vulnerability"
     validations:
       required: true
 
@@ -154,22 +71,7 @@ body:
     id: additional-context
     attributes:
       label: Additional Context
-      description: Add any other context, screenshots, or relevant information
-      placeholder: Any additional information that might be helpful...
+      description: Any other relevant information (config snippets, workarounds, etc.)
+      placeholder: Optional additional details...
     validations:
       required: false
-
-  - type: checkboxes
-    id: checklist
-    attributes:
-      label: Pre-submission Checklist
-      description: Please verify the following before submitting
-      options:
-        - label: I have searched existing issues to avoid duplicates
-          required: true
-        - label: I have included all required information above
-          required: true
-        - label: I have removed any sensitive data from logs and configuration
-          required: true
-        - label: I can consistently reproduce this bug
-          required: false

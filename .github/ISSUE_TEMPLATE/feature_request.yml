@@ -1,63 +1,40 @@
 name: 💡 Feature Request
 description: Suggest a new feature or enhancement for oudbase
 title: "[Feature]: "
-labels: ["enhancement", "needs-triage"]
+labels: ["enhancement"]
 assignees: []
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thank you for suggesting a new feature! Please provide detailed information to help us understand your proposal.
-
   - type: textarea
     id: feature-summary
     attributes:
-      label: Feature Summary
-      description: A brief, clear description of the feature you'd like to see
-      placeholder: Summarize the feature in 1-2 sentences...
+      label: Feature Description
+      description: What feature would you like to see?
+      placeholder: Describe the feature and why it would be useful...
     validations:
       required: true
 
   - type: dropdown
     id: component
     attributes:
-      label: Target Component
-      description: Which part of oudbase would this feature affect?
+      label: Component
+      description: Which component would this affect?
       options:
-        - oudenv.sh (Environment setup)
-        - TNS tools (tns_*.sh)
-        - OUD backup/restore
-        - OUD start/stop scripts
-        - OUDSM/WLS scripts
-        - Configuration management
-        - Testing infrastructure
+        - oudenv.sh
+        - TNS tools
+        - OUD scripts
+        - Templates
         - Documentation
         - New component
-        - Multiple components
-    validations:
-      required: true
-
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Priority
-      description: How important is this feature to you?
-      options:
-        - Critical (Blocking current work)
-        - High (Significantly improves workflow)
-        - Medium (Nice to have, moderate impact)
-        - Low (Minor improvement)
+        - Other
     validations:
       required: true
 
   - type: textarea
     id: problem-statement
     attributes:
-      label: Problem Statement
-      description: What problem does this feature solve? What's the use case?
-      placeholder: |
-        Describe the problem or limitation you're experiencing that this feature would address.
-        Use cases and real-world scenarios are very helpful!
+      label: Use Case
+      description: What problem does this solve? How would you use it?
+      placeholder: Describe the use case and benefits...
     validations:
       required: true
 
@@ -65,116 +42,11 @@ body:
     id: proposed-solution
     attributes:
       label: Proposed Solution
-      description: Describe your proposed solution in detail
+      description: How should this work? Include examples if possible.
       placeholder: |
-        How should this feature work?
-        What commands, options, or configurations would be involved?
-        Include examples of usage if possible.
-    validations:
-      required: true
-
-  - type: textarea
-    id: usage-example
-    attributes:
-      label: Usage Example
-      description: Provide examples of how you would use this feature
-      placeholder: |
-        # Example usage:
-        source oudenv.sh --new-option
-        
-        # Or for TNS tools:
-        tns_add.sh -n mydb -c "connection_string" --new-flag
+        # Example:
+        command --new-option value
       render: shell
-    validations:
-      required: false
-
-  - type: textarea
-    id: alternatives
-    attributes:
-      label: Alternatives Considered
-      description: Have you considered any alternative solutions or workarounds?
-      placeholder: Describe alternative approaches or current workarounds...
-    validations:
-      required: false
-
-  - type: dropdown
-    id: breaking-changes
-    attributes:
-      label: Breaking Changes
-      description: Would this feature introduce breaking changes?
-      options:
-        - "No breaking changes (backward compatible)"
-        - "Minor breaking changes (with migration path)"
-        - "Major breaking changes"
-        - "Not sure"
-    validations:
-      required: true
-
-  - type: textarea
-    id: benefits
-    attributes:
-      label: Benefits
-      description: What benefits would this feature provide?
-      placeholder: |
-        - Improved performance
-        - Better security
-        - Easier configuration
-        - Enhanced functionality
-        - etc.
-    validations:
-      required: false
-
-  - type: dropdown
-    id: implementation-interest
-    attributes:
-      label: Implementation Interest
-      description: Would you be interested in implementing this feature?
-      options:
-        - "Yes, I can implement this feature"
-        - "Yes, with some guidance"
-        - "No, but I can help test"
-        - "No, just requesting"
-    validations:
-      required: true
-
-  - type: textarea
-    id: related-features
-    attributes:
-      label: Related Features/Issues
-      description: Are there related features or existing issues?
-      placeholder: |
-        - Related to issue #123
-        - Similar to feature X in tool Y
-        - Depends on issue #456
-    validations:
-      required: false
-
-  - type: textarea
-    id: documentation-impact
-    attributes:
-      label: Documentation Impact
-      description: What documentation would need to be updated?
-      placeholder: |
-        - README.md updates
-        - New examples needed
-        - Configuration guide changes
-        - etc.
-    validations:
-      required: false
-
-  - type: dropdown
-    id: compatibility
-    attributes:
-      label: Target OUD Versions
-      description: Which OUD versions should this support?
-      multiple: true
-      options:
-        - OUD 11g (11.1.1.7+)
-        - OUD 12c (12.2.1.3+)
-        - OUD 12c (12.2.1.4+)
-        - OUD 14c (14.1.1.0+)
-        - All versions
-        - Not version-specific
     validations:
       required: false
 
@@ -182,26 +54,7 @@ body:
     id: additional-context
     attributes:
       label: Additional Context
-      description: Add any other context, mockups, or references
-      placeholder: |
-        - Screenshots or mockups
-        - Links to relevant documentation
-        - Examples from other tools
-        - Any other relevant information
+      description: Any other relevant information (alternatives, related issues, etc.)
+      placeholder: Optional additional details...
     validations:
       required: false
-
-  - type: checkboxes
-    id: checklist
-    attributes:
-      label: Pre-submission Checklist
-      description: Please verify the following before submitting
-      options:
-        - label: I have searched existing issues and feature requests to avoid duplicates
-          required: true
-        - label: This feature aligns with oudbase's purpose (OUD management)
-          required: true
-        - label: I have provided clear use cases and examples
-          required: true
-        - label: I am willing to help test this feature when implemented
-          required: false
