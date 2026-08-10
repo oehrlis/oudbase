@@ -478,8 +478,13 @@ function source_env() {
 
 	if [ -n "${OUDENV}" ]; then
 		echo_debug "DEBUG: source ${OUDENV}"
+		set +o nounset  # disable nounset
+		set +o errexit  # disable errexit
+		set +o pipefail # disable pipefail
 		# Load OUD environment
 		. "${OUDENV}" SILENT
+		set -o nounset  # exit if script try to use an uninitialised variable
+		# Note: Do not re-enable errexit/pipefail here as it may cause issues
 	else
 		echo_debug "DEBUG: no oudenv.sh found to source"
 	fi
