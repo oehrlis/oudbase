@@ -34,7 +34,7 @@
 # ------------------------------------------------------------------------------
 
 SHELL := /bin/bash
-.PHONY: help fmt lint test test-unit test-integration build package install-local clean ci release install-bats
+.PHONY: help fmt lint test test-unit test-integration build package install-local clean ci release install-bats tag
 
 # Configurable vars
 DISTDIR ?= dist
@@ -55,6 +55,7 @@ help:
 	@echo "  make package             # alias for build"
 	@echo "  make install-local       # install built artifact into PREFIX (for local testing)"
 	@echo "  make release             # build + checksums (+optional signing if GPG env provided)"
+	@echo "  make tag                 # tag the VERSION file's version, push branch + tag (NO_PUSH=1: local only)"
 	@echo "  make ci                  # run lint, tests, build (used by CI)"
 	@echo ""
 	@echo "Variables:"
@@ -167,6 +168,27 @@ else
 	  gpg --batch --yes --pinentry-mode loopback --output "$$f.sig" --detach-sign "$$f"; \
 	done
 endif
+
+# Tag the version from the VERSION file and push branch + tag.
+# A tag that is not pushed does not exist remotely - v2.0.0.0 was once only
+# rescued from a USB backup. Pushed by explicit name (never --tags/--follow-tags),
+# so no stray local tag leaves with it. The tag push starts the release workflow.
+TAG_VERSION := $(strip $(shell cat VERSION 2> /dev/null))
+
+tag:
+	@[ -n "$(TAG_VERSION)" ] || { echo "ERROR: VERSION file missing or empty" >&2; exit 1; }
+	@[ -z "$$(git status --porcelain)" ] || { echo "ERROR: working tree not clean" >&2; exit 1; }
+	@! git rev-parse -q --verify "refs/tags/$(TAG_VERSION)" > /dev/null || { echo "ERROR: tag $(TAG_VERSION) already exists" >&2; exit 1; }
+	@git tag -a "$(TAG_VERSION)" -m "Release $(TAG_VERSION)"
+	@BRANCH=$$(git rev-parse --abbrev-ref HEAD); \
+	if [ -n "$(NO_PUSH)" ]; then \
+	  echo "NO_PUSH set - tag $(TAG_VERSION) is local only. To push:"; \
+	  echo "  git push origin $$BRANCH && git push origin $(TAG_VERSION)"; \
+	else \
+	  git push origin "$$BRANCH" && git push origin "$(TAG_VERSION)" \
+	    || { echo "ERROR: push failed - tag is local only. Run: git push origin $$BRANCH && git push origin $(TAG_VERSION)" >&2; exit 1; }; \
+	  echo "pushed $$BRANCH and $(TAG_VERSION)"; \
+	fi
 
 ci: lint test build
 

@@ -11,6 +11,9 @@ Latest releases are always available via [releases].
 
 ### Added
 
+- `make tag`: tags the version from `VERSION` and pushes branch and tag by explicit name
+  (`NO_PUSH=1` keeps it local and prints the push command). Until now tags were set by hand.
+
 ### Changed
 
 ### Fixed
