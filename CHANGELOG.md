@@ -9,11 +9,6 @@ Latest releases are always available via [releases].
 
 ## [Unreleased] -
 
-### Fixed
-
-- License statement: README.md, src/templates/create/README.md and 05_add_suffix.ldif said GPL v3 (and named
-  oehrlis/docker); the project license is Apache 2.0 as in LICENSE and all other script headers
-
 ### Added
 
 - `make tag`: tags the version from `VERSION` and pushes branch and tag by explicit name
@@ -22,6 +17,9 @@ Latest releases are always available via [releases].
 ### Changed
 
 ### Fixed
+
+- License statement: README.md, src/templates/create/README.md and 05_add_suffix.ldif said GPL v3 (and named
+  oehrlis/docker); the project license is Apache 2.0 as in LICENSE and all other script headers
 
 ## [3.6.1] - 2025.06.30
 
