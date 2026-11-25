@@ -326,4 +326,4 @@ Please file your bug reports, enhancement requests, questions and other support 
 
 ## License
 
-oehrlis/docker is licensed under the GNU General Public License v3.0. You may obtain a copy of the License at <https://www.gnu.org/licenses/gpl.html>.
+oehrlis/oudbase is licensed under the Apache License, Version 2.0. You may obtain a copy of the License at <http://www.apache.org/licenses/LICENSE-2.0> or in the file [LICENSE](LICENSE).
